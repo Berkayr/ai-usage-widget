@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "generated_at": "2026-11-01T12:00:00Z",
+  "providers": [
+    {
+      "id": "claude",
+      "label": "Claude Code",
+      "plan": "DEMO",
+      "state": "OK",
+      "stale": false,
+      "category": "subscription",
+      "windows": [
+        {
+          "id": "five_hour",
+          "label": "5 hour",
+          "used_percent": 34,
+          "resets_in_minutes": 160,
+          "kind": "session",
+          "resets_at": "2026-11-01T14:40:00+00:00"
+        },
+        {
+          "id": "seven_day",
+          "label": "7 day",
+          "used_percent": 61,
+          "resets_in_minutes": 2310,
+          "kind": "weekly",
+          "resets_at": "2026-11-03T02:30:00+00:00"
+        }
+      ],
+      "meters": []
+    },
+    {
+      "id": "codex",
+      "label": "OpenAI Codex",
+      "plan": "DEMO",
+      "state": "OK",
+      "stale": false,
+      "category": "subscription",
+      "windows": [
+        {
+          "id": "primary",
+          "label": "5 hour",
+          "used_percent": 8,
+          "resets_in_minutes": 208,
+          "kind": "session",
+          "resets_at": "2026-11-01T15:28:00+00:00"
+        },
+        {
+          "id": "secondary",
+          "label": "7 day",
+          "used_percent": 77,
+          "resets_in_minutes": 3190,
+          "kind": "weekly",
+          "resets_at": "2026-11-03T17:10:00+00:00"
+        }
+      ],
+      "meters": []
+    },
+    {
+      "id": "gemini",
+      "label": "Google Gemini",
+      "plan": "DEMO",
+      "state": "OK",
+      "stale": false,
+      "category": "subscription",
+      "windows": [
+        {
+          "id": "gm-weekly",
+          "label": "Gemini Models \u00b7 weekly",
+          "used_percent": 28,
+          "resets_in_minutes": 2310,
+          "kind": "weekly",
+          "resets_at": "2026-11-03T02:30:00+00:00"
+        },
+        {
+          "id": "gm-5h",
+          "label": "Gemini Models \u00b7 5h",
+          "used_percent": 12,
+          "resets_in_minutes": 170,
+          "kind": "session",
+          "resets_at": "2026-11-01T14:50:00+00:00"
+        }
+      ],
+      "meters": []
+    }
+  ]
+}

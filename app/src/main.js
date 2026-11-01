@@ -172,3 +172,13 @@ else {
   } catch (error) { draw(sample, true); showToast(`Unable to load quota data: ${error}`); }
 }
 
+
+// Documentation captures can inject synthetic data only in explicit sample mode.
+if (new URLSearchParams(location.search).has('sample') && window.__QUOTA_DOCS_FIXTURE__) {
+  const fixture = window.__QUOTA_DOCS_FIXTURE__;
+  settings = { ...settings, ...fixture.settings };
+  applySettings();
+  draw(fixture.snapshot);
+  $('#settings').hidden = !fixture.openSettings;
+  window.__QUOTA_DOCS_READY__ = true;
+}
