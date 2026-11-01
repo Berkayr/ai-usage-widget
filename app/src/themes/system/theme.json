@@ -1,0 +1,39 @@
+{
+  "id": "system",
+  "name": "System",
+  "sizeTiers": {
+    "xs": 219,
+    "s": 319,
+    "m": 519,
+    "l": 960
+  },
+  "palettes": {
+    "default": {
+      "name": "Desktop",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#a3b8cc",
+      "severityNormal": "#a3b8cc",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#526b82",
+        "severityNormal": "#526b82",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c"
+      }
+    }
+  }
+}

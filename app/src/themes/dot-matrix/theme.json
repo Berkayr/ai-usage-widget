@@ -1,6 +1,6 @@
 {
   "id": "dot-matrix",
-  "name": "01 Dot Matrix",
+  "name": "Dot Matrix",
   "sizeTiers": {
     "xs": 300,
     "s": 380,
@@ -8,6 +8,34 @@
     "l": 700
   },
   "palettes": {
+    "slate": {
+      "name": "Slate",
+      "mode": "dark",
+      "bgWidget": "#20252b",
+      "bgCard": "#29313a",
+      "bgTrackOff": "#414d5a",
+      "textPrimary": "#F4F4F6",
+      "textSecondary": "#B0B0BA",
+      "textMuted": "#8E8E9E",
+      "border": "#4a5663",
+      "accent": "#a7bacb",
+      "severityNormal": "#F4F4F6",
+      "severityWarning": "#FF9E1B",
+      "severityDanger": "#FF2A2A",
+      "light": {
+        "bgWidget": "#eef1f4",
+        "bgCard": "#fafbfd",
+        "bgTrackOff": "#0000001a",
+        "textPrimary": "#1b1b1b",
+        "textSecondary": "#484846",
+        "textMuted": "#63635f",
+        "border": "#c9d1da",
+        "severityNormal": "#1b1b1b",
+        "severityWarning": "#855500",
+        "severityDanger": "#b91c1c",
+        "accent": "#526b82"
+      }
+    },
     "signal-orange": {
       "name": "Signal Orange",
       "mode": "dark",

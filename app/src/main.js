@@ -33,7 +33,7 @@ window.addEventListener('pagehide', dispose, { once: true, signal: domEvents.sig
 const isSample = new URLSearchParams(location.search).has('sample') || !('__TAURI_INTERNALS__' in window);
 const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'], window: 'session', showBars: false, offsetX: 0, style: 'transparent', theme: 'auto' };
 const systemAppearance = matchMedia('(prefers-color-scheme: light)');
-let settings = { theme: 'dot-matrix', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'signal-orange', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
+let settings = { theme: 'system', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'default', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
 try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
 let currentSnapshot = null;
 let currentNoData = false;
@@ -44,7 +44,7 @@ document.querySelector('#app').innerHTML = `
   <main class="widget" id="widget">
     <header class="header" data-tauri-drag-region><div class="title-block"><div class="app-title">AI QUOTA</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
     <section id="provider-onboarding" hidden></section><div class="provider-list" id="providers"></div>
-    <footer class="footer"><span>QUOTA MONITOR</span><span>MATRIX//01</span></footer>
+    <footer class="footer"><span>QUOTA MONITOR</span><span>SYSTEM</span></footer>
     <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><fieldset><legend>Providers &amp; privacy</legend><div id="provider-settings"></div></fieldset><fieldset><legend>About / Diagnostics</legend><p id="runtime-diagnostics" class="setting-note" role="status">Python diagnostics available in the desktop app.</p></fieldset><fieldset class="theme-section"><legend>Theme</legend><div class="theme-picker" id="theme-picker"></div></fieldset><fieldset class="look-section"><legend>Look</legend><label>Color mode<select id="color-mode"><option value="calm">Calm</option><option value="vivid">Vivid</option><option value="mono">Mono</option></select></label><label>Dot count<select id="dot-count"><option>10</option><option>20</option><option>30</option></select></label><label class="toggle-setting">Match physical size across monitors<input id="match-physical-size" type="checkbox"></label><label>Accent edge<select id="accent-edge"><option value="off">Off</option><option value="auto">Auto</option><option value="left">Left</option><option value="right">Right</option></select></label></fieldset><label>Appearance<select id="appearance"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label><label class="toggle-setting">Start at login<input id="start-at-login" type="checkbox" disabled></label><p id="autostart-status" class="setting-note" role="status" hidden></p><section id="linux-settings" hidden><fieldset class="desktop-settings" id="desktop-layer" hidden><legend>Desktop layer</legend><label>Layer<select id="linux-layer"><option value="top">Above windows</option><option value="bottom">On desktop</option></select></label><label>Margin <output id="linux-margin-out"></output><input id="linux-margin" type="range" min="0" max="64" step="1"></label><label>Monitor<select id="linux-monitor"><option value="">Auto</option></select></label></fieldset><p id="desktop-layer-unavailable" class="setting-note" hidden>Desktop layer controls require layer-shell support. Use your desktop's panel integration for a fixed position.</p></section><fieldset class="taskbar-settings" id="taskbar-settings"><legend>Taskbar strip</legend><label class="toggle-setting">Enable taskbar strip<input id="taskbar-enabled" type="checkbox"></label><div class="taskbar-providers"><label class="toggle-setting">Claude<input type="checkbox" data-taskbar-provider="claude"></label><label class="toggle-setting">Codex<input type="checkbox" data-taskbar-provider="codex"></label><label class="toggle-setting">Gemini<input type="checkbox" data-taskbar-provider="gemini"></label><label class="toggle-setting">Copilot<input type="checkbox" data-taskbar-provider="copilot"></label></div><label>Style<select id="taskbar-style"><option value="transparent">Transparent</option><option value="chip">Chip</option></select></label><label>Theme<select id="taskbar-theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Quota window<select id="taskbar-window"><option value="session">Session</option><option value="weekly">Weekly</option><option value="both">Both</option></select></label><label class="toggle-setting">Show mini bars<input id="taskbar-bars" type="checkbox"></label></fieldset></section>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
     <div class="toast" id="toast" hidden></div>
@@ -72,6 +72,9 @@ function applySettings() {
   if (settings.accent) document.documentElement.style.setProperty('--accent', settings.accent);
   if (settings.background) document.documentElement.style.setProperty('--bgWidget', settings.background);
   document.documentElement.dataset.mode = palette.mode;
+  // Native system accent when supported; no platform bridge or font embedding.
+  document.documentElement.style.setProperty('--systemAccent', settings.accent || (CSS.supports('color', 'AccentColor') && CSS.supports('color', 'AccentColorText') ? 'AccentColor' : palette.accent));
+  document.documentElement.style.setProperty('--systemAccentText', CSS.supports('color', 'AccentColorText') ? 'AccentColorText' : palette.textPrimary);
   settings.colorMode = ['calm', 'vivid', 'mono'].includes(settings.colorMode) ? settings.colorMode : 'calm';
   settings.accentEdge = ['off', 'auto', 'left', 'right'].includes(settings.accentEdge) ? settings.accentEdge : 'off';
   document.documentElement.dataset.colorMode = settings.colorMode;
@@ -196,7 +199,7 @@ async function persist() { if (!isSample) try { localStorage.setItem('widgetThem
 let toastTimer;
 function showToast(message) { clearTimeout(toastTimer); const el = $('#toast'); el.textContent = message; el.hidden = false; toastTimer = setTimeout(() => { el.hidden = true; }, 3200); }
 
-const previews = { 'dot-matrix': '••••••', 'circular-rings': '◉ ◎', terminal: '[▓▓░░]', 'frosted-glass': '▰ ▰', brutalist: '84%', 'compact-strip': '━ ━ ━', 'retro-lcd': '▮▮▮▯▯', 'minimal-pace': '──┊──' };
+const previews = { system: '━━━━', 'dot-matrix': '••••••', 'circular-rings': '◉ ◎', terminal: '[▓▓░░]', 'frosted-glass': '▰ ▰', brutalist: '84%', 'compact-strip': '━ ━ ━', 'retro-lcd': '▮▮▮▯▯', 'minimal-pace': '──┊──' };
 for (const item of themes) {
   const button = document.createElement('button');
   button.type = 'button'; button.dataset.theme = item.id; button.setAttribute('aria-pressed', 'false');
@@ -218,7 +221,7 @@ async function activateTheme(id) {
   if (!theme.palettes[settings.palette]) settings.palette = Object.keys(theme.palettes)[0];
   settings.accent = null; settings.background = null;
   document.querySelectorAll('.theme-picker [data-theme]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.theme === theme.id)));
-  $('.footer span:last-child').textContent = theme.id === 'dot-matrix' ? 'MATRIX//01' : theme.name.toUpperCase();
+  $('.footer span:last-child').textContent = theme.name.toUpperCase();
   applySettings();
   if (currentSnapshot) draw(currentSnapshot, currentNoData);
   requestFit();
@@ -279,11 +282,15 @@ async function loadDesktopSettings() {
 async function loadRuntimeDiagnostics() {
   if (isSample) return;
   const target = $('#runtime-diagnostics');
-  target.textContent = 'Checking Python runtime…';
-  try {
-    const { paths } = await invoke('get_runtime_diagnostics');
-    target.textContent = `Python ${paths.python_version} (${paths.runtime_source}) — ${paths.python}`;
-  } catch (error) { target.textContent = String(error); }
+  target.textContent = 'Checking runtime diagnostics…';
+  const [runtime, desktop] = await Promise.allSettled([
+    invoke('get_runtime_diagnostics'), invoke('get_desktop_info'),
+  ]);
+  const runtimeText = runtime.status === 'fulfilled'
+    ? `Python ${runtime.value.paths.python_version} (${runtime.value.paths.runtime_source}) — ${runtime.value.paths.python}`
+    : String(runtime.reason);
+  const monitorWarning = desktop.status === 'fulfilled' ? desktop.value.monitorWarning : null;
+  target.textContent = [runtimeText, monitorWarning].filter(Boolean).join(' • ');
 }
 $('#gear').onclick = () => { $('#settings').hidden = !$('#settings').hidden; if (!$('#settings').hidden) loadRuntimeDiagnostics(); };
 $('#close-settings').onclick = () => { $('#settings').hidden = true; };

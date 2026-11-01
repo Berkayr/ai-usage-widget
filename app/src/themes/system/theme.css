@@ -1,0 +1,13 @@
+@import '../shared/layout.css';
+:root[data-theme=system] {--systemFont:system-ui,"Segoe UI Variable","Segoe UI","Noto Sans","Adwaita Sans",Cantarell,sans-serif;font-family:var(--systemFont)}
+:root[data-theme=system] #widget, :root[data-theme=system] #widget * {font-family:var(--systemFont);letter-spacing:normal}
+:root[data-theme=system] .widget {border-radius:8px;box-shadow:none;--accent:var(--systemAccent);--severityNormal:var(--systemAccent)}
+:root[data-theme=system][data-color-mode=mono] .widget {--accent:var(--textPrimary);--severityNormal:var(--textPrimary)}
+:root[data-theme=system] .provider-card {border-radius:8px;box-shadow:none}
+:root[data-theme=system] .beacon {display:none}
+:root[data-theme=system] .app-title {font-size:17px;font-weight:600}
+:root[data-theme=system] .meter {height:6px;border-radius:3px;margin-top:6px}
+:root[data-theme=system] .window-top b {font-variant-numeric:tabular-nums}
+:root[data-theme=system] .settings, :root[data-theme=system] .gear {border-radius:8px;box-shadow:none}
+@container (min-width:520px) { :root[data-theme=system] .provider-list {grid-template-columns:1fr} }
+:root[data-theme=system] ::selection {background:var(--systemAccent);color:var(--systemAccentText)}

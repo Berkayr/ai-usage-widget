@@ -15,6 +15,7 @@ function meter(window, type) {
   const level = pct === null ? 'unknown' : severity(pct);
   const style = `--used:${pct ?? 0}%;--level:var(--severity${level === 'warning' ? 'Warning' : level === 'danger' ? 'Danger' : 'Normal'})`;
   const label = pct === null ? 'Usage unknown' : `${Math.round(pct)}% used`;
+  if (type === 'system') return `<div class="meter ${pct === null ? 'unknown' : ''}" data-severity="${level}" style="${style}" role="img" aria-label="${label}"><i></i></div>`;
   const count = dotCount(), active = pct === null ? 0 : Math.round(pct * count / 100);
   return `<div class="segments ${type} ${pct === null ? 'unknown' : ''}" style="${style}" role="img" aria-label="${label}">${Array.from({length: count}, (_,i) => `<i class="${i < active ? `on ${pct >= 50 && i >= Math.floor(count / 2) - 1 ? 'threshold' : ''}` : ''}"></i>`).join('')}${type === 'minimal-pace' && elapsed !== null ? `<em style="left:${elapsed}%" title="${Math.round(elapsed)}% of interval elapsed"></em>` : ''}</div>`;
 }
