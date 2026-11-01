@@ -1,0 +1,35 @@
+# Source package draft. Place a reviewed source release beside this PKGBUILD.
+# Replace SKIP with the release SHA-256 before publishing to the AUR.
+pkgname=ai-quota-widget
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Desktop AI subscription quota widget and panel reader'
+arch=('x86_64' 'aarch64')
+license=('custom')
+depends=('webkit2gtk-4.1' 'gtk3' 'python')
+makedepends=('rust' 'cargo' 'nodejs' 'npm' 'python-build' 'python-installer' 'python-wheel' 'python-setuptools')
+optdepends=('gtk-layer-shell: native Wayland corner placement'
+            'plasma5support: Plasma panel widget'
+            'waybar: wlroots panel integration')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  cd "$pkgname-$pkgver"
+  python -m build --wheel --no-isolation
+  cd app
+  npm ci
+  npm run build
+  npx tauri build --no-bundle
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  python -m installer --destdir="$pkgdir" dist/*.whl
+  install -Dm755 packaging/bin/quotacore "$pkgdir/usr/bin/quotacore"
+  install -Dm755 app/src-tauri/target/release/ai-quota-widget "$pkgdir/usr/bin/ai-quota-widget"
+  install -Dm644 packaging/dev.aiquota.widget.desktop "$pkgdir/usr/share/applications/dev.aiquota.widget.desktop"
+  install -Dm644 app/src-tauri/icons/128x128.png "$pkgdir/usr/share/icons/hicolor/128x128/apps/dev.aiquota.widget.png"
+  install -dm755 "$pkgdir/usr/share/ai-quota-widget"
+  cp -r integrations "$pkgdir/usr/share/ai-quota-widget/"
+}

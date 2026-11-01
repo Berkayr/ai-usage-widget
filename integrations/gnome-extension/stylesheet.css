@@ -1,0 +1,4 @@
+/* Shell theme supplies the normal foreground. Text also carries percentage/state. */
+.quota-unknown { opacity: 0.65; }
+.quota-warn { font-weight: bold; }
+.quota-crit { font-weight: bold; text-decoration: underline; }

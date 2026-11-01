@@ -1,3 +1,5 @@
+#[cfg(target_os = "linux")]
+mod linux;
 #[cfg(windows)]
 mod taskbar;
 use notify::{RecursiveMode, Watcher};
@@ -7,14 +9,15 @@ use std::{fs, path::PathBuf, process::{Command, Stdio}, thread, time::Duration};
 use tauri::{Emitter, Manager};
 
 #[derive(Clone, Serialize, Deserialize)]
-struct Settings { palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale")] scale: u16, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default)] taskbar: TaskbarSettings }
+struct Settings { #[cfg(target_os = "linux")] #[serde(default)] linux: linux::Options, #[serde(default="default_auto")] appearance: String, palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale")] scale: u16, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default)] taskbar: TaskbarSettings }
+fn default_auto() -> String { "auto".into() }
 fn default_fit_height() -> bool { true } fn default_scale() -> u16 { 100 } fn default_position() -> String { "Top right".into() }
-impl Default for Settings { fn default() -> Self { Self { palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 94, fit_height: true, scale: 100, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
+impl Default for Settings { fn default() -> Self { Self { #[cfg(target_os = "linux")] linux: linux::Options::default(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 94, fit_height: true, scale: 100, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
-struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32 }
+struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32, style: String, theme: String }
 impl Default for TaskbarSettings {
-    fn default() -> Self { Self { enabled: false, providers: vec!["claude".into(), "codex".into(), "gemini".into()], window: "session".into(), show_bars: false, offset_x: 0 } }
+    fn default() -> Self { Self { enabled: false, providers: vec!["claude".into(), "codex".into(), "gemini".into()], window: "session".into(), show_bars: false, offset_x: 0, style: "transparent".into(), theme: default_auto() } }
 }
 #[derive(Clone, Serialize)]
 struct SnapshotEvent { snapshot: Option<Value> }
@@ -59,8 +62,11 @@ fn refresh_now(app: tauri::AppHandle) -> Result<(), String> { refresh()?; emit_s
 #[tauri::command]
 fn load_settings() -> Settings { fs::read(settings_path()).ok().and_then(|data| serde_json::from_slice(&data).ok()).unwrap_or_default() }
 #[tauri::command]
-fn save_settings(settings: Settings) -> Result<(), String> { let path = settings_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?; fs::write(path, serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?; #[cfg(windows)] taskbar::update_settings(settings.taskbar); Ok(()) }
+fn save_settings(window: tauri::WebviewWindow, settings: Settings) -> Result<(), String> { #[cfg(target_os = "linux")] { let options=settings.linux.clone(); let corner=settings.position.clone(); let target=window.clone(); let _=window.run_on_main_thread(move ||linux::apply(&target,&options,&corner)); } let path = settings_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?; fs::write(path, serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?; #[cfg(windows)] taskbar::update_settings(settings.taskbar); Ok(()) }
 fn current_monitor(window: &tauri::WebviewWindow) -> Result<tauri::Monitor, String> {
+    #[cfg(target_os = "linux")]
+    if linux::wayland() { let options=load_settings().linux; let monitors=window.available_monitors().map_err(|e|e.to_string())?; return options.monitor.and_then(|i|monitors.get(i as usize).cloned()).or_else(||window.primary_monitor().ok().flatten()).or_else(||monitors.into_iter().next()).ok_or_else(||"No monitor available".into()); }
+    if let Some(monitor)=window.current_monitor().map_err(|e|e.to_string())? { return Ok(monitor); }
     let position = window.outer_position().map_err(|e| e.to_string())?;
     window.available_monitors().map_err(|e| e.to_string())?.into_iter().min_by_key(|monitor| { let area=monitor.work_area(); let cx=position.x+window.outer_size().map(|s|s.width as i32/2).unwrap_or(0); let cy=position.y+window.outer_size().map(|s|s.height as i32/2).unwrap_or(0); let x=(cx-(area.position.x+area.size.width as i32/2)).abs(); let y=(cy-(area.position.y+area.size.height as i32/2)).abs(); x.saturating_add(y) }).ok_or_else(||"No monitor available".into())
 }
@@ -77,18 +83,23 @@ fn fit_window_height(window: tauri::WebviewWindow, height_css_px: f64) -> Result
     if !load_settings().fit_height { return Ok(()); }
     let factor=window.scale_factor().map_err(|e|e.to_string())?; let monitor=current_monitor(&window)?; let area=monitor.work_area();
     let height=((height_css_px.max(80.0)*factor).round() as u32).min(area.size.height);
-    let old_position=window.outer_position().map_err(|e|e.to_string())?; let old_size=window.inner_size().map_err(|e|e.to_string())?;
+    let old_position=window.outer_position().unwrap_or(tauri::PhysicalPosition::new(0,0)); let old_size=window.inner_size().map_err(|e|e.to_string())?;
     if (old_size.height as i64 - height as i64).abs() <= 1 { return Ok(()); }
     window.set_size(tauri::PhysicalSize::new(old_size.width,height)).map_err(|e|e.to_string())?;
     let settings=load_settings(); if settings.position!="Free" { snap_window(window,settings.position) } else { let area=monitor.work_area(); let new_y=if old_position.y+old_size.height as i32/2 > area.position.y+area.size.height as i32/2 { area.position.y+area.size.height as i32-height as i32 } else { old_position.y }; window.set_position(tauri::PhysicalPosition::new(old_position.x,new_y)).map_err(|e|e.to_string()) }
 }
 #[tauri::command]
 fn snap_window(window: tauri::WebviewWindow, corner: String) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    if linux::layered() { if corner=="Free" { return Err("Free positioning requires an X11 window; choose a corner on Wayland".into()); } let options=load_settings().linux; let target=window.clone(); return window.run_on_main_thread(move ||linux::apply(&target,&options,&corner)).map_err(|e|e.to_string()); }
     if corner=="Free" { return Ok(()); }
     let monitor=current_monitor(&window)?; let area=monitor.work_area(); let size=window.outer_size().map_err(|e|e.to_string())?;
     let left=corner.ends_with("left"); let top=corner.starts_with("Top");
-    let x=if left {area.position.x} else {area.position.x+area.size.width as i32-size.width as i32};
-    let y=if top {area.position.y} else {area.position.y+area.size.height as i32-size.height as i32};
+    #[cfg(target_os="linux")] let margin=(load_settings().linux.margin.clamp(0,500) as f64 * monitor.scale_factor()).round() as i32;
+    #[cfg(not(target_os="linux"))] let margin=0;
+
+    let x=if left {area.position.x+margin} else {area.position.x+area.size.width as i32-size.width as i32-margin};
+    let y=if top {area.position.y+margin} else {area.position.y+area.size.height as i32-size.height as i32-margin};
     window.set_position(tauri::PhysicalPosition::new(x,y)).map_err(|e|e.to_string())
 }
 #[tauri::command]
@@ -130,6 +141,12 @@ fn start_background(app: tauri::AppHandle) {
         }
     });
 }
+#[tauri::command]
+fn get_linux_hint() -> Option<&'static str> { #[cfg(target_os="linux")] { return linux::placement_hint(); } #[cfg(not(target_os="linux"))] { None } }
+#[tauri::command]
+fn set_autostart(enabled: bool) -> Result<(),String> { #[cfg(target_os="linux")] { return linux::set_autostart(enabled); } #[cfg(not(target_os="linux"))] { let _=enabled; Err("Autostart command is currently supported on Linux".into()) } }
+#[tauri::command]
+fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window]).setup(|app| { if let Some(window)=app.get_webview_window("main") { restore_window(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { #[cfg(target_os="linux")] linux::configure_python(app); if let Some(window)=app.get_webview_window("main") { restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
 }

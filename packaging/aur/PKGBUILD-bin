@@ -1,0 +1,22 @@
+# Binary package draft. Place the reviewed AppImage beside this file.
+# Save as PKGBUILD and replace SKIP with the published checksum before use.
+pkgname=ai-quota-widget-bin
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Desktop AI subscription quota widget (prebuilt AppImage)'
+arch=('x86_64')
+license=('custom')
+provides=('ai-quota-widget')
+conflicts=('ai-quota-widget')
+depends=('fuse2' 'python')
+optdepends=('gtk-layer-shell: native Wayland corner placement')
+source=("ai-quota-widget-$pkgver-x86_64.AppImage")
+sha256sums=('SKIP')
+
+package() {
+  install -Dm755 "ai-quota-widget-$pkgver-x86_64.AppImage" "$pkgdir/opt/ai-quota-widget/ai-quota-widget.AppImage"
+  install -dm755 "$pkgdir/usr/bin" "$pkgdir/usr/share/applications"
+  printf '#!/bin/sh\nexec /opt/ai-quota-widget/ai-quota-widget.AppImage "$@"\n' > "$pkgdir/usr/bin/ai-quota-widget"
+  chmod 755 "$pkgdir/usr/bin/ai-quota-widget"
+  printf '[Desktop Entry]\nType=Application\nName=AI Quota Widget\nExec=ai-quota-widget\nTerminal=false\nCategories=Utility;Monitor;\n' > "$pkgdir/usr/share/applications/dev.aiquota.widget.desktop"
+}

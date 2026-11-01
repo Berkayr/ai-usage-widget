@@ -1,0 +1,11 @@
+{
+  "KPlugin": {
+    "Id": "io.github.aiquota.panel",
+    "Name": "AI Quota",
+    "Description": "AI subscription quotas from the shared quotacore snapshot",
+    "Version": "0.1.0",
+    "Icon": "office-chart-bar"
+  },
+  "KPackageStructure": "Plasma/Applet",
+  "X-Plasma-API-Minimum-Version": "6.0"
+}

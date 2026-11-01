@@ -1,0 +1,3 @@
+[ai-quota]
+command=python3 -m quotacore bar --format i3blocks --providers claude,codex --window session
+interval=30

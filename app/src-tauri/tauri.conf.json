@@ -3,7 +3,70 @@
   "productName": "AI Quota Widget",
   "version": "0.1.0",
   "identifier": "dev.aiquota.widget",
-  "build": { "beforeDevCommand": "npm run dev", "devUrl": "http://localhost:5173", "beforeBuildCommand": "npm run build", "frontendDist": "../dist" },
-  "app": { "windows": [{ "label": "main", "title": "AI Quota Widget", "width": 340, "height": 640, "decorations": false, "transparent": true, "skipTaskbar": true, "resizable": true, "alwaysOnTop": false, "visible": true }], "security": { "csp": "default-src 'self'; img-src 'self' asset: data:; style-src 'self' 'unsafe-inline'; font-src 'self' asset: data:; connect-src ipc: http://ipc.localhost" } },
-  "bundle": { "active": true, "targets": "all" }
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "AI Quota Widget",
+        "width": 340,
+        "height": 640,
+        "decorations": false,
+        "transparent": true,
+        "skipTaskbar": true,
+        "resizable": true,
+        "alwaysOnTop": false,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: data:; style-src 'self' 'unsafe-inline'; font-src 'self' asset: data:; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "appimage",
+      "deb",
+      "rpm"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.icns"
+    ],
+    "linux": {
+      "deb": {
+        "depends": [
+          "python3",
+          "libgtk-3-0",
+          "libwebkit2gtk-4.1-0"
+        ],
+        "files": {
+          "/usr/bin/quotacore": "../../packaging/bin/quotacore"
+        }
+      },
+      "rpm": {
+        "depends": [
+          "python3",
+          "gtk3",
+          "webkit2gtk4.1"
+        ],
+        "files": {
+          "/usr/bin/quotacore": "../../packaging/bin/quotacore"
+        }
+      }
+    },
+    "resources": {
+      "../../quotacore/*.py": "quotacore/",
+      "../../quotacore/providers/*.py": "quotacore/providers/"
+    }
+  }
 }

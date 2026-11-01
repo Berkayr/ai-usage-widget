@@ -166,6 +166,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="quotacore")
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="command", required=True)
+    bar_parser = sub.add_parser("bar", help="read the shared snapshot for a desktop panel")
+    bar_parser.add_argument("--format", choices=("plain", "waybar", "polybar", "i3blocks", "json"), default="plain")
+    bar_parser.add_argument("--providers", default="claude,codex")
+    bar_parser.add_argument("--window", choices=("session", "weekly", "both"), default="session")
     sub.add_parser("snapshot")
     write_parser = sub.add_parser("write")
     write_parser.add_argument("--print", dest="print_snapshot", action="store_true",
@@ -189,7 +193,13 @@ def main(argv: list[str] | None = None) -> int:
     pace_parser.add_argument("--from-file")
     pace_parser.add_argument("--no-log", action="store_true")
     args = parser.parse_args(argv)
-    if args.command == "snapshot":
+    if args.command == "bar":
+        from .bar import render
+        providers = list(dict.fromkeys(x.strip() for x in args.providers.split(",") if x.strip()))
+        if not providers or any(x not in PROVIDERS for x in providers):
+            parser.error("--providers must be a comma-separated list of known provider IDs")
+        print(render(args.format, providers, args.window))
+    elif args.command == "snapshot":
         print(json.dumps(collect(), ensure_ascii=False, indent=2))
     elif args.command == "write":
         result = write_snapshot()

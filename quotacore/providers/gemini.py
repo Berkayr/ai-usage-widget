@@ -24,6 +24,11 @@ def _agy() -> str | None:
         candidate = Path(os.environ.get("LOCALAPPDATA", "")) / "agy" / "bin" / "agy.exe"
         if candidate.is_file():
             return str(candidate)
+    else:
+        # Desktop launchers do not normally inherit the user's shell PATH.
+        candidate = Path.home() / ".local" / "bin" / "agy"
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return str(candidate)
     return None
 
 
@@ -107,6 +112,8 @@ def read_snapshot() -> dict[str, Any] | None:
             label = str(item.get("window") or item.get("label") or item.get("name") or item.get("id") or "Quota")
             pct = item.get("used_percent", item.get("usedPercent"))
             minutes = _window_minutes(item.get("window"))
+            if minutes is None and isinstance(item.get("window_minutes"), int):
+                minutes = item["window_minutes"]
             if pct is None and item.get("remaining_fraction") is not None:
                 remaining = number(item.get("remaining_fraction"))
                 pct = (1 - remaining) * 100 if remaining is not None else None
@@ -163,8 +170,11 @@ def refresh_gemini(timeout: float = 45.0) -> int:
                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         if result.returncode != 0:
             return result.returncode or 1
-        parsed = None
-        for line in reversed(result.stdout.splitlines()):
+        try:
+            parsed = json.loads(result.stdout)
+        except ValueError:
+            parsed = None
+        for line in ([] if isinstance(parsed, dict) else reversed(result.stdout.splitlines())):
             if line.lstrip().startswith("{"):
                 try:
                     parsed = json.loads(line)
