@@ -13,7 +13,7 @@ import { listen } from '@tauri-apps/api/event';
 const isSample = new URLSearchParams(location.search).has('sample') || !('__TAURI_INTERNALS__' in window);
 const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'], window: 'session', showBars: false, offsetX: 0, style: 'transparent', theme: 'auto' };
 const systemAppearance = matchMedia('(prefers-color-scheme: light)');
-let settings = { theme: 'dot-matrix', appearance: 'auto', taskbar: { ...defaultTaskbar }, palette: 'signal-orange', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 94, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
+let settings = { theme: 'dot-matrix', appearance: 'auto', colorMode: 'calm', accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'signal-orange', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
 try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
 let currentSnapshot = null;
 let currentNoData = false;
@@ -24,12 +24,24 @@ document.querySelector('#app').innerHTML = `
     <header class="header" data-tauri-drag-region><div class="title-block"><div class="app-title">AI QUOTA</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
     <div class="provider-list" id="providers"></div>
     <footer class="footer"><span>QUOTA MONITOR</span><span>MATRIX//01</span></footer>
-    <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><fieldset class="theme-section"><legend>Theme</legend><div class="theme-picker" id="theme-picker"></div></fieldset><label>Appearance<select id="appearance"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label><label class="toggle-setting">Start at login<input id="start-at-login" type="checkbox" disabled></label><p id="autostart-status" class="setting-note" role="status" hidden></p><section id="linux-settings" hidden><fieldset class="desktop-settings" id="desktop-layer" hidden><legend>Desktop layer</legend><label>Layer<select id="linux-layer"><option value="top">Above windows</option><option value="bottom">On desktop</option></select></label><label>Margin <output id="linux-margin-out"></output><input id="linux-margin" type="range" min="0" max="64" step="1"></label><label>Monitor<select id="linux-monitor"><option value="">Auto</option></select></label></fieldset><p id="desktop-layer-unavailable" class="setting-note" hidden>Desktop layer controls require layer-shell support. Use your desktop's panel integration for a fixed position.</p></section><fieldset class="taskbar-settings" id="taskbar-settings"><legend>Taskbar strip</legend><label class="toggle-setting">Enable taskbar strip<input id="taskbar-enabled" type="checkbox"></label><div class="taskbar-providers"><label class="toggle-setting">Claude<input type="checkbox" data-taskbar-provider="claude"></label><label class="toggle-setting">Codex<input type="checkbox" data-taskbar-provider="codex"></label><label class="toggle-setting">Gemini<input type="checkbox" data-taskbar-provider="gemini"></label><label class="toggle-setting">Copilot<input type="checkbox" data-taskbar-provider="copilot"></label></div><label>Style<select id="taskbar-style"><option value="transparent">Transparent</option><option value="chip">Chip</option></select></label><label>Theme<select id="taskbar-theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Quota window<select id="taskbar-window"><option value="session">Session</option><option value="weekly">Weekly</option><option value="both">Both</option></select></label><label class="toggle-setting">Show mini bars<input id="taskbar-bars" type="checkbox"></label></fieldset></section>
+    <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><fieldset class="theme-section"><legend>Theme</legend><div class="theme-picker" id="theme-picker"></div></fieldset><fieldset class="look-section"><legend>Look</legend><label>Color mode<select id="color-mode"><option value="calm">Calm</option><option value="vivid">Vivid</option></select></label><label>Accent edge<select id="accent-edge"><option value="off">Off</option><option value="auto">Auto</option><option value="left">Left</option><option value="right">Right</option></select></label></fieldset><label>Appearance<select id="appearance"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label><label class="toggle-setting">Start at login<input id="start-at-login" type="checkbox" disabled></label><p id="autostart-status" class="setting-note" role="status" hidden></p><section id="linux-settings" hidden><fieldset class="desktop-settings" id="desktop-layer" hidden><legend>Desktop layer</legend><label>Layer<select id="linux-layer"><option value="top">Above windows</option><option value="bottom">On desktop</option></select></label><label>Margin <output id="linux-margin-out"></output><input id="linux-margin" type="range" min="0" max="64" step="1"></label><label>Monitor<select id="linux-monitor"><option value="">Auto</option></select></label></fieldset><p id="desktop-layer-unavailable" class="setting-note" hidden>Desktop layer controls require layer-shell support. Use your desktop's panel integration for a fixed position.</p></section><fieldset class="taskbar-settings" id="taskbar-settings"><legend>Taskbar strip</legend><label class="toggle-setting">Enable taskbar strip<input id="taskbar-enabled" type="checkbox"></label><div class="taskbar-providers"><label class="toggle-setting">Claude<input type="checkbox" data-taskbar-provider="claude"></label><label class="toggle-setting">Codex<input type="checkbox" data-taskbar-provider="codex"></label><label class="toggle-setting">Gemini<input type="checkbox" data-taskbar-provider="gemini"></label><label class="toggle-setting">Copilot<input type="checkbox" data-taskbar-provider="copilot"></label></div><label>Style<select id="taskbar-style"><option value="transparent">Transparent</option><option value="chip">Chip</option></select></label><label>Theme<select id="taskbar-theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Quota window<select id="taskbar-window"><option value="session">Session</option><option value="weekly">Weekly</option><option value="both">Both</option></select></label><label class="toggle-setting">Show mini bars<input id="taskbar-bars" type="checkbox"></label></fieldset></section>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
     <div class="toast" id="toast" hidden></div>
   </main>`;
 
 const $ = (selector) => document.querySelector(selector);
+// Palette files use opaque hex colors. Correct text against its actual surface.
+const rgb = hex => hex.replace('#', '').match(/../g).slice(0, 3).map(n => parseInt(n, 16));
+function mix(a, b, weight) { return '#' + rgb(a).map((v, i) => Math.round(v * weight + rgb(b)[i] * (1 - weight)).toString(16).padStart(2, '0')).join(''); }
+function luminance(hex) { return rgb(hex).map(v => { v /= 255; return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }).reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0); }
+function readable(color, background) {
+  const bg = luminance(background), target = bg > .179 ? '#000000' : '#ffffff';
+  for (let i = 0; i <= 100; i++) {
+    const candidate = mix(color, target, 1 - i / 100), value = luminance(candidate);
+    if ((Math.max(value, bg) + .05) / (Math.min(value, bg) + .05) >= 5) return candidate;
+  }
+  return target;
+}
 function applySettings() {
   if (!theme) return;
   const selected = theme.palettes[settings.palette] || Object.values(theme.palettes)[0];
@@ -39,10 +51,35 @@ function applySettings() {
   if (settings.accent) document.documentElement.style.setProperty('--accent', settings.accent);
   if (settings.background) document.documentElement.style.setProperty('--bgWidget', settings.background);
   document.documentElement.dataset.mode = palette.mode;
+  settings.colorMode = ['calm', 'vivid'].includes(settings.colorMode) ? settings.colorMode : 'calm';
+  settings.accentEdge = ['off', 'auto', 'left', 'right'].includes(settings.accentEdge) ? settings.accentEdge : 'off';
+  document.documentElement.dataset.colorMode = settings.colorMode;
+  document.documentElement.dataset.accentEdge = settings.accentEdge === 'auto'
+    ? (settings.position.endsWith('left') ? 'left' : settings.position.endsWith('right') ? 'right' : 'off') : settings.accentEdge;
+  const card = palette.bgCard, background = settings.background || palette.bgWidget;
+  const neutral = mode === 'light' ? '#292d32' : '#e0e3e7';
+  const foreground = settings.colorMode === 'calm' ? mix(palette.textPrimary, neutral, .25) : palette.textPrimary;
+  const primary = readable(foreground, card);
+  const calmText = color => settings.colorMode === 'calm' ? mix(color, neutral, .25) : color;
+  for (const [key, value] of Object.entries({
+    textPrimary: primary,
+    textSecondary: readable(calmText(palette.textSecondary), card),
+    textMuted: readable(calmText(palette.textMuted), card),
+    chromeText: readable(foreground, background),
+    chromeSecondary: readable(calmText(palette.textMuted), background),
+  })) document.documentElement.style.setProperty(`--${key}`, value);
+  if (settings.colorMode === 'calm') {
+    document.documentElement.style.setProperty('--severityNormal', primary);
+    document.documentElement.style.setProperty('--severityWarning', readable(mode === 'light' ? '#805c29' : '#c6ab7d', card));
+    document.documentElement.style.setProperty('--severityDanger', readable(mode === 'light' ? '#99494b' : '#d29898', card));
+  }
+  $('#color-mode').value = settings.colorMode;
+  $('#accent-edge').value = settings.accentEdge;
+  if (currentSnapshot) draw(currentSnapshot, currentNoData);
   document.documentElement.style.setProperty('--widget-opacity', settings.widgetOpacity / 100);
   document.documentElement.style.setProperty('--background-opacity', settings.backgroundOpacity / 100);
   document.documentElement.style.setProperty('--ui-scale', settings.scale / 100);
-  document.querySelector('#app').style.zoom = String(settings.scale / 100);
+  document.documentElement.style.fontSize = `${16 * settings.scale / 100}px`;
   document.documentElement.classList.toggle('fit-height', Boolean(settings.fitHeight)); lastFitHeight = 0;
   settings.taskbar = { ...defaultTaskbar, ...settings.taskbar };
   if (desktopInfo?.platform === 'linux') {
@@ -94,7 +131,7 @@ function currentSample() {
   const now = Date.now();
   return { ...sample, generated_at: new Date(now).toISOString(), providers: sample.providers.map(provider => ({ ...provider, windows: (provider.windows || []).map(window => ({ ...window, resets_at: Number.isFinite(window.resets_in_minutes) ? new Date(now + window.resets_in_minutes * 60000).toISOString() : null })) })) };
 }
-async function persist() { if (!isSample) try { localStorage.setItem('widgetTheme', settings.theme); } catch {} if (!isSample) try { await invoke('save_settings', { settings }); } catch (error) { showToast(String(error)); } }
+async function persist() { if (!isSample) try { localStorage.setItem('widgetTheme', settings.theme); localStorage.setItem('widgetLook', JSON.stringify({ colorMode: settings.colorMode, accentEdge: settings.accentEdge })); } catch {} if (!isSample) try { await invoke('save_settings', { settings }); } catch (error) { showToast(String(error)); } }
 function showToast(message) { const el = $('#toast'); el.textContent = message; el.hidden = false; setTimeout(() => { el.hidden = true; }, 3200); }
 
 const previews = { 'dot-matrix': '••••••', 'circular-rings': '◉ ◎', terminal: '[▓▓░░]', 'frosted-glass': '▰ ▰', brutalist: '84%', 'compact-strip': '━ ━ ━', 'retro-lcd': '▮▮▮▯▯', 'minimal-pace': '──┊──' };
@@ -125,6 +162,7 @@ async function activateTheme(id) {
   requestFit();
 }
 systemAppearance.addEventListener('change', () => { if (settings.appearance === 'auto') applySettings(); });
+for (const [id, key] of [['color-mode', 'colorMode'], ['accent-edge', 'accentEdge']]) $(`#${id}`).onchange = async event => { settings[key] = event.target.value; applySettings(); await persist(); };
 $('#appearance').onchange = async event => { settings.appearance = event.target.value; applySettings(); await persist(); };
 for (const key of ['style', 'theme']) $(`#taskbar-${key}`).onchange = async event => { settings.taskbar[key] = event.target.value; await persist(); };
 $('#taskbar-enabled').onchange = async event => { settings.taskbar.enabled = event.target.checked; await persist(); };
@@ -184,7 +222,7 @@ $('#show-extra-windows').onchange = async (event) => { settings.showExtraWindows
 $('#scale').oninput = async event => { settings.scale = Number(event.target.value); applySettings(); requestFit(); await persist(); };
 document.querySelectorAll('[data-scale]').forEach(button => button.onclick = async () => { settings.scale = Number(button.dataset.scale); applySettings(); requestFit(); await persist(); });
 $('#fit-height').onchange = async event => { settings.fitHeight = event.target.checked; applySettings(); if (settings.fitHeight) requestFit(); await persist(); };
-$('#position').onchange = async event => { settings.position = event.target.value; if (!isSample) try { await invoke('snap_window', { corner: settings.position }); } catch (error) { showToast(String(error)); } await persist(); };
+$('#position').onchange = async event => { settings.position = event.target.value; applySettings(); if (!isSample) try { await invoke('snap_window', { corner: settings.position }); } catch (error) { showToast(String(error)); } await persist(); };
 $('#widget').addEventListener('contextmenu', event => { event.preventDefault(); $('#context-menu').hidden = false; $('#context-menu').style.left = `${event.clientX}px`; $('#context-menu').style.top = `${event.clientY}px`; });
 document.addEventListener('click', event => { if (!event.target.closest('#context-menu')) $('#context-menu').hidden = true; });
 $('#refresh').onclick = async () => { if (isSample) return draw(currentSample()); try { await invoke('refresh_now'); } catch (error) { showToast(String(error)); } };
@@ -199,7 +237,7 @@ else {
     settings = { ...settings, ...(await invoke('load_settings')) };
     // Older native settings structs discard unknown fields; keep the theme in
     // the webview store until the native schema includes it.
-    try { settings.theme = localStorage.getItem('widgetTheme') || settings.theme; } catch {}
+    try { settings.theme = localStorage.getItem('widgetTheme') || settings.theme; Object.assign(settings, JSON.parse(localStorage.getItem('widgetLook') || '{}')); } catch {}
     const overrides = { accent: settings.accent, background: settings.background };
     await activateTheme(settings.theme); Object.assign(settings, overrides); applySettings();
     await loadDesktopSettings();

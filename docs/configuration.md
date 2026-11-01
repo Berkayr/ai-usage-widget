@@ -2,6 +2,8 @@
 
 Display settings and quota collection settings are separate. Change display settings using the gear button; do not edit files while the widget is saving them. The browser's `?sample` mode uses synthetic data and never saves native settings.
 
+New Look fields default to Calm/Off when missing. Until the native settings schema supports them, these two fields also persist in the local webview store; they are not portable by copying `settings.json` alone.
+
 ## Display settings
 
 `settings.json` lives in the operating system's config directory under `ai-quota-widget`: Linux `$XDG_CONFIG_HOME/ai-quota-widget` (normally `~/.config/ai-quota-widget`); Windows `%APPDATA%/ai-quota-widget`. Window geometry is saved separately in `window.json`. `QUOTACORE_HOME` does **not** relocate display settings.
@@ -9,11 +11,13 @@ Display settings and quota collection settings are separate. Change display sett
 | Field | Default | Meaning |
 | --- | --- | --- |
 | `appearance` | `auto` | `auto`, `light`, `dark`; auto follows OS color preference live. |
+| `colorMode` | `calm` | Neutral usage through 50%, soft amber above 50%, muted red from 80%; `vivid` restores theme colors. |
+| `accentEdge` | `off` | `off`, `auto`, `left`, `right`; Auto follows the selected corner, with no edge in Free placement. |
 | `palette` | `signal-orange` | `signal-orange`, `sakura-pink`, `nord`, `mono-paper`. |
 | `accent`, `background` | `null` | Optional CSS color overrides; choosing a palette clears these overrides. |
 | `widgetOpacity` | `100` | Opacity of the entire widget, including text; UI range 20–100. |
-| `backgroundOpacity` | `94` | Background opacity, 0–100; this does not enable compositor blur. |
-| `scale` | `100` | UI zoom, 50–300%; presets 75/100/150/200. Ctrl +/− changes by 10, Ctrl+0 restores 100. |
+| `backgroundOpacity` | `100` | Background opacity, 0–100; this does not enable compositor blur. |
+| `scale` | `100` | Rem-based text and layout scale, 50–300%; presets 75/100/150/200. Ctrl +/− changes by 10, Ctrl+0 restores 100. |
 | `fitHeight` | `true` | Resize to content height. Width still controls the responsive layout. |
 | `position` | `Top right` | Top/Bottom + left/right corners, or `Free` where supported. |
 | `showExtraWindows` | `false` | Reveal secondary/model windows that the source marks hidden. |

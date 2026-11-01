@@ -2,7 +2,10 @@ const hiddenStates = new Set(['DISABLED', 'NOT_INSTALLED', 'NO_SUBSCRIPTION']);
 const abbreviations = { claude: 'CL', codex: 'CX', gemini: 'GM', copilot: 'CP', openrouter: 'OR', deepseek: 'DS', jetbrains: 'JB', 'jetbrains-ai': 'JB' };
 const providerNames = { claude: 'Claude', codex: 'Codex', gemini: 'Gemini', copilot: 'Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains' };
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const severity = pct => pct > 80 ? 'danger' : pct >= 50 ? 'warning' : 'normal';
+const severity = pct => {
+  const calm = typeof document !== 'undefined' && document.documentElement.dataset.colorMode === 'calm';
+  return (calm ? pct >= 80 : pct > 80) ? 'danger' : (calm ? pct > 50 : pct >= 50) ? 'warning' : 'normal';
+};
 function countdown(value) {
   if (!value) return 'RESET UNKNOWN';
   const delta = new Date(value).getTime() - Date.now();
@@ -56,7 +59,7 @@ function providerCard(provider, showExtraWindows) {
   const compact = apiBalance
     ? `<div class="compact-api">${escapeHtml(abbreviation)} ${meters.filter(m => m.unit === 'USD').map(m => `$${typeof m.remaining === 'number' ? m.remaining.toFixed(2) : '—'}`).join(' ') || '—'}</div>`
     : `<div class="compact-content">${compactLine('5H', primary)}${compactLine('WK', weekly)}</div>`;
-  const xs = apiBalance ? '' : `<div class="xs-content"><span class="xs-name">${issue ? '! ' : ''}${escapeHtml(abbreviation)}</span>${dots(pctOf(primary), 8)}<b data-severity="${pctOf(primary) === null ? 'unknown' : severity(pctOf(primary))}">${pctOf(primary) === null ? '—' : `${Math.round(pctOf(primary))}%`}</b><small>${weekly && pctOf(weekly) !== null ? `${Math.round(pctOf(weekly))}%` : '—'}</small></div>`;
+  const xs = apiBalance ? '' : `<div class="xs-content"><span class="xs-name">${issue ? '! ' : ''}${escapeHtml(abbreviation)}</span>${dots(pctOf(primary), 8)}<b data-severity="${pctOf(primary) === null ? 'unknown' : severity(pctOf(primary))}">${pctOf(primary) === null ? '—' : `${Math.round(pctOf(primary))}%`}</b><small data-severity="${weekly && pctOf(weekly) !== null ? severity(pctOf(weekly)) : 'unknown'}">${weekly && pctOf(weekly) !== null ? `${Math.round(pctOf(weekly))}%` : '—'}</small></div>`;
   const details = apiBalance ? '' : windows.map(windowRow).join('') || '';
   const otherMeters = !apiBalance ? meters.map(m => `<div class="balance-row"><span>${escapeHtml(m.label)}</span><b>${m.remaining == null ? '—' : `${escapeHtml(m.remaining)} ${escapeHtml(m.unit || '')}`}</b></div>`).join('') : '';
   const providerName = providerNames[String(provider.id || '').toLowerCase()] || provider.label || provider.id;

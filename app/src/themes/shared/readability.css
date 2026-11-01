@@ -1,0 +1,80 @@
+/* Shared after theme CSS: readable labels without flattening theme layouts. */
+:root .widget .sync-line, :root .widget .plan, :root .widget .status-badge,
+:root .widget .window-top, :root .widget .window-bottom, :root .widget .reset,
+:root .widget .pace, :root .widget .balance-row, :root .widget .empty-window,
+:root .widget .footer, :root .widget .no-data small, :root .widget .ring-center small,
+:root .widget .compact-line, :root .widget .compact-api, :root .widget .xs-name,
+:root .widget .xs-content small, :root .widget .settings label,
+:root .widget .settings legend, :root .widget .settings button,
+:root .widget .settings header strong, :root .widget .setting-note, :root .widget .toast {
+  font-family: JetBrainsMono, monospace;
+  font-size: 11px;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+:root .widget .provider-heading h2 {font-family:JetBrainsMono,monospace;font-size:15px;white-space:normal;overflow-wrap:anywhere}
+:root .widget .window-top b, :root .widget .ring-center strong,
+:root .widget .compact-line b, :root .widget .xs-content b {font-size:max(15px,1em)}
+:root[data-theme=brutalist] .window-top b {font:900 clamp(34px,13cqw,72px)/1.15 Inter,sans-serif;letter-spacing:-2px}
+:root[data-theme=frosted-glass] .window-top b {font-size:26px}
+:root[data-theme=retro-lcd] .window-top b {font-size:30px}
+:root[data-theme=circular-rings] .ring-center strong {font-size:23px}
+:root .widget .settings select, :root .widget .context-menu button {font:11px/1.5 JetBrainsMono,monospace}
+:root .widget .header, :root .widget .app-title {color:var(--chromeText)}
+:root .widget .sync-line, :root .widget .footer {color:var(--chromeSecondary)}
+:root .widget .settings {color:var(--chromeText)}
+:root .widget .settings label, :root .widget .settings legend, :root .widget .setting-note {color:var(--chromeSecondary)}
+:root[data-theme=retro-lcd] .widget .settings {background:var(--bgWidget)}
+:root .look-section {display:grid;gap:12px;min-width:0;margin:0;padding:10px;border:1px solid var(--border);border-radius:6px}
+/* The decorative edge is independent of structural borders (e.g. Brutalist). */
+:root[data-theme=dot-matrix] .widget {border-right:1px solid var(--border);border-radius:15px}
+:root[data-accent-edge=left] .widget::after, :root[data-accent-edge=right] .widget::after {
+  content:'';position:absolute;z-index:4;pointer-events:none;top:12px;bottom:12px;width:2px;
+  background:color-mix(in srgb,var(--accent) 25%,var(--chromeText));opacity:.55;border-radius:2px;
+}
+:root[data-accent-edge=left] .widget::after {left:0}
+:root[data-accent-edge=right] .widget::after {right:0}
+/* Calm keeps each design's geometry and surface colors, with threshold-only ink. */
+:root[data-color-mode=calm] .widget {--accent:var(--textPrimary)}
+:root[data-color-mode=calm] .beacon {background:var(--chromeSecondary);box-shadow:none}
+:root[data-color-mode=calm] .dot-bar i.on {box-shadow:none}
+:root[data-color-mode=calm] .dot-bar i.on[data-severity=normal],
+:root[data-color-mode=calm] .meter>i, :root[data-color-mode=calm] .segments i.on {opacity:.85}
+:root[data-color-mode=calm] .meter>i {background:var(--level);box-shadow:none}
+:root[data-color-mode=calm] .ring-value {opacity:.85}
+:root[data-color-mode=calm] .window-top b {text-shadow:none}
+:root[data-color-mode=calm] .theme-preview {color:var(--textPrimary);text-shadow:none}
+:root[data-color-mode=calm] .provider-heading h2::before, :root[data-color-mode=calm] .app-title::before {color:inherit}
+:root[data-color-mode=calm] .footer span:last-child {color:inherit}
+:root .provider-heading {flex-wrap:wrap}
+:root .window-top {gap:5px}
+:root .dot-bar i {flex:1;min-width:0;max-width:var(--dot)}
+:root .xs-content b, :root .xs-content small {flex:none}
+:root .xs-content .dot-bar {min-width:0;gap:1px}
+:root .compact-line {grid-template-columns:22px minmax(0,1fr) 38px}
+@container (max-width:219px) {
+  :root .widget .xs-content {flex-wrap:wrap;min-height:24px}
+  :root .widget .xs-content small {font-size:15px}
+  :root[data-theme=compact-strip] .windows, :root[data-theme=brutalist] .windows {grid-template-columns:1fr}
+  :root[data-theme=circular-rings] .provider-card {display:block}
+  :root[data-theme=circular-rings] .ring-display {width:100px;margin:0 auto 8px}
+  :root[data-theme=circular-rings] .ring-center small {display:block}
+  :root .widget .footer {flex-wrap:wrap}
+  :root .widget .scale-presets {flex-wrap:wrap}
+  :root .widget .scale-presets button {flex-basis:40%}
+}
+:root .widget .gear {font:15px/1 JetBrainsMono,monospace}
+:root .segments.terminal {font-size:11px}
+:root[data-theme=circular-rings] .provider-list {grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
+:root[data-color-mode=calm] [data-severity=warning] {color:var(--severityWarning)}
+:root[data-color-mode=calm] [data-severity=danger] {color:var(--severityDanger)}
+@container (min-width:220px) and (max-width:320px) {
+  :root[data-theme=dot-matrix] .provider-card:not(.api-balance) {grid-template-columns:65px minmax(0,1fr)}
+  :root[data-theme=dot-matrix] .provider-heading h2 {font-size:15px;overflow-wrap:normal}
+}
+:root[data-theme=brutalist] .provider-list {grid-template-columns:repeat(auto-fit,minmax(min(100%,155px),1fr))}
+@container (max-width:219px) {
+  :root[data-theme=retro-lcd] .window-top {flex-wrap:wrap}
+  :root[data-theme=retro-lcd] .window-top>span {flex-basis:100%}
+}
+:root .widget .balance-row b, :root .widget .compact-api {font-size:15px}

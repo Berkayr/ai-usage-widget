@@ -67,11 +67,11 @@ Choose from eight built-in themes: Dot Matrix, Circular Rings, Terminal, Frosted
 
 ### Colors and sizing
 
-Dot Matrix includes Signal Orange, Sakura Pink, Nord and Mono Paper; the other themes include a palette matched to their design. Accent and background colors can be overridden. Separate widget and background opacity controls let you tune transparency while keeping text readable. These controls change opacity, not monitor brightness or compositor blur.
+Dot Matrix includes Signal Orange, Sakura Pink, Nord and Mono Paper; the other themes include a palette matched to their design. Calm is the default: neutral usage up to 50%, soft amber above 50%, and muted red from 80%. Choose Vivid in Settings → Look for the original colors. The accent edge starts off; Auto follows the selected left/right corner and disappears in Free placement, or you can choose a fixed side. Accent and background colors can be overridden. Separate widget and background opacity controls let you tune transparency while keeping text readable. These controls change opacity, not monitor brightness or compositor blur.
 
 ![Four palette variants of the real widget](docs/screenshots/palettes.png)
 
-Scale from 50% to 300% with presets or Ctrl +/− and Ctrl+0. Width controls layout independently from zoom. Fit height to content, choose a corner, or use supported free placement.
+Scale from 50% to 300% with presets or Ctrl +/− and Ctrl+0. Text and spacing scale through rem-based layout without CSS zoom. Fit height to content, choose a corner, or use supported free placement.
 
 ![Widget at 75, 100 and 150 percent scale](docs/screenshots/scale.png)
 ![XS, S, M and L responsive layouts](docs/screenshots/sizes.png)

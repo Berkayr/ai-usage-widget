@@ -21,7 +21,7 @@ async function run(command, args, cwd) {
 await run(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'build'], resolve(root, 'app'));
 const escape = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const frame = (label, width=340, height=590, settings={}, options={}) => {
-  const config = { snapshot, settings: { appearance: 'dark', fitHeight: true, ...settings }, ...options };
+  const config = { snapshot, settings: { appearance: 'dark', colorMode: 'calm', accentEdge: 'off', fitHeight: true, ...settings }, ...options };
   return `<div class="specimen"><iframe title="${escape(label)}" width="${width}" height="${height}" src="/?sample&docs=${encodeURIComponent(JSON.stringify(config))}"></iframe><p>${escape(label)}</p></div>`;
 };
 const heading = (eyebrow,title,sub='') => `<header><small>${eyebrow}</small><h1>${title}</h1><p>${sub}</p></header>`;
@@ -55,16 +55,37 @@ for (const appearance of ['dark','light']) {
  scenes.set(light ? 'themes-light' : 'themes', {w:1570,h:3000,autoHeight:true,html:shell(heading('EIGHT THEMES', 'Find your own rhythm', 'Every design below is selectable in the application. Fictional quota data.') + `<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map((id,i)=>frame(names[i],340,1250,{theme:id,appearance})).join('')}</div>`,light)});
  for (const [i,id] of themeIds.entries()) {
   scenes.set(`themes/${id}-${appearance}`, {w:436,h:1450,autoHeight:true,html:shell(frame(names[i],340,1250,{theme:id,appearance}),light)});
-  scenes.set(`checks/${id}-${appearance}`, {w:1260,h:1500,autoHeight:true,html:shell(heading('RESPONSIVE CHECK', `${names[i]} / ${appearance}`, '340 px and 200 px / three providers and one provider') + `<div class="row" style="gap:12px">${[340,200].map(width=>[snapshot,oneProvider].map(data=>frame(`${width}px / ${data.providers.length} providers`,width,1200,{theme:id,appearance},{snapshot:data})).join('')).join('')}</div>`,light)});
+  scenes.set(`checks/${id}-${appearance}`, {w:1260,h:1500,autoHeight:true,html:shell(heading('RESPONSIVE CHECK', `${names[i]} / ${appearance}`, 'Calm / 340 px and 200 px / 100% and 150%') + `<div class="row" style="gap:12px">${[340,200].map(width=>[100,150].map(scale=>frame(`${width}px / ${scale}%`,width,2400,{theme:id,appearance,scale})).join('')).join('')}</div>`,light)});
  }
 }
 scenes.set('social-preview', {w:1280,h:640,dpr:1,html:shell(`<div style="display:flex;align-items:center;gap:30px"><div class="copy" style="width:330px;flex:none"><img class="logo" src="/assets-docs/logo.svg"><h1 style="font-size:36px">AI Quota Widget</h1><p>Your AI quotas, on your desktop.</p><span class="pill">Windows + Linux / 8 themes</span></div>${['circular-rings','brutalist','frosted-glass'].map(id=>frame(names[themeIds.indexOf(id)],250,500,{theme:id,scale:80},{snapshot:oneProvider})).join('')}</div>`)});
+scenes.set('checks/vivid', {w:850,h:1600,autoHeight:true,html:shell(heading('COLOR MODE','Calm / Vivid')+`<div class="row">${['calm','vivid'].map(colorMode=>frame(colorMode,340,1400,{colorMode})).join('')}</div>`)});
 const edgeData = structuredClone(snapshot);
 edgeData.providers[0].stale = true;
 edgeData.providers[0].windows.push({id:'extra',label:'Extra window',used_percent:81,kind:'other',hidden_by_default:true,resets_at:null});
 edgeData.providers[1].state = 'AUTH_REQUIRED'; edgeData.providers[1].windows = [{id:'unknown',label:'Unknown quota',used_percent:null,resets_at:null}];
 edgeData.providers[2].state = 'RATE_LIMITED';
 for (const id of themeIds) scenes.set(`checks/${id}-states`, {w:1000,h:1600,autoHeight:true,html:shell(heading('DATA CONTRACT',id,'Hidden extra window / visible extra window / unknown values')+`<div class="row">${[false,true].map(showExtraWindows=>frame(showExtraWindows?'Extra visible':'Extra hidden',340,1300,{theme:id,showExtraWindows},{snapshot:edgeData})).join('')}</div>`)});
+function measure(d) {
+ const w=d.defaultView;
+ const visible=el=>el.getClientRects().length && w.getComputedStyle(el).visibility!=='hidden' && el.getBoundingClientRect().width>0;
+ const leaves=[...d.querySelectorAll('#widget *')].filter(el=>visible(el)&&[...el.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())&&!el.closest('.segments,svg,select'));
+ const minFont=Math.min(...leaves.map(el=>parseFloat(w.getComputedStyle(el).fontSize)));
+ const numbers=[...d.querySelectorAll('.window-top b,.xs-content b,.xs-content small,.compact-line b,.ring-center strong')].filter(visible);
+ const numberFont=Math.min(...numbers.map(el=>parseFloat(w.getComputedStyle(el).fontSize)));
+ const canvas=d.createElement('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});canvas.width=canvas.height=1;
+ const rgba=color=>{ctx.clearRect(0,0,1,1);ctx.fillStyle=color;ctx.fillRect(0,0,1,1);return [...ctx.getImageData(0,0,1,1).data].map((v,i)=>i===3?v/255:v)};
+ const lum=c=>c.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
+ const contrast=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+ const ratios=[...d.querySelectorAll('.sync-line,.plan,.window-top>span,.reset,.pace,.footer,.balance-row,.ring-center small,.xs-name')].filter(el=>visible(el)&&el.textContent.trim()).map(el=>{
+  const layers=[];for(let p=el;p;p=p.parentElement)layers.unshift(rgba(w.getComputedStyle(p).backgroundColor));
+  // Test the translucent widget against the least favorable desktop polarity.
+  let bg=d.documentElement.dataset.mode==='light'?[0,0,0]:[255,255,255];
+  for(const layer of layers)bg=bg.map((v,i)=>layer[i]*layer[3]+v*(1-layer[3]));
+  return {selector:el.className||el.tagName,ratio:contrast(rgba(w.getComputedStyle(el).color),bg)};
+ });
+ return {minFont,numberFont,minContrast:Math.min(...ratios.map(r=>r.ratio)),ratios,scale:Number(d.querySelector('#scale').value),width:w.innerWidth,zoom:w.getComputedStyle(d.querySelector('#app')).zoom};
+}
 const server = createServer(async (req,res)=>{
  try {
   const url=new URL(req.url,'http://localhost');
@@ -95,13 +116,15 @@ try {
  await cdp('Emulation.setTimezoneOverride',{timezoneId:'UTC'});await cdp('Emulation.setLocaleOverride',{locale:'en-US'});
  await cdp('Page.addScriptToEvaluateOnNewDocument',{source:`const NativeDate=Date;window.Date=class extends NativeDate{constructor(...args){super(...(args.length?args:['2026-11-01T12:00:00Z']))}static now(){return 1793534400000}}; const raw=new URLSearchParams(location.search).get('docs');if(raw)window.__QUOTA_DOCS_FIXTURE__=JSON.parse(raw);`});
  for(const [name,scene] of scenes){
+  if(process.env.SCENE && name!==process.env.SCENE)continue;
   errors.length=0;
   await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:scene.h,deviceScaleFactor:scene.dpr||2,mobile:false});
   await cdp('Page.navigate',{url:`${base}/scene/${name}`});
-  const result=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let attempt=0;attempt<150;attempt++){const frames=[...document.querySelectorAll('iframe')];if(location.pathname==='/scene/${name}'&&document.readyState==='complete'&&frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){await document.fonts.ready;await Promise.all(frames.map(f=>f.contentDocument.fonts.ready));for(const f of frames){if(f.contentDocument.documentElement.classList.contains('fit-height')) f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return frames.map(f=>{const d=f.contentDocument;const expected=JSON.parse(new URL(f.src).searchParams.get('docs')).snapshot.providers.length;const overflow=[...d.querySelectorAll('.provider-card,.quota-window,.provider-heading')].filter(el=>el.scrollWidth>el.clientWidth+2).map(el=>el.className);return {cards:d.querySelectorAll('.provider-card').length,expected,overflow,theme:d.documentElement.dataset.theme,styles:d.querySelectorAll('#active-theme').length};});}await new Promise(r=>setTimeout(r,100));}throw Error('Frame readiness timed out');})()`,awaitPromise:true,returnByValue:true});
+  const result=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let attempt=0;attempt<150;attempt++){const frames=[...document.querySelectorAll('iframe')];if(location.pathname==='/scene/${name}'&&document.readyState==='complete'&&frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){await document.fonts.ready;await Promise.all(frames.map(f=>f.contentDocument.fonts.ready));for(const f of frames){if(f.contentDocument.documentElement.classList.contains('fit-height')) f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return frames.map(f=>{const d=f.contentDocument;const expected=JSON.parse(new URL(f.src).searchParams.get('docs')).snapshot.providers.length;const overflow=[...d.querySelectorAll('.provider-list,.provider-card,.quota-window,.provider-heading,.windows')].filter(el=>el.scrollWidth>el.clientWidth+2).map(el=>el.className);return {cards:d.querySelectorAll('.provider-card').length,expected,overflow,theme:d.documentElement.dataset.theme,styles:d.querySelectorAll('#active-theme').length,metrics:(${measure.toString()})(d)};});}await new Promise(r=>setTimeout(r,100));}throw Error('Frame readiness timed out');})()`,awaitPromise:true,returnByValue:true});
   if(result.exceptionDetails||errors.length)throw Error(`${name}: ${JSON.stringify(result.exceptionDetails||errors)}`);
   if(result.result.value.some(frame=>frame.cards!==frame.expected || frame.overflow.length || frame.styles!==1))throw Error(`${name}: layout failure ${JSON.stringify(result.result.value)}`);
   checks.push({scene:name,frames:result.result.value});
+  if(name.startsWith('checks/') && !name.endsWith('-states') && name!=='checks/vivid' && result.result.value.some(f=>f.metrics.minFont<11*f.metrics.scale/100-.01 || f.metrics.numberFont<15*f.metrics.scale/100-.01 || f.metrics.minContrast<4.5))throw Error(`${name}: readability failure ${JSON.stringify(result.result.value)}`);
   if(scene.autoHeight){
    const bounds=await cdp('Runtime.evaluate',{expression:`Math.ceil(Math.max(...[...document.body.children].map(el=>el.getBoundingClientRect().bottom)))+48`,returnByValue:true});
    await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:bounds.result.value,deviceScaleFactor:scene.dpr||2,mobile:false});
@@ -127,10 +150,20 @@ try {
   const extra=d.querySelector('#show-extra-windows');extra.checked=true;extra.dispatchEvent(new Event('change')); if(!d.body.textContent.includes('Extra window'))throw Error('Extra window: '+id);
   extra.checked=false;extra.dispatchEvent(new Event('change'));if(d.body.textContent.includes('Extra window'))throw Error('Hidden extra: '+id);
   for(const appearance of ['light','dark','auto']) {const a=d.querySelector('#appearance');a.value=appearance;a.dispatchEvent(new Event('change'));if(appearance!=='auto'&&d.documentElement.dataset.mode!==appearance)throw Error('Appearance: '+id);}
-  for(const scale of [50,300]){const a=d.querySelector('#scale');a.value=scale;a.dispatchEvent(new Event('input'));if(Number(d.querySelector('#app').style.zoom)!==scale/100)throw Error('Scale: '+id);}
+  for(const scale of [50,300]){const a=d.querySelector('#scale');a.value=scale;a.dispatchEvent(new Event('input'));if(parseFloat(d.documentElement.style.fontSize)!==16*scale/100 || d.querySelector('#app').style.zoom)throw Error('Scale: '+id);}
   const scale=d.querySelector('#scale');scale.value=100;scale.dispatchEvent(new Event('input'));
  }
- return 'Theme switching, palette, appearance, fit/settings height, scale and extra-window checks passed';
+ for(const value of ['off','auto','left','right']) {
+   const edge=d.querySelector('#accent-edge');edge.value=value;edge.dispatchEvent(new Event('change'));
+   for(const position of ['Top left','Bottom right','Free']) {
+    const p=d.querySelector('#position');p.value=position;p.dispatchEvent(new Event('change'));
+    const expected=value==='auto'?(position.endsWith('left')?'left':position.endsWith('right')?'right':'off'):value;
+    if(d.documentElement.dataset.accentEdge!==expected)throw Error('Accent edge: '+value+' / '+position);
+   }
+  }
+  const color=d.querySelector('#color-mode');
+  for(const value of ['vivid','calm']) {color.value=value;color.dispatchEvent(new Event('change'));if(d.documentElement.dataset.colorMode!==value)throw Error('Color mode: '+value);}
+ return 'Accent edge (12 combinations), color mode, theme switching, palette, appearance, fit/settings height, scale and extra-window checks passed';
  })()`,awaitPromise:true,returnByValue:true});
  if(interactions.exceptionDetails)throw Error(JSON.stringify(interactions.exceptionDetails));
  await writeFile(resolve(output,'checks/results.json'),JSON.stringify({checks,interactions:interactions.result.value},null,2)+'\n');
