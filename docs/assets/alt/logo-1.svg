@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad1" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#15151C"/>
+      <stop offset="100%" stop-color="#0A0A0D"/>
+    </radialGradient>
+  </defs>
+
+  <!-- App Icon Base Squircle -->
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="url(#bgGrad1)" stroke="#282835" stroke-width="4"/>
+
+  <!-- Subtle Outer Technical Reticle / Scale Brackets -->
+  <path d="M 104 156 L 92 156 L 92 356 L 104 356" fill="none" stroke="#333342" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 408 156 L 420 156 L 420 356 L 408 356" fill="none" stroke="#333342" stroke-width="3" stroke-linecap="round"/>
+  <!-- Middle Level Gauge Indicator -->
+  <line x1="86" y1="256" x2="98" y2="256" stroke="#FF5A1F" stroke-width="3" stroke-linecap="round"/>
+  <line x1="414" y1="256" x2="426" y2="256" stroke="#FF5A1F" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- 7x7 Dot Matrix Meter Grid -->
+  <!-- Row 0 (y=136, Inactive) -->
+  <circle cx="136" cy="136" r="13" fill="#25252E"/>
+  <circle cx="176" cy="136" r="13" fill="#25252E"/>
+  <circle cx="216" cy="136" r="13" fill="#25252E"/>
+  <circle cx="256" cy="136" r="13" fill="#25252E"/>
+  <circle cx="296" cy="136" r="13" fill="#25252E"/>
+  <circle cx="336" cy="136" r="13" fill="#25252E"/>
+  <circle cx="376" cy="136" r="13" fill="#25252E"/>
+
+  <!-- Row 1 (y=176, Inactive) -->
+  <circle cx="136" cy="176" r="13" fill="#25252E"/>
+  <circle cx="176" cy="176" r="13" fill="#25252E"/>
+  <circle cx="216" cy="176" r="13" fill="#25252E"/>
+  <circle cx="256" cy="176" r="13" fill="#25252E"/>
+  <circle cx="296" cy="176" r="13" fill="#25252E"/>
+  <circle cx="336" cy="176" r="13" fill="#25252E"/>
+  <circle cx="376" cy="176" r="13" fill="#25252E"/>
+
+  <!-- Row 2 (y=216, Inactive) -->
+  <circle cx="136" cy="216" r="13" fill="#25252E"/>
+  <circle cx="176" cy="216" r="13" fill="#25252E"/>
+  <circle cx="216" cy="216" r="13" fill="#25252E"/>
+  <circle cx="256" cy="216" r="13" fill="#25252E"/>
+  <circle cx="296" cy="216" r="13" fill="#25252E"/>
+  <circle cx="336" cy="216" r="13" fill="#25252E"/>
+  <circle cx="376" cy="216" r="13" fill="#25252E"/>
+
+  <!-- Row 3 (y=256, Threshold Level with Signal Orange Peak) -->
+  <circle cx="136" cy="256" r="13" fill="#F4F4F6"/>
+  <circle cx="176" cy="256" r="13" fill="#F4F4F6"/>
+  <circle cx="216" cy="256" r="13" fill="#F4F4F6"/>
+  <circle cx="256" cy="256" r="13" fill="#F4F4F6"/>
+  <circle cx="296" cy="256" r="13" fill="#F4F4F6"/>
+  <!-- Peak Cursor Dot (Signal Orange) -->
+  <circle cx="336" cy="256" r="14.5" fill="#FF5A1F"/>
+  <circle cx="376" cy="256" r="13" fill="#25252E"/>
+
+  <!-- Row 4 (y=296, Active Normal) -->
+  <circle cx="136" cy="296" r="13" fill="#F4F4F6"/>
+  <circle cx="176" cy="296" r="13" fill="#F4F4F6"/>
+  <circle cx="216" cy="296" r="13" fill="#F4F4F6"/>
+  <circle cx="256" cy="296" r="13" fill="#F4F4F6"/>
+  <circle cx="296" cy="296" r="13" fill="#F4F4F6"/>
+  <circle cx="336" cy="296" r="13" fill="#F4F4F6"/>
+  <circle cx="376" cy="296" r="13" fill="#F4F4F6"/>
+
+  <!-- Row 5 (y=336, Active Normal) -->
+  <circle cx="136" cy="336" r="13" fill="#F4F4F6"/>
+  <circle cx="176" cy="336" r="13" fill="#F4F4F6"/>
+  <circle cx="216" cy="336" r="13" fill="#F4F4F6"/>
+  <circle cx="256" cy="336" r="13" fill="#F4F4F6"/>
+  <circle cx="296" cy="336" r="13" fill="#F4F4F6"/>
+  <circle cx="336" cy="336" r="13" fill="#F4F4F6"/>
+  <circle cx="376" cy="336" r="13" fill="#F4F4F6"/>
+
+  <!-- Row 6 (y=376, Active Normal) -->
+  <circle cx="136" cy="376" r="13" fill="#F4F4F6"/>
+  <circle cx="176" cy="376" r="13" fill="#F4F4F6"/>
+  <circle cx="216" cy="376" r="13" fill="#F4F4F6"/>
+  <circle cx="256" cy="376" r="13" fill="#F4F4F6"/>
+  <circle cx="296" cy="376" r="13" fill="#F4F4F6"/>
+  <circle cx="336" cy="376" r="13" fill="#F4F4F6"/>
+  <circle cx="376" cy="376" r="13" fill="#F4F4F6"/>
+</svg>
