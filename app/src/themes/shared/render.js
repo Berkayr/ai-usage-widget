@@ -1,3 +1,4 @@
+import { safeState } from './safety.js';
 import { escapeHtml as esc, severity, countdown, pctOf, shortWindowLabel, hiddenStates, providerNames } from '../dot-matrix/render.js';
 
 function pace(window) {
@@ -40,7 +41,7 @@ export function createRenderer(type) {
   return (root, snapshot, { noData = false, showExtraWindows = false } = {}) => {
     const providers = (Array.isArray(snapshot?.providers) ? snapshot.providers : []).filter(p => !hiddenStates.has(String(p.state).toUpperCase()));
     root.innerHTML = providers.map(p => {
-      const state = String(p.state || 'SOURCE_UNAVAILABLE').toUpperCase();
+      const state = safeState(p.state);
       const windows = (Array.isArray(p.windows) ? p.windows : []).filter(w => showExtraWindows || !w.hidden_by_default);
       const badge = state !== 'OK' || p.stale ? `<span class="status-badge ${p.stale || state === 'STALE' ? 'stale' : state.toLowerCase()}">${esc(p.stale && state === 'OK' ? 'STALE' : state.replaceAll('_',' '))}</span>` : '';
       const name = providerNames[String(p.id).toLowerCase()] || p.label || p.id || 'Provider';

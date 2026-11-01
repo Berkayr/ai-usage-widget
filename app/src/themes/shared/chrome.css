@@ -66,3 +66,14 @@
 /* A short strip must expand while its scrollable settings are open. */
 .fit-height .widget:has(.settings:not([hidden])){min-height:33.75rem}
 .theme-picker [data-theme=circular-rings] .theme-preview{color:#38bdf8}.theme-picker [data-theme=terminal] .theme-preview{color:#34d399;font-size:0.875rem}.theme-picker [data-theme=frosted-glass] .theme-preview{color:#38bdf8;text-shadow:0 0 0.5rem #38bdf860}.theme-picker [data-theme=brutalist] .theme-preview{font-family:Inter,sans-serif;font-weight:900;color:#9abf00}.theme-picker [data-theme=compact-strip] .theme-preview{color:#9396ff;font-size:0.875rem}.theme-picker [data-theme=retro-lcd] .theme-preview{color:#1aa592;font-family:DotGothic16,monospace}.theme-picker [data-theme=minimal-pace] .theme-preview{color:#13946f;font-weight:400}
+
+.provider-choice { display:flex !important; align-items:flex-start; gap:.5rem; margin:.75rem 0; }
+.provider-choice input { flex:0 0 auto; width:auto !important; margin-top:.25rem; }
+.provider-choice span { font-size:.75rem; line-height:1.5; overflow-wrap:anywhere; color:var(--chromeText, var(--textPrimary)); }
+#provider-onboarding { padding:.75rem; color:var(--chromeText, var(--textPrimary)); }
+#provider-onboarding h3, #provider-settings h3 { font-size:1rem; line-height:1.4; margin:0 0 .5rem; }
+.provider-choices { max-height:45vh; overflow:auto; padding-right:.25rem; }
+.provider-consent-actions { padding-top:.75rem; }
+.provider-consent-actions button { padding:.5rem 1rem; color:var(--textPrimary); background:var(--bgCard); border:1px solid var(--border); border-radius:.25rem; cursor:pointer; font:inherit; }
+.provider-consent-actions .setting-note { margin:.25rem 0 0; color:var(--chromeSecondary, var(--textSecondary)); }
+#provider-onboarding[hidden], #providers[hidden] { display:none !important; }

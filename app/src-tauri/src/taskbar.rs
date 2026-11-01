@@ -28,6 +28,9 @@ use windows_sys::{
 const UPDATE: u32 = WM_APP + 21;
 static WINDOW: AtomicIsize = AtomicIsize::new(0);
 static MODEL: OnceLock<Mutex<Model>> = OnceLock::new();
+static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
+thread_local! { static IS_STRIP: Cell<bool> = const { Cell::new(false) }; }
+static WORKER: Mutex<Option<std::thread::JoinHandle<()>>> = Mutex::new(None);
 #[derive(Clone)]
 struct Model {
     settings: TaskbarSettings,
@@ -50,11 +53,27 @@ pub(super) fn update_snapshot(snapshot: Option<Value>) {
     }
 }
 pub(super) fn update_settings(settings: TaskbarSettings) {
+    let enabled = settings.enabled;
     if let Some(model) = MODEL.get() {
-        if let Ok(mut m) = model.lock() {
-            m.settings = settings;
+        if let Ok(mut m) = model.lock() { m.settings = settings; }
+    }
+    // The GUI callback must never wait for a controller joining this thread.
+    if IS_STRIP.with(|flag| flag.get()) { wake(); return; }
+    if let Ok(mut worker) = WORKER.lock() {
+        if !enabled {
+            if let Some(handle) = worker.take() {
+                let hwnd = WINDOW.load(Ordering::Acquire) as HWND;
+                if !hwnd.is_null() { unsafe { PostMessageW(hwnd, WM_CLOSE, 0, 0); } }
+                let _ = handle.join();
+            }
+        } else {
+            if worker.as_ref().map(|w| w.is_finished()).unwrap_or(false) {
+                if let Some(handle) = worker.take() { let _ = handle.join(); }
+            }
+            if worker.is_none() {
+                if let Some(app) = APP.get() { *worker = Some(spawn_strip(app.clone())); }
+            } else { wake(); }
         }
-        wake();
     }
 }
 fn wide(text: &str) -> Vec<u16> {
@@ -402,6 +421,10 @@ impl Strip {
     unsafe fn refresh(&mut self, hwnd: HWND, force: bool) {
         if let Ok(m) = MODEL.get().unwrap().lock() {
             self.model = m.clone();
+        }
+        if !self.model.settings.enabled {
+            PostMessageW(hwnd, WM_CLOSE, 0, 0);
+            return;
         }
         let shell = FindWindowW(w!("Shell_TrayWnd"), null());
         if shell != self.shell || (self.hook.is_null() && !shell.is_null()) {
@@ -893,18 +916,19 @@ unsafe extern "system" fn procedure(hwnd: HWND, message: u32, wp: WPARAM, lp: LP
     }
 }
 pub(super) fn start(app: tauri::AppHandle) {
-    if MODEL
-        .set(Mutex::new(Model {
-            settings: load_settings().taskbar,
-            snapshot: read_snapshot(),
-        }))
-        .is_err()
-    {
-        return;
-    }
+    let _ = APP.set(app);
+    let settings = load_settings().taskbar;
+    let _ = MODEL.set(Mutex::new(Model { settings: settings.clone(), snapshot: read_snapshot() }));
+    update_settings(settings);
+}
+fn spawn_strip(app: tauri::AppHandle) -> std::thread::JoinHandle<()> {
     std::thread::Builder::new()
         .name("taskbar-strip".into())
         .spawn(move || unsafe {
+            IS_STRIP.with(|flag| flag.set(true));
+            loop {
+            // Settings may have been disabled before the new thread was scheduled.
+            if !MODEL.get().unwrap().lock().unwrap().settings.enabled { return; }
             SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
             let mut token = 0;
             let input = GdiplusStartupInput {
@@ -962,7 +986,7 @@ pub(super) fn start(app: tauri::AppHandle) {
                 null(),
             );
             let mut state = Box::new(Strip {
-                app,
+                app: app.clone(),
                 model: MODEL.get().unwrap().lock().unwrap().clone(),
                 hook: null_mut(),
                 shell: null_mut(),
@@ -993,13 +1017,20 @@ pub(super) fn start(app: tauri::AppHandle) {
                 TranslateMessage(&message);
                 DispatchMessageW(&message);
             }
-            if IsWindow(hwnd) != 0 {
-                DestroyWindow(hwnd);
-            }
+            // Cleanup outside the guarded callback: DestroyWindow synchronously
+            // reenters the procedure, where the reentrancy guard can skip WM_DESTROY.
+            WINDOW.store(0, Ordering::Release);
+            KillTimer(hwnd, 1);
+            if !state.hook.is_null() { UnhookWinEvent(state.hook); state.hook = null_mut(); }
+            if !state.tooltip.is_null() { DestroyWindow(state.tooltip); state.tooltip = null_mut(); }
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0);
+            if IsWindow(hwnd) != 0 { DestroyWindow(hwnd); }
             GdiplusShutdown(token);
+            // A rapid re-enable during teardown reuses this thread and recreates
+            // its resources; an off state exits without leaving a worker behind.
+            }
         })
-        .expect("unable to start taskbar GUI thread");
+        .expect("unable to start taskbar GUI thread")
 }
 #[cfg(test)]
 mod tests {

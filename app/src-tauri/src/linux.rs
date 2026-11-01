@@ -2,7 +2,6 @@
 use gtk::{glib::translate::ToGlibPtr, prelude::*};
 use libloading::Library;
 use serde::{Deserialize, Serialize};
-use tauri::Manager;
 use std::{cell::RefCell, ffi::c_void, fs, sync::atomic::{AtomicBool, Ordering}};
 
 type Window = *mut gtk::ffi::GtkWindow;
@@ -26,13 +25,6 @@ pub fn placement_hint() -> Option<&'static str> {
     if wayland() && !layered() && !HINT_SHOWN.swap(true,Ordering::Relaxed) {
         Some("This Wayland desktop cannot place the widget at a fixed corner. Use the panel integration, or launch with GDK_BACKEND=x11 when XWayland is available.")
     } else { None }
-}
-pub fn configure_python(app: &tauri::App) {
-    if std::env::var_os("QUOTACORE_PYTHONPATH").is_none() {
-        if let Ok(root)=app.path().resource_dir() {
-            if root.join("quotacore/__main__.py").is_file() { std::env::set_var("QUOTACORE_PYTHONPATH",root); }
-        }
-    }
 }
 
 pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
@@ -123,8 +115,7 @@ pub fn set_linux_focus(window: tauri::WebviewWindow, open: bool) {
         } }); } } else { gtk.set_accept_focus(open); }
     });
 }
-// The shared frontend is owned by the theme task. Observe its existing settings
-// panel without changing that file; installed at page load and guarded per document.
+// Observe shared settings/consent focus needs; installed once per document.
 pub const SCRIPT: &str = r#"(() => {
  if (window.__linuxWidgetObserver) return; window.__linuxWidgetObserver = true;
  window.__TAURI_INTERNALS__.invoke('get_linux_hint').then(message => {
@@ -135,7 +126,8 @@ pub const SCRIPT: &str = r#"(() => {
  }).catch(()=>{});
  let lastOpen;
  const update = () => { const panel = document.getElementById('settings');
- const open=!!panel && !panel.hidden; if (open===lastOpen) return; lastOpen=open;
+ const consent=document.getElementById('provider-onboarding');
+ const open=(!!panel && !panel.hidden) || (!!consent && !consent.hidden); if (open===lastOpen) return; lastOpen=open;
  window.__TAURI_INTERNALS__.invoke('set_linux_focus', {open}).catch(() => {}); };
  new MutationObserver(update).observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['hidden']}); update();
 })()"#;

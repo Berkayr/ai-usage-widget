@@ -1,7 +1,8 @@
+import { escapeHtml, safeState } from '../shared/safety.js';
 const hiddenStates = new Set(['DISABLED', 'NOT_INSTALLED', 'NO_SUBSCRIPTION']);
 const abbreviations = { claude: 'CL', codex: 'CX', gemini: 'GM', copilot: 'CP', openrouter: 'OR', deepseek: 'DS', jetbrains: 'JB', 'jetbrains-ai': 'JB' };
 const providerNames = { claude: 'Claude', codex: 'Codex', gemini: 'Gemini', copilot: 'Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains' };
-const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
 const severity = pct => {
   const calm = typeof document !== 'undefined' && document.documentElement.dataset.colorMode === 'calm';
   return (calm ? pct >= 80 : pct > 80) ? 'danger' : (calm ? pct > 50 : pct >= 50) ? 'warning' : 'normal';
@@ -43,7 +44,7 @@ function balanceRows(provider) {
   return meters.filter(m => m.unit === 'USD').map(m => `<div class="balance-row"><span>${escapeHtml(m.label || 'API balance')}</span><b>${typeof m.remaining === 'number' ? `$${m.remaining.toFixed(2)}` : '—'}</b></div>`).join('');
 }
 function providerCard(provider, showExtraWindows) {
-  const state = String(provider.state || 'SOURCE_UNAVAILABLE').toUpperCase();
+  const state = safeState(provider.state);
   const issue = state !== 'OK' || provider.stale;
   const badge = issue ? `<span class="status-badge ${state.toLowerCase()}">${escapeHtml(provider.stale && state === 'OK' ? 'STALE' : state.replace('_', ' '))}</span>` : '';
   const windows = (Array.isArray(provider.windows) ? provider.windows : []).filter(w => showExtraWindows || !w.hidden_by_default);

@@ -7,7 +7,9 @@ mod autostart;
 use notify::{RecursiveMode, Watcher};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::{fs, path::PathBuf, process::{Command, Stdio}, thread, time::Duration};
+mod collector;
+use std::io::Write;
+use std::{fs, path::PathBuf, process::Command, thread, time::Duration};
 use tauri::{Emitter, Manager};
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -32,29 +34,51 @@ fn snapshot_path() -> PathBuf {
 fn settings_path() -> PathBuf { dirs::config_dir().unwrap_or_else(|| dirs::home_dir().unwrap()).join("ai-quota-widget").join("settings.json") }
 fn window_path() -> PathBuf { settings_path().parent().unwrap().join("window.json") }
 fn read_snapshot() -> Option<Value> { fs::read(snapshot_path()).ok().and_then(|bytes| serde_json::from_slice(&bytes).ok()) }
-fn refresh() -> Result<(), String> {
-    let python_path = std::env::var_os("QUOTACORE_PYTHONPATH");
-    #[cfg(target_os = "windows")]
-    let mut candidates = vec![vec!["-3", "-m", "quotacore", "write"], vec!["-m", "quotacore", "write"]];
-    #[cfg(not(target_os = "windows"))]
-    let mut candidates = vec![vec!["-m", "quotacore", "write"]];
-    #[cfg(target_os = "windows")] let executables = vec!["py", "python"];
-    #[cfg(not(target_os = "windows"))] let executables = vec!["python3"];
-    let cwd = python_path.as_ref().map(PathBuf::from);
-    let mut last_error = String::from("No Python interpreter found");
-    for (index, executable) in executables.iter().enumerate() {
-        let args = candidates.remove(0);
+const COLLECTOR_TIMEOUT: u64 = 120;
+fn collector(operation: &str, extra: &[String]) -> Result<Value, String> {
+    let cwd = std::env::var_os("QUOTACORE_PYTHONPATH").map(PathBuf::from);
+    #[cfg(windows)] let executables = [("py", true), ("python", false)];
+    #[cfg(not(windows))] let executables = [("python3", false)];
+    for (executable, launcher) in executables {
         let mut command = Command::new(executable);
-        command.args(args).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::piped());
+        if launcher { command.arg("-3"); }
+        command.args(["-m", "quotacore", operation]).args(extra).env("PYTHONDONTWRITEBYTECODE", "1");
         if let Some(ref path) = cwd { command.current_dir(path).env("PYTHONPATH", path); }
-        #[cfg(target_os = "windows")] { use std::os::windows::process::CommandExt; command.creation_flags(0x08000000); }
-        match command.output() {
-            Ok(output) if output.status.success() => return Ok(()),
-            Ok(output) => { last_error = String::from_utf8_lossy(&output.stderr).trim().to_string(); },
-            Err(error) => last_error = error.to_string(),
+        let bytes = match collector::run(command, Duration::from_secs(COLLECTOR_TIMEOUT)) {
+            Ok(bytes) => bytes,
+            Err(error) if error == "Collector could not start" => continue,
+            Err(error) => return Err(error),
+        };
+        return if bytes.is_empty() { Ok(Value::Null) } else { serde_json::from_slice(&bytes).map_err(|_| "Collector returned invalid JSON".into()) };
+    }
+    Err("No Python interpreter found".into())
+}
+fn refresh() -> Result<(), String> { collector("write", &[]).map(|_| ()) }
+#[tauri::command]
+fn get_provider_config() -> Result<Value, String> { collector("provider-config", &[]) }
+#[tauri::command]
+fn configure_providers(providers: Vec<String>) -> Result<(), String> {
+    const IDS: &[&str] = &["claude", "codex", "gemini", "copilot", "openrouter", "deepseek", "jetbrains"];
+    if providers.iter().any(|id| !IDS.contains(&id.as_str())) { return Err("Unknown provider".into()); }
+    collector("configure", &providers).map(|_| ())
+}
+fn private_write(path: PathBuf, bytes: Vec<u8>) -> Result<(), String> {
+    use std::fs::OpenOptions;
+    fs::create_dir_all(path.parent().ok_or("Invalid data path")?).map_err(|e| e.to_string())?;
+    let mut options = OpenOptions::new();
+    options.write(true).create(true);
+    #[cfg(unix)] { use std::os::unix::fs::OpenOptionsExt; options.mode(0o600); }
+    let mut file = options.open(&path).map_err(|e| e.to_string())?;
+    #[cfg(unix)] { use std::os::unix::fs::PermissionsExt; file.set_permissions(fs::Permissions::from_mode(0o600)).map_err(|e|e.to_string())?; }
+    file.set_len(0).map_err(|e|e.to_string())?;
+    file.write_all(&bytes).map_err(|e|e.to_string())
+}
+fn configure_python(app: &tauri::App) {
+    if std::env::var_os("QUOTACORE_PYTHONPATH").is_none() {
+        if let Ok(root)=app.path().resource_dir() {
+            if root.join("quotacore/__main__.py").is_file() { std::env::set_var("QUOTACORE_PYTHONPATH", root); }
         }
     }
-    Err(last_error)
 }
 fn emit_snapshot(app: &tauri::AppHandle) { let snapshot = read_snapshot(); #[cfg(windows)] taskbar::update_snapshot(snapshot.clone()); let _ = app.emit("snapshot", SnapshotEvent { snapshot }); }
 #[tauri::command]
@@ -64,7 +88,7 @@ fn refresh_now(app: tauri::AppHandle) -> Result<(), String> { refresh()?; emit_s
 #[tauri::command]
 fn load_settings() -> Settings { fs::read(settings_path()).ok().and_then(|data| serde_json::from_slice(&data).ok()).unwrap_or_default() }
 #[tauri::command]
-fn save_settings(window: tauri::WebviewWindow, settings: Settings) -> Result<(), String> { #[cfg(target_os = "linux")] { let options=settings.linux.clone(); let corner=settings.position.clone(); let target=window.clone(); let _=window.run_on_main_thread(move ||linux::apply(&target,&options,&corner)); } let path = settings_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?; fs::write(path, serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?; #[cfg(windows)] taskbar::update_settings(settings.taskbar); Ok(()) }
+fn save_settings(window: tauri::WebviewWindow, settings: Settings) -> Result<(), String> { #[cfg(target_os = "linux")] { let options=settings.linux.clone(); let corner=settings.position.clone(); let target=window.clone(); let _=window.run_on_main_thread(move ||linux::apply(&target,&options,&corner)); } let path = settings_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?; private_write(path, serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?; #[cfg(windows)] taskbar::update_settings(settings.taskbar); Ok(()) }
 fn current_monitor(window: &tauri::WebviewWindow) -> Result<tauri::Monitor, String> {
     #[cfg(target_os = "linux")]
     if linux::wayland() { let options=load_settings().linux; let monitors=window.available_monitors().map_err(|e|e.to_string())?; return options.monitor.and_then(|i|monitors.get(i as usize).cloned()).or_else(||window.primary_monitor().ok().flatten()).or_else(||monitors.into_iter().next()).ok_or_else(||"No monitor available".into()); }
@@ -116,7 +140,7 @@ fn save_window_state(app: tauri::AppHandle) -> Result<(), String> {
     let window = app.get_webview_window("main").ok_or("Main window unavailable")?;
     let position = window.outer_position().map_err(|e| e.to_string())?; let size = window.outer_size().map_err(|e| e.to_string())?;
     let path = window_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?;
-    fs::write(path, serde_json::to_vec(&json!({"x":position.x,"y":position.y,"width":size.width,"height":size.height})).map_err(|e| e.to_string())?).map_err(|e| e.to_string())
+    private_write(path, serde_json::to_vec(&json!({"x":position.x,"y":position.y,"width":size.width,"height":size.height})).map_err(|e| e.to_string())?).map_err(|e| e.to_string())
 }
 fn restore_window(window: &tauri::WebviewWindow) {
     if let Ok(value) = fs::read(window_path()).and_then(|data| serde_json::from_slice::<Value>(&data).map_err(std::io::Error::other)) {
@@ -176,5 +200,5 @@ async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> 
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { #[cfg(target_os="linux")] linux::configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
 }
