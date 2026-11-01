@@ -11,7 +11,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const output = resolve(root, 'docs/screenshots');
 const snapshot = JSON.parse(await readFile(resolve(root, 'docs/tools/fixtures/quotas.json'), 'utf8'));
 if (typeof WebSocket === 'undefined') throw new Error('Use Node with built-in WebSocket (Node 22+ recommended).');
-await mkdir(output, { recursive: true });
+await mkdir(resolve(output, 'themes'), { recursive: true });
+await mkdir(resolve(output, 'checks'), { recursive: true });
 async function run(command, args, cwd) {
   const child = spawn(command, args, { cwd, stdio: 'inherit' });
   const [code] = await once(child, 'exit');
@@ -44,6 +45,26 @@ scenes.set('states',{w:1050,h:860,html:shell(heading('HONEST STATUS','Know when 
 scenes.set('kde-panel',{w:1100,h:370,html:shell(heading('KDE PLASMA 6','Part of your panel','Breeze light · compact session view · mini bars')+`<div class="panel-area"><div class="bar" style="height:44px;background:#eff0f1;color:#232629;border:1px solid #bdc3c7"><span>◉ &nbsp; ▣ &nbsp; ▤</span><div class="strip"><span>CL <b>34%</b><div class="track"><i style="width:34%"></i></div></span><span>CX <b style="color:#8a6300">77%</b><div class="track" style="color:#8a6300"><i style="width:77%"></i></div></span><span>GM <b style="color:#b42323">86%</b><div class="track" style="color:#b42323"><i style="width:86%"></i></div></span><span style="color:#232629">⌁ &nbsp; 12:00</span></div></div></div>`,true)});
 scenes.set('waybar',{w:1100,h:360,html:shell(heading('HYPRLAND / SWAY','Your bar, your workflow','Waybar · shared snapshot · session usage')+`<div class="panel-area"><div class="bar" style="height:32px;font-family:Mono;background:#20242d"><span>1 &nbsp; 2 &nbsp; 3 &nbsp; 4</span><span style="font-size:12px">CL 34% · 2h40 | CX 8% · 3h28 | GM 12% · 2h50 &nbsp; │ &nbsp; 12:00</span></div></div>`)});
 scenes.set('social-preview',{w:1280,h:640,dpr:1,html:shell(`<div class="hero"><div class="copy" style="max-width:650px"><img class="logo" src="/assets-docs/logo.svg"><small> WINDOWS + LINUX</small><h1>AI Quota Widget</h1><p style="font-size:20px">Your AI quotas, right on your desktop.</p><span class="pill">Claude Code · Codex · Gemini</span></div>${frame('Fictional quota data',280,500,{scale:75})}</div>`)});
+const themeIds = ['dot-matrix', 'circular-rings', 'terminal', 'frosted-glass', 'brutalist', 'compact-strip', 'retro-lcd', 'minimal-pace'];
+const names = ['Dot Matrix', 'Circular Rings', 'Terminal', 'Frosted Glass', 'Brutalist', 'Compact Strip', 'Retro LCD', 'Minimal Pace'];
+const oneProvider = { ...snapshot, providers: snapshot.providers.slice(0,1) };
+for (const appearance of ['dark','light']) {
+ const light = appearance === 'light';
+ const trio = ['circular-rings','brutalist','frosted-glass'];
+ scenes.set(`hero-${appearance}`, {w:1220,h:1450,autoHeight:true,html:shell(heading('YOUR LIMITS. IN SIGHT.', 'Keep your next session in view.', 'Claude Code · Codex · Gemini / Eight themes. One local quota snapshot.') + `<div class="row">${trio.map(id=>frame(names[themeIds.indexOf(id)],340,1200,{theme:id,appearance})).join('')}</div>`,light)});
+ scenes.set(light ? 'themes-light' : 'themes', {w:1570,h:3000,autoHeight:true,html:shell(heading('EIGHT THEMES', 'Find your own rhythm', 'Every design below is selectable in the application. Fictional quota data.') + `<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map((id,i)=>frame(names[i],340,1250,{theme:id,appearance})).join('')}</div>`,light)});
+ for (const [i,id] of themeIds.entries()) {
+  scenes.set(`themes/${id}-${appearance}`, {w:436,h:1450,autoHeight:true,html:shell(frame(names[i],340,1250,{theme:id,appearance}),light)});
+  scenes.set(`checks/${id}-${appearance}`, {w:1260,h:1500,autoHeight:true,html:shell(heading('RESPONSIVE CHECK', `${names[i]} / ${appearance}`, '340 px and 200 px / three providers and one provider') + `<div class="row" style="gap:12px">${[340,200].map(width=>[snapshot,oneProvider].map(data=>frame(`${width}px / ${data.providers.length} providers`,width,1200,{theme:id,appearance},{snapshot:data})).join('')).join('')}</div>`,light)});
+ }
+}
+scenes.set('social-preview', {w:1280,h:640,dpr:1,html:shell(`<div style="display:flex;align-items:center;gap:30px"><div class="copy" style="width:330px;flex:none"><img class="logo" src="/assets-docs/logo.svg"><h1 style="font-size:36px">AI Quota Widget</h1><p>Your AI quotas, on your desktop.</p><span class="pill">Windows + Linux / 8 themes</span></div>${['circular-rings','brutalist','frosted-glass'].map(id=>frame(names[themeIds.indexOf(id)],250,500,{theme:id,scale:80},{snapshot:oneProvider})).join('')}</div>`)});
+const edgeData = structuredClone(snapshot);
+edgeData.providers[0].stale = true;
+edgeData.providers[0].windows.push({id:'extra',label:'Extra window',used_percent:81,kind:'other',hidden_by_default:true,resets_at:null});
+edgeData.providers[1].state = 'AUTH_REQUIRED'; edgeData.providers[1].windows = [{id:'unknown',label:'Unknown quota',used_percent:null,resets_at:null}];
+edgeData.providers[2].state = 'RATE_LIMITED';
+for (const id of themeIds) scenes.set(`checks/${id}-states`, {w:1000,h:1600,autoHeight:true,html:shell(heading('DATA CONTRACT',id,'Hidden extra window / visible extra window / unknown values')+`<div class="row">${[false,true].map(showExtraWindows=>frame(showExtraWindows?'Extra visible':'Extra hidden',340,1300,{theme:id,showExtraWindows},{snapshot:edgeData})).join('')}</div>`)});
 const server = createServer(async (req,res)=>{
  try {
   const url=new URL(req.url,'http://localhost');
@@ -68,6 +89,7 @@ try {
  const targets=await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
  ws=new WebSocket(targets.find(t=>t.type==='page').webSocketDebuggerUrl);await once(ws,'open');
  const errors=[];
+ const checks=[];
  ws.addEventListener('message',event=>{const message=JSON.parse(event.data);if(message.method==='Runtime.exceptionThrown')errors.push(message.params.exceptionDetails.text);const call=pending.get(message.id);if(call){clearTimeout(call.timer);pending.delete(message.id);if(message.error)call.reject(Error(message.error.message));else call.resolve(message.result);}});
  await cdp('Page.enable');await cdp('Runtime.enable');
  await cdp('Emulation.setTimezoneOverride',{timezoneId:'UTC'});await cdp('Emulation.setLocaleOverride',{locale:'en-US'});
@@ -76,15 +98,43 @@ try {
   errors.length=0;
   await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:scene.h,deviceScaleFactor:scene.dpr||2,mobile:false});
   await cdp('Page.navigate',{url:`${base}/scene/${name}`});
-  const result=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let attempt=0;attempt<150;attempt++){const frames=[...document.querySelectorAll('iframe')];if(location.pathname==='/scene/${name}'&&document.readyState==='complete'&&frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){await document.fonts.ready;await Promise.all(frames.map(f=>f.contentDocument.fonts.ready));for(const f of frames){if(f.contentDocument.documentElement.classList.contains('fit-height')) f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return frames.map(f=>({cards:f.contentDocument.querySelectorAll('.provider-card').length,body:f.contentDocument.body.scrollHeight}));}await new Promise(r=>setTimeout(r,100));}throw Error('Frame readiness timed out');})()`,awaitPromise:true,returnByValue:true});
+  const result=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let attempt=0;attempt<150;attempt++){const frames=[...document.querySelectorAll('iframe')];if(location.pathname==='/scene/${name}'&&document.readyState==='complete'&&frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){await document.fonts.ready;await Promise.all(frames.map(f=>f.contentDocument.fonts.ready));for(const f of frames){if(f.contentDocument.documentElement.classList.contains('fit-height')) f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return frames.map(f=>{const d=f.contentDocument;const expected=JSON.parse(new URL(f.src).searchParams.get('docs')).snapshot.providers.length;const overflow=[...d.querySelectorAll('.provider-card,.quota-window,.provider-heading')].filter(el=>el.scrollWidth>el.clientWidth+2).map(el=>el.className);return {cards:d.querySelectorAll('.provider-card').length,expected,overflow,theme:d.documentElement.dataset.theme,styles:d.querySelectorAll('#active-theme').length};});}await new Promise(r=>setTimeout(r,100));}throw Error('Frame readiness timed out');})()`,awaitPromise:true,returnByValue:true});
   if(result.exceptionDetails||errors.length)throw Error(`${name}: ${JSON.stringify(result.exceptionDetails||errors)}`);
-  if(result.result.value.some(frame=>frame.cards!==3))throw Error(`${name}: missing provider cards`);
+  if(result.result.value.some(frame=>frame.cards!==frame.expected || frame.overflow.length || frame.styles!==1))throw Error(`${name}: layout failure ${JSON.stringify(result.result.value)}`);
+  checks.push({scene:name,frames:result.result.value});
+  if(scene.autoHeight){
+   const bounds=await cdp('Runtime.evaluate',{expression:`Math.ceil(Math.max(...[...document.body.children].map(el=>el.getBoundingClientRect().bottom)))+48`,returnByValue:true});
+   await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:bounds.result.value,deviceScaleFactor:scene.dpr||2,mobile:false});
+   await cdp('Runtime.evaluate',{expression:'new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))',awaitPromise:true});
+  }
   const capture=await cdp('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
   const png=Buffer.from(capture.data,'base64');
   if(name==='social-preview'&&png.length>=1000000)throw Error('Social preview exceeds 1 MB');
   await writeFile(resolve(output,`${name}.png`),png);
-  console.log(`${name}.png (${scene.w*(scene.dpr||2)} × ${scene.h*(scene.dpr||2)})`);
+  console.log(`${name}.png (${png.readUInt32BE(16)} × ${png.readUInt32BE(20)})`);
  }
+ // Exercise switching in the same webview; a screenshot alone cannot detect
+ // cached CSS accumulating or a selector failing after repeated switches.
+ const interactions = await cdp('Runtime.evaluate',{expression:`(async()=>{
+ const f=document.querySelector('iframe'),w=f.contentWindow,d=f.contentDocument;
+ for(const id of ${JSON.stringify(themeIds)}){
+  d.querySelector('#theme-picker [data-theme="'+id+'"]').click();
+  for(let n=0;d.documentElement.dataset.theme!==id&&n<100;n++) await new Promise(r=>setTimeout(r,20));
+  if(d.documentElement.dataset.theme!==id || d.querySelectorAll('#active-theme').length!==1) throw Error('Theme switch: '+id);
+  const p=d.querySelector('#palette'); if(!p.value || !p.options.length)throw Error('Missing palette: '+id);
+  const fit=d.querySelector('#fit-height');for(const checked of [false,true]){fit.checked=checked;fit.dispatchEvent(new Event('change'));if(d.documentElement.classList.contains('fit-height')!==checked)throw Error('Fit height: '+id);}
+  d.querySelector('#gear').click();await new Promise(r=>requestAnimationFrame(r));if(d.querySelector('#settings').hidden || d.querySelector('#widget').getBoundingClientRect().height<540)throw Error('Settings height: '+id);d.querySelector('#close-settings').click();
+  const extra=d.querySelector('#show-extra-windows');extra.checked=true;extra.dispatchEvent(new Event('change')); if(!d.body.textContent.includes('Extra window'))throw Error('Extra window: '+id);
+  extra.checked=false;extra.dispatchEvent(new Event('change'));if(d.body.textContent.includes('Extra window'))throw Error('Hidden extra: '+id);
+  for(const appearance of ['light','dark','auto']) {const a=d.querySelector('#appearance');a.value=appearance;a.dispatchEvent(new Event('change'));if(appearance!=='auto'&&d.documentElement.dataset.mode!==appearance)throw Error('Appearance: '+id);}
+  for(const scale of [50,300]){const a=d.querySelector('#scale');a.value=scale;a.dispatchEvent(new Event('input'));if(Number(d.querySelector('#app').style.zoom)!==scale/100)throw Error('Scale: '+id);}
+  const scale=d.querySelector('#scale');scale.value=100;scale.dispatchEvent(new Event('input'));
+ }
+ return 'Theme switching, palette, appearance, fit/settings height, scale and extra-window checks passed';
+ })()`,awaitPromise:true,returnByValue:true});
+ if(interactions.exceptionDetails)throw Error(JSON.stringify(interactions.exceptionDetails));
+ await writeFile(resolve(output,'checks/results.json'),JSON.stringify({checks,interactions:interactions.result.value},null,2)+'\n');
+ console.log(interactions.result.value);
 } finally {
  if(ws)ws.close();for(const call of pending.values())clearTimeout(call.timer);
  if(chrome&&chrome.exitCode===null){chrome.kill('SIGTERM');await Promise.race([once(chrome,'exit'),new Promise(r=>setTimeout(r,3000))]);if(chrome.exitCode===null)chrome.kill('SIGKILL');}

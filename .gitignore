@@ -38,3 +38,4 @@ app/src-tauri/icons/ios/
 # Private launch copy; synthetic screenshots are intentional documentation assets
 docs/about.md
 docs/tools/.capture-*/
+docs/screenshots/checks/

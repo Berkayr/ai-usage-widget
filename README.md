@@ -14,7 +14,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/hero-light.png">
-    <img src="docs/screenshots/hero-dark.png" width="1000" alt="Three provider cards with fictional quota percentages, dot bars and reset countdowns">
+    <img src="docs/screenshots/hero-dark.png" width="1000" alt="Circular Rings, Brutalist and Frosted Glass themes showing fictional quota data">
   </picture>
 </p>
 <p align="center"><a href="#install">Download</a> · <a href="#quick-start">Quick start</a> · <a href="docs/providers.md">Docs</a></p>
@@ -54,7 +54,20 @@ Open Vite's displayed URL with `?sample` to see fictional data. For a native sou
 
 ## Make it yours
 
-Choose Signal Orange, Sakura Pink, Nord or Mono Paper, then set appearance to Auto, Light or Dark. Accent and background colors can be overridden. Separate widget and background opacity controls let you tune transparency while keeping text readable. These controls change opacity, not monitor brightness or compositor blur.
+### Themes
+
+Choose from eight built-in themes: Dot Matrix, Circular Rings, Terminal, Frosted Glass, Brutalist, Compact Strip, Retro LCD and Minimal Pace. The Theme cards at the top of Settings switch the layout immediately. Each theme supports Auto, Light and Dark appearance; the palette list follows the selected theme. Compact Strip becomes horizontal in wide windows. Minimal Pace compares usage with elapsed session or weekly time; unknown intervals remain marked unavailable.
+
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/themes-light.png">
+  <img src="docs/screenshots/themes.png" alt="Eight selectable application themes with fictional quota data" width="1100">
+</picture>
+
+[Individual dark and light captures](docs/screenshots/themes/) · [Light gallery](docs/screenshots/themes-light.png)
+
+### Colors and sizing
+
+Dot Matrix includes Signal Orange, Sakura Pink, Nord and Mono Paper; the other themes include a palette matched to their design. Accent and background colors can be overridden. Separate widget and background opacity controls let you tune transparency while keeping text readable. These controls change opacity, not monitor brightness or compositor blur.
 
 ![Four palette variants of the real widget](docs/screenshots/palettes.png)
 
@@ -124,7 +137,7 @@ Requests retrieve usage or balances; the collector does not submit prompts or re
 
 ## Roadmap
 
-Cursor, Kiro, Amp and Grok adapters; a broader theme engine; native desktop acceptance across more environments; signed release validation; winget and AUR distribution. These are plans, not current integrations.
+Cursor, Kiro, Amp and Grok adapters; additional themes; native desktop acceptance across more environments; signed release validation; winget and AUR distribution. These are plans, not current integrations.
 
 ## Contributing
 
