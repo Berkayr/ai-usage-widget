@@ -1,3 +1,5 @@
+#[cfg(windows)]
+mod taskbar;
 use notify::{RecursiveMode, Watcher};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -5,9 +7,15 @@ use std::{fs, path::PathBuf, process::{Command, Stdio}, thread, time::Duration};
 use tauri::{Emitter, Manager};
 
 #[derive(Clone, Serialize, Deserialize)]
-struct Settings { palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale")] scale: u16, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool }
+struct Settings { palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale")] scale: u16, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default)] taskbar: TaskbarSettings }
 fn default_fit_height() -> bool { true } fn default_scale() -> u16 { 100 } fn default_position() -> String { "Top right".into() }
-impl Default for Settings { fn default() -> Self { Self { palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 94, fit_height: true, scale: 100, position: "Top right".into(), show_extra_windows: false } } }
+impl Default for Settings { fn default() -> Self { Self { palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 94, fit_height: true, scale: 100, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default, rename_all="camelCase")]
+struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32 }
+impl Default for TaskbarSettings {
+    fn default() -> Self { Self { enabled: false, providers: vec!["claude".into(), "codex".into(), "gemini".into()], window: "session".into(), show_bars: false, offset_x: 0 } }
+}
 #[derive(Clone, Serialize)]
 struct SnapshotEvent { snapshot: Option<Value> }
 
@@ -43,7 +51,7 @@ fn refresh() -> Result<(), String> {
     }
     Err(last_error)
 }
-fn emit_snapshot(app: &tauri::AppHandle) { let _ = app.emit("snapshot", SnapshotEvent { snapshot: read_snapshot() }); }
+fn emit_snapshot(app: &tauri::AppHandle) { let snapshot = read_snapshot(); #[cfg(windows)] taskbar::update_snapshot(snapshot.clone()); let _ = app.emit("snapshot", SnapshotEvent { snapshot }); }
 #[tauri::command]
 fn get_snapshot() -> Value { json!({"snapshot": read_snapshot()}) }
 #[tauri::command]
@@ -51,7 +59,7 @@ fn refresh_now(app: tauri::AppHandle) -> Result<(), String> { refresh()?; emit_s
 #[tauri::command]
 fn load_settings() -> Settings { fs::read(settings_path()).ok().and_then(|data| serde_json::from_slice(&data).ok()).unwrap_or_default() }
 #[tauri::command]
-fn save_settings(settings: Settings) -> Result<(), String> { let path = settings_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?; fs::write(path, serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?).map_err(|e| e.to_string()) }
+fn save_settings(settings: Settings) -> Result<(), String> { let path = settings_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?; fs::write(path, serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?; #[cfg(windows)] taskbar::update_settings(settings.taskbar); Ok(()) }
 fn current_monitor(window: &tauri::WebviewWindow) -> Result<tauri::Monitor, String> {
     let position = window.outer_position().map_err(|e| e.to_string())?;
     window.available_monitors().map_err(|e| e.to_string())?.into_iter().min_by_key(|monitor| { let area=monitor.work_area(); let cx=position.x+window.outer_size().map(|s|s.width as i32/2).unwrap_or(0); let cy=position.y+window.outer_size().map(|s|s.height as i32/2).unwrap_or(0); let x=(cx-(area.position.x+area.size.width as i32/2)).abs(); let y=(cy-(area.position.y+area.size.height as i32/2)).abs(); x.saturating_add(y) }).ok_or_else(||"No monitor available".into())
@@ -123,5 +131,5 @@ fn start_background(app: tauri::AppHandle) {
     });
 }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window]).setup(|app| { if let Some(window)=app.get_webview_window("main") { restore_window(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window]).setup(|app| { if let Some(window)=app.get_webview_window("main") { restore_window(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
 }

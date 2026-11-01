@@ -6,7 +6,8 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 
 const isSample = new URLSearchParams(location.search).has('sample') || !('__TAURI_INTERNALS__' in window);
-let settings = { palette: 'signal-orange', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 94, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
+const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'], window: 'session', showBars: false, offsetX: 0 };
+let settings = { taskbar: { ...defaultTaskbar }, palette: 'signal-orange', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 94, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
 try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
 let currentSnapshot = null;
 
@@ -15,7 +16,7 @@ document.querySelector('#app').innerHTML = `
     <header class="header" data-tauri-drag-region><div class="title-block"><div class="app-title">AI QUOTA</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
     <div class="provider-list" id="providers"></div>
     <footer class="footer"><span>QUOTA MONITOR</span><span>MATRIX//01</span></footer>
-    <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label></section>
+    <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label><fieldset class="taskbar-settings" id="taskbar-settings"><legend>Taskbar strip</legend><label class="toggle-setting">Enable taskbar strip<input id="taskbar-enabled" type="checkbox"></label><div class="taskbar-providers"><label class="toggle-setting">Claude<input type="checkbox" data-taskbar-provider="claude"></label><label class="toggle-setting">Codex<input type="checkbox" data-taskbar-provider="codex"></label><label class="toggle-setting">Gemini<input type="checkbox" data-taskbar-provider="gemini"></label><label class="toggle-setting">Copilot<input type="checkbox" data-taskbar-provider="copilot"></label></div><label>Quota window<select id="taskbar-window"><option value="session">Session</option><option value="weekly">Weekly</option><option value="both">Both</option></select></label><label class="toggle-setting">Show mini bars<input id="taskbar-bars" type="checkbox"></label></fieldset></section>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
     <div class="toast" id="toast" hidden></div>
   </main>`;
@@ -32,6 +33,11 @@ function applySettings() {
   document.documentElement.style.setProperty('--ui-scale', settings.scale / 100);
   document.querySelector('#app').style.zoom = String(settings.scale / 100);
   document.documentElement.classList.toggle('fit-height', Boolean(settings.fitHeight)); lastFitHeight = 0;
+  settings.taskbar = { ...defaultTaskbar, ...settings.taskbar };
+  $('#taskbar-enabled').checked = settings.taskbar.enabled;
+  $('#taskbar-window').value = settings.taskbar.window;
+  $('#taskbar-bars').checked = settings.taskbar.showBars;
+  document.querySelectorAll('[data-taskbar-provider]').forEach(input => { input.checked = settings.taskbar.providers.includes(input.dataset.taskbarProvider); });
   $('#palette').value = settings.palette;
   $('#accent').value = settings.accent || palette.accent;
   $('#background').value = settings.background || palette.bgWidget;
@@ -67,6 +73,10 @@ async function persist() { if (!isSample) try { await invoke('save_settings', { 
 function showToast(message) { const el = $('#toast'); el.textContent = message; el.hidden = false; setTimeout(() => { el.hidden = true; }, 3200); }
 
 for (const [id, item] of Object.entries(theme.palettes)) $('#palette').add(new Option(item.name, id));
+$('#taskbar-enabled').onchange = async event => { settings.taskbar.enabled = event.target.checked; await persist(); };
+$('#taskbar-window').onchange = async event => { settings.taskbar.window = event.target.value; await persist(); };
+$('#taskbar-bars').onchange = async event => { settings.taskbar.showBars = event.target.checked; await persist(); };
+document.querySelectorAll('[data-taskbar-provider]').forEach(input => input.onchange = async () => { settings.taskbar.providers = [...document.querySelectorAll('[data-taskbar-provider]:checked')].map(input => input.dataset.taskbarProvider); await persist(); });
 $('#gear').onclick = () => { $('#settings').hidden = !$('#settings').hidden; };
 $('#close-settings').onclick = () => { $('#settings').hidden = true; };
 $('#palette').onchange = async (event) => { settings.palette = event.target.value; settings.accent = null; settings.background = null; applySettings(); await persist(); };
@@ -84,6 +94,7 @@ document.addEventListener('click', event => { if (!event.target.closest('#contex
 $('#refresh').onclick = async () => { if (isSample) return draw(currentSample()); try { await invoke('refresh_now'); } catch (error) { showToast(String(error)); } };
 $('#menu-settings').onclick = () => { $('#settings').hidden = false; };
 
+$('#taskbar-settings').hidden = !isSample && !/Windows/i.test(navigator.userAgent);
 applySettings();
 fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === '+' || event.key === '=') settings.scale = Math.min(300, settings.scale + 10); else if (event.key === '-') settings.scale = Math.max(50, settings.scale - 10); else if (event.key === '0') settings.scale = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); });
 if (isSample) draw(currentSample());
@@ -92,6 +103,8 @@ else {
     settings = { ...settings, ...(await invoke('load_settings')) }; applySettings();
     const initial = await invoke('get_snapshot'); draw(initial.snapshot, !initial.snapshot);
     await listen('snapshot', event => draw(event.payload.snapshot, !event.payload.snapshot));
+    await listen('open-settings', () => { $('#settings').hidden = false; });
+    await listen('taskbar-settings-changed', event => { settings.taskbar = { ...defaultTaskbar, ...event.payload }; applySettings(); });
     await listen('refresh-error', event => showToast(event.payload));
   } catch (error) { draw(sample, true); showToast(`Unable to load quota data: ${error}`); }
 }
