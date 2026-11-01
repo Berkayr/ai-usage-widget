@@ -1,4 +1,4 @@
-# Linux packaging and desktop integration
+# Packaging and desktop integration
 
 From the repository root, build the widget with:
 
@@ -10,7 +10,7 @@ npx tauri build --bundles appimage,deb,rpm
 
 Bundle targets are AppImage, deb and rpm. The no-bundle debug acceptance build does not create installers. Tauri generates the package desktop entry and uses the existing temporary icons under `app/src-tauri/icons/`; `packaging/dev.aiquota.widget.desktop` is the source-package desktop entry. Replace temporary icons after design review. No proprietary font or brand asset is needed.
 
-The Tauri resources include the Python quotacore module. The widget resolves it from its installed resources and runs it using host `python3`. `QUOTACORE_PYTHONPATH` overrides the module location. Deb/rpm and the source AUR recipe also install a `quotacore` launcher. On deb/rpm it resolves the bundled Python sources; use `quotacore bar` in panel examples instead of `python3 -m quotacore bar`. Panel examples using `python3 -m` require quotacore available to that interpreter separately (the source AUR recipe installs it). For a development checkout:
+The Tauri resources include the Python quotacore module. The widget resolves it from its installed resources and runs it using host `python3`. The native app always loads its packaged sources; `QUOTACORE_PYTHON` may select an interpreter executable, without arguments. Deb/rpm and the source AUR recipe also install a `quotacore` launcher. On deb/rpm it resolves the bundled Python sources; use `quotacore bar` in panel examples instead of `python3 -m quotacore bar`. Panel examples using `python3 -m` require quotacore available to that interpreter separately (the source AUR recipe installs it). For a development checkout:
 
 ```sh
 python3 -m venv .venv
@@ -80,3 +80,58 @@ checksum validation until reviewed release artifacts exist. Before publication:
 CI warns if `SKIP` is reintroduced. Do not replace a placeholder with `SKIP` or
 publish the drafts before these checks. Checksums alone do not authenticate a
 release publisher.
+
+## Windows: with Python and slim
+
+Release builds publish two NSIS installers and two MSI packages for x86-64:
+
+- **with-python**: Python 3.13.17 from python.org, extracted under the application resource directory's `python/`. No separate Python installation required.
+- **slim**: no Python files installed; requires a working Python 3.10+ (`py -3`, `python3` or `python`). Choose this edition when Python is already installed.
+
+Both editions share an application identity: install one, not both. Uninstall before
+switching editions so an old with-Python installation cannot leave runtime files
+behind. Normal upgrades within the same edition retain the normal identity.
+NSIS hooks run before/after copying Tauri's generated resource list, and MSI uses
+a different installer engine. Separate resource sets provide a predictable,
+reviewable omission in both formats without a custom installer template or
+copy-then-delete hook. This is a user-selected slim edition, not automatic detection
+by the installer.
+
+On Windows, from the repository root:
+
+```powershell
+./scripts/fetch-python.ps1
+cd app
+npm ci
+npm run tauri -- build --locked --bundles nsis,msi --config src-tauri/tauri.with-python.conf.json
+# Or build slim (does not include python/ even if it exists locally):
+npm run tauri -- build --locked --bundles nsis,msi
+```
+
+On Linux, `scripts/fetch-python.sh` prepares the identical Windows runtime for
+cross-build staging; it does not bundle Python into Linux packages. Both scripts
+read the same pinned URL and SHA-256 in `scripts/python-runtime.json`. The Windows
+script also checks PSF Authenticode signatures on python.exe and python313.dll.
+Keep LICENSE.txt from the upstream archive with the runtime. Never commit the
+runtime directory or zip. Downloads happen at build time only.
+
+Windows installers embed the small WebView2 bootstrapper (about 1.8 MB). Windows 11
+and most Windows 10 machines already have WebView2, so nothing is downloaded; if it
+is missing, the bootstrapper installs it from Microsoft during setup. The app itself
+downloads nothing at first launch. Python contributes about 10.9 MB of compressed
+input / 22.6 MB installed to with-Python; final installer sizes depend on WebView2,
+Rust build mode and compression and must be measured on Windows. Slim saves the
+Python contribution; WebView2 is shared by both editions.
+
+The widget selects `QUOTACORE_PYTHON`, then packaged Python if present, then system
+Python 3.10+. Invalid explicit overrides or a damaged embedded runtime fail with a
+clear message rather than silently selecting another interpreter. The packaged
+module directory supplies `PYTHONPATH`; `site` is disabled and no pip installation
+is performed. About / Diagnostics reports the selected source, version and path
+using passive `doctor` output. Direct `python -m quotacore doctor` reports `direct`
+when launched outside the native selector.
+
+Linux uses system Python 3.10+: deb/rpm declare the minimum version. AppImage
+cannot enforce a package dependency and reports installation guidance if Python
+is missing or too old. A host interpreter avoids duplicating the distribution's
+Python security maintenance and matches the existing CLI/panel integration.

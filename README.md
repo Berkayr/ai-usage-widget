@@ -31,7 +31,7 @@ Pre-release: installers are coming with v0.1. The name and logo are provisional.
 | Linux | AppImage, Debian/Ubuntu `.deb`, Fedora `.rpm` | Coming with v0.1 |
 | Arch Linux | AUR package | Coming with v0.1; recipe drafts only |
 
-No winget or AUR installation command is published yet. Linux needs host Python 3.10+, provider CLIs and the appropriate GTK/WebKit runtime; AppImage also has host dependencies. Windows needs Python and the relevant provider tools. See [packaging](packaging/README.md) before building or testing a package.
+No winget or AUR installation command is published yet. Linux needs host Python 3.10+, provider CLIs and the appropriate GTK/WebKit runtime; AppImage also has host dependencies. Windows **with Python** installers include a verified private Python runtime; no separate Python installation is needed. If Python 3.10+ is already installed, choose **slim** to skip the bundled runtime and use your existing interpreter. Provider tools are still installed separately. See [packaging](packaging/README.md) before building or testing a package.
 
 ## Quick start
 

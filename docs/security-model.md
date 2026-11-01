@@ -104,12 +104,41 @@ Implementation: [atomic files](../quotacore/paths.py),
 
 ## Processes and hooks
 
-The native app prefers the packaged Python module resources on both Windows and
-Linux. An explicit `QUOTACORE_PYTHONPATH` overrides that directory. Host Python
-and provider executables still resolve from the trusted local installation and
-PATH. `quotacore doctor` exposes the interpreter, module and resolved CLI paths.
-Windows tries the Python launcher, then Python when the executable cannot start.
-Trust the inherited Python, PATH, library and proxy environment.
+The native app loads quotacore only from its packaged resource directory on
+Windows and Linux (debug source builds may use the checkout). `PYTHONPATH` is set
+to that directory; the old `QUOTACORE_PYTHONPATH` module override is not used by
+the native app. Interpreter selection is `QUOTACORE_PYTHON` (an executable path,
+without arguments), then embedded Python, then system Python 3.10+. Versions are
+probed with `--version` under a five-second deadline; no failed collection is
+retried with another interpreter. Explicit invalid overrides and damaged bundled
+runtimes are errors. About / Diagnostics runs passive `doctor` and displays the
+selected runtime source, interpreter path and version. Direct CLI launches report
+`direct`. Diagnostics contain private paths; do not attach them unredacted.
+
+Windows with-Python builds include python.org's official AMD64 embeddable Python
+3.13.17. The URL and SHA-256 are pinned in
+[`scripts/python-runtime.json`](../scripts/python-runtime.json), matching the
+[official release page](https://www.python.org/downloads/release/python-31317/)
+and its published Sigstore message digest. Build scripts reject a digest mismatch
+before extraction; Windows also requires valid Python Software Foundation
+Authenticode signatures on python.exe and python313.dll. The PSF license travels
+with the runtime. This pin must be reviewed for upstream security updates before
+release; Python 3.13.18 is source-only and has no official embeddable binary.
+
+`python313._pth` includes only the standard-library zip, runtime directory and
+parent application resource directory; `import site` remains disabled. The native
+collector disables `site` for system interpreters too, removes `PYTHONHOME`, and
+runs from the resource directory. No user site-packages are installed or needed:
+quotacore uses only the standard library. Runtime binaries remain ordinary
+upstream files: no PyInstaller/Nuitka onefile executable, runtime self-extraction,
+first-launch download or privilege elevation. Linux uses the host Python security
+updates; deb/rpm require 3.10+ and AppImage gives installation guidance. Windows
+slim omits Python entirely. Both Windows editions embed Microsoft's WebView2 bootstrapper, which downloads WebView2 from Microsoft during setup only if it is missing.
+
+Host interpreters, explicit runtime overrides, provider executables, PATH,
+library and proxy environment are trusted local inputs. Selecting an interpreter
+is not a sandbox for a malicious executable. The Python install-manager automatic
+installation flags are disabled on child processes.
 
 The [native collector runner](../app/src-tauri/src/collector.rs) has a 120-second
 deadline, a 1 MiB stdout limit and generic UI errors (raw stderr is discarded).
