@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "generated_at": "2026-10-31T18:42:00+00:00",
+  "providers": [
+    { "id": "claude", "label": "Claude Code", "plan": "Pro", "state": "OK", "stale": false, "category": "subscription", "windows": [
+      { "id": "five_hour", "label": "5 hour", "used_percent": 34, "resets_in_minutes": 160, "kind": "session" },
+      { "id": "seven_day", "label": "7 day", "used_percent": 61, "resets_in_minutes": 2310, "kind": "weekly" },
+      { "id": "provider-extra", "label": "Extra window", "raw_label": "Internal Preview", "used_percent": 21, "resets_in_minutes": 470, "kind": "other", "hidden_by_default": true }
+    ], "meters": [] },
+    { "id": "codex", "label": "OpenAI Codex", "plan": "Plus", "state": "STALE", "stale": true, "category": "subscription", "windows": [
+      { "id": "primary", "label": "5 hour", "used_percent": 8, "resets_in_minutes": 208, "kind": "session" },
+      { "id": "secondary", "label": "7 day", "used_percent": 77, "resets_in_minutes": 3190, "kind": "weekly" },
+      { "id": "credits", "label": "Credits", "used_percent": null, "resets_in_minutes": null, "kind": "other", "hidden_by_default": true }
+    ], "meters": [] },
+    { "id": "gemini", "label": "Google Gemini", "plan": "Advanced", "state": "RATE_LIMITED", "stale": false, "category": "subscription", "windows": [
+      { "id": "gm-weekly", "label": "Gemini Models · weekly", "used_percent": 28, "resets_in_minutes": 2310, "kind": "weekly" },
+      { "id": "gm-5h", "label": "Gemini Models · 5h", "used_percent": 12, "resets_in_minutes": 170, "kind": "session" },
+      { "id": "claude-weekly", "label": "Claude and GPT models · weekly", "used_percent": 53, "resets_in_minutes": 1880, "kind": "weekly", "hidden_by_default": true },
+      { "id": "claude-5h", "label": "Claude and GPT models · 5h", "used_percent": 19, "resets_in_minutes": 100, "kind": "session", "hidden_by_default": true },
+      { "id": "argon-weekly", "label": "Gemini 4 Argon · weekly", "used_percent": 44, "resets_in_minutes": 2700, "kind": "weekly", "hidden_by_default": true }
+    ], "meters": [] },
+    { "id": "copilot", "label": "GitHub Copilot", "plan": null, "state": "NOT_INSTALLED", "stale": false, "category": "credits", "windows": [], "meters": [] },
+    { "id": "openrouter", "label": "OpenRouter", "plan": null, "state": "OK", "stale": false, "category": "api-balance", "windows": [], "meters": [ { "id": "balance", "label": "Credit balance", "unit": "USD", "remaining": 12.48 } ] },
+    { "id": "deepseek", "label": "DeepSeek API", "plan": null, "state": "AUTH_REQUIRED", "stale": false, "category": "api-balance", "windows": [], "meters": [] },
+    { "id": "jetbrains", "label": "JetBrains AI", "plan": null, "state": "SOURCE_UNAVAILABLE", "stale": false, "category": "credits", "windows": [], "meters": [] }
+  ]
+}

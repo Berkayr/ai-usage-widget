@@ -1,0 +1,74 @@
+import './themes/dot-matrix/theme.css';
+import { renderSnapshot } from './themes/dot-matrix/render.js';
+import sample from './sample-snapshot.json';
+import theme from './themes/dot-matrix/theme.json';
+import { invoke } from '@tauri-apps/api/core';
+import { listen } from '@tauri-apps/api/event';
+
+const isSample = new URLSearchParams(location.search).has('sample') || !('__TAURI_INTERNALS__' in window);
+let settings = { palette: 'signal-orange', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 94, showExtraWindows: false };
+try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
+let currentSnapshot = null;
+
+document.querySelector('#app').innerHTML = `
+  <main class="widget" id="widget">
+    <header class="header" data-tauri-drag-region><div class="title-block"><div class="app-title">AI QUOTA</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
+    <div class="provider-list" id="providers"></div>
+    <footer class="footer"><span>QUOTA MONITOR</span><span>MATRIX//01</span></footer>
+    <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label></section>
+    <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
+    <div class="toast" id="toast" hidden></div>
+  </main>`;
+
+const $ = (selector) => document.querySelector(selector);
+function applySettings() {
+  const palette = theme.palettes[settings.palette] || theme.palettes['signal-orange'];
+  for (const [key, value] of Object.entries(palette)) if (key !== 'name' && key !== 'mode') document.documentElement.style.setProperty(`--${key}`, value);
+  if (settings.accent) document.documentElement.style.setProperty('--accent', settings.accent);
+  if (settings.background) document.documentElement.style.setProperty('--bg-widget', settings.background);
+  document.documentElement.dataset.mode = palette.mode;
+  document.documentElement.style.setProperty('--widget-opacity', settings.widgetOpacity / 100);
+  document.documentElement.style.setProperty('--background-opacity', settings.backgroundOpacity / 100);
+  $('#palette').value = settings.palette;
+  $('#accent').value = settings.accent || palette.accent;
+  $('#background').value = settings.background || palette.bgWidget;
+  $('#widget-opacity').value = settings.widgetOpacity; $('#widget-out').value = `${settings.widgetOpacity}%`;
+  $('#background-opacity').value = settings.backgroundOpacity; $('#background-out').value = `${settings.backgroundOpacity}%`;
+  $('#show-extra-windows').checked = Boolean(settings.showExtraWindows);
+}
+function draw(snapshot, noData = false) {
+  currentSnapshot = snapshot;
+  renderSnapshot($('#providers'), snapshot, { noData, showExtraWindows: settings.showExtraWindows });
+  $('#updated').textContent = snapshot?.generated_at ? `SYNC ${new Date(snapshot.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'NO DATA YET';
+}
+function currentSample() {
+  const now = Date.now();
+  return { ...sample, generated_at: new Date(now).toISOString(), providers: sample.providers.map(provider => ({ ...provider, windows: (provider.windows || []).map(window => ({ ...window, resets_at: Number.isFinite(window.resets_in_minutes) ? new Date(now + window.resets_in_minutes * 60000).toISOString() : null })) })) };
+}
+async function persist() { if (!isSample) try { await invoke('save_settings', { settings }); } catch (error) { showToast(String(error)); } }
+function showToast(message) { const el = $('#toast'); el.textContent = message; el.hidden = false; setTimeout(() => { el.hidden = true; }, 3200); }
+
+for (const [id, item] of Object.entries(theme.palettes)) $('#palette').add(new Option(item.name, id));
+$('#gear').onclick = () => { $('#settings').hidden = !$('#settings').hidden; };
+$('#close-settings').onclick = () => { $('#settings').hidden = true; };
+$('#palette').onchange = async (event) => { settings.palette = event.target.value; settings.accent = null; settings.background = null; applySettings(); await persist(); };
+$('#accent').oninput = async (event) => { settings.accent = event.target.value; applySettings(); await persist(); };
+$('#background').oninput = async (event) => { settings.background = event.target.value; applySettings(); await persist(); };
+$('#widget-opacity').oninput = async (event) => { settings.widgetOpacity = Number(event.target.value); applySettings(); await persist(); };
+$('#background-opacity').oninput = async (event) => { settings.backgroundOpacity = Number(event.target.value); applySettings(); await persist(); };
+$('#show-extra-windows').onchange = async (event) => { settings.showExtraWindows = event.target.checked; try { localStorage.setItem('showExtraWindows', String(settings.showExtraWindows)); } catch {} draw(currentSnapshot); await persist(); };
+$('#widget').addEventListener('contextmenu', event => { event.preventDefault(); $('#context-menu').hidden = false; $('#context-menu').style.left = `${event.clientX}px`; $('#context-menu').style.top = `${event.clientY}px`; });
+document.addEventListener('click', event => { if (!event.target.closest('#context-menu')) $('#context-menu').hidden = true; });
+$('#refresh').onclick = async () => { if (isSample) return draw(currentSample()); try { await invoke('refresh_now'); } catch (error) { showToast(String(error)); } };
+$('#menu-settings').onclick = () => { $('#settings').hidden = false; };
+
+applySettings();
+if (isSample) draw(currentSample());
+else {
+  try {
+    settings = { ...settings, ...(await invoke('load_settings')) }; applySettings();
+    const initial = await invoke('get_snapshot'); draw(initial.snapshot, !initial.snapshot);
+    await listen('snapshot', event => draw(event.payload.snapshot, !event.payload.snapshot));
+    await listen('refresh-error', event => showToast(event.payload));
+  } catch (error) { draw(sample, true); showToast(`Unable to load quota data: ${error}`); }
+}

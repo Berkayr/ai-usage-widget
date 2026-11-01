@@ -4,6 +4,11 @@ Snapshots contain a generation timestamp and ordered provider records. A
 provider describes where and when its quota was measured, its freshness and
 availability state, and every quota window returned by that provider. Unknown
 usage percentages stay null; they are never represented as zero.
+
+Quota windows may include ``hidden_by_default: true`` when the value is not
+useful by default (for example, empty credits, provider-specific extra windows,
+or non-primary Gemini model groups). ``raw_label`` preserves a provider's
+original label when its display label is normalized to "Extra window".
 """
 from __future__ import annotations
 
@@ -46,11 +51,17 @@ def meter_record(meter_id: str, label: str, unit: str, *, used: float | None = N
 
 def window_record(window_id: str, label: str, used_percent: float | None,
                   resets_at: str | None = None, window_minutes: int | None = None,
-                  kind: str = "other") -> dict[str, Any]:
+                  kind: str = "other", *, hidden_by_default: bool = False,
+                  raw_label: str | None = None) -> dict[str, Any]:
     if used_percent is not None:
         used_percent = max(0.0, min(100.0, float(used_percent)))
-    return {"id": str(window_id), "label": label, "used_percent": used_percent,
-            "resets_at": resets_at, "window_minutes": window_minutes, "kind": kind}
+    result = {"id": str(window_id), "label": label, "used_percent": used_percent,
+              "resets_at": resets_at, "window_minutes": window_minutes, "kind": kind}
+    if hidden_by_default or used_percent is None and resets_at is None:
+        result["hidden_by_default"] = True
+    if raw_label is not None:
+        result["raw_label"] = raw_label
+    return result
 
 
 def snapshot(providers: list[dict[str, Any]]) -> dict[str, Any]:

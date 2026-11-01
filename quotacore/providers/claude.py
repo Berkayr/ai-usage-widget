@@ -77,12 +77,16 @@ def _usage_windows(data: dict[str, Any]) -> list[dict[str, Any]]:
         if not isinstance(entry, dict):
             continue
         pct = entry.get("utilization", entry.get("used_percentage"))
-        if pct is None:
-            continue
         pct_num = pct
-        label = {"five_hour": "5 hour", "fiveHour": "5 hour", "seven_day": "7 day", "sevenDay": "7 day"}.get(key, key.replace("_", " ").title())
+        known = {"five_hour": "5 hour", "fiveHour": "5 hour", "seven_day": "7 day", "sevenDay": "7 day"}
+        raw_label = key.replace("_", " ").title()
+        is_extra = key not in known
+        label = "Extra window" if is_extra else known[key]
         minutes = 300 if key in ("five_hour", "fiveHour") else 10080 if key in ("seven_day", "sevenDay") else None
-        windows.append(make_window(key, label, pct_num, entry.get("resets_at"), minutes, kind_for(label, minutes)))
+        window = make_window(key, label, pct_num, entry.get("resets_at"), minutes, kind_for(label, minutes))
+        if is_extra:
+            window.update(hidden_by_default=True, raw_label=raw_label)
+        windows.append(window)
     return windows
 
 

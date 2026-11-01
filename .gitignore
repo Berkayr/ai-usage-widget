@@ -28,3 +28,9 @@ target/
 # Agent reports (contain local paths)
 tasarim/**/RAPOR*.md
 tasarim/RAPOR*.md
+
+# App build output
+app/dist/
+app/src-tauri/gen/
+app/src-tauri/icons/android/
+app/src-tauri/icons/ios/

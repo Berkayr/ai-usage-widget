@@ -1,0 +1,9 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "AI Quota Widget",
+  "version": "0.1.0",
+  "identifier": "dev.aiquota.widget",
+  "build": { "beforeDevCommand": "npm run dev", "devUrl": "http://localhost:5173", "beforeBuildCommand": "npm run build", "frontendDist": "../dist" },
+  "app": { "windows": [{ "label": "main", "title": "AI Quota Widget", "width": 340, "height": 640, "decorations": false, "transparent": true, "skipTaskbar": true, "resizable": true, "alwaysOnTop": false, "visible": true }], "security": { "csp": "default-src 'self'; img-src 'self' asset: data:; style-src 'self' 'unsafe-inline'; font-src 'self' asset: data:; connect-src ipc: http://ipc.localhost" } },
+  "bundle": { "active": true, "targets": "all" }
+}

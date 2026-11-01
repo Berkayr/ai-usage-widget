@@ -109,9 +109,12 @@ def windows_from_response(payload: dict[str, Any]) -> tuple[list[dict[str, Any]]
         except (TypeError, ValueError):
             duration = None
         label = "5 hour" if duration == 300 else "7 day" if duration == 10080 else str(entry.get("name") or key).replace("_", " ").title()
-        windows.append(make_window(str(key), label, entry.get("usedPercent", entry.get("used_percent")),
-                                   entry.get("resetsAt", entry.get("resets_at")), duration,
-                                   kind_for(label, duration)))
+        window = make_window(str(key), label, entry.get("usedPercent", entry.get("used_percent")),
+                             entry.get("resetsAt", entry.get("resets_at")), duration,
+                             kind_for(label, duration))
+        if key not in ("primary", "secondary", "credits"):
+            window.update(hidden_by_default=True, label="Extra window", raw_label=label)
+        windows.append(window)
     return windows, limits.get("planType", limits.get("plan_type")) if isinstance(limits, dict) else None
 
 

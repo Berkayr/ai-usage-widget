@@ -1,0 +1,11 @@
+{
+  "id": "dot-matrix",
+  "name": "01 Dot Matrix",
+  "sizeTiers": { "xs": 300, "s": 380, "m": 520, "l": 700 },
+  "palettes": {
+    "signal-orange": { "name": "Signal Orange", "mode": "dark", "bgWidget": "#0E0E11", "bgCard": "#15151A", "bgTrackOff": "#292930", "textPrimary": "#F4F4F6", "textSecondary": "#B0B0BA", "textMuted": "#8E8E9E", "border": "#303039", "accent": "#FF3B1D", "severityNormal": "#F4F4F6", "severityWarning": "#FF9E1B", "severityDanger": "#FF2A2A" },
+    "sakura-pink": { "name": "Sakura Pink", "mode": "light", "bgWidget": "#FDF2F5", "bgCard": "#FCE7EE", "bgTrackOff": "#E8CFD7", "textPrimary": "#2D121E", "textSecondary": "#60394B", "textMuted": "#7A4E62", "border": "#E8C8D4", "accent": "#E11D74", "severityNormal": "#0D9488", "severityWarning": "#D97706", "severityDanger": "#E11D48" },
+    "nord": { "name": "Nord", "mode": "dark", "bgWidget": "#242933", "bgCard": "#2E3440", "bgTrackOff": "#434C5E", "textPrimary": "#ECEFF4", "textSecondary": "#BBC3D0", "textMuted": "#9099AB", "border": "#434C5E", "accent": "#88C0D0", "severityNormal": "#A3BE8C", "severityWarning": "#EBCB8B", "severityDanger": "#BF616A" },
+    "mono-paper": { "name": "Mono Paper", "mode": "light", "bgWidget": "#F2EFE9", "bgCard": "#E6E2D8", "bgTrackOff": "#CFCCC4", "textPrimary": "#141413", "textSecondary": "#3F3D39", "textMuted": "#5C5954", "border": "#C8C4BB", "accent": "#141413", "severityNormal": "#141413", "severityWarning": "#8C5A08", "severityDanger": "#B91C1C" }
+  }
+}

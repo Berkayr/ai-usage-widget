@@ -84,6 +84,38 @@ class CoreTests(unittest.TestCase):
         self.assertEqual({w["id"] for w in windows}, {"primary", "secondary", "model-extra"})
         self.assertEqual(plan, "sample")
 
+    def test_window_visibility_metadata(self):
+        claude_windows = claude._usage_windows({
+            "five_hour": {"utilization": 20}, "seven_day": {"utilization": 30},
+            "opaque_key": {"utilization": 21, "resets_at": "2030-01-01T00:00:00Z"},
+        })
+        extra = claude_windows[-1]
+        self.assertTrue(extra["hidden_by_default"])
+        self.assertEqual(extra["label"], "Extra window")
+        self.assertEqual(extra["raw_label"], "Opaque Key")
+        codex_windows, _ = codex.windows_from_response({"rateLimits": {
+            "primary": {"usedPercent": 5}, "credits": {"usedPercent": None, "resetsAt": None}}})
+        self.assertEqual(len(codex_windows), 2)
+        self.assertTrue(codex_windows[1]["hidden_by_default"])
+
+    def test_gemini_hides_non_primary_groups(self):
+        windows, _ = gemini.windows_from_usage({"command": {"data": {"groups": [
+            {"name": "Main", "buckets": [{"id": "main", "window": "weekly", "remaining_fraction": .5}]},
+            {"name": "Other", "buckets": [{"id": "other", "window": "weekly", "remaining_fraction": .5}]},
+        ]}}})
+        self.assertNotIn("hidden_by_default", windows[0])
+        self.assertTrue(windows[1]["hidden_by_default"])
+
+    def test_write_is_silent_unless_print_requested(self):
+        with mock.patch.object(__main__, "write_snapshot", return_value={"schema": 1}), \
+             mock.patch("sys.stdout", new_callable=io.StringIO) as output:
+            self.assertEqual(__main__.main(["write"]), 0)
+            self.assertEqual(output.getvalue(), "")
+        with mock.patch.object(__main__, "write_snapshot", return_value={"schema": 1}), \
+             mock.patch("sys.stdout", new_callable=io.StringIO) as output:
+            self.assertEqual(__main__.main(["write", "--print"]), 0)
+            self.assertIn('"schema": 1', output.getvalue())
+
     def test_codex_app_server_exchange_uses_json_rpc_and_closes(self):
         response = {"id": 2, "result": {"rateLimits": {"primary": {"usedPercent": 4}}}}
 

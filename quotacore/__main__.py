@@ -105,7 +105,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("snapshot")
-    sub.add_parser("write")
+    write_parser = sub.add_parser("write")
+    write_parser.add_argument("--print", dest="print_snapshot", action="store_true",
+                              help="also print the written snapshot as JSON")
     sub.add_parser("detect")
     sub.add_parser("doctor")
     sub.add_parser("refresh-gemini")
@@ -122,7 +124,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "snapshot":
         print(json.dumps(collect(), ensure_ascii=False, indent=2))
     elif args.command == "write":
-        print(json.dumps(write_snapshot(), ensure_ascii=False, indent=2))
+        result = write_snapshot()
+        if args.print_snapshot:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
     elif args.command == "detect":
         print(json.dumps([{"id": key, "detected": module.detect(), "auth": module.META["auth"]} for key, module in PROVIDERS.items()], ensure_ascii=False, indent=2))
     elif args.command == "doctor":

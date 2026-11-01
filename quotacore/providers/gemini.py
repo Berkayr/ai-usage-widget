@@ -59,7 +59,7 @@ def windows_from_usage(payload: dict[str, Any]) -> tuple[list[dict[str, Any]], s
     data = command.get("data") or {}
     groups = data.get("groups") or []
     windows = []
-    for group in groups:
+    for group_index, group in enumerate(groups):
         if not isinstance(group, dict):
             continue
         for bucket in group.get("buckets") or []:
@@ -75,8 +75,11 @@ def windows_from_usage(payload: dict[str, Any]) -> tuple[list[dict[str, Any]], s
             label = f"{group_name} · {window_name}"
             bucket_id = str(bucket.get("id") or label)
             kind = "session" if isinstance(win, str) and win.lower() == "5h" else kind_for(label, minutes)
-            windows.append(make_window(bucket_id, label, (1.0 - fraction) * 100,
-                                       bucket.get("reset_time"), minutes, kind))
+            window = make_window(bucket_id, label, (1.0 - fraction) * 100,
+                                 bucket.get("reset_time"), minutes, kind)
+            if group_index > 0:
+                window["hidden_by_default"] = True
+            windows.append(window)
     plan = data.get("plan_tier") or data.get("plan")
     return windows, plan if isinstance(plan, str) else None
 
@@ -107,14 +110,21 @@ def read_snapshot() -> dict[str, Any] | None:
             if pct is None and item.get("remaining_fraction") is not None:
                 remaining = number(item.get("remaining_fraction"))
                 pct = (1 - remaining) * 100 if remaining is not None else None
-            windows.append(make_window(str(item.get("id") or item.get("name") or label), label,
-                                       pct, item.get("resets_at", item.get("reset_time")), minutes,
-                                       item.get("kind") if item.get("kind") in ("session", "weekly", "model", "other") else kind_for(label, minutes)))
+            window = make_window(str(item.get("id") or item.get("name") or label), label,
+                                 pct, item.get("resets_at", item.get("reset_time")), minutes,
+                                 item.get("kind") if item.get("kind") in ("session", "weekly", "model", "other") else kind_for(label, minutes))
+            # Keep visibility metadata when re-reading a normalized record.
+            if item.get("hidden_by_default"):
+                window["hidden_by_default"] = True
+            windows.append(window)
         plan = data.get("plan") if isinstance(data.get("plan"), str) else None
         captured = timestamp(data.get("checked_at") or data.get("captured_at")) or iso_now()
         source = data.get("source") if data.get("source") in ("agy-usage", "agy-statusline") else "agy-statusline"
     if not windows:
         return None
+    # Visible windows first, then session before weekly, keeping the provider's order otherwise.
+    rank = {"session": 0, "weekly": 1, "model": 2, "other": 3}
+    windows.sort(key=lambda w: (bool(w.get("hidden_by_default")), rank.get(w.get("kind"), 3)))
     try:
         age = datetime.now(timezone.utc).timestamp() - datetime.fromisoformat(captured).timestamp()
     except (ValueError, TypeError):

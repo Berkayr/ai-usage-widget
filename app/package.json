@@ -1,0 +1,9 @@
+{
+  "name": "ai-quota-widget",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "predev": "node scripts/copy-fonts.mjs", "dev": "vite", "prebuild": "node scripts/copy-fonts.mjs", "build": "vite build", "tauri": "tauri" },
+  "dependencies": { "@tauri-apps/api": "^2.8.0" },
+  "devDependencies": { "@fontsource/dotgothic16": "^5.2.6", "@fontsource/jetbrains-mono": "^5.2.6", "@tauri-apps/cli": "^2.8.4", "vite": "^6.3.5" }
+}
