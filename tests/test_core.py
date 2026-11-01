@@ -246,7 +246,7 @@ class CoreTests(unittest.TestCase):
 
     def test_hook_chain_passes_stdout(self):
         payload = {"rate_limits": {"five_hour": {"used_percentage": 33, "resets_at": 1900000000}}}
-        chain = subprocess.list2cmdline([sys.executable, "-c", "import os;os.write(1,b'chain output\\x0a')"])
+        chain = [sys.executable, "-c", "import os;os.write(1,b'chain output\\x0a')"]
         with mock.patch("sys.stdin", io.StringIO(json.dumps(payload))), mock.patch("sys.stdout", new_callable=io.StringIO) as output:
             self.assertEqual(run_hook("claude", chain), 0)
         self.assertEqual(output.getvalue(), "chain output\n")
@@ -259,11 +259,11 @@ class CoreTests(unittest.TestCase):
             self.assertEqual(codex.read()["state"], "NOT_INSTALLED")
             self.assertEqual(gemini.read()["state"], "NOT_INSTALLED")
 
-    def test_config_defaults_follow_detection(self):
+    def test_config_defaults_require_consent(self):
         self.assertEqual(home_dir(), Path(self.temp.name))
         self.assertEqual(config_dir(), Path(self.temp.name))
         config = load_config({"claude": True, "codex": False, "gemini": True})
-        self.assertTrue(config["providers"]["claude"]["enabled"])
+        self.assertFalse(config["providers"]["claude"]["enabled"])
         self.assertFalse(config["providers"]["codex"]["enabled"])
 
     def test_gemini_hook_snapshot_roundtrip(self):

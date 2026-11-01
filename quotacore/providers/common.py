@@ -31,11 +31,21 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
+MAX_HTTP_BYTES = 1024 * 1024
+
+
+def read_response(response) -> bytes:
+    value = response.read(MAX_HTTP_BYTES + 1)
+    if len(value) > MAX_HTTP_BYTES:
+        raise ValueError("Provider response exceeds 1 MiB")
+    return value
+
+
 def get_json(url: str, key: str) -> tuple[Any, str | None, str | None, str | None]:
     request = urllib.request.Request(url, headers={"Authorization": "Bearer " + key, "Accept": "application/json", "User-Agent": "quotacore/0.2"})
     try:
         with urllib.request.build_opener(NoRedirect()).open(request, timeout=15) as response:
-            payload = json.loads(response.read().decode("utf-8"))
+            payload = json.loads(read_response(response).decode("utf-8"))
         return payload, None, None, None
     except urllib.error.HTTPError as exc:
         if exc.code in (401, 403):

@@ -42,8 +42,8 @@ def load_config(detect: dict[str, bool] | None = None) -> dict[str, Any]:
     except (OSError, ValueError):
         pass
     detect = detect or {key: False for key in IDS}
-    result = {"providers": {key: {"enabled": bool(detect.get(key)), "order": i} for i, key in enumerate(DEFAULT_ORDER)},
-              "interval": 300}
+    result = {"providers": {key: {"enabled": False, "order": i} for i, key in enumerate(DEFAULT_ORDER)},
+              "interval": 300, "initialized": False}
     try:
         atomic_json(path, result)
     except OSError:
@@ -57,9 +57,8 @@ def normalize_config(data: dict[str, Any], detect: dict[str, bool] | None = None
     providers = {}
     for index, key in enumerate(DEFAULT_ORDER):
         item = source.get(key) if isinstance(source.get(key), dict) else {}
-        # A provider added in a newer version is not in an older config file:
-        # fall back to detection instead of silently keeping it off.
-        default = bool(detect.get(key)) if key not in source else False
+        # New providers always require explicit opt-in.
+        default = False
         providers[key] = {"enabled": bool(item.get("enabled", default)), "order": int(item.get("order", index))}
     try:
         interval = max(30, int(data.get("interval", 300)))
@@ -68,13 +67,20 @@ def normalize_config(data: dict[str, Any], detect: dict[str, bool] | None = None
     for key, item in source.items():
         if key not in providers and isinstance(item, dict):
             providers[key] = {"enabled": bool(item.get("enabled", False)), "order": int(item.get("order", len(providers)))}
-    return {"providers": providers, "interval": interval}
+    return {"providers": providers, "interval": interval,
+            "initialized": bool(data.get("initialized", bool(source)))}
 
 
 def atomic_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=str(path.parent))
     try:
+        from .privacy import restrict_file
+        try:
+            restrict_file(Path(temporary))
+        except Exception:
+            os.close(fd)
+            raise
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
             json.dump(data, handle, ensure_ascii=False, indent=2)
             handle.write("\n")

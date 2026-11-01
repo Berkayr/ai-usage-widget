@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import sys
 import time
 from datetime import datetime, timezone
@@ -18,7 +19,11 @@ claude, codex, gemini = (PROVIDERS[x] for x in ("claude", "codex", "gemini"))
 
 
 def detect_all() -> dict[str, bool]:
-    return {key: module.detect() for key, module in PROVIDERS.items()}
+    # Detection must not open secrets.json or provider credential contents.
+    return {key: (bool(os.environ.get(key.upper() + "_API_KEY")) or
+                   (config_dir() / "secrets.json").is_file())
+            if key in ("openrouter", "deepseek") else module.detect()
+            for key, module in PROVIDERS.items()}
 
 
 def _config():
@@ -38,7 +43,7 @@ def collect() -> dict:
     ordered = sorted(PROVIDERS, key=lambda key: settings.get(key, {}).get("order", 999))
     records = []
     for key in ordered:
-        if not settings[key]["enabled"]:
+        if not config["initialized"] or not settings[key]["enabled"]:
             records.append(provider_record(key, PROVIDERS[key].META["label"], state="DISABLED"))
         elif not detected[key]:
             records.append(PROVIDERS[key].read(previous.get(key)))
@@ -55,7 +60,7 @@ def write_snapshot() -> dict:
     return result
 
 
-def doctor() -> dict:
+def doctor(live: bool = False) -> dict:
     detected, config = _config()
     states = {}
     try:
@@ -66,7 +71,9 @@ def doctor() -> dict:
     now = datetime.now(timezone.utc)
     result = []
     for key, module in PROVIDERS.items():
-        record = states.get(key) or module.read(None)
+        enabled = config["initialized"] and config["providers"].get(key, {}).get("enabled", False)
+        record = (module.read(states.get(key)) if live and enabled else
+                  states.get(key, {}) if enabled else {"state": "DISABLED"})
         captured = record.get("captured_at")
         age = None
         if captured:
@@ -74,9 +81,13 @@ def doctor() -> dict:
                 age = max(0, int((now - datetime.fromisoformat(captured.replace("Z", "+00:00"))).total_seconds()))
             except (ValueError, TypeError):
                 pass
-        result.append({"id": key, "detected": detected[key], "enabled": config["providers"].get(key, {}).get("enabled", False),
+        result.append({"id": key, "detected": detected[key], "enabled": enabled,
                        "state": record.get("state"), "source": record.get("source"), "age_seconds": age})
-    return {"version": __version__, "providers": result}
+    return {"version": __version__, "providers": result, "live": live,
+            "paths": {"python": sys.executable, "module": str(__file__),
+                      "codex": codex._executable(), "agy": gemini._agy(),
+                      "gh": shutil.which("gh"),
+                      "python_override": os.environ.get("QUOTACORE_PYTHONPATH")}}
 
 
 def daemon(interval: int) -> int:
@@ -125,10 +136,8 @@ def _pace(snapshot_value: dict, *, no_log: bool, mode: str) -> int:
     if not no_log:
         log_path = data_path("pace-log.jsonl")
         events = reset_events(report, previous_record)
-        with log_path.open("a", encoding="utf-8", newline="\n") as handle:
-            handle.write(json.dumps({"event": "run", **report}, ensure_ascii=False, separators=(",", ":")) + "\n")
-            for event in events:
-                handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\n")
+        from .history import append_history
+        append_history(log_path, [{"event": "run", **report}, *events])
         atomic_json(state_path, {"profiles": {p["id"]: p["profile"] for p in report["providers"]}, "last": report})
     else:
         atomic_json(state_path, {"profiles": {p["id"]: p["profile"] for p in report["providers"]}, "last": previous_record})
@@ -175,7 +184,11 @@ def main(argv: list[str] | None = None) -> int:
     write_parser.add_argument("--print", dest="print_snapshot", action="store_true",
                               help="also print the written snapshot as JSON")
     sub.add_parser("detect")
-    sub.add_parser("doctor")
+    sub.add_parser("doctor").add_argument("--live", action="store_true")
+    sub.add_parser("init", help="choose providers before first collection")
+    sub.add_parser("provider-config", help="show consent status without reading credentials")
+    consent_parser = sub.add_parser("configure", help="explicitly enable the selected providers")
+    consent_parser.add_argument("providers", nargs="*", choices=list(PROVIDERS))
     sub.add_parser("refresh-gemini")
     key_parser = sub.add_parser("key")
     key_sub = key_parser.add_subparsers(dest="key_command", required=True)
@@ -185,13 +198,16 @@ def main(argv: list[str] | None = None) -> int:
     daemon_parser.add_argument("--interval", type=int, default=None)
     hook_parser = sub.add_parser("hook")
     hook_parser.add_argument("provider", choices=("claude", "agy"))
-    hook_parser.add_argument("--chain", default=None)
+    chain_options = hook_parser.add_mutually_exclusive_group()
+    chain_options.add_argument("--chain-cmd", "--chain", dest="chain_cmd", help="JSON array of executable and arguments (no shell)")
+    chain_options.add_argument("--chain-shell", help="explicit trusted shell command; receives raw hook input")
     pace_parser = sub.add_parser("pace")
     pace_mode = pace_parser.add_mutually_exclusive_group()
     pace_mode.add_argument("--json", action="store_true")
     pace_mode.add_argument("--line", action="store_true")
     pace_parser.add_argument("--from-file")
-    pace_parser.add_argument("--no-log", action="store_true")
+    pace_parser.add_argument("--no-log", action="store_true", help="skip history appends; still update pace state")
+    pace_parser.add_argument("--purge", action="store_true", help="delete pace history and state without collecting")
     args = parser.parse_args(argv)
     if args.command == "bar":
         from .bar import render
@@ -206,13 +222,29 @@ def main(argv: list[str] | None = None) -> int:
         if args.print_snapshot:
             print(json.dumps(result, ensure_ascii=False, indent=2))
     elif args.command == "detect":
-        print(json.dumps([{"id": key, "detected": module.detect(), "auth": module.META["auth"]} for key, module in PROVIDERS.items()], ensure_ascii=False, indent=2))
+        detected = detect_all()
+        print(json.dumps([{"id": key, "detected": detected[key], "auth": module.META["auth"]} for key, module in PROVIDERS.items()], ensure_ascii=False, indent=2))
     elif args.command == "doctor":
-        print(json.dumps(doctor(), ensure_ascii=False, indent=2))
+        print(json.dumps(doctor(args.live), ensure_ascii=False, indent=2))
+    elif args.command == "provider-config":
+        detected, config = _config()
+        from .consent import DISCLOSURES
+        print(json.dumps({"detected": detected, "disclosures": DISCLOSURES, **config}))
+    elif args.command in ("init", "configure"):
+        detected, config = _config()
+        selected = args.providers if args.command == "configure" else []
+        if args.command == "init":
+            from .consent import DISCLOSURES
+            print("Choose what to track. No provider is enabled until you finish.")
+            for key in PROVIDERS:
+                answer = input(f"{key} ({'detected' if detected[key] else 'not detected'}): {DISCLOSURES[key]} Enable? [y/N] ")
+                if answer.strip().lower() in ("y", "yes"): selected.append(key)
+        for key, item in config["providers"].items(): item["enabled"] = key in selected
+        config["initialized"] = True
+        atomic_json(config_dir() / "config.json", config)
     elif args.command == "refresh-gemini":
         return gemini.refresh_gemini()
     elif args.command == "key":
-        from .paths import atomic_json
         path = config_dir() / "secrets.json"
         try:
             values = json.loads(path.read_text(encoding="utf-8"))
@@ -232,8 +264,20 @@ def main(argv: list[str] | None = None) -> int:
         return daemon(max(30, args.interval if args.interval is not None else config["interval"]))
     elif args.command == "hook":
         from .hooks import run_hook
-        return run_hook(args.provider, args.chain)
+        chain = None
+        if args.chain_cmd:
+            try:
+                chain = json.loads(args.chain_cmd)
+                if not isinstance(chain, list) or not chain or not all(isinstance(v, str) and v for v in chain):
+                    raise ValueError()
+            except ValueError:
+                parser.error("--chain-cmd requires a nonempty JSON array of strings")
+        return run_hook(args.provider, chain, chain_shell=args.chain_shell)
     elif args.command == "pace":
+        if args.purge:
+            for name in ("pace-log.jsonl", "pace-state.json"):
+                data_path(name).unlink(missing_ok=True)
+            return 0
         if args.from_file:
             try:
                 value = json.loads(open(args.from_file, encoding="utf-8").read())

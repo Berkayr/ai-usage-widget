@@ -12,7 +12,7 @@ from typing import Any
 
 from ..paths import data_path
 from ..schema import iso_now, provider_record
-from .common import kind_for, make_window, safe_error, timestamp
+from .common import kind_for, make_window, safe_error, timestamp, read_response
 
 LABEL = "Claude Code"
 META = {"id": "claude", "label": LABEL, "category": "subscription", "auth": "local-file", "experimental": False, "docs_url": "https://docs.anthropic.com/"}
@@ -54,7 +54,7 @@ def _live() -> tuple[dict[str, Any] | None, str | None, str | None]:
     })
     try:
         with urllib.request.build_opener(NoRedirect()).open(request, timeout=15) as response:
-            parsed = json.loads(response.read().decode("utf-8"))
+            parsed = json.loads(read_response(response).decode("utf-8"))
             return (parsed, None, None) if isinstance(parsed, dict) else (None, "SCHEMA_CHANGED", "Invalid usage response")
     except urllib.error.HTTPError as exc:
         if exc.code in (401, 403):
