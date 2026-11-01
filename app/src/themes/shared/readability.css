@@ -15,7 +15,7 @@
 :root .widget .provider-heading h2 {font-family:JetBrainsMono,monospace;font-size:15px;white-space:normal;overflow-wrap:anywhere}
 :root .widget .window-top b, :root .widget .ring-center strong,
 :root .widget .compact-line b, :root .widget .xs-content b {font-size:max(15px,1em)}
-:root[data-theme=brutalist] .window-top b {font:900 clamp(34px,13cqw,72px)/1.15 Inter,sans-serif;letter-spacing:-2px}
+:root[data-theme=brutalist] .window-top b {font:900 2.5rem/1.15 Inter,sans-serif;letter-spacing:-.02em}
 :root[data-theme=frosted-glass] .window-top b {font-size:26px}
 :root[data-theme=retro-lcd] .window-top b {font-size:30px}
 :root[data-theme=circular-rings] .ring-center strong {font-size:23px}
@@ -103,4 +103,20 @@
 :root .widget .segments.unknown i {background:transparent;border:1px dashed var(--textMuted)}
 :root[data-color-mode=mono] .ring-track {stroke:var(--bgTrackOff)}
 :root[data-color-mode=mono] .provider-card {background-image:none}
-:root[data-theme=brutalist] .window-top b {font-size:clamp(28px,8cqw,52px)}
+:root[data-theme=brutalist] .window-top b {font-size:2.5rem}
+
+/* Fixed numeric type steps; never interpolate glyphs with the container width. */
+:root .widget :is(.window-top b,.ring-center strong,.compact-line b,.xs-content b,.xs-content small) {
+  font-family:JetBrainsMono,monospace;font-variant-numeric:tabular-nums;
+  font-size:.9375rem;font-weight:600;line-height:1.2;letter-spacing:0;
+}
+:root[data-theme=system] .widget :is(.window-top b,.ring-center strong,.compact-line b,.xs-content b,.xs-content small) {font-family:var(--systemFont)}
+:root[data-theme=brutalist] .widget :is(.window-top b,.ring-center strong,.compact-line b,.xs-content b,.xs-content small) {font-family:Inter,sans-serif;font-weight:900;letter-spacing:-.02em}
+:root[data-theme=brutalist] .widget .window-top b {font-size:2.5rem}
+:root[data-theme=retro-lcd] .widget .window-top b {font-size:1.875rem}
+:root[data-theme=frosted-glass] .widget .window-top b {font-size:1.625rem}
+:root[data-theme=circular-rings] .widget .ring-center strong {font-size:1.4375rem}
+@container (max-width:219px) {
+  :root[data-theme=brutalist] .widget .window-top b {font-size:1.875rem}
+  :root[data-theme=retro-lcd] .widget .window-top b {font-size:1.5625rem}
+}
