@@ -829,6 +829,12 @@
       font-family: inherit;
       font-size: 10.5px;
     }
+      /* Use the full wide single-provider lane at L. */
+    .widget-frame[data-size-tier="l"][data-cols="1"] .horizon-grid { align-content: stretch; }
+    .widget-frame[data-size-tier="l"][data-cols="1"] .horizon-card { min-height: 0; }
+      .widget-frame[data-size-tier="l"][data-cols="1"] .horizon-grid { flex: 1 1 auto; grid-auto-rows: minmax(0, 1fr); min-height: 0; }
+    .widget-frame[data-size-tier="l"][data-cols="1"] .horizon-card { min-height: 0; }
+    .widget-frame[data-size-tier="l"][data-cols="1"] .lanes-stack { justify-content: space-evenly; }
   </style>
 </head>
 <body>
@@ -1504,5 +1510,33 @@
     applyPalette('tokyo-night');
     applyDimensions(480, 490, 'm');
   </script>
+
+<script id="fit-to-content">
+/* Fewer providers than the layout was sized for: shrink the frame to its content
+   (the chosen size preset stays the upper bound) instead of leaving empty space. */
+(function () {
+  const frame = document.querySelector('.widget-frame');
+  if (!frame) return;
+  let busy = false;
+  function visibleCards() {
+    return [...frame.querySelectorAll('[data-provider]')].filter(el => !el.closest('[hidden]') && el.offsetParent !== null).length;
+  }
+  function fit() {
+    if (busy) return; busy = true;
+    frame.style.height = ''; frame.style.minHeight = '';
+    const tier = frame.getAttribute('data-size-tier');
+    if (visibleCards() < 3 || tier === 's' || tier === 'xs') {
+      const preset = frame.getBoundingClientRect().height;
+      frame.style.minHeight = '0'; frame.style.height = 'auto';
+      const natural = frame.scrollHeight;
+      frame.style.height = Math.min(preset, natural) + 'px';
+    }
+    requestAnimationFrame(() => { busy = false; });
+  }
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(frame, { subtree: true, attributes: true, attributeFilter: ['hidden', 'data-size-tier', 'class'] });
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+  addEventListener('load', () => setTimeout(fit, 50));
+})();
+</script>
 </body>
 </html>

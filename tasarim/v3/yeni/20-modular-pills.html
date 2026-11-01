@@ -770,7 +770,21 @@
       font-family: inherit;
       font-size: 10.5px;
     }
+      /* Let a lone module expand across the available wide layout. */
+    .widget-frame[data-size-tier="l"][data-cols="1"] .pills-deck { align-content: stretch; }
+    .widget-frame[data-size-tier="l"][data-cols="1"] .provider-module { min-height: 0; }
+      .widget-frame[data-size-tier="l"][data-cols="1"] .subpills-grid { gap: 12px; }
+    .widget-frame[data-size-tier="l"][data-cols="1"] .window-pill { padding: 12px 18px; }
+    .widget-frame[data-size-tier="l"][data-cols="1"] .pill-pct { font-size: 24px; }
   </style>
+<style id="s-tier-fix">
+/* S tier: pills become single-line chips (short label + percent); no reset text, no extra strip. */
+.widget-frame[data-size-tier="s"] .pill-rst,
+.widget-frame[data-size-tier="s"] .pill-win-full,
+.widget-frame[data-size-tier="s"] .extra-pill-strip { display: none !important; }
+.widget-frame[data-size-tier="s"] .pill-win-short { display: inline !important; }
+.widget-frame[data-size-tier="s"] .pill-left { display: flex !important; align-items: center; }
+</style>
 </head>
 <body>
 
@@ -1372,5 +1386,33 @@
     applyPalette('catppuccin-mocha');
     applyDimensions(460, 450, 'm');
   </script>
+
+<script id="fit-to-content">
+/* Fewer providers than the layout was sized for: shrink the frame to its content
+   (the chosen size preset stays the upper bound) instead of leaving empty space. */
+(function () {
+  const frame = document.querySelector('.widget-frame');
+  if (!frame) return;
+  let busy = false;
+  function visibleCards() {
+    return [...frame.querySelectorAll('[data-provider]')].filter(el => !el.closest('[hidden]') && el.offsetParent !== null).length;
+  }
+  function fit() {
+    if (busy) return; busy = true;
+    frame.style.height = ''; frame.style.minHeight = '';
+    const tier = frame.getAttribute('data-size-tier');
+    if (visibleCards() < 3 || tier === 's' || tier === 'xs') {
+      const preset = frame.getBoundingClientRect().height;
+      frame.style.minHeight = '0'; frame.style.height = 'auto';
+      const natural = frame.scrollHeight;
+      frame.style.height = Math.min(preset, natural) + 'px';
+    }
+    requestAnimationFrame(() => { busy = false; });
+  }
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(frame, { subtree: true, attributes: true, attributeFilter: ['hidden', 'data-size-tier', 'class'] });
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+  addEventListener('load', () => setTimeout(fit, 50));
+})();
+</script>
 </body>
 </html>

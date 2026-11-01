@@ -887,7 +887,31 @@
       font-family: inherit;
       font-size: 10.5px;
     }
+      /* Reserve enough width for the S-size percentage readouts. */
+    .widget-frame[data-size-tier="s"][data-cols="1"] .channel-strip { grid-template-columns: 78px minmax(0, 1fr) 62px; gap: 4px; padding: 4px 6px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .trim-readouts { min-width: 0; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .trim-pct { font-size: 11px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .trim-readout { min-width: 0; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .vu-meter-well { padding: 3px; gap: 3px; }
   </style>
+<style id="s-tier-fix">
+/* S tier: each channel becomes one short row: name | mini ladder | "5H 34%  WK 61%". */
+.widget-frame[data-size-tier="s"] .channel-strip { min-height: 0 !important; overflow: hidden; align-items: center !important; }
+.widget-frame[data-size-tier="s"] .channel-lamp-row,
+.widget-frame[data-size-tier="s"] .db-scale,
+.widget-frame[data-size-tier="s"] .ladder-tag,
+.widget-frame[data-size-tier="s"] .trim-rst,
+.widget-frame[data-size-tier="s"] .extra-col,
+.widget-frame[data-size-tier="s"] .inline-extra-chip,
+.widget-frame[data-size-tier="s"] .tag-age { display: none !important; }
+.widget-frame[data-size-tier="s"] .vu-meter-well { height: 34px !important; min-height: 0 !important; padding: 2px !important; }
+.widget-frame[data-size-tier="s"] .ladder-col, .widget-frame[data-size-tier="s"] .ladder-segments { height: 100% !important; min-height: 0 !important; }
+.widget-frame[data-size-tier="s"] .trim-readouts { display: flex !important; flex-direction: column; gap: 1px !important; }
+.widget-frame[data-size-tier="s"] .trim-box { padding: 0 3px !important; min-height: 0 !important; }
+.widget-frame[data-size-tier="s"] .trim-top { display: flex !important; gap: 3px; align-items: baseline; }
+.widget-frame[data-size-tier="s"] .trim-pct { font-size: 11px !important; line-height: 1.15; }
+.widget-frame[data-size-tier="s"] .ch-plan { display: none !important; }
+</style>
 </head>
 <body>
 
@@ -1582,5 +1606,33 @@
     applyPalette('gruvbox-dark');
     applyDimensions(520, 440, 'm');
   </script>
+
+<script id="fit-to-content">
+/* Fewer providers than the layout was sized for: shrink the frame to its content
+   (the chosen size preset stays the upper bound) instead of leaving empty space. */
+(function () {
+  const frame = document.querySelector('.widget-frame');
+  if (!frame) return;
+  let busy = false;
+  function visibleCards() {
+    return [...frame.querySelectorAll('[data-provider]')].filter(el => !el.closest('[hidden]') && el.offsetParent !== null).length;
+  }
+  function fit() {
+    if (busy) return; busy = true;
+    frame.style.height = ''; frame.style.minHeight = '';
+    const tier = frame.getAttribute('data-size-tier');
+    if (visibleCards() < 3 || tier === 's' || tier === 'xs') {
+      const preset = frame.getBoundingClientRect().height;
+      frame.style.minHeight = '0'; frame.style.height = 'auto';
+      const natural = frame.scrollHeight;
+      frame.style.height = Math.min(preset, natural) + 'px';
+    }
+    requestAnimationFrame(() => { busy = false; });
+  }
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(frame, { subtree: true, attributes: true, attributeFilter: ['hidden', 'data-size-tier', 'class'] });
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+  addEventListener('load', () => setTimeout(fit, 50));
+})();
+</script>
 </body>
 </html>

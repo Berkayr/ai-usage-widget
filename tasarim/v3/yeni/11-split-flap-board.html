@@ -784,6 +784,19 @@
       font-family: inherit;
       font-size: 10.5px;
     }
+      /* The S three-provider view uses the existing compact 5H / weekly readout. */
+    .widget-frame[data-size-tier="s"][data-cols="1"] .departures-board { gap: 4px; align-content: start; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .departure-card { display: grid; grid-template-columns: 44px minmax(0, 1fr); grid-template-rows: 1fr; align-items: center; gap: 4px; padding: 3px 6px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .dep-header { border: 0; padding: 0; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .dep-title-group { gap: 0; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .prov-full-flap,
+    .widget-frame[data-size-tier="s"][data-cols="1"] .plan-plaque,
+    .widget-frame[data-size-tier="s"][data-cols="1"] .status-plaque,
+    .widget-frame[data-size-tier="s"][data-cols="1"] .dep-windows,
+    .widget-frame[data-size-tier="s"][data-cols="1"] .extra-track-row { display: none; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .prov-monogram-flap { display: inline-flex; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .xs-flap-summary { display: flex; justify-content: flex-end; gap: 6px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .pct-flap-group .flap-char { min-width: 12px; }
   </style>
 </head>
 <body>
@@ -1390,5 +1403,33 @@
     applyPalette('dracula');
     applyDimensions(540, 440, 'm');
   </script>
+
+<script id="fit-to-content">
+/* Fewer providers than the layout was sized for: shrink the frame to its content
+   (the chosen size preset stays the upper bound) instead of leaving empty space. */
+(function () {
+  const frame = document.querySelector('.widget-frame');
+  if (!frame) return;
+  let busy = false;
+  function visibleCards() {
+    return [...frame.querySelectorAll('[data-provider]')].filter(el => !el.closest('[hidden]') && el.offsetParent !== null).length;
+  }
+  function fit() {
+    if (busy) return; busy = true;
+    frame.style.height = ''; frame.style.minHeight = '';
+    const tier = frame.getAttribute('data-size-tier');
+    if (visibleCards() < 3 || tier === 's' || tier === 'xs') {
+      const preset = frame.getBoundingClientRect().height;
+      frame.style.minHeight = '0'; frame.style.height = 'auto';
+      const natural = frame.scrollHeight;
+      frame.style.height = Math.min(preset, natural) + 'px';
+    }
+    requestAnimationFrame(() => { busy = false; });
+  }
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(frame, { subtree: true, attributes: true, attributeFilter: ['hidden', 'data-size-tier', 'class'] });
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+  addEventListener('load', () => setTimeout(fit, 50));
+})();
+</script>
 </body>
 </html>

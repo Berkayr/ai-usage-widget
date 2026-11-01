@@ -811,7 +811,31 @@
       gap: 5px;
       cursor: pointer;
     }
+      /* At S, give each provider a compact left label and two clear meter rows. */
+    .widget-frame[data-size-tier="s"][data-cols="1"] .providers-stack { align-content: start; gap: 4px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .provider-card { display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 4px 7px; padding: 4px 6px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .provider-top { grid-row: 1 / span 2; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; border: 0; padding: 0; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .provider-name { font-size: 12px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .provider-plan,
+    .widget-frame[data-size-tier="s"][data-cols="1"] .provider-badges { display: none; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .windows-list { grid-column: 2; gap: 2px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .window-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1px 4px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .window-row-header { gap: 3px; }
+    .widget-frame[data-size-tier="s"][data-cols="1"] .eink-bar-track { height: 5px; }
   </style>
+<style id="s-tier-fix">
+/* S tier: one compact line per window (short label + percent), thin bar below. */
+.widget-frame[data-size-tier="s"] .window-item { display: block !important; position: static !important; }
+.widget-frame[data-size-tier="s"] .window-row-header { display: flex !important; justify-content: space-between; align-items: baseline; position: static !important; margin: 0 !important; }
+.widget-frame[data-size-tier="s"] .window-row-header > * { position: static !important; }
+.widget-frame[data-size-tier="s"] .window-label-full,
+.widget-frame[data-size-tier="s"] .window-reset,
+.widget-frame[data-size-tier="s"] .pace-note { display: none !important; }
+.widget-frame[data-size-tier="s"] .window-label-short { display: inline !important; font-size: 10px; }
+.widget-frame[data-size-tier="s"] .window-pct { font-size: 13px !important; line-height: 1.1; }
+.widget-frame[data-size-tier="s"] .provider-card:first-child { padding-right: 26px !important; }
+.widget-frame[data-size-tier="s"] .eink-bar-track { height: 4px !important; margin-top: 1px; position: static !important; }
+</style>
 </head>
 <body>
 
@@ -1485,5 +1509,33 @@
     applyPalette('mono-paper');
     applyDimensions(420, 490, 'm');
   </script>
+
+<script id="fit-to-content">
+/* Fewer providers than the layout was sized for: shrink the frame to its content
+   (the chosen size preset stays the upper bound) instead of leaving empty space. */
+(function () {
+  const frame = document.querySelector('.widget-frame');
+  if (!frame) return;
+  let busy = false;
+  function visibleCards() {
+    return [...frame.querySelectorAll('[data-provider]')].filter(el => !el.closest('[hidden]') && el.offsetParent !== null).length;
+  }
+  function fit() {
+    if (busy) return; busy = true;
+    frame.style.height = ''; frame.style.minHeight = '';
+    const tier = frame.getAttribute('data-size-tier');
+    if (visibleCards() < 3 || tier === 's' || tier === 'xs') {
+      const preset = frame.getBoundingClientRect().height;
+      frame.style.minHeight = '0'; frame.style.height = 'auto';
+      const natural = frame.scrollHeight;
+      frame.style.height = Math.min(preset, natural) + 'px';
+    }
+    requestAnimationFrame(() => { busy = false; });
+  }
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(frame, { subtree: true, attributes: true, attributeFilter: ['hidden', 'data-size-tier', 'class'] });
+  new MutationObserver(() => requestAnimationFrame(fit)).observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+  addEventListener('load', () => setTimeout(fit, 50));
+})();
+</script>
 </body>
 </html>
