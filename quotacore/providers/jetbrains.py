@@ -1,4 +1,4 @@
-"""Read JetBrains AI quota XML without modifying IDE state."""
+"""Read JetBrains quota XML without modifying IDE state."""
 import glob
 import json
 import os

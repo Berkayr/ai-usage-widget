@@ -5,6 +5,9 @@ const attack = '\" data-probe=\"injected\"><img src=x onerror=alert(1)>';
 assert.equal(safeState(attack), 'SOURCE_UNAVAILABLE');
 assert.equal(safeState('ok'), 'OK');
 assert.ok(!escapeHtml(attack).includes('<img'));
+// The renderers read the responsive meter setting from the host document.
+globalThis.document = { documentElement: { dataset: { dotCount: '20' } }, querySelector: () => ({ clientWidth: 340 }) };
+globalThis.getComputedStyle = () => ({ fontSize: '16px' });
 let count = 0;
 for (const entry of await readdir(new URL('../app/src/themes/', import.meta.url), {withFileTypes:true})) {
   if (!entry.isDirectory() || entry.name === 'shared') continue;
@@ -21,5 +24,5 @@ for (const entry of await readdir(new URL('../app/src/themes/', import.meta.url)
   assert.match(root.innerHTML, /&lt;img/);
   count++;
 }
-assert.equal(count, 8);
+assert.equal(count, 9);
 console.log(`${count} theme renderers escape hostile snapshot fields and restrict states`);

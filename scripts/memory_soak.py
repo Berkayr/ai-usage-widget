@@ -12,7 +12,7 @@ import tempfile
 import time
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--binary', type=Path, default=Path('app/src-tauri/target/debug/ai-quota-widget'))
+parser.add_argument('--binary', type=Path, default=Path('app/src-tauri/target/debug/ai-usage'))
 parser.add_argument('--monitor', help='Connector/model+geometry name or legacy numeric index')
 parser.add_argument('--output', type=Path, help='Optional synthetic measurements and logs directory')
 args = parser.parse_args()
@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='ai-usage-soak-') as temporary:
     home = root / 'home'
     state = root / 'state'
     config = root / 'config'
-    for path in (home, state, config / 'ai-quota-widget'):
+    for path in (home, state, config / 'ai-usage'):
         path.mkdir(parents=True)
     (state / 'config.json').write_text(json.dumps({'initialized': True, 'providers': {
         key: {'enabled': True} for key in ('claude', 'codex', 'gemini')}}))
@@ -35,7 +35,7 @@ with tempfile.TemporaryDirectory(prefix='ai-usage-soak-') as temporary:
                 'linux': {'layer': 'top', 'margin': 16, 'monitor': None}}
     if args.monitor:
         settings['linux']['monitor'] = int(args.monitor) if args.monitor.isdigit() else args.monitor
-    (config / 'ai-quota-widget/settings.json').write_text(json.dumps(settings))
+    (config / 'ai-usage/settings.json').write_text(json.dumps(settings))
     fixture = json.loads(Path('app/src/sample-snapshot.json').read_text())
     def replace_snapshot(sequence):
         fixture['generated_at'] = dt.datetime.now(dt.timezone.utc).isoformat()

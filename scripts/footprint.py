@@ -50,7 +50,7 @@ def measure(binary, enabled, duration):
     unit = f'ai-usage-footprint-{os.getpid()}-{os.urandom(4).hex()}.scope'
     with tempfile.TemporaryDirectory(prefix='ai-usage-footprint-') as tmp:
         root = Path(tmp)
-        for name in ('home', 'config/ai-quota-widget', 'state', 'data', 'cache'):
+        for name in ('home', 'config/ai-usage', 'state', 'data', 'cache'):
             (root / name).mkdir(parents=True)
         ids = ('claude', 'codex', 'gemini', 'copilot', 'openrouter', 'deepseek', 'jetbrains')
         (root / 'state/config.json').write_text(json.dumps({'initialized': True, 'providers': {
@@ -66,7 +66,7 @@ def measure(binary, enabled, duration):
         cli.parent.mkdir(parents=True)
         cli.write_text('#!/bin/sh\nexit 1\n')
         cli.chmod(0o700)
-        (root / 'config/ai-quota-widget/settings.json').write_text(json.dumps({
+        (root / 'config/ai-usage/settings.json').write_text(json.dumps({
             'linux': {'layer': 'bottom'}, 'position': 'Top right'}))
         allowed = ('DISPLAY', 'WAYLAND_DISPLAY', 'XDG_RUNTIME_DIR', 'DBUS_SESSION_BUS_ADDRESS',
                    'XDG_SESSION_TYPE', 'GDK_BACKEND', 'LANG', 'XAUTHORITY')
@@ -154,8 +154,8 @@ def main():
     args = parser.parse_args()
     if args.duration < 40:
         parser.error('At least 40 seconds required (30 second warmup)')
-    binaries = args.binary or [p for p in (ROOT / 'app/src-tauri/target/debug/ai-quota-widget',
-                                         ROOT / 'app/src-tauri/target/release/ai-quota-widget',
+    binaries = args.binary or [p for p in (ROOT / 'app/src-tauri/target/debug/ai-usage',
+                                         ROOT / 'app/src-tauri/target/release/ai-usage',
                                          *sorted((ROOT / 'app/src-tauri/target/release/bundle/appimage').glob('*.AppImage')))
                               if p.is_file() and p.stat().st_size > 0]
     if not binaries:
