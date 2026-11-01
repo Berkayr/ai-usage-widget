@@ -1,0 +1,1376 @@
+<!--
+  DESIGN 20 (v3): PILL STACK / MODULAR SMART-HOME CHIPS
+  Default Widget Dimensions (Size M): 460px × 450px
+  v3 Features:
+  - Material You / Control Center modular stadium capsules where the capsule background itself acts as a full-bleed progress fill
+  - Dual nested window sub-pills (5H + WK) with proportional left-to-right liquid fill & crisp high-contrast labels
+  - Responsive Size System: XS (160×90), S (260×200), M (460×450), L (680×560) + free drag resize handle
+  - 8-step progressive field shedding & strict ban on 2+1 orphan grids
+  - 16 named WCAG-verified color palettes + Custom Accent/BG pickers & dual opacity sliders
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>20 — Pill Stack / Modular Smart-Home Chips (QUOTA v3)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-stage: #090a0f;
+      --bg-rgb: 17, 17, 27;
+      --bg-card-rgb: 30, 30, 46;
+      --widget-opacity: 1;
+      --bg-opacity: 0.92;
+      --bg-widget: rgba(var(--bg-rgb), var(--bg-opacity));
+      --bg-card: rgba(var(--bg-card-rgb), var(--bg-opacity));
+      --text-primary: #cdd6f4;
+      --text-secondary: #a6adc8;
+      --text-muted: #9399b2;
+      --border-color: rgba(205, 214, 244, 0.14);
+      --pill-well: rgba(0, 0, 0, 0.28);
+      --accent: #cba6f7;
+      --severity-normal: #a6e3a1;
+      --severity-warning: #f9e2af;
+      --severity-danger: #f38ba8;
+      --widget-width: 460px;
+      --widget-height: 450px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-stage);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 12px;
+      gap: 12px;
+      user-select: none;
+    }
+
+    /* Demo Toolbar */
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      background: #141420;
+      border: 1px solid #2d2d44;
+      padding: 7px 11px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #cdd6f4;
+      max-width: 1120px;
+      z-index: 30;
+    }
+    .demo-toolbar .size-badge {
+      color: var(--accent);
+      font-weight: 700;
+      min-width: 114px;
+      padding-right: 8px;
+      border-right: 1px solid #2d2d44;
+    }
+    .demo-toolbar .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-right: 8px;
+      border-right: 1px solid #2d2d44;
+    }
+    .demo-toolbar .toolbar-group:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+    .demo-toolbar button,
+    .demo-toolbar select {
+      background: #1e1e2e;
+      color: #f3f4f6;
+      border: 1px solid #45475a;
+      border-radius: 4px;
+      padding: 3px 7px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .demo-toolbar button:hover,
+    .demo-toolbar select:hover {
+      border-color: var(--accent);
+    }
+    .demo-toolbar button.active {
+      background: var(--accent);
+      color: #11111b;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .demo-toolbar input[type="color"] {
+      width: 21px;
+      height: 21px;
+      border: 1px solid #585b70;
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    .demo-toolbar input[type="range"] {
+      width: 56px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .val-readout {
+      min-width: 28px;
+      font-size: 10px;
+      color: #a6adc8;
+    }
+
+    /* CSS-Only Desktop Wallpaper Stage */
+    .wallpaper-stage {
+      padding: 30px 44px;
+      border-radius: 26px;
+      position: relative;
+      overflow: hidden;
+      min-width: 360px;
+      min-height: 260px;
+      background:
+        radial-gradient(circle at 20% 22%, rgba(203, 166, 247, 0.36) 0%, transparent 45%),
+        radial-gradient(circle at 82% 28%, rgba(166, 227, 161, 0.30) 0%, transparent 46%),
+        radial-gradient(circle at 50% 84%, rgba(243, 139, 168, 0.30) 0%, transparent 50%),
+        linear-gradient(135deg, #0f111a 0%, #1e1e2e 50%, #11111b 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 24px 60px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wallpaper-stage::after {
+      content: "MODULAR PILLS STAGE // DRAG CORNER TO RESIZE";
+      position: absolute;
+      bottom: 8px;
+      right: 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+
+    /* Widget Frame */
+    .widget-frame {
+      width: var(--widget-width);
+      height: var(--widget-height);
+      opacity: var(--widget-opacity);
+      background-color: var(--bg-widget);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 26px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 22px 54px rgba(0, 0, 0, 0.5);
+      z-index: 2;
+    }
+
+    /* Mini floating corner bar when header sheds in S / XS */
+    .mini-corner-bar {
+      display: none;
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      align-items: center;
+      gap: 4px;
+      z-index: 12;
+    }
+    .mini-sync-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .mini-gear-btn {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .mini-gear-btn svg {
+      width: 11px;
+      height: 11px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    /* Header: App name + last update pill on left, gear icon on right */
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px 6px;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+    .app-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      color: var(--text-primary);
+    }
+    .refresh-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 3px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .refresh-pill strong {
+      color: var(--accent);
+    }
+
+    .gear-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .gear-btn:hover,
+    .gear-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .gear-btn svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Modular Pill Deck (1, 2, or 3 cols — never 2+1 for 3 providers) */
+    .pills-deck {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 9px;
+      min-height: 0;
+    }
+    .widget-frame[data-cols="2"] .pills-deck {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .widget-frame[data-cols="3"] .pills-deck {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Stadium Provider Module Card */
+    .provider-module {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 10px 13px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 7px;
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+      min-width: 0;
+    }
+    .provider-module[hidden] {
+      display: none !important;
+    }
+    .provider-module.is-stale {
+      border-style: dashed;
+      border-width: 1.5px;
+      border-color: var(--severity-danger);
+    }
+
+    .module-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+    .mod-id {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+    .status-orb {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--severity-normal);
+      flex-shrink: 0;
+    }
+    .prov-name {
+      font-size: 15.5px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .prov-monogram {
+      display: none;
+      font-size: 12.5px;
+      font-weight: 800;
+    }
+    .plan-chip {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--accent);
+      padding: 1px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .inline-extra-chip {
+      display: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      color: var(--text-secondary);
+      border: 1px dotted var(--border-color);
+      padding: 1px 6px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .mod-badges {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+    .tag-stale {
+      background: var(--severity-danger);
+      color: #11111b;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .tag-stale-short {
+      display: none;
+      background: var(--severity-danger);
+      color: #11111b;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 0 5px;
+      border-radius: 999px;
+    }
+    .tag-age {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Nested Stadium Window Capsules (2 side-by-side pills or stacked) */
+    .subpills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      align-items: stretch;
+    }
+    .widget-frame[data-cols="3"] .subpills-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .window-pill {
+      position: relative;
+      background: var(--pill-well);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      padding: 6px 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      min-width: 0;
+    }
+    /* Full-bleed left-to-right progress fill inside the stadium capsule */
+    .pill-fill-layer {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      opacity: 0.24;
+      border-right: 2px solid currentColor;
+      transition: width 0.3s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .pill-fill-layer[data-severity="normal"] {
+      background: var(--severity-normal);
+      color: var(--severity-normal);
+    }
+    .pill-fill-layer[data-severity="warning"] {
+      background: var(--severity-warning);
+      color: var(--severity-warning);
+    }
+    .pill-fill-layer[data-severity="danger"] {
+      background: var(--severity-danger);
+      color: var(--severity-danger);
+    }
+
+    .pill-left,
+    .pill-right {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      white-space: nowrap;
+    }
+    .pill-right {
+      align-items: flex-end;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .pill-win-full {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .pill-win-short {
+      display: none;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .pill-rst {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      color: var(--text-muted);
+    }
+    .pill-pct {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.05;
+    }
+    .pill-pct[data-severity="normal"] { color: var(--severity-normal); }
+    .pill-pct[data-severity="warning"] { color: var(--severity-warning); }
+    .pill-pct[data-severity="danger"] { color: var(--severity-danger); }
+
+    /* Extra Window Capsule Row */
+    .extra-pill-strip {
+      position: relative;
+      z-index: 1;
+      background: var(--pill-well);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      padding: 3px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5px;
+      color: var(--text-secondary);
+      overflow: hidden;
+    }
+    .extra-pill-pct {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--severity-normal);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* XS Single-Capsule Summary (Step 6) */
+    .xs-pill-summary {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    .xs-wk-muted {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Footer */
+    .widget-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 6px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .legend-cluster {
+      display: flex;
+      gap: 10px;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legend-pill {
+      width: 10px;
+      height: 6px;
+      border-radius: 999px;
+    }
+
+    /* ==========================================================================
+       8-STEP PROGRESSIVE FIELD SHEDDING
+       ========================================================================== */
+    .widget-frame[data-size-tier="l"] .pill-pct {
+      font-size: 21px;
+    }
+    .widget-frame[data-size-tier="l"] .window-pill {
+      padding: 10px 16px;
+    }
+
+    /* Step 1: Shed footer below L */
+    .widget-frame.shed-step-1 .widget-footer {
+      display: none;
+    }
+
+    /* Step 2: Collapse extra Opus pill into inline chip (<380px H) */
+    .widget-frame.shed-step-2 .extra-pill-strip {
+      display: none;
+    }
+    .widget-frame.shed-step-2 .inline-extra-chip {
+      display: inline-block;
+    }
+    .widget-frame.shed-step-2b .inline-extra-chip {
+      display: none;
+    }
+
+    /* Step 3: Shed outer header bar (<320px W or <260px H) */
+    .widget-frame.shed-step-3 {
+      padding: 8px 10px;
+      gap: 6px;
+      border-radius: 18px;
+    }
+    .widget-frame.shed-step-3 .widget-header {
+      display: none;
+    }
+    .widget-frame.shed-step-3 .mini-corner-bar {
+      display: inline-flex;
+    }
+    .widget-frame.shed-step-3 .provider-module {
+      padding: 6px 10px;
+      border-radius: 15px;
+      gap: 4px;
+    }
+
+    /* Step 4: Shorten labels (<280px W or <240px H) */
+    .widget-frame.shed-step-4 .pill-win-full,
+    .widget-frame.shed-step-4 .tag-age {
+      display: none;
+    }
+    .widget-frame.shed-step-4 .pill-win-short {
+      display: inline;
+    }
+    .widget-frame.shed-step-4 .window-pill {
+      padding: 4px 9px;
+    }
+    .widget-frame.shed-step-4 .pill-pct {
+      font-size: 13.5px;
+    }
+
+    /* Step 5: Hide plan chips & reset countdown timers (<240px W or <190px H) */
+    .widget-frame.shed-step-5 .plan-chip,
+    .widget-frame.shed-step-5 .pill-rst {
+      display: none;
+    }
+
+    /* Step 6 (XS ~160x90): Each provider becomes a single full-bleed stadium pill */
+    .widget-frame.shed-step-6 {
+      padding: 5px 7px;
+      gap: 3px;
+      border-radius: 14px;
+    }
+    .widget-frame.shed-step-6 .pills-deck {
+      gap: 3px;
+    }
+    .widget-frame.shed-step-6 .provider-module {
+      border-radius: 999px;
+      padding: 2px 9px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .widget-frame.shed-step-6 .subpills-grid,
+    .widget-frame.shed-step-6 .tag-stale {
+      display: none;
+    }
+    .widget-frame.shed-step-6 .xs-pill-summary {
+      display: flex;
+    }
+    .widget-frame.shed-step-6 .tag-stale-short {
+      display: inline-block;
+    }
+
+    /* Step 7 (Extreme XS <175px W): Abbreviate provider names */
+    .widget-frame.shed-step-7 .prov-name {
+      display: none;
+    }
+    .widget-frame.shed-step-7 .prov-monogram {
+      display: inline;
+    }
+
+    /* Resize Handle */
+    .resize-handle {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 16px;
+      height: 16px;
+      cursor: nwse-resize;
+      z-index: 14;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 2px;
+      opacity: 0.65;
+    }
+    .resize-handle:hover {
+      opacity: 1;
+    }
+    .resize-handle svg {
+      width: 10px;
+      height: 10px;
+      stroke: var(--accent);
+      stroke-width: 2;
+    }
+
+    /* Settings Overlay */
+    .settings-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(var(--bg-rgb), 0.97);
+      backdrop-filter: blur(18px);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 20;
+      transform: translateX(100%);
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow-y: auto;
+    }
+    .settings-overlay.open {
+      transform: translateX(0);
+    }
+    .settings-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .settings-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .close-btn {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .settings-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11px;
+    }
+    .set-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 9px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .set-group-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+    }
+    .set-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .set-row select,
+    .set-row input[type="range"] {
+      accent-color: var(--accent);
+      max-width: 135px;
+      font-family: inherit;
+      font-size: 10.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-toolbar" role="region" aria-label="Widget Demo Controls">
+    <span class="size-badge" id="sizeBadge">M · 460×450 px</span>
+
+    <div class="toolbar-group">
+      <span>Size:</span>
+      <button type="button" data-size-preset="xs">XS</button>
+      <button type="button" data-size-preset="s">S</button>
+      <button type="button" class="active" data-size-preset="m">M</button>
+      <button type="button" data-size-preset="l">L</button>
+    </div>
+
+    <div class="toolbar-group">
+      <span>Providers:</span>
+      <button type="button" class="active" data-toggle-provider="claude">Claude</button>
+      <button type="button" class="active" data-toggle-provider="codex">Codex</button>
+      <button type="button" class="active" data-toggle-provider="gemini">Gemini</button>
+    </div>
+
+    <div class="toolbar-group">
+      <label for="paletteSelect">Palette:</label>
+      <select id="paletteSelect" aria-label="Color Palette">
+        <option value="signal-orange">01 · Signal Orange</option>
+        <option value="sakura-pink">02 · Sakura Pink</option>
+        <option value="nord">03 · Nord</option>
+        <option value="solarized-dark">04 · Solarized Dark</option>
+        <option value="mono-paper">05 · Mono Paper</option>
+        <option value="matrix-green">06 · Matrix Green</option>
+        <option value="high-contrast">07 · High Contrast AAA</option>
+        <option value="okabe-ito-safe">08 · Okabe-Ito Safe</option>
+        <option value="viridis-safe">09 · Viridis Telemetry</option>
+        <option value="tol-light-safe">10 · Paul Tol Muted Safe</option>
+        <option value="catppuccin-mocha" selected>11 · Catppuccin Mocha (Default)</option>
+        <option value="gruvbox-dark">12 · Gruvbox Industrial</option>
+        <option value="tokyo-night">13 · Tokyo Night</option>
+        <option value="dracula">14 · Dracula Neon</option>
+        <option value="amber-crt">15 · Amber Phosphor</option>
+        <option value="cobalt-blueprint">16 · Cobalt Blueprint</option>
+        <option value="custom">Custom Colors</option>
+      </select>
+    </div>
+
+    <div class="toolbar-group">
+      <button type="button" id="themeToggle">Light / Dark</button>
+      <button type="button" id="dangerSimToggle">Test &gt;80%</button>
+    </div>
+
+    <div class="toolbar-group">
+      <label for="accentPicker">Accent:</label>
+      <input type="color" id="accentPicker" value="#cba6f7" />
+      <label for="bgPicker">BG:</label>
+      <input type="color" id="bgPicker" value="#11111b" />
+    </div>
+
+    <div class="toolbar-group">
+      <label for="widgetOpacitySlider">Widget:</label>
+      <input type="range" id="widgetOpacitySlider" min="20" max="100" value="100" />
+      <span class="val-readout" id="widgetOpacityVal">100%</span>
+      <label for="bgOpacitySlider">BG:</label>
+      <input type="range" id="bgOpacitySlider" min="0" max="100" value="92" />
+      <span class="val-readout" id="bgOpacityVal">92%</span>
+    </div>
+  </div>
+
+  <div class="wallpaper-stage">
+    <main class="widget-frame" id="widgetFrame" data-size-tier="m" data-cols="1">
+      <div class="mini-corner-bar">
+        <span class="mini-sync-dot" title="Last refresh 23:41"></span>
+        <button type="button" class="mini-gear-btn" id="miniSettingsBtn" title="Open Settings" aria-label="Open Settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path></svg>
+        </button>
+      </div>
+
+      <!-- Header -->
+      <header class="widget-header">
+        <div class="header-left">
+          <span class="app-title">QUOTA</span>
+          <span class="refresh-pill">Synced <strong>23:41</strong></span>
+        </div>
+        <button type="button" class="gear-btn" id="openSettingsBtn" title="Open Settings" aria-label="Open Settings">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <section class="pills-deck">
+        <!-- CLAUDE -->
+        <article class="provider-module" data-provider="claude">
+          <div class="module-top">
+            <div class="mod-id">
+              <span class="status-orb"></span>
+              <h2 class="prov-name">Claude</h2>
+              <span class="prov-monogram">CL</span>
+              <span class="plan-chip">Max</span>
+              <span class="inline-extra-chip">OP:12%</span>
+            </div>
+          </div>
+
+          <div class="subpills-grid">
+            <div class="window-pill" data-win="claude-5h" data-pct="34" data-default-pct="34">
+              <div class="pill-fill-layer"></div>
+              <div class="pill-left">
+                <span class="pill-win-full">5-Hour</span>
+                <span class="pill-win-short">5H</span>
+                <span class="pill-rst">2h 41m</span>
+              </div>
+              <div class="pill-right">
+                <span class="pill-pct">34%</span>
+              </div>
+            </div>
+
+            <div class="window-pill" data-win="claude-wk" data-pct="61" data-default-pct="61">
+              <div class="pill-fill-layer"></div>
+              <div class="pill-left">
+                <span class="pill-win-full">Weekly</span>
+                <span class="pill-win-short">WK</span>
+                <span class="pill-rst">3d 4h</span>
+              </div>
+              <div class="pill-right">
+                <span class="pill-pct">61%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="extra-pill-strip">
+            <div class="pill-fill-layer" data-severity="normal" style="width:12%"></div>
+            <span style="position:relative;z-index:1;">Opus weekly</span>
+            <span class="extra-pill-pct">12%</span>
+          </div>
+
+          <div class="xs-pill-summary">
+            <span class="pill-pct" data-severity="normal" style="font-size:13px">34%</span>
+            <span class="xs-wk-muted">·61%</span>
+          </div>
+        </article>
+
+        <!-- CODEX -->
+        <article class="provider-module" data-provider="codex">
+          <div class="module-top">
+            <div class="mod-id">
+              <span class="status-orb"></span>
+              <h2 class="prov-name">Codex</h2>
+              <span class="prov-monogram">CX</span>
+              <span class="plan-chip">Plus</span>
+            </div>
+          </div>
+
+          <div class="subpills-grid">
+            <div class="window-pill" data-win="codex-5h" data-pct="8" data-default-pct="8">
+              <div class="pill-fill-layer"></div>
+              <div class="pill-left">
+                <span class="pill-win-full">5-Hour</span>
+                <span class="pill-win-short">5H</span>
+                <span class="pill-rst">4h 10m</span>
+              </div>
+              <div class="pill-right">
+                <span class="pill-pct">8%</span>
+              </div>
+            </div>
+
+            <div class="window-pill" id="codexWkPill" data-win="codex-wk" data-pct="77" data-default-pct="77" data-danger-pct="90">
+              <div class="pill-fill-layer"></div>
+              <div class="pill-left">
+                <span class="pill-win-full">Weekly</span>
+                <span class="pill-win-short">WK</span>
+                <span class="pill-rst">1d 6h</span>
+              </div>
+              <div class="pill-right">
+                <span class="pill-pct">77%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="xs-pill-summary">
+            <span class="pill-pct" data-severity="normal" style="font-size:13px">8%</span>
+            <span class="xs-wk-muted" id="xsCodexWk">·77%</span>
+          </div>
+        </article>
+
+        <!-- GEMINI -->
+        <article class="provider-module is-stale" data-provider="gemini">
+          <div class="module-top">
+            <div class="mod-id">
+              <span class="status-orb"></span>
+              <h2 class="prov-name">Gemini</h2>
+              <span class="prov-monogram">GM</span>
+              <span class="plan-chip">AI Pro</span>
+            </div>
+            <div class="mod-badges">
+              <span class="tag-stale">STALE</span>
+              <span class="tag-stale-short">!</span>
+              <span class="tag-age">3h ago</span>
+            </div>
+          </div>
+
+          <div class="subpills-grid">
+            <div class="window-pill" data-win="gemini-5h" data-pct="17" data-default-pct="17">
+              <div class="pill-fill-layer"></div>
+              <div class="pill-left">
+                <span class="pill-win-full">5-Hour</span>
+                <span class="pill-win-short">5H</span>
+                <span class="pill-rst">1h 05m</span>
+              </div>
+              <div class="pill-right">
+                <span class="pill-pct">17%</span>
+              </div>
+            </div>
+
+            <div class="window-pill" data-win="gemini-wk" data-pct="7" data-default-pct="7">
+              <div class="pill-fill-layer"></div>
+              <div class="pill-left">
+                <span class="pill-win-full">Weekly</span>
+                <span class="pill-win-short">WK</span>
+                <span class="pill-rst">6d</span>
+              </div>
+              <div class="pill-right">
+                <span class="pill-pct">7%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="xs-pill-summary">
+            <span class="pill-pct" data-severity="normal" style="font-size:13px">17%</span>
+            <span class="xs-wk-muted">·7%</span>
+          </div>
+        </article>
+      </section>
+
+      <footer class="widget-footer">
+        <div class="legend-cluster">
+          <span class="legend-item"><i class="legend-pill" style="background:var(--severity-normal)"></i>&lt;50% OK</span>
+          <span class="legend-item"><i class="legend-pill" style="background:var(--severity-warning)"></i>50-80% WARN</span>
+          <span class="legend-item"><i class="legend-pill" style="background:var(--severity-danger)"></i>&gt;80% CRIT</span>
+        </div>
+        <span>PILLS // 20</span>
+      </footer>
+
+      <!-- Draggable Resize Handle -->
+      <div class="resize-handle" id="resizeHandle" title="Drag to resize widget">
+        <svg viewBox="0 0 10 10"><line x1="2" y1="9" x2="9" y2="2"/><line x1="6" y1="9" x2="9" y2="6"/></svg>
+      </div>
+
+      <!-- Slide-in Settings Panel -->
+      <aside class="settings-overlay" id="settingsOverlay" aria-label="Widget Settings">
+        <div class="settings-top">
+          <span class="settings-title">QUOTA // PILLS SETTINGS</span>
+          <button type="button" class="close-btn" id="closeSettingsBtn">× CLOSE</button>
+        </div>
+        <div class="settings-body">
+          <div class="set-group">
+            <span class="set-group-title">Palette &amp; Custom Colors</span>
+            <div class="set-row">
+              <span>Preset Palette</span>
+              <select id="panelPaletteSelect">
+                <option value="signal-orange">01 · Signal Orange</option>
+                <option value="sakura-pink">02 · Sakura Pink</option>
+                <option value="nord">03 · Nord</option>
+                <option value="solarized-dark">04 · Solarized Dark</option>
+                <option value="mono-paper">05 · Mono Paper</option>
+                <option value="matrix-green">06 · Matrix Green</option>
+                <option value="high-contrast">07 · High Contrast AAA</option>
+                <option value="okabe-ito-safe">08 · Okabe-Ito Safe</option>
+                <option value="viridis-safe">09 · Viridis Telemetry</option>
+                <option value="tol-light-safe">10 · Paul Tol Muted Safe</option>
+                <option value="catppuccin-mocha" selected>11 · Catppuccin Mocha</option>
+                <option value="gruvbox-dark">12 · Gruvbox Industrial</option>
+                <option value="tokyo-night">13 · Tokyo Night</option>
+                <option value="dracula">14 · Dracula Neon</option>
+                <option value="amber-crt">15 · Amber Phosphor</option>
+                <option value="cobalt-blueprint">16 · Cobalt Blueprint</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div class="set-row">
+              <span>Accent Color</span>
+              <input type="color" id="panelAccentPicker" value="#cba6f7" />
+            </div>
+            <div class="set-row">
+              <span>Background Color</span>
+              <input type="color" id="panelBgPicker" value="#11111b" />
+            </div>
+          </div>
+
+          <div class="set-group">
+            <span class="set-group-title">Transparency</span>
+            <div class="set-row">
+              <span>Widget Opacity</span>
+              <input type="range" id="panelWidgetOpacity" min="20" max="100" value="100" />
+            </div>
+            <div class="set-row">
+              <span>Background Opacity</span>
+              <input type="range" id="panelBgOpacity" min="0" max="100" value="92" />
+            </div>
+          </div>
+
+          <div class="set-group">
+            <span class="set-group-title">Notifications (Opt-In)</span>
+            <div class="set-row">
+              <span>Capsule Threshold Alerts</span>
+              <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;">
+                <input type="checkbox" id="notifToggle" />
+                <strong id="notifStatusText">OFF</strong>
+              </label>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const PALETTES = {
+      'signal-orange': { mode: 'dark', bgWidget: '#0E0E11', bgCard: '#15151A', textPrimary: '#F4F4F6', textMuted: '#8E8E9E', accent: '#FF3B1D', ok: '#F4F4F6', warn: '#FF9E1B', danger: '#FF2A2A' },
+      'sakura-pink':   { mode: 'light', bgWidget: '#FDF2F5', bgCard: '#FCE7EE', textPrimary: '#2D121E', textMuted: '#7A4E62', accent: '#E11D74', ok: '#0D9488', warn: '#D97706', danger: '#E11D48' },
+      'nord':          { mode: 'dark', bgWidget: '#242933', bgCard: '#2E3440', textPrimary: '#ECEFF4', textMuted: '#9099AB', accent: '#88C0D0', ok: '#A3BE8C', warn: '#EBCB8B', danger: '#BF616A' },
+      'solarized-dark':{ mode: 'dark', bgWidget: '#00212B', bgCard: '#073642', textPrimary: '#FDF6E3', textMuted: '#93A1A1', accent: '#268BD2', ok: '#859900', warn: '#B58900', danger: '#DC322F' },
+      'mono-paper':    { mode: 'light', bgWidget: '#F2EFE9', bgCard: '#E6E2D8', textPrimary: '#141413', textMuted: '#5C5954', accent: '#141413', ok: '#141413', warn: '#8C5A08', danger: '#B91C1C' },
+      'matrix-green':  { mode: 'dark', bgWidget: '#030A04', bgCard: '#071409', textPrimary: '#D1FFD7', textMuted: '#4E9A57', accent: '#00FF41', ok: '#00FF41', warn: '#CCFF00', danger: '#FF3355' },
+      'high-contrast': { mode: 'dark', bgWidget: '#000000', bgCard: '#0A0A0A', textPrimary: '#FFFFFF', textMuted: '#D4D4D4', accent: '#00FFFF', ok: '#00FF66', warn: '#FFFF00', danger: '#FF3333' },
+      'okabe-ito-safe':{ mode: 'dark', bgWidget: '#0F141C', bgCard: '#171F2C', textPrimary: '#F8FAFC', textMuted: '#94A3B8', accent: '#56B4E9', ok: '#009E73', warn: '#E69F00', danger: '#D55E00' },
+      'viridis-safe':  { mode: 'dark', bgWidget: '#10111E', bgCard: '#191B2E', textPrimary: '#F5F7FA', textMuted: '#9AA1B9', accent: '#21918C', ok: '#35B779', warn: '#FDE725', danger: '#F8536B' },
+      'tol-light-safe':{ mode: 'light', bgWidget: '#F7F8FA', bgCard: '#FFFFFF', textPrimary: '#111827', textMuted: '#4B5563', accent: '#332288', ok: '#117733', warn: '#B8860B', danger: '#882255' },
+      'catppuccin-mocha':{ mode: 'dark', bgWidget: '#11111B', bgCard: '#1E1E2E', textPrimary: '#CDD6F4', textMuted: '#9399B2', accent: '#CBA6F7', ok: '#A6E3A1', warn: '#F9E2AF', danger: '#F38BA8' },
+      'gruvbox-dark':  { mode: 'dark', bgWidget: '#1D2021', bgCard: '#282828', textPrimary: '#EBDBB2', textMuted: '#A89984', accent: '#FE8019', ok: '#B8BB26', warn: '#FABD2F', danger: '#FB4934' },
+      'tokyo-night':   { mode: 'dark', bgWidget: '#16161E', bgCard: '#1A1B26', textPrimary: '#C0CAF5', textMuted: '#7982A9', accent: '#7AA2F7', ok: '#73DACA', warn: '#E0AF68', danger: '#F7768E' },
+      'dracula':       { mode: 'dark', bgWidget: '#1E1F29', bgCard: '#282A36', textPrimary: '#F8F8F2', textMuted: '#959DCB', accent: '#BD93F9', ok: '#50FA7B', warn: '#F1FA8C', danger: '#FF5555' },
+      'amber-crt':     { mode: 'dark', bgWidget: '#0C0800', bgCard: '#171002', textPrimary: '#FFE082', textMuted: '#B38822', accent: '#FFB000', ok: '#FFB000', warn: '#FF7700', danger: '#FF2200' },
+      'cobalt-blueprint':{ mode: 'dark', bgWidget: '#071A38', bgCard: '#0D274E', textPrimary: '#EBF3FF', textMuted: '#8AB0E6', accent: '#FFFFFF', ok: '#5CE1E6', warn: '#FFD166', danger: '#FF5C77' }
+    };
+
+    const SIZE_PRESETS = {
+      xs: { w: 160, h: 90 },
+      s:  { w: 260, h: 200 },
+      m:  { w: 460, h: 450 },
+      l:  { w: 680, h: 560 }
+    };
+
+    let currentWidth = 460;
+    let currentHeight = 450;
+
+    function getSeverity(pct) {
+      if (pct > 80) return 'danger';
+      if (pct >= 50) return 'warning';
+      return 'normal';
+    }
+
+    function hexToRgbTuple(hex) {
+      const clean = hex.replace('#', '');
+      const num = parseInt(clean, 16);
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function renderPills() {
+      document.querySelectorAll('.provider-module').forEach(mod => {
+        const pills = mod.querySelectorAll('.window-pill');
+        let peakPct = 0;
+        let primary5hPct = 0;
+
+        pills.forEach((pill, index) => {
+          const pct = Number(pill.getAttribute('data-pct'));
+          if (index === 0) primary5hPct = pct;
+          peakPct = Math.max(peakPct, pct);
+          const sev = getSeverity(pct);
+
+          const fill = pill.querySelector('.pill-fill-layer');
+          const pctEl = pill.querySelector('.pill-pct');
+          fill.style.width = pct + '%';
+          fill.setAttribute('data-severity', sev);
+          pctEl.textContent = pct + '%';
+          pctEl.setAttribute('data-severity', sev);
+        });
+
+        const peakSev = getSeverity(peakPct);
+        const primarySev = getSeverity(primary5hPct);
+        const orb = mod.querySelector('.status-orb');
+        orb.style.background = `var(--severity-${peakSev})`;
+
+      });
+    }
+
+    function applyPalette(id) {
+      if (id === 'custom') return;
+      const p = PALETTES[id];
+      if (!p) return;
+      document.documentElement.setAttribute('data-theme', p.mode);
+      const [wr, wg, wb] = hexToRgbTuple(p.bgWidget);
+      const [cr, cg, cb] = hexToRgbTuple(p.bgCard);
+      const [tr, tg, tb] = hexToRgbTuple(p.textPrimary);
+      const root = document.documentElement.style;
+      root.setProperty('--bg-rgb', `${wr}, ${wg}, ${wb}`);
+      root.setProperty('--bg-card-rgb', `${cr}, ${cg}, ${cb}`);
+      root.setProperty('--text-primary', p.textPrimary);
+      root.setProperty('--text-secondary', p.textMuted);
+      root.setProperty('--text-muted', p.textMuted);
+      root.setProperty('--accent', p.accent);
+      root.setProperty('--severity-normal', p.ok);
+      root.setProperty('--severity-warning', p.warn);
+      root.setProperty('--severity-danger', p.danger);
+      root.setProperty('--border-color', `rgba(${tr}, ${tg}, ${tb}, 0.16)`);
+      root.setProperty('--pill-well', p.mode === 'light' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0.28)');
+
+      document.getElementById('accentPicker').value = p.accent.toLowerCase();
+      document.getElementById('panelAccentPicker').value = p.accent.toLowerCase();
+      document.getElementById('bgPicker').value = p.bgWidget.toLowerCase();
+      document.getElementById('panelBgPicker').value = p.bgWidget.toLowerCase();
+      document.getElementById('paletteSelect').value = id;
+      document.getElementById('panelPaletteSelect').value = id;
+      renderPills();
+    }
+
+    function setCustomMode() {
+      document.getElementById('paletteSelect').value = 'custom';
+      document.getElementById('panelPaletteSelect').value = 'custom';
+    }
+
+    function applyAccentColor(hex) {
+      setCustomMode();
+      document.documentElement.style.setProperty('--accent', hex);
+      document.documentElement.style.setProperty('--severity-normal', hex);
+      document.getElementById('accentPicker').value = hex;
+      document.getElementById('panelAccentPicker').value = hex;
+      renderPills();
+    }
+
+    function applyBgColor(hex) {
+      setCustomMode();
+      const [r, g, b] = hexToRgbTuple(hex);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      const isLight = lum > 0.5;
+      const cardR = isLight ? Math.max(0, r - 12) : Math.min(255, r + 14);
+      const cardG = isLight ? Math.max(0, g - 12) : Math.min(255, g + 14);
+      const cardB = isLight ? Math.max(0, b - 14) : Math.min(255, b + 18);
+      const root = document.documentElement.style;
+      root.setProperty('--bg-rgb', `${r}, ${g}, ${b}`);
+      root.setProperty('--bg-card-rgb', `${cardR}, ${cardG}, ${cardB}`);
+      root.setProperty('--text-primary', isLight ? '#111827' : '#cdd6f4');
+      root.setProperty('--text-secondary', isLight ? '#4b5563' : '#a6adc8');
+      root.setProperty('--text-muted', isLight ? '#6b7280' : '#9399b2');
+      const ink = isLight ? '17, 24, 39' : '205, 214, 244';
+      root.setProperty('--border-color', `rgba(${ink}, 0.16)`);
+      root.setProperty('--pill-well', isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0.28)');
+      document.getElementById('bgPicker').value = hex;
+      document.getElementById('panelBgPicker').value = hex;
+      renderPills();
+    }
+
+    function applyWidgetOpacity(pct) {
+      document.documentElement.style.setProperty('--widget-opacity', (pct / 100).toFixed(2));
+      document.getElementById('widgetOpacitySlider').value = pct;
+      document.getElementById('panelWidgetOpacity').value = pct;
+      document.getElementById('widgetOpacityVal').textContent = pct + '%';
+    }
+
+    function applyBgOpacity(pct) {
+      document.documentElement.style.setProperty('--bg-opacity', (pct / 100).toFixed(2));
+      document.getElementById('bgOpacitySlider').value = pct;
+      document.getElementById('panelBgOpacity').value = pct;
+      document.getElementById('bgOpacityVal').textContent = pct + '%';
+    }
+
+    function applyDimensions(w, h, presetKey = null) {
+      currentWidth = Math.max(130, Math.min(920, Math.round(w)));
+      currentHeight = Math.max(72, Math.min(760, Math.round(h)));
+      const frame = document.getElementById('widgetFrame');
+      document.documentElement.style.setProperty('--widget-width', currentWidth + 'px');
+      document.documentElement.style.setProperty('--widget-height', currentHeight + 'px');
+
+      let tier = 'm';
+      if (currentWidth < 220 || currentHeight < 140) tier = 'xs';
+      else if (currentWidth < 320 || currentHeight < 280) tier = 's';
+      else if (currentWidth >= 620 && currentHeight >= 540) tier = 'l';
+      frame.setAttribute('data-size-tier', tier);
+
+      document.querySelectorAll('[data-size-preset]').forEach(btn => {
+        const key = btn.getAttribute('data-size-preset');
+        btn.classList.toggle('active', presetKey ? key === presetKey : key === tier);
+      });
+
+      document.getElementById('sizeBadge').textContent = `${tier.toUpperCase()} · ${currentWidth}×${currentHeight} px`;
+
+      frame.classList.toggle('shed-step-1', currentHeight < 540 || currentWidth < 480);
+      frame.classList.toggle('shed-step-2', currentHeight < 380);
+      frame.classList.toggle('shed-step-2b', currentHeight < 260 || currentWidth < 260);
+      frame.classList.toggle('shed-step-3', currentWidth < 320 || currentHeight < 260);
+      frame.classList.toggle('shed-step-4', currentWidth < 280 || currentHeight < 240);
+      frame.classList.toggle('shed-step-5', currentWidth < 240 || currentHeight < 190);
+      frame.classList.toggle('shed-step-6', currentWidth < 220 || currentHeight < 140);
+      frame.classList.toggle('shed-step-7', currentWidth < 175 || currentHeight < 105);
+
+      const activeCount = document.querySelectorAll('.provider-module:not([hidden])').length;
+      const aspect = currentWidth / currentHeight;
+      let cols = 1;
+      if (activeCount === 2 && currentWidth >= 360 && aspect >= 1.25 && currentHeight >= 150) {
+        cols = 2;
+      } else if (activeCount === 3 && currentWidth >= 520 && aspect >= 1.38 && currentHeight >= 150) {
+        cols = 3;
+      }
+      frame.setAttribute('data-cols', String(cols));
+      renderPills();
+    }
+
+    document.querySelectorAll('[data-size-preset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-size-preset');
+        const preset = SIZE_PRESETS[key];
+        if (preset) applyDimensions(preset.w, preset.h, key);
+      });
+    });
+
+    // Resize Handle Dragging
+    const resizeHandle = document.getElementById('resizeHandle');
+    let isDragging = false, startX = 0, startY = 0, startW = 0, startH = 0;
+    resizeHandle.addEventListener('pointerdown', e => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startW = currentWidth;
+      startH = currentHeight;
+      resizeHandle.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    resizeHandle.addEventListener('pointermove', e => {
+      if (!isDragging) return;
+      const dw = (e.clientX - startX) * 2;
+      const dh = (e.clientY - startY);
+      applyDimensions(startW + dw, startH + dh);
+    });
+    resizeHandle.addEventListener('pointerup', () => { isDragging = false; });
+
+    // Provider Toggles
+    document.querySelectorAll('[data-toggle-provider]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-toggle-provider');
+        const mod = document.querySelector(`.provider-module[data-provider="${target}"]`);
+        const activeCount = document.querySelectorAll('.provider-module:not([hidden])').length;
+        if (!mod.hasAttribute('hidden') && activeCount <= 1) return;
+
+        if (mod.hasAttribute('hidden')) {
+          mod.removeAttribute('hidden');
+          btn.classList.add('active');
+        } else {
+          mod.setAttribute('hidden', '');
+          btn.classList.remove('active');
+        }
+        applyDimensions(currentWidth, currentHeight);
+      });
+    });
+
+    document.getElementById('paletteSelect').addEventListener('change', e => applyPalette(e.target.value));
+    document.getElementById('panelPaletteSelect').addEventListener('change', e => applyPalette(e.target.value));
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      applyPalette(cur === 'dark' ? 'sakura-pink' : 'catppuccin-mocha');
+    });
+
+    let dangerSim = false;
+    document.getElementById('dangerSimToggle').addEventListener('click', e => {
+      dangerSim = !dangerSim;
+      e.currentTarget.classList.toggle('active', dangerSim);
+      const pill = document.getElementById('codexWkPill');
+      const nextPct = dangerSim ? pill.getAttribute('data-danger-pct') : pill.getAttribute('data-default-pct');
+      pill.setAttribute('data-pct', nextPct);
+      document.getElementById('xsCodexWk').textContent = '·' + nextPct + '%';
+      renderPills();
+    });
+
+    document.getElementById('accentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('panelAccentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('bgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+    document.getElementById('panelBgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+    document.getElementById('widgetOpacitySlider').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('panelWidgetOpacity').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('bgOpacitySlider').addEventListener('input', e => applyBgOpacity(e.target.value));
+    document.getElementById('panelBgOpacity').addEventListener('input', e => applyBgOpacity(e.target.value));
+
+    const settingsOverlay = document.getElementById('settingsOverlay');
+    const openSettingsBtn = document.getElementById('openSettingsBtn');
+    const miniSettingsBtn = document.getElementById('miniSettingsBtn');
+    function toggleSettings() {
+      const isOpen = settingsOverlay.classList.toggle('open');
+      openSettingsBtn.classList.toggle('active', isOpen);
+    }
+    openSettingsBtn.addEventListener('click', toggleSettings);
+    miniSettingsBtn.addEventListener('click', toggleSettings);
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+      settingsOverlay.classList.remove('open');
+      openSettingsBtn.classList.remove('active');
+    });
+
+    document.getElementById('notifToggle').addEventListener('change', e => {
+      document.getElementById('notifStatusText').textContent = e.target.checked ? 'ON' : 'OFF';
+    });
+
+    applyPalette('catppuccin-mocha');
+    applyDimensions(460, 450, 'm');
+  </script>
+</body>
+</html>

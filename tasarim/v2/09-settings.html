@@ -1,0 +1,1291 @@
+<!--
+  DESIGN 09 (v2): FULL SETTINGS PANEL (DESIGN 01 DOT-MATRIX STYLE)
+  Fixed Panel Dimensions: 520px × 720px
+  Interactive Features:
+  - 5 Switchable Tabs: General, Providers, Theme, Notifications (OFF by default), About
+  - Live Mini Widget Preview docked at the bottom of the 520×720 panel that reacts in real time to:
+    * Used % vs Remaining % mode
+    * Reset time format (Relative / Absolute / Both)
+    * Provider enable/disable, drag/button reorder, and per-provider window checkboxes
+    * 8 Layout Thumbnails selector
+    * Custom Accent & Background Color Pickers + Preset Swatches + Custom Hex Input
+    * Font family, Density, Corner Radius, Widget Opacity, and Background Opacity sliders
+    * Theme JSON Export / Import preview
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>09 — Full Settings Panel (Design 01 Style, 520×720)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Fira+Code:wght@500;700&family=JetBrains+Mono:wght@400;600;700&family=Orbitron:wght@700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-stage: #07070b;
+      --bg-rgb: 14, 14, 18;
+      --bg-card-rgb: 22, 22, 29;
+      --bg-dot-off-rgb: 44, 44, 58;
+      --widget-opacity: 1;
+      --bg-opacity: 0.94;
+      --bg-panel: rgba(var(--bg-rgb), var(--bg-opacity));
+      --bg-card: rgba(var(--bg-card-rgb), var(--bg-opacity));
+      --bg-dot-off: rgba(var(--bg-dot-off-rgb), 0.85);
+      --text-primary: #f2f2f5;
+      --text-secondary: #9a9aa8;
+      --text-muted: #666676;
+      --border-color: rgba(255, 255, 255, 0.15);
+      --accent: #ff3b1d;
+      --severity-normal: var(--accent);
+      --severity-warning: #ff9e1b;
+      --severity-danger: #ff2a2a;
+      --corner-radius: 14px;
+      --active-font: 'DotGothic16', monospace;
+      --dot-matrix-bg: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+      --panel-width: 520px;
+      --panel-height: 720px;
+    }
+
+    [data-theme="light"] {
+      --bg-stage: #d8d8de;
+      --bg-rgb: 236, 236, 240;
+      --bg-card-rgb: 223, 223, 230;
+      --bg-dot-off-rgb: 185, 185, 198;
+      --text-primary: #121216;
+      --text-secondary: #4e4e5a;
+      --text-muted: #727282;
+      --border-color: rgba(0, 0, 0, 0.16);
+      --accent: #e02b0e;
+      --severity-normal: var(--accent);
+      --severity-warning: #d96b00;
+      --severity-danger: #d91414;
+      --dot-matrix-bg: radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-stage);
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px;
+      gap: 12px;
+    }
+
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      background: rgba(18, 18, 24, 0.95);
+      border: 1px solid #333342;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #d4d4dc;
+      z-index: 20;
+    }
+    .demo-toolbar .size-badge {
+      color: var(--accent);
+      font-weight: 700;
+      padding-right: 8px;
+      border-right: 1px solid #333342;
+    }
+    .demo-toolbar button {
+      background: #23232e;
+      color: #eee;
+      border: 1px solid #444454;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .demo-toolbar button.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Colorful CSS-Only Desktop Wallpaper Stage */
+    .wallpaper-stage {
+      padding: 24px 36px;
+      border-radius: 26px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(255, 59, 29, 0.42) 0%, transparent 45%),
+        radial-gradient(circle at 84% 25%, rgba(255, 95, 162, 0.40) 0%, transparent 46%),
+        radial-gradient(circle at 52% 84%, rgba(56, 189, 248, 0.40) 0%, transparent 50%),
+        linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #090d16 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 24px 60px rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Fixed 520×720 Settings Window (Design 01 Dot-Matrix Style) */
+    .settings-window {
+      width: var(--panel-width);
+      height: var(--panel-height);
+      opacity: var(--widget-opacity);
+      background-color: var(--bg-panel);
+      background-image: var(--dot-matrix-bg);
+      background-size: 6px 6px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 2px solid var(--border-color);
+      border-right-width: 5px;
+      border-right-color: var(--accent);
+      border-radius: var(--corner-radius);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      z-index: 2;
+    }
+
+    /* Window Header */
+    .win-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border-color);
+      flex-shrink: 0;
+    }
+    .win-header-left {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .beacon-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .win-title {
+      font-family: var(--active-font);
+      font-size: 20px;
+      letter-spacing: 2.5px;
+      color: var(--text-primary);
+    }
+    .win-sub {
+      font-size: 10.5px;
+      color: var(--text-secondary);
+    }
+    .win-sub strong {
+      color: var(--accent);
+    }
+
+    /* Navigation Tabs */
+    .tabs-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .tab-btn {
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 4px;
+      font-family: 'DotGothic16', monospace;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .tab-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Tab Panels Viewport */
+    .tab-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tab-pane.active {
+      display: flex;
+    }
+
+    /* Card & Form Primitives */
+    .cfg-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .cfg-card-title {
+      font-family: 'DotGothic16', monospace;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cfg-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+    }
+    .cfg-label {
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .cfg-hint {
+      font-size: 9.5px;
+      color: var(--text-muted);
+    }
+
+    select,
+    input[type="text"],
+    input[type="time"] {
+      background: rgba(0, 0, 0, 0.28);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 4px 7px;
+      font-family: inherit;
+      font-size: 11px;
+    }
+    [data-theme="light"] select,
+    [data-theme="light"] input[type="text"],
+    [data-theme="light"] input[type="time"] {
+      background: rgba(255, 255, 255, 0.65);
+    }
+
+    .seg-group {
+      display: inline-flex;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .seg-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      padding: 3px 8px;
+      font-family: inherit;
+      font-size: 10.5px;
+      cursor: pointer;
+    }
+    .seg-btn.active {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 34px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: var(--bg-dot-off);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      transition: 0.2s;
+    }
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 2px;
+      bottom: 2px;
+      background-color: var(--text-primary);
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .switch input:checked + .slider {
+      background-color: var(--accent);
+      border-color: var(--accent);
+    }
+    .switch input:checked + .slider::before {
+      transform: translateX(16px);
+      background-color: #fff;
+    }
+
+    /* Screen Anchor 3×3 Grid */
+    .anchor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 28px);
+      gap: 4px;
+    }
+    .anchor-cell {
+      height: 18px;
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      background: rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+    .anchor-cell.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Providers List with Drag Handles */
+    .prov-item {
+      background: rgba(0, 0, 0, 0.16);
+      border: 1px solid var(--border-color);
+      border-radius: 7px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .prov-item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .drag-cluster {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .drag-handle {
+      cursor: grab;
+      color: var(--text-muted);
+      font-size: 13px;
+      user-select: none;
+      padding: 0 3px;
+    }
+    .order-btns {
+      display: inline-flex;
+      gap: 2px;
+    }
+    .order-btns button {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 3px;
+      font-size: 9px;
+      padding: 1px 4px;
+      cursor: pointer;
+    }
+    .status-pill {
+      font-size: 9.5px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-pill.detected {
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+    .status-pill.missing {
+      border: 1px dashed var(--text-muted);
+      color: var(--text-muted);
+    }
+    .win-checks {
+      display: flex;
+      gap: 10px;
+      font-size: 10px;
+      color: var(--text-secondary);
+      padding-left: 22px;
+    }
+    .win-checks label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .win-checks input {
+      accent-color: var(--accent);
+    }
+
+    /* Theme Tab: 8 Layout Thumbnails Gallery */
+    .thumb-gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .layout-thumb {
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px;
+      background: rgba(0, 0, 0, 0.22);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 9.5px;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+    .layout-thumb:hover {
+      border-color: var(--accent);
+    }
+    .layout-thumb.active {
+      border-color: var(--accent);
+      background: rgba(255, 59, 29, 0.12);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .thumb-art {
+      height: 24px;
+      border-radius: 3px;
+      background: var(--bg-dot-off);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DotGothic16', monospace;
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+
+    .color-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .swatch {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+    }
+    .hex-input {
+      width: 72px;
+      text-transform: uppercase;
+    }
+
+    /* Live Mini Preview Dock inside the 520×720 Window */
+    .live-preview-dock {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .preview-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--text-secondary);
+      border-bottom: 1px dotted var(--border-color);
+      padding-bottom: 4px;
+    }
+    .preview-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-brand strong {
+      font-family: var(--active-font);
+      color: var(--text-primary);
+      font-size: 13px;
+      letter-spacing: 1.5px;
+    }
+    .preview-rows {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 6px;
+    }
+    .prev-card {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      padding: 5px 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 10px;
+    }
+    .prev-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .prev-name {
+      font-family: var(--active-font);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .prev-pct {
+      font-family: var(--active-font);
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .prev-dots {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 2px;
+      height: 5px;
+    }
+    .prev-dots span {
+      border-radius: 50%;
+      background: var(--bg-dot-off);
+    }
+    .prev-dots span.on {
+      background: var(--accent);
+    }
+
+    .disabled-section {
+      opacity: 0.42;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-toolbar" role="region" aria-label="Settings Panel Demo Controls">
+    <span class="size-badge">520×720 px (09 — Full Settings Panel)</span>
+    <button type="button" id="themeToggle">Light / Dark</button>
+    <button type="button" id="pinkTestBtn">Test Pink Accent (#ff5fa2)</button>
+    <a href="index.html" style="color:var(--accent);text-decoration:none;font-weight:700;margin-left:6px;">← Back to v2 Gallery</a>
+  </div>
+
+  <div class="wallpaper-stage">
+    <main class="settings-window" id="settingsWindow">
+      <!-- Header: App name far left, last updated right next to it -->
+      <header class="win-header">
+        <div class="win-header-left">
+          <div class="brand-cluster">
+            <span class="beacon-dot"></span>
+            <span class="win-title">QUOTA // SETTINGS</span>
+          </div>
+          <span class="win-sub">SYNC <strong>23:41</strong></span>
+        </div>
+        <span style="font-family:'DotGothic16',monospace;font-size:12px;color:var(--accent)">520×720</span>
+      </header>
+
+      <!-- 5 Interactive Tabs -->
+      <nav class="tabs-bar" role="tablist">
+        <button type="button" class="tab-btn active" data-tab="general">General</button>
+        <button type="button" class="tab-btn" data-tab="providers">Providers</button>
+        <button type="button" class="tab-btn" data-tab="theme">Theme</button>
+        <button type="button" class="tab-btn" data-tab="notifications" id="notifTabBtn">Alerts [OFF]</button>
+        <button type="button" class="tab-btn" data-tab="about">About</button>
+      </nav>
+
+      <!-- Tab Content Area -->
+      <section class="tab-viewport">
+        <!-- TAB 1: GENERAL -->
+        <div class="tab-pane active" id="tab-general">
+          <div class="cfg-card">
+            <div class="cfg-card-title">Startup &amp; Polling</div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Start at Login</span>
+                <span class="cfg-hint">Launch background widget automatically on OS sign-in</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Refresh Interval</span>
+                <span class="cfg-hint">Local quota polling cadence</span>
+              </div>
+              <select id="refreshIntervalSelect">
+                <option value="1m">Every 1 minute</option>
+                <option value="2m">Every 2 minutes</option>
+                <option value="5m" selected>Every 5 minutes (Default)</option>
+                <option value="15m">Every 15 minutes</option>
+              </select>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Interface Language</span>
+                <span class="cfg-hint">UI labels and time formatting</span>
+              </div>
+              <select id="langSelect">
+                <option value="en" selected>English (EN)</option>
+                <option value="tr">Türkçe (TR)</option>
+                <option value="de">Deutsch (DE)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-title">Quota &amp; Reset Formatting</div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Percentage Display Mode</span>
+                <span class="cfg-hint">Updates live mini preview below</span>
+              </div>
+              <div class="seg-group" id="pctModeGroup">
+                <button type="button" class="seg-btn active" data-pct-mode="used">Used %</button>
+                <button type="button" class="seg-btn" data-pct-mode="remaining">Remaining %</button>
+              </div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Reset Time Format</span>
+                <span class="cfg-hint">Countdown vs wall-clock reset timestamp</span>
+              </div>
+              <div class="seg-group" id="resetFmtGroup">
+                <button type="button" class="seg-btn active" data-rst-fmt="relative">Relative (2h 41m)</button>
+                <button type="button" class="seg-btn" data-rst-fmt="absolute">Absolute (02:22)</button>
+                <button type="button" class="seg-btn" data-rst-fmt="both">Both</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-title">Screen &amp; Anchor Position</div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Target Monitor</span>
+                <span class="cfg-hint">Multi-monitor desktop placement</span>
+              </div>
+              <select>
+                <option selected>Primary Display (2560×1440)</option>
+                <option>Display 2 — Secondary (1920×1080)</option>
+              </select>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Desktop AnchorZone</span>
+                <span class="cfg-hint" id="anchorLabel">Current: Middle-Right Dock</span>
+              </div>
+              <div class="anchor-grid" id="anchorGrid">
+                <div class="anchor-cell" data-anchor="Top-Left"></div>
+                <div class="anchor-cell" data-anchor="Top-Bar"></div>
+                <div class="anchor-cell" data-anchor="Top-Right"></div>
+                <div class="anchor-cell" data-anchor="Middle-Left"></div>
+                <div class="anchor-cell" data-anchor="Center-Float"></div>
+                <div class="anchor-cell active" data-anchor="Middle-Right Dock"></div>
+                <div class="anchor-cell" data-anchor="Bottom-Left"></div>
+                <div class="anchor-cell" data-anchor="Bottom-Bar"></div>
+                <div class="anchor-cell" data-anchor="Bottom-Right"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: PROVIDERS -->
+        <div class="tab-pane" id="tab-providers">
+          <div class="cfg-card">
+            <div class="cfg-card-title">
+              <span>Configured Providers (Drag or Use ▲/▼ to Reorder)</span>
+            </div>
+            <div id="providersOrderList" style="display:flex;flex-direction:column;gap:7px;">
+              <!-- Claude -->
+              <div class="prov-item" draggable="true" data-prov-id="claude" data-prov-name="Claude" data-prov-pct="34" data-prov-rst-rel="2h 41m" data-prov-rst-abs="02:22">
+                <div class="prov-item-head">
+                  <div class="drag-cluster">
+                    <span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+                    <div class="order-btns">
+                      <button type="button" class="move-up">▲</button>
+                      <button type="button" class="move-down">▼</button>
+                    </div>
+                    <strong>Claude Code</strong>
+                    <span class="status-pill detected">Detected · Max</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" class="prov-enable-toggle" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="win-checks">
+                  <label><input type="checkbox" checked /> 5-hour window</label>
+                  <label><input type="checkbox" checked /> Weekly window</label>
+                  <label><input type="checkbox" checked /> Extra: Opus weekly</label>
+                </div>
+              </div>
+
+              <!-- Codex -->
+              <div class="prov-item" draggable="true" data-prov-id="codex" data-prov-name="Codex" data-prov-pct="77" data-prov-rst-rel="1d 6h" data-prov-rst-abs="Sun 05:41">
+                <div class="prov-item-head">
+                  <div class="drag-cluster">
+                    <span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+                    <div class="order-btns">
+                      <button type="button" class="move-up">▲</button>
+                      <button type="button" class="move-down">▼</button>
+                    </div>
+                    <strong>Codex CLI</strong>
+                    <span class="status-pill detected">Detected · Plus</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" class="prov-enable-toggle" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="win-checks">
+                  <label><input type="checkbox" checked /> 5-hour window</label>
+                  <label><input type="checkbox" checked /> Weekly window</label>
+                </div>
+              </div>
+
+              <!-- Gemini -->
+              <div class="prov-item" draggable="true" data-prov-id="gemini" data-prov-name="Gemini" data-prov-pct="17" data-prov-rst-rel="1h 05m" data-prov-rst-abs="00:46">
+                <div class="prov-item-head">
+                  <div class="drag-cluster">
+                    <span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+                    <div class="order-btns">
+                      <button type="button" class="move-up">▲</button>
+                      <button type="button" class="move-down">▼</button>
+                    </div>
+                    <strong>Gemini CLI</strong>
+                    <span class="status-pill detected">Detected · AI Pro (Stale 3h)</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" class="prov-enable-toggle" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="win-checks">
+                  <label><input type="checkbox" checked /> 5-hour window</label>
+                  <label><input type="checkbox" checked /> Weekly window</label>
+                </div>
+              </div>
+
+              <!-- Future / Not Installed Provider Example -->
+              <div class="prov-item" draggable="true" data-prov-id="local-extra" data-prov-name="OpenRouter" data-prov-pct="42" data-prov-rst-rel="12d" data-prov-rst-abs="Nov 13">
+                <div class="prov-item-head">
+                  <div class="drag-cluster">
+                    <span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+                    <div class="order-btns">
+                      <button type="button" class="move-up">▲</button>
+                      <button type="button" class="move-down">▼</button>
+                    </div>
+                    <strong>OpenRouter / Custom API</strong>
+                    <span class="status-pill missing">Not Installed</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" class="prov-enable-toggle" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="win-checks">
+                  <label><input type="checkbox" disabled /> Monthly credit cap</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: THEME -->
+        <div class="tab-pane" id="tab-theme">
+          <div class="cfg-card">
+            <div class="cfg-card-title">8 Structural Layout Presets</div>
+            <div class="thumb-gallery" id="layoutGallery">
+              <div class="layout-thumb active" data-layout="01 Dot-Matrix">
+                <div class="thumb-art">:::: 01</div>
+                <span>01 Dot-Matrix</span>
+              </div>
+              <div class="layout-thumb" data-layout="02 Ring Grid">
+                <div class="thumb-art">(◎) 02</div>
+                <span>02 Rings</span>
+              </div>
+              <div class="layout-thumb" data-layout="03 Terminal TUI">
+                <div class="thumb-art">[█░] 03</div>
+                <span>03 TUI Bars</span>
+              </div>
+              <div class="layout-thumb" data-layout="04 Frosted Glass">
+                <div class="thumb-art">▬▬ 04</div>
+                <span>04 Acrylic</span>
+              </div>
+              <div class="layout-thumb" data-layout="05 Brutalist">
+                <div class="thumb-art">77% 05</div>
+                <span>05 Brutal</span>
+              </div>
+              <div class="layout-thumb" data-layout="06 Compact Strip">
+                <div class="thumb-art">═══ 06</div>
+                <span>06 Strip</span>
+              </div>
+              <div class="layout-thumb" data-layout="07 Retro LCD">
+                <div class="thumb-art">888 07</div>
+                <span>07 LCD</span>
+              </div>
+              <div class="layout-thumb" data-layout="08 Minimal Pace">
+                <div class="thumb-art">─┼─ 08</div>
+                <span>08 Pace</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-title">Custom Colors (Presets + Hex + Picker)</div>
+            <div class="cfg-row">
+              <span>Accent Color</span>
+              <div class="color-controls">
+                <span class="swatch" style="background:#ff3b1d" data-accent-preset="#ff3b1d"></span>
+                <span class="swatch" style="background:#ff5fa2" data-accent-preset="#ff5fa2"></span>
+                <span class="swatch" style="background:#38bdf8" data-accent-preset="#38bdf8"></span>
+                <span class="swatch" style="background:#10b981" data-accent-preset="#10b981"></span>
+                <span class="swatch" style="background:#c8ff00" data-accent-preset="#c8ff00"></span>
+                <input type="color" id="accentColorPicker" value="#ff3b1d" />
+                <input type="text" class="hex-input" id="accentHexInput" value="#FF3B1D" maxlength="7" />
+              </div>
+            </div>
+            <div class="cfg-row">
+              <span>Background Color</span>
+              <div class="color-controls">
+                <span class="swatch" style="background:#0e0e12" data-bg-preset="#0e0e12"></span>
+                <span class="swatch" style="background:#0f172a" data-bg-preset="#0f172a"></span>
+                <span class="swatch" style="background:#181024" data-bg-preset="#181024"></span>
+                <span class="swatch" style="background:#0c1914" data-bg-preset="#0c1914"></span>
+                <input type="color" id="bgColorPicker" value="#0e0e12" />
+                <input type="text" class="hex-input" id="bgHexInput" value="#0E0E12" maxlength="7" />
+              </div>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-title">Typography, Geometry &amp; Transparency</div>
+            <div class="cfg-row">
+              <span>Display Font</span>
+              <select id="fontSelect">
+                <option value="'DotGothic16', monospace" selected>DotGothic16 (Dot-Matrix)</option>
+                <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                <option value="'Fira Code', monospace">Fira Code</option>
+                <option value="'Orbitron', sans-serif">Orbitron (LCD)</option>
+                <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
+              </select>
+            </div>
+            <div class="cfg-row">
+              <span>Density &amp; Corner Radius</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <select id="densitySelect">
+                  <option value="compact">Compact</option>
+                  <option value="standard" selected>Standard</option>
+                  <option value="spacious">Spacious</option>
+                </select>
+                <input type="range" id="radiusSlider" min="0" max="28" value="14" style="width:70px;accent-color:var(--accent)" />
+                <span id="radiusVal" style="font-size:10px;min-width:26px;">14px</span>
+              </div>
+            </div>
+            <div class="cfg-row">
+              <span>Widget Opacity (Whole Window)</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="range" id="widgetAlphaSlider" min="20" max="100" value="100" style="width:110px;accent-color:var(--accent)" />
+                <span id="widgetAlphaVal" style="font-size:10px;min-width:30px;">100%</span>
+              </div>
+            </div>
+            <div class="cfg-row">
+              <span>Background Opacity (Crisp Text)</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="range" id="bgAlphaSlider" min="0" max="100" value="94" style="width:110px;accent-color:var(--accent)" />
+                <span id="bgAlphaVal" style="font-size:10px;min-width:30px;">94%</span>
+              </div>
+            </div>
+            <div class="cfg-row" style="padding-top:4px;border-top:1px dotted var(--border-color);">
+              <span>Theme JSON File</span>
+              <div style="display:flex;gap:6px;">
+                <button type="button" class="seg-btn" style="border:1px solid var(--border-color);border-radius:4px;" id="importThemeBtn">Import .json</button>
+                <button type="button" class="seg-btn active" style="border-radius:4px;" id="exportThemeBtn">Export .json</button>
+              </div>
+            </div>
+            <div id="themeExportStatus" style="font-size:9.5px;color:var(--accent);display:none;"></div>
+          </div>
+        </div>
+
+        <!-- TAB 4: NOTIFICATIONS (OFF BY DEFAULT) -->
+        <div class="tab-pane" id="tab-notifications">
+          <div class="cfg-card">
+            <div class="cfg-card-title">
+              <span>Master Notification Control (Opt-In Only)</span>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Enable Desktop Notifications</span>
+                <span class="cfg-hint">OFF by default — the widget stays completely silent unless you opt in</span>
+              </div>
+              <label class="switch">
+                <!-- Explicitly unchecked by default -->
+                <input type="checkbox" id="masterNotifToggle" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="cfg-card disabled-section" id="notifDetailsCard">
+            <div class="cfg-card-title">Threshold &amp; Reset Rules</div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Warning Threshold Alert</span>
+                <span class="cfg-hint">Notify once per window when crossing warning level</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="range" id="warnThreshSlider" min="40" max="75" value="50" style="width:80px;accent-color:var(--accent)" />
+                <span id="warnThreshVal">50%</span>
+              </div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Critical Threshold Alert</span>
+                <span class="cfg-hint">Notify when approaching rate cap</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="range" id="critThreshSlider" min="75" max="99" value="80" style="width:80px;accent-color:var(--accent)" />
+                <span id="critThreshVal">80%</span>
+              </div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Window Reset Complete Alert</span>
+                <span class="cfg-hint">Notify when a depleted 5-hour or weekly window resets to 0%</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Quiet Hours (Do Not Disturb)</span>
+                <span class="cfg-hint">Suppress all opt-in alerts during night hours</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <input type="time" value="22:00" />
+                <span>to</span>
+                <input type="time" value="08:00" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: ABOUT -->
+        <div class="tab-pane" id="tab-about">
+          <div class="cfg-card">
+            <div class="cfg-card-title">Application &amp; Build Info</div>
+            <div class="cfg-row">
+              <span>Version</span>
+              <strong style="color:var(--accent)">v0.2.0-alpha (Open Source MIT/Apache-2.0)</strong>
+            </div>
+            <div class="cfg-row">
+              <span>Runtime Target</span>
+              <span>Windows 11 + Linux (KDE Plasma / Wayland / X11)</span>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-title">Provider Data Sources &amp; Freshness</div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Claude Code</span>
+                <span class="cfg-hint">Local CLI status / OAuth session headers</span>
+              </div>
+              <span class="status-pill detected">Fresh · 2m ago</span>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Codex CLI</span>
+                <span class="cfg-hint">Local ~/.codex session state &amp; rate headers</span>
+              </div>
+              <span class="status-pill detected">Fresh · 2m ago</span>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-label">
+                <span>Gemini CLI</span>
+                <span class="cfg-hint">Local quota cache snapshot</span>
+              </div>
+              <span class="status-pill" style="border:1px solid var(--severity-danger);color:var(--severity-danger)">Stale · 3h ago</span>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-title">Privacy Guarantee (Zero Telemetry)</div>
+            <p style="font-size:10.5px;color:var(--text-secondary);line-height:1.45;">
+              100% local execution. This widget never collects, logs, or transmits usage telemetry, prompts, account identifiers, or analytics to any third-party server. All quota numbers stay strictly on your machine.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Interactive Mini Widget Preview -->
+      <aside class="live-preview-dock" aria-label="Live Mini Widget Preview">
+        <div class="preview-head">
+          <div class="preview-brand">
+            <span class="beacon-dot" style="width:7px;height:7px;"></span>
+            <strong>QUOTA</strong>
+            <span>SYNC 23:41</span>
+          </div>
+          <span id="previewLayoutBadge" style="color:var(--accent);font-family:'DotGothic16',monospace;">LIVE PREVIEW · 01 Dot-Matrix</span>
+        </div>
+        <div class="preview-rows" id="livePreviewRows"></div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    let currentPctMode = 'used';
+    let currentRstFmt = 'relative';
+    let currentLayoutName = '01 Dot-Matrix';
+
+    function hexToRgbTuple(hex) {
+      const clean = hex.replace('#', '');
+      if (clean.length !== 6) return [14, 14, 18];
+      const num = parseInt(clean, 16);
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function setAccentColor(hex) {
+      if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+      document.documentElement.style.setProperty('--accent', hex);
+      document.getElementById('accentColorPicker').value = hex;
+      document.getElementById('accentHexInput').value = hex.toUpperCase();
+      renderLivePreview();
+    }
+
+    function setBgColor(hex) {
+      if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+      const [r, g, b] = hexToRgbTuple(hex);
+      const cardR = Math.min(255, r + 10);
+      const cardG = Math.min(255, g + 10);
+      const cardB = Math.min(255, b + 14);
+      document.documentElement.style.setProperty('--bg-rgb', `${r}, ${g}, ${b}`);
+      document.documentElement.style.setProperty('--bg-card-rgb', `${cardR}, ${cardG}, ${cardB}`);
+      document.getElementById('bgColorPicker').value = hex;
+      document.getElementById('bgHexInput').value = hex.toUpperCase();
+    }
+
+    function renderLivePreview() {
+      const container = document.getElementById('livePreviewRows');
+      container.innerHTML = '';
+      document.getElementById('previewLayoutBadge').textContent = `LIVE PREVIEW · ${currentLayoutName}`;
+
+      document.querySelectorAll('#providersOrderList .prov-item').forEach(item => {
+        const enabled = item.querySelector('.prov-enable-toggle').checked;
+        if (!enabled) return;
+
+        const name = item.getAttribute('data-prov-name');
+        const usedPct = Number(item.getAttribute('data-prov-pct'));
+        const displayPct = currentPctMode === 'used' ? usedPct : (100 - usedPct);
+        const suffix = currentPctMode === 'used' ? '% USED' : '% LEFT';
+        const rel = item.getAttribute('data-prov-rst-rel');
+        const abs = item.getAttribute('data-prov-rst-abs');
+        let rstText = rel;
+        if (currentRstFmt === 'absolute') rstText = abs;
+        if (currentRstFmt === 'both') rstText = `${rel} (${abs})`;
+
+        const card = document.createElement('div');
+        card.className = 'prev-card';
+        const litDots = Math.max(1, Math.round((displayPct / 100) * 12));
+        let dotsHtml = '';
+        for (let i = 0; i < 12; i++) {
+          dotsHtml += `<span class="${i < litDots ? 'on' : ''}"></span>`;
+        }
+
+        card.innerHTML = `
+          <div class="prev-card-top">
+            <span class="prev-name">${name}</span>
+            <span class="prev-pct">${displayPct}${suffix}</span>
+          </div>
+          <div class="prev-dots">${dotsHtml}</div>
+          <div style="font-size:9px;color:var(--text-muted)">RST ${rstText}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + target).classList.add('active');
+      });
+    });
+
+    // Percentage mode (Used vs Remaining)
+    document.querySelectorAll('[data-pct-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-pct-mode]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPctMode = btn.getAttribute('data-pct-mode');
+        renderLivePreview();
+      });
+    });
+
+    // Reset format
+    document.querySelectorAll('[data-rst-fmt]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-rst-fmt]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentRstFmt = btn.getAttribute('data-rst-fmt');
+        renderLivePreview();
+      });
+    });
+
+    // Anchor zone selector
+    document.querySelectorAll('.anchor-cell').forEach(cell => {
+      cell.addEventListener('click', () => {
+        document.querySelectorAll('.anchor-cell').forEach(c => c.classList.remove('active'));
+        cell.classList.add('active');
+        document.getElementById('anchorLabel').textContent = 'Current: ' + cell.getAttribute('data-anchor');
+      });
+    });
+
+    // Provider toggles & reordering
+    const provList = document.getElementById('providersOrderList');
+    provList.addEventListener('change', e => {
+      if (e.target.classList.contains('prov-enable-toggle')) {
+        renderLivePreview();
+      }
+    });
+    provList.addEventListener('click', e => {
+      const item = e.target.closest('.prov-item');
+      if (!item) return;
+      if (e.target.classList.contains('move-up') && item.previousElementSibling) {
+        provList.insertBefore(item, item.previousElementSibling);
+        renderLivePreview();
+      }
+      if (e.target.classList.contains('move-down') && item.nextElementSibling) {
+        provList.insertBefore(item.nextElementSibling, item);
+        renderLivePreview();
+      }
+    });
+
+    // Layout thumbnails
+    document.querySelectorAll('.layout-thumb').forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        document.querySelectorAll('.layout-thumb').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+        currentLayoutName = thumb.getAttribute('data-layout');
+        renderLivePreview();
+      });
+    });
+
+    // Colors
+    document.querySelectorAll('[data-accent-preset]').forEach(s => {
+      s.addEventListener('click', () => setAccentColor(s.getAttribute('data-accent-preset')));
+    });
+    document.getElementById('accentColorPicker').addEventListener('input', e => setAccentColor(e.target.value));
+    document.getElementById('accentHexInput').addEventListener('input', e => {
+      const v = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(v)) setAccentColor(v);
+    });
+
+    document.querySelectorAll('[data-bg-preset]').forEach(s => {
+      s.addEventListener('click', () => setBgColor(s.getAttribute('data-bg-preset')));
+    });
+    document.getElementById('bgColorPicker').addEventListener('input', e => setBgColor(e.target.value));
+    document.getElementById('bgHexInput').addEventListener('input', e => {
+      const v = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(v)) setBgColor(v);
+    });
+
+    // Font, Radius, Opacity Sliders
+    document.getElementById('fontSelect').addEventListener('change', e => {
+      document.documentElement.style.setProperty('--active-font', e.target.value);
+    });
+    document.getElementById('radiusSlider').addEventListener('input', e => {
+      document.documentElement.style.setProperty('--corner-radius', e.target.value + 'px');
+      document.getElementById('radiusVal').textContent = e.target.value + 'px';
+    });
+    document.getElementById('widgetAlphaSlider').addEventListener('input', e => {
+      document.documentElement.style.setProperty('--widget-opacity', (e.target.value / 100).toFixed(2));
+      document.getElementById('widgetAlphaVal').textContent = e.target.value + '%';
+    });
+    document.getElementById('bgAlphaSlider').addEventListener('input', e => {
+      document.documentElement.style.setProperty('--bg-opacity', (e.target.value / 100).toFixed(2));
+      document.getElementById('bgAlphaVal').textContent = e.target.value + '%';
+    });
+
+    // Export / Import Theme buttons
+    const exportStatus = document.getElementById('themeExportStatus');
+    document.getElementById('exportThemeBtn').addEventListener('click', () => {
+      exportStatus.style.display = 'block';
+      exportStatus.textContent = `Exported "${currentLayoutName.toLowerCase().replace(/\s+/g, '-')}.quota-theme.json" (accent ${document.getElementById('accentHexInput').value}, bg ${document.getElementById('bgHexInput').value})`;
+    });
+    document.getElementById('importThemeBtn').addEventListener('click', () => {
+      exportStatus.style.display = 'block';
+      exportStatus.textContent = 'Ready to load *.quota-theme.json schema v1 file.';
+    });
+
+    // Notifications Master Toggle (OFF by default)
+    const masterNotif = document.getElementById('masterNotifToggle');
+    const notifDetailsCard = document.getElementById('notifDetailsCard');
+    const notifTabBtn = document.getElementById('notifTabBtn');
+    masterNotif.addEventListener('change', e => {
+      const on = e.target.checked;
+      notifDetailsCard.classList.toggle('disabled-section', !on);
+      notifTabBtn.textContent = on ? 'Alerts [ON]' : 'Alerts [OFF]';
+    });
+    document.getElementById('warnThreshSlider').addEventListener('input', e => {
+      document.getElementById('warnThreshVal').textContent = e.target.value + '%';
+    });
+    document.getElementById('critThreshSlider').addEventListener('input', e => {
+      document.getElementById('critThreshVal').textContent = e.target.value + '%';
+    });
+
+    // Demo toolbar helpers
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const html = document.documentElement;
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      setBgColor(next === 'dark' ? '#0e0e12' : '#ececf0');
+    });
+    document.getElementById('pinkTestBtn').addEventListener('click', () => setAccentColor('#ff5fa2'));
+
+    renderLivePreview();
+  </script>
+</body>
+</html>

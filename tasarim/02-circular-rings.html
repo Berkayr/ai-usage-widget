@@ -1,0 +1,605 @@
+<!--
+  DESIGN 02: CIRCULAR RING GAUGES GRID
+  Fixed Widget Dimensions: 540px × 440px
+  Visual Language: Radial SVG telemetry rings (dual concentric + satellite rings) arranged in an adaptive multi-column bento grid.
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>02 — Circular Ring Gauges Grid (540×440)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-stage: #070a10;
+      --bg-widget: #0f141f;
+      --bg-tile: #161d2b;
+      --bg-ring-track: #253047;
+      --text-primary: #f3f6fc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-color: #243046;
+      --accent: #38bdf8;
+      --severity-normal: #2dd4bf;
+      --severity-warning: #fbbf24;
+      --severity-danger: #f43f5e;
+      --stale-bg: rgba(244, 63, 94, 0.16);
+      --stale-border: #f43f5e;
+      --widget-width: 540px;
+      --widget-height: 440px;
+    }
+
+    [data-theme="light"] {
+      --bg-stage: #dde3ed;
+      --bg-widget: #f1f5f9;
+      --bg-tile: #ffffff;
+      --bg-ring-track: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+      --accent: #0284c7;
+      --severity-normal: #0d9488;
+      --severity-warning: #d97706;
+      --severity-danger: #e11d48;
+      --stale-bg: rgba(225, 29, 72, 0.1);
+      --stale-border: #e11d48;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-stage);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      gap: 14px;
+    }
+
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      background: #131924;
+      border: 1px solid #2b3952;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #cbd5e1;
+    }
+    .demo-toolbar .size-badge {
+      color: #38bdf8;
+      font-weight: 700;
+      padding-right: 6px;
+      border-right: 1px solid #2b3952;
+    }
+    .demo-toolbar button {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 5px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .demo-toolbar button.active {
+      background: #0284c7;
+      color: #fff;
+      border-color: #38bdf8;
+    }
+
+    /* Fixed Widget Container */
+    .widget-frame {
+      width: var(--widget-width);
+      height: var(--widget-height);
+      background: var(--bg-widget);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .app-name {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--text-primary);
+    }
+    .ring-legend {
+      display: flex;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .ring-legend span::before {
+      content: "◎ ";
+      color: var(--accent);
+    }
+    .header-right {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: var(--bg-tile);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+    }
+    .header-right strong {
+      color: var(--text-primary);
+    }
+
+    /* Adaptive Grid for 1, 2, or 3 providers */
+    .rings-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .provider-tile {
+      background: var(--bg-tile);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      min-height: 0;
+    }
+    .provider-tile[hidden] {
+      display: none !important;
+    }
+    .provider-tile.is-stale {
+      border-color: var(--stale-border);
+    }
+
+    .tile-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+    }
+    .tile-title-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .provider-name {
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .plan-pill {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+    }
+
+    .stale-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--stale-bg);
+      color: var(--severity-danger);
+      border: 1px solid var(--stale-border);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* Concentric SVG Gauge Container */
+    .gauge-stage {
+      position: relative;
+      width: 148px;
+      height: 148px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2px 0;
+    }
+    .gauge-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .ring-track {
+      fill: none;
+      stroke: var(--bg-ring-track);
+    }
+    .ring-value {
+      fill: none;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.4s ease, stroke 0.3s ease;
+    }
+    .ring-value[data-severity="normal"] { stroke: var(--severity-normal); }
+    .ring-value[data-severity="warning"] { stroke: var(--severity-warning); }
+    .ring-value[data-severity="danger"] { stroke: var(--severity-danger); }
+
+    .gauge-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      pointer-events: none;
+    }
+    .center-primary {
+      font-family: 'Space Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .center-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+    .center-caption {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Bottom Breakdown Rows */
+    .tile-metrics {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 8px;
+      background: rgba(128, 128, 128, 0.06);
+      border-radius: 8px;
+    }
+    .metric-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ring-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .ring-dot[data-severity="normal"] { background: var(--severity-normal); }
+    .ring-dot[data-severity="warning"] { background: var(--severity-warning); }
+    .ring-dot[data-severity="danger"] { background: var(--severity-danger); }
+
+    .metric-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .metric-right {
+      font-family: 'Space Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .metric-reset {
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+    .metric-pct {
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .metric-pct[data-severity="normal"] { color: var(--severity-normal); }
+    .metric-pct[data-severity="warning"] { color: var(--severity-warning); }
+    .metric-pct[data-severity="danger"] { color: var(--severity-danger); }
+
+    .stale-note {
+      font-size: 10px;
+      color: var(--severity-danger);
+      text-align: center;
+      font-family: 'Space Mono', monospace;
+      padding-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-toolbar" role="region" aria-label="Widget Demo Controls">
+    <span class="size-badge">540×440 px</span>
+    <span>Providers:</span>
+    <button type="button" class="active" data-toggle-provider="claude">Claude</button>
+    <button type="button" class="active" data-toggle-provider="codex">Codex</button>
+    <button type="button" class="active" data-toggle-provider="gemini">Gemini</button>
+    <button type="button" id="themeToggle">Light / Dark</button>
+    <button type="button" id="dangerSimToggle">Test &gt;80% Danger</button>
+  </div>
+
+  <main class="widget-frame">
+    <header class="widget-header">
+      <div class="header-left">
+        <span class="app-name">QUOTA</span>
+        <div class="ring-legend">
+          <span>Outer: 5h</span>
+          <span>Mid: Weekly</span>
+          <span>Inner: Extra</span>
+        </div>
+      </div>
+      <div class="header-right">
+        Last refresh <strong>23:41</strong>
+      </div>
+    </header>
+
+    <section class="rings-grid">
+      <!-- CLAUDE TILE -->
+      <article class="provider-tile" data-provider="claude">
+        <div class="tile-header">
+          <div class="tile-title-group">
+            <h2 class="provider-name">Claude</h2>
+            <span class="plan-pill">Max</span>
+          </div>
+        </div>
+
+        <div class="gauge-stage">
+          <svg class="gauge-svg" viewBox="0 0 140 140">
+            <!-- Outer Ring: 5-hour (r=58, C=364.4) -->
+            <circle class="ring-track" cx="70" cy="70" r="58" stroke-width="10" />
+            <circle class="ring-value" data-ring-pct="34" data-r="58" cx="70" cy="70" r="58" stroke-width="10" />
+            <!-- Middle Ring: Weekly (r=44, C=276.5) -->
+            <circle class="ring-track" cx="70" cy="70" r="44" stroke-width="10" />
+            <circle class="ring-value" data-ring-pct="61" data-r="44" cx="70" cy="70" r="44" stroke-width="10" />
+            <!-- Inner Ring: Extra Opus weekly (r=30, C=188.5) -->
+            <circle class="ring-track" cx="70" cy="70" r="30" stroke-width="8" />
+            <circle class="ring-value" data-ring-pct="12" data-r="30" cx="70" cy="70" r="30" stroke-width="8" />
+          </svg>
+          <div class="gauge-center">
+            <span class="center-primary">34%</span>
+            <span class="center-sub">W: 61%</span>
+            <span class="center-caption">5H / WK</span>
+          </div>
+        </div>
+
+        <div class="tile-metrics">
+          <div class="metric-row" data-metric-pct="34">
+            <div class="metric-left">
+              <span class="ring-dot"></span>
+              <span class="metric-name">5-hour</span>
+            </div>
+            <div class="metric-right">
+              <span class="metric-reset">2h 41m</span>
+              <span class="metric-pct">34%</span>
+            </div>
+          </div>
+          <div class="metric-row" data-metric-pct="61">
+            <div class="metric-left">
+              <span class="ring-dot"></span>
+              <span class="metric-name">Weekly</span>
+            </div>
+            <div class="metric-right">
+              <span class="metric-reset">3d 4h</span>
+              <span class="metric-pct">61%</span>
+            </div>
+          </div>
+          <div class="metric-row" data-metric-pct="12">
+            <div class="metric-left">
+              <span class="ring-dot"></span>
+              <span class="metric-name">Opus weekly</span>
+            </div>
+            <div class="metric-right">
+              <span class="metric-reset">extra</span>
+              <span class="metric-pct">12%</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- CODEX TILE -->
+      <article class="provider-tile" data-provider="codex">
+        <div class="tile-header">
+          <div class="tile-title-group">
+            <h2 class="provider-name">Codex</h2>
+            <span class="plan-pill">Plus</span>
+          </div>
+        </div>
+
+        <div class="gauge-stage">
+          <svg class="gauge-svg" viewBox="0 0 140 140">
+            <!-- Outer Ring: 5-hour (r=56) -->
+            <circle class="ring-track" cx="70" cy="70" r="56" stroke-width="12" />
+            <circle class="ring-value" data-ring-pct="8" data-r="56" cx="70" cy="70" r="56" stroke-width="12" />
+            <!-- Inner Ring: Weekly (r=40) -->
+            <circle class="ring-track" cx="70" cy="70" r="40" stroke-width="12" />
+            <circle class="ring-value" id="codexWeeklyRing" data-ring-pct="77" data-default-pct="77" data-danger-pct="89" data-r="40" cx="70" cy="70" r="40" stroke-width="12" />
+          </svg>
+          <div class="gauge-center">
+            <span class="center-primary">8%</span>
+            <span class="center-sub" id="codexCenterSub">W: 77%</span>
+            <span class="center-caption">5H / WK</span>
+          </div>
+        </div>
+
+        <div class="tile-metrics">
+          <div class="metric-row" data-metric-pct="8">
+            <div class="metric-left">
+              <span class="ring-dot"></span>
+              <span class="metric-name">5-hour</span>
+            </div>
+            <div class="metric-right">
+              <span class="metric-reset">4h 10m</span>
+              <span class="metric-pct">8%</span>
+            </div>
+          </div>
+          <div class="metric-row" id="codexWeeklyRow" data-metric-pct="77">
+            <div class="metric-left">
+              <span class="ring-dot"></span>
+              <span class="metric-name">Weekly</span>
+            </div>
+            <div class="metric-right">
+              <span class="metric-reset">1d 6h</span>
+              <span class="metric-pct">77%</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- GEMINI TILE -->
+      <article class="provider-tile is-stale" data-provider="gemini">
+        <div class="tile-header">
+          <div class="tile-title-group">
+            <h2 class="provider-name">Gemini</h2>
+            <span class="plan-pill">AI Pro</span>
+          </div>
+          <span class="stale-badge">STALE</span>
+        </div>
+
+        <div class="gauge-stage">
+          <svg class="gauge-svg" viewBox="0 0 140 140">
+            <!-- Outer Ring: 5-hour (r=56) -->
+            <circle class="ring-track" cx="70" cy="70" r="56" stroke-width="12" />
+            <circle class="ring-value" data-ring-pct="17" data-r="56" cx="70" cy="70" r="56" stroke-width="12" />
+            <!-- Inner Ring: Weekly (r=40) -->
+            <circle class="ring-track" cx="70" cy="70" r="40" stroke-width="12" />
+            <circle class="ring-value" data-ring-pct="7" data-r="40" cx="70" cy="70" r="40" stroke-width="12" />
+          </svg>
+          <div class="gauge-center">
+            <span class="center-primary">17%</span>
+            <span class="center-sub">W: 7%</span>
+            <span class="center-caption">5H / WK</span>
+          </div>
+        </div>
+
+        <div class="tile-metrics">
+          <div class="metric-row" data-metric-pct="17">
+            <div class="metric-left">
+              <span class="ring-dot"></span>
+              <span class="metric-name">5-hour</span>
+            </div>
+            <div class="metric-right">
+              <span class="metric-reset">1h 05m</span>
+              <span class="metric-pct">17%</span>
+            </div>
+          </div>
+          <div class="metric-row" data-metric-pct="7">
+            <div class="metric-left">
+              <span class="ring-dot"></span>
+              <span class="metric-name">Weekly</span>
+            </div>
+            <div class="metric-right">
+              <span class="metric-reset">6d</span>
+              <span class="metric-pct">7%</span>
+            </div>
+          </div>
+          <div class="stale-note">updated 3h ago</div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    function getSeverity(pct) {
+      if (pct > 80) return 'danger';
+      if (pct >= 50) return 'warning';
+      return 'normal';
+    }
+
+    function updateRings() {
+      document.querySelectorAll('.ring-value').forEach(circle => {
+        const pct = Number(circle.getAttribute('data-ring-pct'));
+        const r = Number(circle.getAttribute('data-r'));
+        const circumference = 2 * Math.PI * r;
+        const offset = circumference - (pct / 100) * circumference;
+        circle.style.strokeDasharray = `${circumference}`;
+        circle.style.strokeDashoffset = `${offset}`;
+        circle.setAttribute('data-severity', getSeverity(pct));
+      });
+
+      document.querySelectorAll('.metric-row').forEach(row => {
+        const pct = Number(row.getAttribute('data-metric-pct'));
+        const sev = getSeverity(pct);
+        const dot = row.querySelector('.ring-dot');
+        const pctText = row.querySelector('.metric-pct');
+        dot.setAttribute('data-severity', sev);
+        pctText.setAttribute('data-severity', sev);
+        pctText.textContent = pct + '%';
+      });
+    }
+
+    document.querySelectorAll('[data-toggle-provider]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-toggle-provider');
+        const tile = document.querySelector(`.provider-tile[data-provider="${target}"]`);
+        const activeCount = document.querySelectorAll('.provider-tile:not([hidden])').length;
+        if (!tile.hasAttribute('hidden') && activeCount <= 1) return;
+
+        const willHide = !tile.hasAttribute('hidden');
+        if (willHide) {
+          tile.setAttribute('hidden', '');
+          btn.classList.remove('active');
+        } else {
+          tile.removeAttribute('hidden');
+          btn.classList.add('active');
+        }
+      });
+    });
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const html = document.documentElement;
+      html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+
+    let dangerSim = false;
+    document.getElementById('dangerSimToggle').addEventListener('click', (e) => {
+      dangerSim = !dangerSim;
+      e.currentTarget.classList.toggle('active', dangerSim);
+      const ring = document.getElementById('codexWeeklyRing');
+      const row = document.getElementById('codexWeeklyRow');
+      const centerSub = document.getElementById('codexCenterSub');
+      const nextPct = dangerSim ? 89 : 77;
+      ring.setAttribute('data-ring-pct', nextPct);
+      row.setAttribute('data-metric-pct', nextPct);
+      centerSub.textContent = 'W: ' + nextPct + '%';
+      updateRings();
+    });
+
+    updateRings();
+  </script>
+</body>
+</html>

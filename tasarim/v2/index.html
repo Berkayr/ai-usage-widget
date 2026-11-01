@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QUOTA v2 — 8 Revised Widget Designs + 09 Full Settings Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --card: #0f131c;
+      --border: #22293a;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --pink: #ff5fa2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      padding: 28px 24px 60px;
+    }
+
+    .gallery-header {
+      max-width: 1760px;
+      margin: 0 auto 28px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .gallery-header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .gallery-header p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 6px;
+      max-width: 880px;
+      line-height: 1.5;
+    }
+    .header-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+    .badge {
+      background: #161d2b;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      color: #cbd5e1;
+    }
+    .badge strong {
+      color: var(--accent);
+    }
+
+    /* Full-width showcase row for Design 06 (1040×48 Horizontal Strip) */
+    .strip-showcase {
+      max-width: 1760px;
+      margin: 0 auto 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    /* Responsive multi-column gallery grid for 01..05, 07..09 */
+    .gallery-grid {
+      max-width: 1760px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+
+    .design-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .design-card.featured-settings {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 1px rgba(255, 95, 162, 0.35);
+    }
+
+    .card-topbar {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #131824;
+    }
+    .card-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: rgba(56, 189, 248, 0.14);
+      color: var(--accent);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .card-num.new-badge {
+      background: rgba(255, 95, 162, 0.18);
+      color: var(--pink);
+    }
+    .card-desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .dim-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #94a3b8;
+      background: #0b0e16;
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .open-link {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 5px 10px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 6px;
+    }
+    .open-link:hover {
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .iframe-wrap {
+      width: 100%;
+      background: #06080d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    iframe {
+      width: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="gallery-header">
+    <div>
+      <h1>QUOTA (Round 2 / v2) — 8 Revised Widget Designs + 09 Full Settings Panel</h1>
+      <p>
+        Every design now places the app name and "last updated" timestamp together on the left, adds a top-right Settings gear button with an interactive in-widget settings overlay (notifications OFF by default), drives 100% of its colors via CSS variables (custom accent + background color pickers), and includes dual opacity sliders (widget opacity + crisp-text background opacity) over a pure-CSS desktop wallpaper stage.
+      </p>
+    </div>
+    <div class="header-badges">
+      <span class="badge">Header: <strong>App Name + Time Left | Gear Right</strong></span>
+      <span class="badge">Colors: <strong>100% CSS Vars + Pink #ff5fa2</strong></span>
+      <span class="badge">Notifications: <strong>OFF by default</strong></span>
+    </div>
+  </header>
+
+  <!-- Full-width horizontal strip mockup first so its 1040×48px bar is unclipped -->
+  <section class="strip-showcase">
+    <div class="card-topbar">
+      <div class="card-title-group">
+        <div class="card-title">
+          <span class="card-num">06 v2</span>
+          <span>Compact Horizontal Strip (1040×48 — Gemini "1h 05m / 17%" Collision Fixed)</span>
+        </div>
+        <div class="card-desc">48px tall horizontal dock strip with fixed meter spacing, left brand+time capsule, right gear icon, and slide-down settings drawer.</div>
+      </div>
+      <div class="card-actions">
+        <span class="dim-pill">1040 × 48 px</span>
+        <a class="open-link" href="06-compact-strip.html" target="_blank" rel="noopener">Open Standalone ↗</a>
+      </div>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="06-compact-strip.html" height="290" title="06 Compact Horizontal Strip v2"></iframe>
+    </div>
+  </section>
+
+  <main class="gallery-grid">
+    <!-- 09 FULL SETTINGS PANEL -->
+    <article class="design-card featured-settings">
+      <div class="card-topbar">
+        <div class="card-title-group">
+          <div class="card-title">
+            <span class="card-num new-badge">09 NEW</span>
+            <span>Full Settings Panel (Design 01 Dot-Matrix Style)</span>
+          </div>
+          <div class="card-desc">Interactive 5-tab settings window (General, Providers, Theme, Notifications OFF by default, About) + live mini widget preview.</div>
+        </div>
+        <div class="card-actions">
+          <span class="dim-pill">520 × 720 px</span>
+          <a class="open-link" href="09-settings.html" target="_blank" rel="noopener">Standalone ↗</a>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="09-settings.html" height="840" title="09 Full Settings Panel"></iframe>
+      </div>
+    </article>
+
+    <!-- 01 -->
+    <article class="design-card">
+      <div class="card-topbar">
+        <div class="card-title-group">
+          <div class="card-title">
+            <span class="card-num">01 v2</span>
+            <span>Dot-Matrix Monochrome (Tall Right-Edge Card)</span>
+          </div>
+          <div class="card-desc">Left-aligned header time, top-right gear slide-in settings, custom CSS variable colors, and dual opacity over wallpaper.</div>
+        </div>
+        <div class="card-actions">
+          <span class="dim-pill">340 × 640 px</span>
+          <a class="open-link" href="01-dot-matrix.html" target="_blank" rel="noopener">Standalone ↗</a>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="01-dot-matrix.html" height="790" title="01 Dot-Matrix Monochrome v2"></iframe>
+      </div>
+    </article>
+
+    <!-- 02 -->
+    <article class="design-card">
+      <div class="card-topbar">
+        <div class="card-title-group">
+          <div class="card-title">
+            <span class="card-num">02 v2</span>
+            <span>Circular Ring Gauges Grid</span>
+          </div>
+          <div class="card-desc">Concentric radial SVG ring gauges driven by custom accent CSS variables, gear overlay, and wallpaper transparency.</div>
+        </div>
+        <div class="card-actions">
+          <span class="dim-pill">540 × 440 px</span>
+          <a class="open-link" href="02-circular-rings.html" target="_blank" rel="noopener">Standalone ↗</a>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="02-circular-rings.html" height="590" title="02 Circular Ring Gauges Grid v2"></iframe>
+      </div>
+    </article>
+
+    <!-- 03 -->
+    <article class="design-card">
+      <div class="card-topbar">
+        <div class="card-title-group">
+          <div class="card-title">
+            <span class="card-num">03 v2</span>
+            <span>Terminal / TUI ASCII Bars</span>
+          </div>
+          <div class="card-desc">Left-aligned TTY clock, top-right [CFG] button opening an ASCII box-drawing settings modal, and custom color variables.</div>
+        </div>
+        <div class="card-actions">
+          <span class="dim-pill">540 × 410 px</span>
+          <a class="open-link" href="03-terminal-tui.html" target="_blank" rel="noopener">Standalone ↗</a>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="03-terminal-tui.html" height="560" title="03 Terminal TUI ASCII Bars v2"></iframe>
+      </div>
+    </article>
+
+    <!-- 04 -->
+    <article class="design-card">
+      <div class="card-topbar">
+        <div class="card-title-group">
+          <div class="card-title">
+            <span class="card-num">04 v2</span>
+            <span>Frosted Glass / Acrylic Floating Cards</span>
+          </div>
+          <div class="card-desc">Layered translucent acrylic cards over multi-orb desktop wallpaper with crisp-text background opacity control.</div>
+        </div>
+        <div class="card-actions">
+          <span class="dim-pill">440 × 520 px</span>
+          <a class="open-link" href="04-frosted-glass.html" target="_blank" rel="noopener">Standalone ↗</a>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="04-frosted-glass.html" height="670" title="04 Frosted Glass Floating Cards v2"></iframe>
+      </div>
+    </article>
+
+    <!-- 05 -->
+    <article class="design-card">
+      <div class="card-topbar">
+        <div class="card-title-group">
+          <div class="card-title">
+            <span class="card-num">05 v2</span>
+            <span>Brutalist Huge Numbers</span>
+          </div>
+          <div class="card-desc">54px poster numerals with left-aligned refresh stamp, top-right brutalist gear block, and CSS-variable color overrides.</div>
+        </div>
+        <div class="card-actions">
+          <span class="dim-pill">560 × 440 px</span>
+          <a class="open-link" href="05-brutalist-numbers.html" target="_blank" rel="noopener">Standalone ↗</a>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="05-brutalist-numbers.html" height="590" title="05 Brutalist Huge Numbers v2"></iframe>
+      </div>
+    </article>
+
+    <!-- 07 -->
+    <article class="design-card">
+      <div class="card-topbar">
+        <div class="card-title-group">
+          <div class="card-title">
+            <span class="card-num">07 v2</span>
+            <span>Retro LCD / Segment Display</span>
+          </div>
+          <div class="card-desc">Hardware LCD screen with ghosted 888% backdrops, custom LCD ink/backlight color pickers, and digital setup screen.</div>
+        </div>
+        <div class="card-actions">
+          <span class="dim-pill">480 × 460 px</span>
+          <a class="open-link" href="07-retro-lcd.html" target="_blank" rel="noopener">Standalone ↗</a>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="07-retro-lcd.html" height="610" title="07 Retro LCD Segment Display v2"></iframe>
+      </div>
+    </article>
+
+    <!-- 08 -->
+    <article class="design-card">
+      <div class="card-topbar">
+        <div class="card-title-group">
+          <div class="card-title">
+            <span class="card-num">08 v2</span>
+            <span>Minimal Line Bars with Pace Marker</span>
+          </div>
+          <div class="card-desc">Scandinavian hairline bars with time-elapsed Pace Marker tick, left-aligned timestamp, and slide-in minimal settings.</div>
+        </div>
+        <div class="card-actions">
+          <span class="dim-pill">460 × 520 px</span>
+          <a class="open-link" href="08-minimal-pace.html" target="_blank" rel="noopener">Standalone ↗</a>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <iframe src="08-minimal-pace.html" height="670" title="08 Minimal Line Bars with Pace Marker v2"></iframe>
+      </div>
+    </article>
+  </main>
+
+</body>
+</html>

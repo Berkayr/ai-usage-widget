@@ -1,0 +1,1394 @@
+<!--
+  DESIGN 11 (v3): MECHANICAL SPLIT-FLAP SOLARI BOARD
+  Default Widget Dimensions (Size M): 540px × 440px
+  v3 Features:
+  - Solari di Udine / Vestaboard mechanical split-flap departure board aesthetic
+  - Recessed 3D mechanical character/digit tiles bisected by a 1px horizontal hinge shadow
+  - 10-tile mechanical color-flap progress meters + timetable status plaques (ON TIME / CAUTION / STALE 3H)
+  - Responsive Size System: XS (160×90), S (260×200), M (540×440), L (720×560) + free drag resize handle
+  - 8-step progressive field shedding & strict ban on 2+1 orphan grids
+  - 16 named WCAG-verified color palettes + Custom Accent/BG pickers & dual opacity sliders
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>11 — Mechanical Split-Flap Solari Board (QUOTA v3)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-stage: #09090b;
+      --bg-rgb: 20, 20, 22;
+      --bg-card-rgb: 31, 32, 36;
+      --widget-opacity: 1;
+      --bg-opacity: 0.96;
+      --bg-widget: rgba(var(--bg-rgb), var(--bg-opacity));
+      --bg-card: rgba(var(--bg-card-rgb), var(--bg-opacity));
+      --flap-bg: rgba(var(--bg-card-rgb), 0.98);
+      --text-primary: #f7f7f2;
+      --text-secondary: #a1a1aa;
+      --text-muted: #7c7e87;
+      --border-color: rgba(247, 247, 242, 0.16);
+      --hinge-line: rgba(0, 0, 0, 0.65);
+      --flap-off: rgba(247, 247, 242, 0.10);
+      --accent: #ffcc00;
+      --severity-normal: #34d399;
+      --severity-warning: #fbbf24;
+      --severity-danger: #ef4444;
+      --widget-width: 540px;
+      --widget-height: 440px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-stage);
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 12px;
+      gap: 12px;
+      user-select: none;
+    }
+
+    /* Demo Toolbar */
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      background: #141417;
+      border: 1px solid #2e2e36;
+      padding: 7px 11px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #e4e4e7;
+      max-width: 1120px;
+      z-index: 30;
+    }
+    .demo-toolbar .size-badge {
+      color: var(--accent);
+      font-weight: 700;
+      min-width: 114px;
+      padding-right: 8px;
+      border-right: 1px solid #2e2e36;
+    }
+    .demo-toolbar .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-right: 8px;
+      border-right: 1px solid #2e2e36;
+    }
+    .demo-toolbar .toolbar-group:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+    .demo-toolbar button,
+    .demo-toolbar select {
+      background: #222228;
+      color: #f4f4f5;
+      border: 1px solid #3f3f4a;
+      border-radius: 4px;
+      padding: 3px 7px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .demo-toolbar button:hover,
+    .demo-toolbar select:hover {
+      border-color: var(--accent);
+    }
+    .demo-toolbar button.active {
+      background: var(--accent);
+      color: #141416;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .demo-toolbar input[type="color"] {
+      width: 21px;
+      height: 21px;
+      border: 1px solid #52525b;
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    .demo-toolbar input[type="range"] {
+      width: 56px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .val-readout {
+      min-width: 28px;
+      font-size: 10px;
+      color: #a1a1aa;
+    }
+
+    /* CSS-Only Desktop Wallpaper Stage */
+    .wallpaper-stage {
+      padding: 30px 44px;
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      min-width: 360px;
+      min-height: 260px;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(255, 204, 0, 0.30) 0%, transparent 45%),
+        radial-gradient(circle at 82% 28%, rgba(52, 211, 153, 0.25) 0%, transparent 48%),
+        radial-gradient(circle at 50% 84%, rgba(239, 68, 68, 0.26) 0%, transparent 50%),
+        linear-gradient(135deg, #111115 0%, #1e1b2e 50%, #090a0f 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 24px 60px rgba(0, 0, 0, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wallpaper-stage::after {
+      content: "SOLARI DEPARTURE STAGE // DRAG CORNER TO RESIZE";
+      position: absolute;
+      bottom: 8px;
+      right: 16px;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+
+    /* Widget Frame */
+    .widget-frame {
+      width: var(--widget-width);
+      height: var(--widget-height);
+      opacity: var(--widget-opacity);
+      background-color: var(--bg-widget);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 22px 52px rgba(0, 0, 0, 0.65);
+      z-index: 2;
+    }
+
+    /* Mini floating corner bar when header is shed in S / XS */
+    .mini-corner-bar {
+      display: none;
+      position: absolute;
+      top: 4px;
+      right: 5px;
+      align-items: center;
+      gap: 4px;
+      z-index: 12;
+    }
+    .mini-sync-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .mini-gear-btn {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .mini-gear-btn svg {
+      width: 11px;
+      height: 11px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    /* Mechanical Split-Flap Tile Primitive */
+    .flap-word {
+      display: inline-flex;
+      gap: 2px;
+      align-items: center;
+    }
+    .flap-char {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 1;
+      min-width: 17px;
+      height: 23px;
+      padding: 0 3px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, var(--flap-bg) 49%, rgba(0,0,0,0.28) 51%, var(--flap-bg) 100%);
+      border: 1px solid var(--border-color);
+      border-bottom-width: 2px;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 2px rgba(0,0,0,0.45);
+    }
+    /* Horizontal Hinge Bisector Line */
+    .flap-char::after,
+    .flap-plaque::after,
+    .flap-meter-cell::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: var(--hinge-line);
+      pointer-events: none;
+    }
+
+    .flap-plaque {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 600;
+      font-size: 11.5px;
+      letter-spacing: 0.8px;
+      padding: 2px 7px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, var(--flap-bg) 49%, rgba(0,0,0,0.25) 51%, var(--flap-bg) 100%);
+      border: 1px solid var(--border-color);
+      border-bottom-width: 2px;
+      border-radius: 3px;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* Header: App name in split-flap tiles + last update on left, gear on right */
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .header-left .flap-char.brand-tile {
+      color: var(--accent);
+      border-color: var(--accent);
+      font-size: 15px;
+      min-width: 16px;
+      height: 22px;
+    }
+    .refresh-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .refresh-meta .time-plaque {
+      color: var(--accent);
+      font-size: 12px;
+    }
+
+    .gear-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .gear-btn:hover,
+    .gear-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .gear-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Departure Board Grid (1, 2, or 3 cols — never 2+1 for 3 providers) */
+    .departures-board {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      min-height: 0;
+    }
+    .widget-frame[data-cols="2"] .departures-board {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .widget-frame[data-cols="3"] .departures-board {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .departure-card {
+      background: rgba(0, 0, 0, 0.24);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+      min-height: 0;
+      min-width: 0;
+    }
+    .departure-card[hidden] {
+      display: none !important;
+    }
+    .departure-card.is-stale {
+      border-style: dashed;
+      border-color: var(--severity-danger);
+    }
+
+    .dep-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .dep-title-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .prov-monogram-flap {
+      display: none;
+    }
+    .plan-plaque {
+      color: var(--accent);
+      border-color: var(--accent);
+      font-size: 10px;
+      padding: 1px 5px;
+    }
+    .inline-extra-chip {
+      display: none;
+      font-size: 9.5px;
+      color: var(--text-secondary);
+      border: 1px dotted var(--border-color);
+      padding: 1px 4px;
+      white-space: nowrap;
+    }
+
+    .status-plaque {
+      font-size: 10px;
+      padding: 1px 6px;
+      letter-spacing: 0.7px;
+    }
+    .status-plaque[data-status="ok"] {
+      color: var(--severity-normal);
+      border-color: var(--severity-normal);
+    }
+    .status-plaque[data-status="warn"] {
+      color: var(--severity-warning);
+      border-color: var(--severity-warning);
+    }
+    .status-plaque[data-status="danger"] {
+      background: var(--severity-danger);
+      color: #ffffff;
+      border-color: var(--severity-danger);
+    }
+    .status-short {
+      display: none;
+      background: var(--severity-danger);
+      color: #fff;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 0 4px;
+      border-radius: 2px;
+    }
+
+    /* Split-Flap Timetable Windows */
+    .dep-windows {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      justify-content: center;
+    }
+    .dep-win-row {
+      display: grid;
+      grid-template-columns: 62px 1fr auto auto;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+    .widget-frame[data-cols="3"] .dep-win-row,
+    .widget-frame[data-cols="2"] .dep-win-row {
+      grid-template-columns: 32px 1fr auto;
+    }
+    .widget-frame[data-cols="3"] .win-rst-plaque,
+    .widget-frame[data-cols="2"] .win-rst-plaque {
+      display: none;
+    }
+
+    .win-tag-full {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .win-tag-short {
+      display: none;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    /* 10-Tile Mechanical Flap Meter Strip */
+    .flap-meter {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 2.5px;
+      height: 15px;
+      min-width: 50px;
+    }
+    .flap-meter-cell {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--flap-off);
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+    .flap-meter-cell.on[data-severity="normal"] {
+      background: var(--severity-normal);
+      border-color: var(--severity-normal);
+    }
+    .flap-meter-cell.on[data-severity="warning"] {
+      background: var(--severity-warning);
+      border-color: var(--severity-warning);
+    }
+    .flap-meter-cell.on[data-severity="danger"] {
+      background: var(--severity-danger);
+      border-color: var(--severity-danger);
+    }
+
+    .win-rst-plaque {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .pct-flap-group .flap-char {
+      min-width: 14px;
+      height: 20px;
+      font-size: 14px;
+    }
+    .pct-flap-group[data-severity="normal"] .flap-char { color: var(--severity-normal); }
+    .pct-flap-group[data-severity="warning"] .flap-char { color: var(--severity-warning); }
+    .pct-flap-group[data-severity="danger"] .flap-char { color: var(--severity-danger); }
+
+    /* Extra Track Row */
+    .extra-track-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 4px;
+      border-top: 1px dotted var(--border-color);
+      font-size: 10px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    /* XS Condensed Flap Summary (Step 6) */
+    .xs-flap-summary {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      margin-left: auto;
+    }
+    .xs-flap-meter {
+      display: inline-grid;
+      grid-template-columns: repeat(5, 6px);
+      gap: 1.5px;
+      height: 11px;
+    }
+    .xs-wk-label {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .widget-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 5px;
+      border-top: 1px solid var(--border-color);
+      font-size: 9.5px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .legend-cluster {
+      display: flex;
+      gap: 10px;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legend-tile {
+      width: 8px;
+      height: 8px;
+      border-radius: 1.5px;
+    }
+
+    /* ==========================================================================
+       8-STEP PROGRESSIVE FIELD SHEDDING
+       ========================================================================== */
+    .widget-frame[data-size-tier="l"] .pct-flap-group .flap-char {
+      min-width: 17px;
+      height: 24px;
+      font-size: 17px;
+    }
+
+    /* Step 1: Shed footer below L */
+    .widget-frame.shed-step-1 .widget-footer {
+      display: none;
+    }
+
+    /* Step 2: Collapse extra track row into inline chip (<380px H) */
+    .widget-frame.shed-step-2 .extra-track-row {
+      display: none;
+    }
+    .widget-frame.shed-step-2 .inline-extra-chip {
+      display: inline-block;
+    }
+    .widget-frame.shed-step-2b .inline-extra-chip {
+      display: none;
+    }
+
+    /* Step 3: Shed outer header bar (<320px W or <260px H) */
+    .widget-frame.shed-step-3 {
+      padding: 7px 9px;
+      gap: 5px;
+    }
+    .widget-frame.shed-step-3 .widget-header {
+      display: none;
+    }
+    .widget-frame.shed-step-3 .mini-corner-bar {
+      display: inline-flex;
+    }
+    .widget-frame.shed-step-3 .departure-card {
+      padding: 5px 7px;
+      gap: 4px;
+    }
+
+    /* Step 4: Shorten window labels (<280px W or <240px H) */
+    .widget-frame.shed-step-4 .win-tag-full {
+      display: none;
+    }
+    .widget-frame.shed-step-4 .win-tag-short {
+      display: inline;
+    }
+    .widget-frame.shed-step-4 .dep-win-row {
+      grid-template-columns: 24px 1fr auto;
+    }
+    .widget-frame.shed-step-4 .win-rst-plaque {
+      display: none;
+    }
+
+    /* Step 5: Hide plan plaques & reset timers (<240px W or <190px H) */
+    .widget-frame.shed-step-5 .plan-plaque,
+    .widget-frame.shed-step-5 .status-plaque:not([data-status="danger"]) {
+      display: none;
+    }
+
+    /* Step 6 (XS ~160x90): Condense into tight XS split-flap rows */
+    .widget-frame.shed-step-6 {
+      padding: 5px 7px;
+      gap: 3px;
+    }
+    .widget-frame.shed-step-6 .departures-board {
+      gap: 3px;
+    }
+    .widget-frame.shed-step-6 .departure-card {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 5px;
+      gap: 4px;
+    }
+    .widget-frame.shed-step-6 .dep-header {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .widget-frame.shed-step-6 .dep-windows,
+    .widget-frame.shed-step-6 .status-plaque {
+      display: none;
+    }
+    .widget-frame.shed-step-6 .xs-flap-summary {
+      display: flex;
+    }
+    .widget-frame.shed-step-6 .departure-card.is-stale .status-short {
+      display: inline-block;
+    }
+
+    /* Step 7 (Extreme XS <175px W): Abbreviate provider flap tiles to 2 letters */
+    .widget-frame.shed-step-7 .prov-full-flap {
+      display: none;
+    }
+    .widget-frame.shed-step-7 .prov-monogram-flap {
+      display: inline-flex;
+    }
+    .widget-frame.shed-step-7 .flap-char {
+      min-width: 13px;
+      height: 17px;
+      font-size: 12px;
+    }
+
+    /* Resize Handle */
+    .resize-handle {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 16px;
+      height: 16px;
+      cursor: nwse-resize;
+      z-index: 14;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 2px;
+      opacity: 0.65;
+    }
+    .resize-handle:hover {
+      opacity: 1;
+    }
+    .resize-handle svg {
+      width: 10px;
+      height: 10px;
+      stroke: var(--accent);
+      stroke-width: 2;
+    }
+
+    /* Settings Overlay */
+    .settings-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(var(--bg-rgb), 0.97);
+      backdrop-filter: blur(14px);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 20;
+      transform: translateX(100%);
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow-y: auto;
+    }
+    .settings-overlay.open {
+      transform: translateX(0);
+    }
+    .settings-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .settings-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      letter-spacing: 1.2px;
+      color: var(--accent);
+    }
+    .close-btn {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .settings-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11px;
+    }
+    .set-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .set-group-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+    }
+    .set-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .set-row select,
+    .set-row input[type="range"] {
+      accent-color: var(--accent);
+      max-width: 135px;
+      font-family: inherit;
+      font-size: 10.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-toolbar" role="region" aria-label="Widget Demo Controls">
+    <span class="size-badge" id="sizeBadge">M · 540×440 px</span>
+
+    <div class="toolbar-group">
+      <span>Size:</span>
+      <button type="button" data-size-preset="xs">XS</button>
+      <button type="button" data-size-preset="s">S</button>
+      <button type="button" class="active" data-size-preset="m">M</button>
+      <button type="button" data-size-preset="l">L</button>
+    </div>
+
+    <div class="toolbar-group">
+      <span>Providers:</span>
+      <button type="button" class="active" data-toggle-provider="claude">Claude</button>
+      <button type="button" class="active" data-toggle-provider="codex">Codex</button>
+      <button type="button" class="active" data-toggle-provider="gemini">Gemini</button>
+    </div>
+
+    <div class="toolbar-group">
+      <label for="paletteSelect">Palette:</label>
+      <select id="paletteSelect" aria-label="Color Palette">
+        <option value="signal-orange">01 · Signal Orange</option>
+        <option value="sakura-pink">02 · Sakura Pink</option>
+        <option value="nord">03 · Nord</option>
+        <option value="solarized-dark">04 · Solarized Dark</option>
+        <option value="mono-paper">05 · Mono Paper</option>
+        <option value="matrix-green">06 · Matrix Green</option>
+        <option value="high-contrast">07 · High Contrast AAA</option>
+        <option value="okabe-ito-safe">08 · Okabe-Ito Safe</option>
+        <option value="viridis-safe">09 · Viridis Telemetry</option>
+        <option value="tol-light-safe">10 · Paul Tol Muted Safe</option>
+        <option value="catppuccin-mocha">11 · Catppuccin Mocha</option>
+        <option value="gruvbox-dark">12 · Gruvbox Industrial</option>
+        <option value="tokyo-night">13 · Tokyo Night</option>
+        <option value="dracula" selected>14 · Dracula Neon (Default)</option>
+        <option value="amber-crt">15 · Amber Phosphor</option>
+        <option value="cobalt-blueprint">16 · Cobalt Blueprint</option>
+        <option value="custom">Custom Colors</option>
+      </select>
+    </div>
+
+    <div class="toolbar-group">
+      <button type="button" id="themeToggle">Light / Dark</button>
+      <button type="button" id="dangerSimToggle">Test &gt;80%</button>
+    </div>
+
+    <div class="toolbar-group">
+      <label for="accentPicker">Accent:</label>
+      <input type="color" id="accentPicker" value="#bd93f9" />
+      <label for="bgPicker">BG:</label>
+      <input type="color" id="bgPicker" value="#1e1f29" />
+    </div>
+
+    <div class="toolbar-group">
+      <label for="widgetOpacitySlider">Widget:</label>
+      <input type="range" id="widgetOpacitySlider" min="20" max="100" value="100" />
+      <span class="val-readout" id="widgetOpacityVal">100%</span>
+      <label for="bgOpacitySlider">BG:</label>
+      <input type="range" id="bgOpacitySlider" min="0" max="100" value="96" />
+      <span class="val-readout" id="bgOpacityVal">96%</span>
+    </div>
+  </div>
+
+  <div class="wallpaper-stage">
+    <main class="widget-frame" id="widgetFrame" data-size-tier="m" data-cols="1">
+      <div class="mini-corner-bar">
+        <span class="mini-sync-dot" title="Last refresh 23:41"></span>
+        <button type="button" class="mini-gear-btn" id="miniSettingsBtn" title="Open Settings" aria-label="Open Settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path></svg>
+        </button>
+      </div>
+
+      <!-- Header: Split-flap QUOTA tiles + last updated on left, gear on right -->
+      <header class="widget-header">
+        <div class="header-left">
+          <div class="flap-word" aria-label="QUOTA">
+            <span class="flap-char brand-tile">Q</span>
+            <span class="flap-char brand-tile">U</span>
+            <span class="flap-char brand-tile">O</span>
+            <span class="flap-char brand-tile">T</span>
+            <span class="flap-char brand-tile">A</span>
+          </div>
+          <div class="refresh-meta">
+            <span>DEPARTURES</span>
+            <span class="flap-plaque time-plaque">23:41</span>
+          </div>
+        </div>
+        <button type="button" class="gear-btn" id="openSettingsBtn" title="Open Settings" aria-label="Open Settings">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <section class="departures-board">
+        <!-- CLAUDE -->
+        <article class="departure-card" data-provider="claude">
+          <div class="dep-header">
+            <div class="dep-title-group">
+              <div class="flap-word prov-full-flap" aria-label="Claude">
+                <span class="flap-char">C</span><span class="flap-char">L</span><span class="flap-char">A</span><span class="flap-char">U</span><span class="flap-char">D</span><span class="flap-char">E</span>
+              </div>
+              <div class="flap-word prov-monogram-flap" aria-label="CL">
+                <span class="flap-char">C</span><span class="flap-char">L</span>
+              </div>
+              <span class="flap-plaque plan-plaque">MAX</span>
+              <span class="inline-extra-chip">OP:12%</span>
+            </div>
+            <span class="flap-plaque status-plaque" data-status="warn">CAUTION · 61%</span>
+          </div>
+
+          <div class="dep-windows">
+            <div class="dep-win-row" data-win="claude-5h" data-pct="34" data-default-pct="34">
+              <span class="win-tag-full">5-HOUR</span>
+              <span class="win-tag-short">5H</span>
+              <div class="flap-meter"></div>
+              <span class="flap-plaque win-rst-plaque">RST 2H 41M</span>
+              <div class="flap-word pct-flap-group"></div>
+            </div>
+
+            <div class="dep-win-row" data-win="claude-wk" data-pct="61" data-default-pct="61">
+              <span class="win-tag-full">WEEKLY</span>
+              <span class="win-tag-short">WK</span>
+              <div class="flap-meter"></div>
+              <span class="flap-plaque win-rst-plaque">RST 3D 04H</span>
+              <div class="flap-word pct-flap-group"></div>
+            </div>
+          </div>
+
+          <div class="extra-track-row">
+            <span>EXTRA TRACK // OPUS WEEKLY</span>
+            <div class="flap-word pct-flap-group" data-severity="normal">
+              <span class="flap-char">0</span><span class="flap-char">1</span><span class="flap-char">2</span><span class="flap-char">%</span>
+            </div>
+          </div>
+
+          <!-- XS Summary -->
+          <div class="xs-flap-summary">
+            <div class="flap-word pct-flap-group" data-xs-flap="34"></div>
+            <span class="xs-wk-label">·61%</span>
+          </div>
+        </article>
+
+        <!-- CODEX -->
+        <article class="departure-card" data-provider="codex">
+          <div class="dep-header">
+            <div class="dep-title-group">
+              <div class="flap-word prov-full-flap" aria-label="Codex">
+                <span class="flap-char">C</span><span class="flap-char">O</span><span class="flap-char">D</span><span class="flap-char">E</span><span class="flap-char">X</span>
+              </div>
+              <div class="flap-word prov-monogram-flap" aria-label="CX">
+                <span class="flap-char">C</span><span class="flap-char">X</span>
+              </div>
+              <span class="flap-plaque plan-plaque">PLUS</span>
+            </div>
+            <span class="flap-plaque status-plaque" id="codexStatusPlaque" data-status="warn">CAUTION · 77%</span>
+          </div>
+
+          <div class="dep-windows">
+            <div class="dep-win-row" data-win="codex-5h" data-pct="8" data-default-pct="8">
+              <span class="win-tag-full">5-HOUR</span>
+              <span class="win-tag-short">5H</span>
+              <div class="flap-meter"></div>
+              <span class="flap-plaque win-rst-plaque">RST 4H 10M</span>
+              <div class="flap-word pct-flap-group"></div>
+            </div>
+
+            <div class="dep-win-row" data-win="codex-wk" data-pct="77" data-default-pct="77" data-danger-pct="89">
+              <span class="win-tag-full">WEEKLY</span>
+              <span class="win-tag-short">WK</span>
+              <div class="flap-meter"></div>
+              <span class="flap-plaque win-rst-plaque">RST 1D 06H</span>
+              <div class="flap-word pct-flap-group"></div>
+            </div>
+          </div>
+
+          <div class="xs-flap-summary">
+            <div class="flap-word pct-flap-group" data-xs-flap="8"></div>
+            <span class="xs-wk-label" id="xsCodexWk">·77%</span>
+          </div>
+        </article>
+
+        <!-- GEMINI -->
+        <article class="departure-card is-stale" data-provider="gemini">
+          <div class="dep-header">
+            <div class="dep-title-group">
+              <div class="flap-word prov-full-flap" aria-label="Gemini">
+                <span class="flap-char">G</span><span class="flap-char">E</span><span class="flap-char">M</span><span class="flap-char">I</span><span class="flap-char">N</span><span class="flap-char">I</span>
+              </div>
+              <div class="flap-word prov-monogram-flap" aria-label="GM">
+                <span class="flap-char">G</span><span class="flap-char">M</span>
+              </div>
+              <span class="flap-plaque plan-plaque">AI PRO</span>
+              <span class="status-short">!</span>
+            </div>
+            <span class="flap-plaque status-plaque" data-status="danger">STALE · 3H AGO</span>
+          </div>
+
+          <div class="dep-windows">
+            <div class="dep-win-row" data-win="gemini-5h" data-pct="17" data-default-pct="17">
+              <span class="win-tag-full">5-HOUR</span>
+              <span class="win-tag-short">5H</span>
+              <div class="flap-meter"></div>
+              <span class="flap-plaque win-rst-plaque">RST 1H 05M</span>
+              <div class="flap-word pct-flap-group"></div>
+            </div>
+
+            <div class="dep-win-row" data-win="gemini-wk" data-pct="7" data-default-pct="7">
+              <span class="win-tag-full">WEEKLY</span>
+              <span class="win-tag-short">WK</span>
+              <div class="flap-meter"></div>
+              <span class="flap-plaque win-rst-plaque">RST 6D 00H</span>
+              <div class="flap-word pct-flap-group"></div>
+            </div>
+          </div>
+
+          <div class="xs-flap-summary">
+            <div class="flap-word pct-flap-group" data-xs-flap="17"></div>
+            <span class="xs-wk-label">·7%</span>
+          </div>
+        </article>
+      </section>
+
+      <footer class="widget-footer">
+        <div class="legend-cluster">
+          <span class="legend-item"><i class="legend-tile" style="background:var(--severity-normal)"></i>&lt;50% ON TIME</span>
+          <span class="legend-item"><i class="legend-tile" style="background:var(--severity-warning)"></i>50-80% CAUTION</span>
+          <span class="legend-item"><i class="legend-tile" style="background:var(--severity-danger)"></i>&gt;80% / STALE</span>
+        </div>
+        <span>SOLARI // 11</span>
+      </footer>
+
+      <!-- Draggable Resize Handle -->
+      <div class="resize-handle" id="resizeHandle" title="Drag to resize widget">
+        <svg viewBox="0 0 10 10"><line x1="2" y1="9" x2="9" y2="2"/><line x1="6" y1="9" x2="9" y2="6"/></svg>
+      </div>
+
+      <!-- Slide-in Settings Panel -->
+      <aside class="settings-overlay" id="settingsOverlay" aria-label="Widget Settings">
+        <div class="settings-top">
+          <span class="settings-title">QUOTA // SOLARI SETTINGS</span>
+          <button type="button" class="close-btn" id="closeSettingsBtn">× CLOSE</button>
+        </div>
+        <div class="settings-body">
+          <div class="set-group">
+            <span class="set-group-title">Palette &amp; Custom Colors</span>
+            <div class="set-row">
+              <span>Preset Palette</span>
+              <select id="panelPaletteSelect">
+                <option value="signal-orange">01 · Signal Orange</option>
+                <option value="sakura-pink">02 · Sakura Pink</option>
+                <option value="nord">03 · Nord</option>
+                <option value="solarized-dark">04 · Solarized Dark</option>
+                <option value="mono-paper">05 · Mono Paper</option>
+                <option value="matrix-green">06 · Matrix Green</option>
+                <option value="high-contrast">07 · High Contrast AAA</option>
+                <option value="okabe-ito-safe">08 · Okabe-Ito Safe</option>
+                <option value="viridis-safe">09 · Viridis Telemetry</option>
+                <option value="tol-light-safe">10 · Paul Tol Muted Safe</option>
+                <option value="catppuccin-mocha">11 · Catppuccin Mocha</option>
+                <option value="gruvbox-dark">12 · Gruvbox Industrial</option>
+                <option value="tokyo-night">13 · Tokyo Night</option>
+                <option value="dracula" selected>14 · Dracula Neon</option>
+                <option value="amber-crt">15 · Amber Phosphor</option>
+                <option value="cobalt-blueprint">16 · Cobalt Blueprint</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div class="set-row">
+              <span>Accent Color</span>
+              <input type="color" id="panelAccentPicker" value="#bd93f9" />
+            </div>
+            <div class="set-row">
+              <span>Background Color</span>
+              <input type="color" id="panelBgPicker" value="#1e1f29" />
+            </div>
+          </div>
+
+          <div class="set-group">
+            <span class="set-group-title">Transparency</span>
+            <div class="set-row">
+              <span>Widget Opacity</span>
+              <input type="range" id="panelWidgetOpacity" min="20" max="100" value="100" />
+            </div>
+            <div class="set-row">
+              <span>Background Opacity</span>
+              <input type="range" id="panelBgOpacity" min="0" max="100" value="96" />
+            </div>
+          </div>
+
+          <div class="set-group">
+            <span class="set-group-title">Notifications (Opt-In)</span>
+            <div class="set-row">
+              <span>Board Flip Alerts</span>
+              <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;">
+                <input type="checkbox" id="notifToggle" />
+                <strong id="notifStatusText">OFF</strong>
+              </label>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const PALETTES = {
+      'signal-orange': { mode: 'dark', bgWidget: '#0E0E11', bgCard: '#15151A', textPrimary: '#F4F4F6', textMuted: '#8E8E9E', accent: '#FF3B1D', ok: '#F4F4F6', warn: '#FF9E1B', danger: '#FF2A2A' },
+      'sakura-pink':   { mode: 'light', bgWidget: '#FDF2F5', bgCard: '#FCE7EE', textPrimary: '#2D121E', textMuted: '#7A4E62', accent: '#E11D74', ok: '#0D9488', warn: '#D97706', danger: '#E11D48' },
+      'nord':          { mode: 'dark', bgWidget: '#242933', bgCard: '#2E3440', textPrimary: '#ECEFF4', textMuted: '#9099AB', accent: '#88C0D0', ok: '#A3BE8C', warn: '#EBCB8B', danger: '#BF616A' },
+      'solarized-dark':{ mode: 'dark', bgWidget: '#00212B', bgCard: '#073642', textPrimary: '#FDF6E3', textMuted: '#93A1A1', accent: '#268BD2', ok: '#859900', warn: '#B58900', danger: '#DC322F' },
+      'mono-paper':    { mode: 'light', bgWidget: '#F2EFE9', bgCard: '#E6E2D8', textPrimary: '#141413', textMuted: '#5C5954', accent: '#141413', ok: '#141413', warn: '#8C5A08', danger: '#B91C1C' },
+      'matrix-green':  { mode: 'dark', bgWidget: '#030A04', bgCard: '#071409', textPrimary: '#D1FFD7', textMuted: '#4E9A57', accent: '#00FF41', ok: '#00FF41', warn: '#CCFF00', danger: '#FF3355' },
+      'high-contrast': { mode: 'dark', bgWidget: '#000000', bgCard: '#0A0A0A', textPrimary: '#FFFFFF', textMuted: '#D4D4D4', accent: '#00FFFF', ok: '#00FF66', warn: '#FFFF00', danger: '#FF3333' },
+      'okabe-ito-safe':{ mode: 'dark', bgWidget: '#0F141C', bgCard: '#171F2C', textPrimary: '#F8FAFC', textMuted: '#94A3B8', accent: '#56B4E9', ok: '#009E73', warn: '#E69F00', danger: '#D55E00' },
+      'viridis-safe':  { mode: 'dark', bgWidget: '#10111E', bgCard: '#191B2E', textPrimary: '#F5F7FA', textMuted: '#9AA1B9', accent: '#21918C', ok: '#35B779', warn: '#FDE725', danger: '#F8536B' },
+      'tol-light-safe':{ mode: 'light', bgWidget: '#F7F8FA', bgCard: '#FFFFFF', textPrimary: '#111827', textMuted: '#4B5563', accent: '#332288', ok: '#117733', warn: '#B8860B', danger: '#882255' },
+      'catppuccin-mocha':{ mode: 'dark', bgWidget: '#11111B', bgCard: '#1E1E2E', textPrimary: '#CDD6F4', textMuted: '#9399B2', accent: '#CBA6F7', ok: '#A6E3A1', warn: '#F9E2AF', danger: '#F38BA8' },
+      'gruvbox-dark':  { mode: 'dark', bgWidget: '#1D2021', bgCard: '#282828', textPrimary: '#EBDBB2', textMuted: '#A89984', accent: '#FE8019', ok: '#B8BB26', warn: '#FABD2F', danger: '#FB4934' },
+      'tokyo-night':   { mode: 'dark', bgWidget: '#16161E', bgCard: '#1A1B26', textPrimary: '#C0CAF5', textMuted: '#7982A9', accent: '#7AA2F7', ok: '#73DACA', warn: '#E0AF68', danger: '#F7768E' },
+      'dracula':       { mode: 'dark', bgWidget: '#1E1F29', bgCard: '#282A36', textPrimary: '#F8F8F2', textMuted: '#959DCB', accent: '#BD93F9', ok: '#50FA7B', warn: '#F1FA8C', danger: '#FF5555' },
+      'amber-crt':     { mode: 'dark', bgWidget: '#0C0800', bgCard: '#171002', textPrimary: '#FFE082', textMuted: '#B38822', accent: '#FFB000', ok: '#FFB000', warn: '#FF7700', danger: '#FF2200' },
+      'cobalt-blueprint':{ mode: 'dark', bgWidget: '#071A38', bgCard: '#0D274E', textPrimary: '#EBF3FF', textMuted: '#8AB0E6', accent: '#FFFFFF', ok: '#5CE1E6', warn: '#FFD166', danger: '#FF5C77' }
+    };
+
+    const SIZE_PRESETS = {
+      xs: { w: 160, h: 90 },
+      s:  { w: 260, h: 200 },
+      m:  { w: 540, h: 440 },
+      l:  { w: 720, h: 560 }
+    };
+
+    let currentWidth = 540;
+    let currentHeight = 440;
+
+    function getSeverity(pct) {
+      if (pct > 80) return 'danger';
+      if (pct >= 50) return 'warning';
+      return 'normal';
+    }
+
+    function hexToRgbTuple(hex) {
+      const clean = hex.replace('#', '');
+      const num = parseInt(clean, 16);
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function formatFlapDigits(pct) {
+      const str = String(pct).padStart(2, '0');
+      return str.split('').map(ch => `<span class="flap-char">${ch}</span>`).join('') + `<span class="flap-char">%</span>`;
+    }
+
+    function renderFlapBoard() {
+      document.querySelectorAll('.dep-win-row').forEach(row => {
+        const pct = Number(row.getAttribute('data-pct'));
+        const sev = getSeverity(pct);
+        const meter = row.querySelector('.flap-meter');
+        const digits = row.querySelector('.pct-flap-group');
+
+        digits.setAttribute('data-severity', sev);
+        digits.innerHTML = formatFlapDigits(pct);
+
+        const totalCells = 10;
+        const onCells = Math.max(pct > 0 ? 1 : 0, Math.round((pct / 100) * totalCells));
+        meter.innerHTML = '';
+        for (let i = 0; i < totalCells; i++) {
+          const cell = document.createElement('span');
+          cell.className = 'flap-meter-cell' + (i < onCells ? ' on' : '');
+          cell.setAttribute('data-severity', sev);
+          meter.appendChild(cell);
+        }
+      });
+
+      document.querySelectorAll('[data-xs-flap]').forEach(el => {
+        const pct = Number(el.getAttribute('data-xs-flap'));
+        const sev = getSeverity(pct);
+        el.setAttribute('data-severity', sev);
+        el.innerHTML = formatFlapDigits(pct);
+      });
+    }
+
+    function applyPalette(id) {
+      if (id === 'custom') return;
+      const p = PALETTES[id];
+      if (!p) return;
+      document.documentElement.setAttribute('data-theme', p.mode);
+      const [wr, wg, wb] = hexToRgbTuple(p.bgWidget);
+      const [cr, cg, cb] = hexToRgbTuple(p.bgCard);
+      const [tr, tg, tb] = hexToRgbTuple(p.textPrimary);
+      const root = document.documentElement.style;
+      root.setProperty('--bg-rgb', `${wr}, ${wg}, ${wb}`);
+      root.setProperty('--bg-card-rgb', `${cr}, ${cg}, ${cb}`);
+      root.setProperty('--text-primary', p.textPrimary);
+      root.setProperty('--text-secondary', p.textMuted);
+      root.setProperty('--text-muted', p.textMuted);
+      root.setProperty('--accent', p.accent);
+      root.setProperty('--severity-normal', p.ok);
+      root.setProperty('--severity-warning', p.warn);
+      root.setProperty('--severity-danger', p.danger);
+      root.setProperty('--border-color', `rgba(${tr}, ${tg}, ${tb}, 0.18)`);
+      root.setProperty('--flap-off', `rgba(${tr}, ${tg}, ${tb}, 0.09)`);
+
+      document.getElementById('accentPicker').value = p.accent.toLowerCase();
+      document.getElementById('panelAccentPicker').value = p.accent.toLowerCase();
+      document.getElementById('bgPicker').value = p.bgWidget.toLowerCase();
+      document.getElementById('panelBgPicker').value = p.bgWidget.toLowerCase();
+      document.getElementById('paletteSelect').value = id;
+      document.getElementById('panelPaletteSelect').value = id;
+      renderFlapBoard();
+    }
+
+    function setCustomMode() {
+      document.getElementById('paletteSelect').value = 'custom';
+      document.getElementById('panelPaletteSelect').value = 'custom';
+    }
+
+    function applyAccentColor(hex) {
+      setCustomMode();
+      document.documentElement.style.setProperty('--accent', hex);
+      document.documentElement.style.setProperty('--severity-normal', hex);
+      document.getElementById('accentPicker').value = hex;
+      document.getElementById('panelAccentPicker').value = hex;
+      renderFlapBoard();
+    }
+
+    function applyBgColor(hex) {
+      setCustomMode();
+      const [r, g, b] = hexToRgbTuple(hex);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      const isLight = lum > 0.5;
+      const cardR = isLight ? Math.max(0, r - 14) : Math.min(255, r + 14);
+      const cardG = isLight ? Math.max(0, g - 14) : Math.min(255, g + 14);
+      const cardB = isLight ? Math.max(0, b - 16) : Math.min(255, b + 18);
+      const root = document.documentElement.style;
+      root.setProperty('--bg-rgb', `${r}, ${g}, ${b}`);
+      root.setProperty('--bg-card-rgb', `${cardR}, ${cardG}, ${cardB}`);
+      root.setProperty('--text-primary', isLight ? '#141413' : '#f7f7f2');
+      root.setProperty('--text-secondary', isLight ? '#4b5563' : '#a1a1aa');
+      root.setProperty('--text-muted', isLight ? '#6b7280' : '#7c7e87');
+      const ink = isLight ? '20, 20, 19' : '247, 247, 242';
+      root.setProperty('--border-color', `rgba(${ink}, 0.18)`);
+      root.setProperty('--flap-off', `rgba(${ink}, 0.09)`);
+      document.getElementById('bgPicker').value = hex;
+      document.getElementById('panelBgPicker').value = hex;
+      renderFlapBoard();
+    }
+
+    function applyWidgetOpacity(pct) {
+      document.documentElement.style.setProperty('--widget-opacity', (pct / 100).toFixed(2));
+      document.getElementById('widgetOpacitySlider').value = pct;
+      document.getElementById('panelWidgetOpacity').value = pct;
+      document.getElementById('widgetOpacityVal').textContent = pct + '%';
+    }
+
+    function applyBgOpacity(pct) {
+      document.documentElement.style.setProperty('--bg-opacity', (pct / 100).toFixed(2));
+      document.getElementById('bgOpacitySlider').value = pct;
+      document.getElementById('panelBgOpacity').value = pct;
+      document.getElementById('bgOpacityVal').textContent = pct + '%';
+    }
+
+    function applyDimensions(w, h, presetKey = null) {
+      currentWidth = Math.max(130, Math.min(920, Math.round(w)));
+      currentHeight = Math.max(72, Math.min(760, Math.round(h)));
+      const frame = document.getElementById('widgetFrame');
+      document.documentElement.style.setProperty('--widget-width', currentWidth + 'px');
+      document.documentElement.style.setProperty('--widget-height', currentHeight + 'px');
+
+      let tier = 'm';
+      if (currentWidth < 220 || currentHeight < 140) tier = 'xs';
+      else if (currentWidth < 320 || currentHeight < 280) tier = 's';
+      else if (currentWidth >= 620 && currentHeight >= 540) tier = 'l';
+      frame.setAttribute('data-size-tier', tier);
+
+      document.querySelectorAll('[data-size-preset]').forEach(btn => {
+        const key = btn.getAttribute('data-size-preset');
+        btn.classList.toggle('active', presetKey ? key === presetKey : key === tier);
+      });
+
+      document.getElementById('sizeBadge').textContent = `${tier.toUpperCase()} · ${currentWidth}×${currentHeight} px`;
+
+      frame.classList.toggle('shed-step-1', currentHeight < 540 || currentWidth < 480);
+      frame.classList.toggle('shed-step-2', currentHeight < 380);
+      frame.classList.toggle('shed-step-2b', currentHeight < 260 || currentWidth < 260);
+      frame.classList.toggle('shed-step-3', currentWidth < 320 || currentHeight < 260);
+      frame.classList.toggle('shed-step-4', currentWidth < 280 || currentHeight < 240);
+      frame.classList.toggle('shed-step-5', currentWidth < 240 || currentHeight < 190);
+      frame.classList.toggle('shed-step-6', currentWidth < 220 || currentHeight < 140);
+      frame.classList.toggle('shed-step-7', currentWidth < 175 || currentHeight < 105);
+
+      // Never allow 2+1 orphan grid for 3 providers
+      const activeCount = document.querySelectorAll('.departure-card:not([hidden])').length;
+      const aspect = currentWidth / currentHeight;
+      let cols = 1;
+      if (activeCount === 2 && currentWidth >= 420 && aspect >= 1.35 && currentHeight >= 150) {
+        cols = 2;
+      } else if (activeCount === 3 && currentWidth >= 620 && aspect >= 1.45 && currentHeight >= 150) {
+        cols = 3;
+      }
+      frame.setAttribute('data-cols', String(cols));
+    }
+
+    document.querySelectorAll('[data-size-preset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-size-preset');
+        const preset = SIZE_PRESETS[key];
+        if (preset) applyDimensions(preset.w, preset.h, key);
+      });
+    });
+
+    // Resize Handle Dragging
+    const resizeHandle = document.getElementById('resizeHandle');
+    let isDragging = false, startX = 0, startY = 0, startW = 0, startH = 0;
+    resizeHandle.addEventListener('pointerdown', e => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startW = currentWidth;
+      startH = currentHeight;
+      resizeHandle.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    resizeHandle.addEventListener('pointermove', e => {
+      if (!isDragging) return;
+      const dw = (e.clientX - startX) * 2;
+      const dh = (e.clientY - startY);
+      applyDimensions(startW + dw, startH + dh);
+    });
+    resizeHandle.addEventListener('pointerup', () => { isDragging = false; });
+
+    // Provider Toggles
+    document.querySelectorAll('[data-toggle-provider]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-toggle-provider');
+        const card = document.querySelector(`.departure-card[data-provider="${target}"]`);
+        const activeCount = document.querySelectorAll('.departure-card:not([hidden])').length;
+        if (!card.hasAttribute('hidden') && activeCount <= 1) return;
+
+        if (card.hasAttribute('hidden')) {
+          card.removeAttribute('hidden');
+          btn.classList.add('active');
+        } else {
+          card.setAttribute('hidden', '');
+          btn.classList.remove('active');
+        }
+        applyDimensions(currentWidth, currentHeight);
+      });
+    });
+
+    document.getElementById('paletteSelect').addEventListener('change', e => applyPalette(e.target.value));
+    document.getElementById('panelPaletteSelect').addEventListener('change', e => applyPalette(e.target.value));
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      applyPalette(cur === 'dark' ? 'mono-paper' : 'dracula');
+    });
+
+    let dangerSim = false;
+    document.getElementById('dangerSimToggle').addEventListener('click', e => {
+      dangerSim = !dangerSim;
+      e.currentTarget.classList.toggle('active', dangerSim);
+      const row = document.querySelector('[data-win="codex-wk"]');
+      const nextPct = dangerSim ? row.getAttribute('data-danger-pct') : row.getAttribute('data-default-pct');
+      row.setAttribute('data-pct', nextPct);
+      const plaque = document.getElementById('codexStatusPlaque');
+      plaque.setAttribute('data-status', dangerSim ? 'danger' : 'warn');
+      plaque.textContent = dangerSim ? `LIMIT CRIT · ${nextPct}%` : `CAUTION · ${nextPct}%`;
+      document.getElementById('xsCodexWk').textContent = '·' + nextPct + '%';
+      renderFlapBoard();
+    });
+
+    document.getElementById('accentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('panelAccentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('bgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+    document.getElementById('panelBgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+    document.getElementById('widgetOpacitySlider').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('panelWidgetOpacity').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('bgOpacitySlider').addEventListener('input', e => applyBgOpacity(e.target.value));
+    document.getElementById('panelBgOpacity').addEventListener('input', e => applyBgOpacity(e.target.value));
+
+    const settingsOverlay = document.getElementById('settingsOverlay');
+    const openSettingsBtn = document.getElementById('openSettingsBtn');
+    const miniSettingsBtn = document.getElementById('miniSettingsBtn');
+    function toggleSettings() {
+      const isOpen = settingsOverlay.classList.toggle('open');
+      openSettingsBtn.classList.toggle('active', isOpen);
+    }
+    openSettingsBtn.addEventListener('click', toggleSettings);
+    miniSettingsBtn.addEventListener('click', toggleSettings);
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+      settingsOverlay.classList.remove('open');
+      openSettingsBtn.classList.remove('active');
+    });
+
+    document.getElementById('notifToggle').addEventListener('change', e => {
+      document.getElementById('notifStatusText').textContent = e.target.checked ? 'ON' : 'OFF';
+    });
+
+    applyPalette('dracula');
+    applyDimensions(540, 440, 'm');
+  </script>
+</body>
+</html>

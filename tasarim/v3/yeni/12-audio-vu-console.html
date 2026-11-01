@@ -1,0 +1,1586 @@
+<!--
+  DESIGN 12 (v3): INDUSTRIAL AUDIO VU / MIXING CONSOLE
+  Default Widget Dimensions (Size M): 520px × 440px
+  v3 Features:
+  - Vertical studio mastering channel strips with bottom-up 16-segment LED ladders (5H + WK + EX)
+  - Segment color mapped by vertical height threshold (0-50% OK, 50-80% WARN, 80-100% PEAK) + top CLIP indicator lamp
+  - Bottom studio scribble-strip tape labels & digital trim readouts
+  - Responsive Size System: XS (160×90), S (260×200), M (520×440), L (680×560) + free drag resize handle
+  - 8-step progressive field shedding & strict ban on 2+1 orphan grids
+  - 16 named WCAG-verified color palettes + Custom Accent/BG pickers & dual opacity sliders
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>12 — Industrial Audio VU / Mixing Console (QUOTA v3)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-stage: #08090b;
+      --bg-rgb: 17, 19, 21;
+      --bg-card-rgb: 27, 30, 35;
+      --widget-opacity: 1;
+      --bg-opacity: 0.95;
+      --bg-widget: rgba(var(--bg-rgb), var(--bg-opacity));
+      --bg-card: rgba(var(--bg-card-rgb), var(--bg-opacity));
+      --text-primary: #eceff4;
+      --text-secondary: #94a3b8;
+      --text-muted: #6c7686;
+      --border-color: rgba(236, 239, 244, 0.14);
+      --led-off: rgba(236, 239, 244, 0.09);
+      --accent: #fe8019;
+      --severity-normal: #b8bb26;
+      --severity-warning: #fabd2f;
+      --severity-danger: #fb4934;
+      --widget-width: 520px;
+      --widget-height: 440px;
+      --brushed-metal: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.015) 0px,
+        rgba(255, 255, 255, 0.015) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-stage);
+      color: var(--text-primary);
+      font-family: 'Fira Code', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 12px;
+      gap: 12px;
+      user-select: none;
+    }
+
+    /* Demo Toolbar */
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      background: #141619;
+      border: 1px solid #2d323b;
+      padding: 7px 11px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #e2e8f0;
+      max-width: 1120px;
+      z-index: 30;
+    }
+    .demo-toolbar .size-badge {
+      color: var(--accent);
+      font-weight: 700;
+      min-width: 114px;
+      padding-right: 8px;
+      border-right: 1px solid #2d323b;
+    }
+    .demo-toolbar .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-right: 8px;
+      border-right: 1px solid #2d323b;
+    }
+    .demo-toolbar .toolbar-group:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+    .demo-toolbar button,
+    .demo-toolbar select {
+      background: #20242b;
+      color: #f1f5f9;
+      border: 1px solid #3b4252;
+      border-radius: 4px;
+      padding: 3px 7px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .demo-toolbar button:hover,
+    .demo-toolbar select:hover {
+      border-color: var(--accent);
+    }
+    .demo-toolbar button.active {
+      background: var(--accent);
+      color: #111315;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .demo-toolbar input[type="color"] {
+      width: 21px;
+      height: 21px;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    .demo-toolbar input[type="range"] {
+      width: 56px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .val-readout {
+      min-width: 28px;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+
+    /* CSS-Only Desktop Wallpaper Stage */
+    .wallpaper-stage {
+      padding: 30px 44px;
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      min-width: 360px;
+      min-height: 260px;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(254, 128, 25, 0.32) 0%, transparent 45%),
+        radial-gradient(circle at 80% 28%, rgba(184, 187, 38, 0.26) 0%, transparent 46%),
+        radial-gradient(circle at 50% 82%, rgba(251, 73, 52, 0.28) 0%, transparent 50%),
+        linear-gradient(135deg, #0d0f12 0%, #1d2021 52%, #090b0e 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 24px 60px rgba(0, 0, 0, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wallpaper-stage::after {
+      content: "MASTERING CONSOLE STAGE // DRAG CORNER TO RESIZE";
+      position: absolute;
+      bottom: 8px;
+      left: 16px;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+
+    /* Widget Frame */
+    .widget-frame {
+      width: var(--widget-width);
+      height: var(--widget-height);
+      opacity: var(--widget-opacity);
+      background-color: var(--bg-widget);
+      background-image: var(--brushed-metal);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 22px 50px rgba(0, 0, 0, 0.6);
+      z-index: 2;
+    }
+
+    /* Mini floating corner bar when header sheds in S / XS */
+    .mini-corner-bar {
+      display: none;
+      position: absolute;
+      top: 4px;
+      right: 5px;
+      align-items: center;
+      gap: 4px;
+      z-index: 12;
+    }
+    .mini-sync-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+    }
+    .mini-gear-btn {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .mini-gear-btn svg {
+      width: 11px;
+      height: 11px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    /* Header: App name + last update on left, gear icon on right */
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .rack-screw {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid var(--text-muted);
+      background: rgba(0, 0, 0, 0.4);
+      flex-shrink: 0;
+    }
+    .app-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text-primary);
+    }
+    .refresh-meta {
+      font-size: 10.5px;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 1px 7px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .refresh-meta strong {
+      color: var(--accent);
+    }
+
+    .gear-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .gear-btn:hover,
+    .gear-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .gear-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Channel Strips Grid (1, 2, or 3 cols — never 2+1 for 3 providers) */
+    .console-channels {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      min-height: 0;
+    }
+    .widget-frame[data-cols="2"] .console-channels {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .widget-frame[data-cols="3"] .console-channels {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .channel-strip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 9px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+      min-height: 0;
+      min-width: 0;
+      position: relative;
+    }
+    .channel-strip[hidden] {
+      display: none !important;
+    }
+    .channel-strip.is-stale {
+      border-style: dashed;
+      border-color: var(--severity-danger);
+    }
+
+    /* Top Peak / Clip / Stale Indicator Lamp Bar */
+    .channel-lamp-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .clip-lamp {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .clip-lamp .lamp-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--led-off);
+    }
+    .clip-lamp.is-warn {
+      color: var(--severity-warning);
+      border-color: var(--severity-warning);
+    }
+    .clip-lamp.is-warn .lamp-dot {
+      background: var(--severity-warning);
+      box-shadow: 0 0 5px var(--severity-warning);
+    }
+    .clip-lamp.is-clip {
+      color: #fff;
+      background: var(--severity-danger);
+      border-color: var(--severity-danger);
+    }
+    .clip-lamp.is-clip .lamp-dot {
+      background: #fff;
+      box-shadow: 0 0 6px #fff;
+    }
+
+    .stale-badge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tag-stale {
+      background: var(--severity-danger);
+      color: #fff;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .tag-stale-short {
+      display: none;
+      background: var(--severity-danger);
+      color: #fff;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 0 4px;
+      border-radius: 2px;
+    }
+    .tag-age {
+      font-size: 9px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Vertical VU Meter Well */
+    .vu-meter-well {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      padding: 6px 8px;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 7px;
+      min-height: 0;
+    }
+
+    .db-scale {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 9px;
+      color: var(--text-muted);
+      text-align: right;
+      padding: 1px 0;
+      user-select: none;
+    }
+    .db-scale .crit-mark {
+      color: var(--severity-danger);
+      font-weight: 700;
+    }
+
+    .ladder-col {
+      flex: 1;
+      max-width: 34px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      min-height: 0;
+    }
+    .ladder-col.extra-col {
+      max-width: 18px;
+    }
+    .ladder-segments {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column-reverse; /* index 0 at bottom, index 15 at top */
+      gap: 2px;
+      min-height: 0;
+    }
+    .vu-seg {
+      flex: 1;
+      width: 100%;
+      border-radius: 1.5px;
+      background: var(--led-off);
+      min-height: 2px;
+    }
+    .vu-seg.on-ok {
+      background: var(--severity-normal);
+      box-shadow: 0 0 4px var(--severity-normal);
+    }
+    .vu-seg.on-warn {
+      background: var(--severity-warning);
+      box-shadow: 0 0 4px var(--severity-warning);
+    }
+    .vu-seg.on-crit {
+      background: var(--severity-danger);
+      box-shadow: 0 0 5px var(--severity-danger);
+    }
+    .ladder-tag {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.4px;
+      flex-shrink: 0;
+    }
+
+    /* Digital Trim Readouts below VU Ladders */
+    .trim-readouts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .trim-box {
+      background: rgba(0, 0, 0, 0.26);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 3px 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    .trim-top {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .trim-win-name {
+      font-size: 9.5px;
+      color: var(--text-secondary);
+    }
+    .trim-pct {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.05;
+    }
+    .trim-pct[data-severity="normal"] { color: var(--severity-normal); }
+    .trim-pct[data-severity="warning"] { color: var(--severity-warning); }
+    .trim-pct[data-severity="danger"] { color: var(--severity-danger); }
+
+    .trim-rst {
+      font-size: 9.5px;
+      color: var(--text-muted);
+    }
+
+    .extra-bus-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--text-secondary);
+      padding: 2px 4px;
+      border: 1px dotted var(--border-color);
+      border-radius: 3px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .extra-bus-pct {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Bottom Studio Scribble-Strip Tape Label */
+    .scribble-strip {
+      background: rgba(0, 0, 0, 0.42);
+      border-top: 2px solid var(--accent);
+      border-radius: 3px;
+      padding: 4px 7px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .scribble-left {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      min-width: 0;
+    }
+    .ch-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .ch-monogram {
+      display: none;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .ch-plan {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0 4px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .inline-extra-chip {
+      display: none;
+      font-size: 9.5px;
+      color: var(--text-secondary);
+      border: 1px dotted var(--border-color);
+      padding: 0 4px;
+      white-space: nowrap;
+    }
+
+    /* When 1-column vertical stack is active (and not XS), use horizontal channel strip layout */
+    .widget-frame[data-cols="1"]:not(.shed-step-6) .channel-strip {
+      display: grid;
+      grid-template-columns: 115px 1fr 135px;
+      grid-template-rows: auto auto;
+      align-items: center;
+      gap: 6px 10px;
+      padding: 7px 10px;
+    }
+    .widget-frame[data-cols="1"]:not(.shed-step-6) .scribble-strip {
+      grid-column: 1;
+      grid-row: 1;
+      border-top: none;
+      border-left: 3px solid var(--accent);
+    }
+    .widget-frame[data-cols="1"]:not(.shed-step-6) .channel-lamp-row {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .widget-frame[data-cols="1"]:not(.shed-step-6) .vu-meter-well {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      height: 100%;
+      min-height: 68px;
+    }
+    .widget-frame[data-cols="1"]:not(.shed-step-6) .trim-readouts {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      grid-template-columns: 1fr;
+    }
+    .widget-frame[data-cols="1"]:not(.shed-step-6) .extra-bus-row {
+      display: none;
+    }
+
+    /* XS Micro-Equalizer Pillar Row (Step 6) */
+    .xs-vu-summary {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+    .xs-pillars {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 16px;
+      padding: 2px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border-color);
+      border-radius: 2px;
+    }
+    .xs-pillar-bar {
+      width: 4px;
+      border-radius: 1px;
+    }
+    .xs-pct-text {
+      font-size: 12.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .xs-wk-dim {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .widget-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 5px;
+      border-top: 1px solid var(--border-color);
+      font-size: 9.5px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .legend-cluster {
+      display: flex;
+      gap: 10px;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legend-led {
+      width: 8px;
+      height: 5px;
+      border-radius: 1px;
+    }
+
+    /* ==========================================================================
+       8-STEP PROGRESSIVE FIELD SHEDDING
+       ========================================================================== */
+    .widget-frame[data-size-tier="l"] .trim-pct {
+      font-size: 21px;
+    }
+    .widget-frame[data-size-tier="l"] .ladder-col {
+      max-width: 44px;
+    }
+
+    /* Step 1: Shed footer below L */
+    .widget-frame.shed-step-1 .widget-footer {
+      display: none;
+    }
+
+    /* Step 2: Collapse extra Opus row into inline chip (<380px H) */
+    .widget-frame.shed-step-2 .extra-bus-row,
+    .widget-frame.shed-step-2 .ladder-col.extra-col {
+      display: none;
+    }
+    .widget-frame.shed-step-2 .inline-extra-chip {
+      display: inline-block;
+    }
+    .widget-frame.shed-step-2b .inline-extra-chip {
+      display: none;
+    }
+
+    /* Step 3: Shed outer header bar (<320px W or <260px H) */
+    .widget-frame.shed-step-3 {
+      padding: 7px 9px;
+      gap: 5px;
+    }
+    .widget-frame.shed-step-3 .widget-header {
+      display: none;
+    }
+    .widget-frame.shed-step-3 .mini-corner-bar {
+      display: inline-flex;
+    }
+
+    /* Step 4: Hide dB scale & age text (<280px W or <240px H) */
+    .widget-frame.shed-step-4 .db-scale,
+    .widget-frame.shed-step-4 .tag-age {
+      display: none;
+    }
+
+    /* Step 5: Hide plan badges & reset countdown timers (<240px W or <190px H) */
+    .widget-frame.shed-step-5 .ch-plan,
+    .widget-frame.shed-step-5 .trim-rst {
+      display: none;
+    }
+
+    /* Step 6 (XS ~160x90): Ultra-tight micro-equalizer row */
+    .widget-frame.shed-step-6 {
+      padding: 5px 7px;
+      gap: 3px;
+    }
+    .widget-frame.shed-step-6 .console-channels {
+      gap: 3px;
+    }
+    .widget-frame.shed-step-6 .channel-strip {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 6px;
+      gap: 4px;
+    }
+    .widget-frame.shed-step-6 .vu-meter-well,
+    .widget-frame.shed-step-6 .trim-readouts,
+    .widget-frame.shed-step-6 .clip-lamp,
+    .widget-frame.shed-step-6 .tag-stale {
+      display: none;
+    }
+    .widget-frame.shed-step-6 .scribble-strip {
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+    .widget-frame.shed-step-6 .xs-vu-summary {
+      display: flex;
+    }
+    .widget-frame.shed-step-6 .tag-stale-short {
+      display: inline-block;
+    }
+
+    /* Step 7 (Extreme XS <175px W): Abbreviate provider names */
+    .widget-frame.shed-step-7 .ch-name {
+      display: none;
+    }
+    .widget-frame.shed-step-7 .ch-monogram {
+      display: inline;
+    }
+
+    /* Resize Handle */
+    .resize-handle {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 16px;
+      height: 16px;
+      cursor: nwse-resize;
+      z-index: 14;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 2px;
+      opacity: 0.65;
+    }
+    .resize-handle:hover {
+      opacity: 1;
+    }
+    .resize-handle svg {
+      width: 10px;
+      height: 10px;
+      stroke: var(--accent);
+      stroke-width: 2;
+    }
+
+    /* Settings Overlay */
+    .settings-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(var(--bg-rgb), 0.97);
+      backdrop-filter: blur(14px);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 20;
+      transform: translateX(100%);
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow-y: auto;
+    }
+    .settings-overlay.open {
+      transform: translateX(0);
+    }
+    .settings-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .settings-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .close-btn {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .settings-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11px;
+    }
+    .set-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .set-group-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+    }
+    .set-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .set-row select,
+    .set-row input[type="range"] {
+      accent-color: var(--accent);
+      max-width: 135px;
+      font-family: inherit;
+      font-size: 10.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-toolbar" role="region" aria-label="Widget Demo Controls">
+    <span class="size-badge" id="sizeBadge">M · 520×440 px</span>
+
+    <div class="toolbar-group">
+      <span>Size:</span>
+      <button type="button" data-size-preset="xs">XS</button>
+      <button type="button" data-size-preset="s">S</button>
+      <button type="button" class="active" data-size-preset="m">M</button>
+      <button type="button" data-size-preset="l">L</button>
+    </div>
+
+    <div class="toolbar-group">
+      <span>Providers:</span>
+      <button type="button" class="active" data-toggle-provider="claude">Claude</button>
+      <button type="button" class="active" data-toggle-provider="codex">Codex</button>
+      <button type="button" class="active" data-toggle-provider="gemini">Gemini</button>
+    </div>
+
+    <div class="toolbar-group">
+      <label for="paletteSelect">Palette:</label>
+      <select id="paletteSelect" aria-label="Color Palette">
+        <option value="signal-orange">01 · Signal Orange</option>
+        <option value="sakura-pink">02 · Sakura Pink</option>
+        <option value="nord">03 · Nord</option>
+        <option value="solarized-dark">04 · Solarized Dark</option>
+        <option value="mono-paper">05 · Mono Paper</option>
+        <option value="matrix-green">06 · Matrix Green</option>
+        <option value="high-contrast">07 · High Contrast AAA</option>
+        <option value="okabe-ito-safe">08 · Okabe-Ito Safe</option>
+        <option value="viridis-safe">09 · Viridis Telemetry</option>
+        <option value="tol-light-safe">10 · Paul Tol Muted Safe</option>
+        <option value="catppuccin-mocha">11 · Catppuccin Mocha</option>
+        <option value="gruvbox-dark" selected>12 · Gruvbox Industrial (Default)</option>
+        <option value="tokyo-night">13 · Tokyo Night</option>
+        <option value="dracula">14 · Dracula Neon</option>
+        <option value="amber-crt">15 · Amber Phosphor</option>
+        <option value="cobalt-blueprint">16 · Cobalt Blueprint</option>
+        <option value="custom">Custom Colors</option>
+      </select>
+    </div>
+
+    <div class="toolbar-group">
+      <button type="button" id="themeToggle">Light / Dark</button>
+      <button type="button" id="dangerSimToggle">Test &gt;80%</button>
+    </div>
+
+    <div class="toolbar-group">
+      <label for="accentPicker">Accent:</label>
+      <input type="color" id="accentPicker" value="#fe8019" />
+      <label for="bgPicker">BG:</label>
+      <input type="color" id="bgPicker" value="#1d2021" />
+    </div>
+
+    <div class="toolbar-group">
+      <label for="widgetOpacitySlider">Widget:</label>
+      <input type="range" id="widgetOpacitySlider" min="20" max="100" value="100" />
+      <span class="val-readout" id="widgetOpacityVal">100%</span>
+      <label for="bgOpacitySlider">BG:</label>
+      <input type="range" id="bgOpacitySlider" min="0" max="100" value="95" />
+      <span class="val-readout" id="bgOpacityVal">95%</span>
+    </div>
+  </div>
+
+  <div class="wallpaper-stage">
+    <main class="widget-frame" id="widgetFrame" data-size-tier="m" data-cols="3">
+      <div class="mini-corner-bar">
+        <span class="mini-sync-dot" title="Last refresh 23:41"></span>
+        <button type="button" class="mini-gear-btn" id="miniSettingsBtn" title="Open Settings" aria-label="Open Settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path></svg>
+        </button>
+      </div>
+
+      <!-- Header -->
+      <header class="widget-header">
+        <div class="header-left">
+          <span class="rack-screw"></span>
+          <span class="app-title">QUOTA</span>
+          <span class="refresh-meta">BUS SYNC <strong>23:41</strong></span>
+        </div>
+        <button type="button" class="gear-btn" id="openSettingsBtn" title="Open Settings" aria-label="Open Settings">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <section class="console-channels">
+        <!-- CLAUDE CHANNEL -->
+        <article class="channel-strip" data-provider="claude" data-5h="34" data-wk="61" data-default-wk="61" data-ex="12">
+          <div class="channel-lamp-row">
+            <span class="clip-lamp"><i class="lamp-dot"></i><span class="lamp-text">PEAK</span></span>
+            <span class="inline-extra-chip">OP:12%</span>
+          </div>
+
+          <div class="vu-meter-well">
+            <div class="db-scale">
+              <span class="crit-mark">100</span>
+              <span class="crit-mark">80</span>
+              <span>60</span>
+              <span>40</span>
+              <span>20</span>
+              <span>0</span>
+            </div>
+            <div class="ladder-col">
+              <div class="ladder-segments" data-ladder="5h"></div>
+              <span class="ladder-tag">5H</span>
+            </div>
+            <div class="ladder-col">
+              <div class="ladder-segments" data-ladder="wk"></div>
+              <span class="ladder-tag">WK</span>
+            </div>
+            <div class="ladder-col extra-col" title="Opus Weekly 12%">
+              <div class="ladder-segments" data-ladder="ex"></div>
+              <span class="ladder-tag">OP</span>
+            </div>
+          </div>
+
+          <div class="trim-readouts">
+            <div class="trim-box">
+              <div class="trim-top">
+                <span class="trim-win-name">5H</span>
+                <span class="trim-pct" data-role="pct-5h" data-severity="normal">34%</span>
+              </div>
+              <span class="trim-rst">2h 41m</span>
+            </div>
+            <div class="trim-box">
+              <div class="trim-top">
+                <span class="trim-win-name">WK</span>
+                <span class="trim-pct" data-role="pct-wk" data-severity="warning">61%</span>
+              </div>
+              <span class="trim-rst">3d 4h</span>
+            </div>
+          </div>
+
+          <div class="extra-bus-row">
+            <span>AUX: Opus weekly</span>
+            <span class="extra-bus-pct">12%</span>
+          </div>
+
+          <div class="scribble-strip">
+            <div class="scribble-left">
+              <h2 class="ch-name">Claude</h2>
+              <span class="ch-monogram">CL</span>
+              <span class="ch-plan">Max</span>
+            </div>
+          </div>
+
+          <div class="xs-vu-summary">
+            <div class="xs-pillars">
+              <span class="xs-pillar-bar" data-xs-bar="5h" style="height:34%;background:var(--severity-normal)"></span>
+              <span class="xs-pillar-bar" data-xs-bar="wk" style="height:61%;background:var(--severity-warning)"></span>
+            </div>
+            <span class="xs-pct-text"><span data-role="pct-5h">34%</span><span class="xs-wk-dim">·61%</span></span>
+          </div>
+        </article>
+
+        <!-- CODEX CHANNEL -->
+        <article class="channel-strip" data-provider="codex" data-5h="8" data-wk="77" data-default-wk="77" data-danger-wk="92">
+          <div class="channel-lamp-row">
+            <span class="clip-lamp"><i class="lamp-dot"></i><span class="lamp-text">PEAK</span></span>
+          </div>
+
+          <div class="vu-meter-well">
+            <div class="db-scale">
+              <span class="crit-mark">100</span>
+              <span class="crit-mark">80</span>
+              <span>60</span>
+              <span>40</span>
+              <span>20</span>
+              <span>0</span>
+            </div>
+            <div class="ladder-col">
+              <div class="ladder-segments" data-ladder="5h"></div>
+              <span class="ladder-tag">5H</span>
+            </div>
+            <div class="ladder-col">
+              <div class="ladder-segments" data-ladder="wk"></div>
+              <span class="ladder-tag">WK</span>
+            </div>
+          </div>
+
+          <div class="trim-readouts">
+            <div class="trim-box">
+              <div class="trim-top">
+                <span class="trim-win-name">5H</span>
+                <span class="trim-pct" data-role="pct-5h" data-severity="normal">8%</span>
+              </div>
+              <span class="trim-rst">4h 10m</span>
+            </div>
+            <div class="trim-box">
+              <div class="trim-top">
+                <span class="trim-win-name">WK</span>
+                <span class="trim-pct" data-role="pct-wk" data-severity="warning">77%</span>
+              </div>
+              <span class="trim-rst">1d 6h</span>
+            </div>
+          </div>
+
+          <div class="scribble-strip">
+            <div class="scribble-left">
+              <h2 class="ch-name">Codex</h2>
+              <span class="ch-monogram">CX</span>
+              <span class="ch-plan">Plus</span>
+            </div>
+          </div>
+
+          <div class="xs-vu-summary">
+            <div class="xs-pillars">
+              <span class="xs-pillar-bar" data-xs-bar="5h" style="height:18%;background:var(--severity-normal)"></span>
+              <span class="xs-pillar-bar" data-xs-bar="wk" style="height:77%;background:var(--severity-warning)"></span>
+            </div>
+            <span class="xs-pct-text"><span data-role="pct-5h">8%</span><span class="xs-wk-dim" id="xsCodexWk">·77%</span></span>
+          </div>
+        </article>
+
+        <!-- GEMINI CHANNEL -->
+        <article class="channel-strip is-stale" data-provider="gemini" data-5h="17" data-wk="7" data-default-wk="7">
+          <div class="channel-lamp-row">
+            <span class="clip-lamp"><i class="lamp-dot"></i><span class="lamp-text">PEAK</span></span>
+            <div class="stale-badge-wrap">
+              <span class="tag-stale">STALE</span>
+              <span class="tag-stale-short">!</span>
+              <span class="tag-age">3h ago</span>
+            </div>
+          </div>
+
+          <div class="vu-meter-well">
+            <div class="db-scale">
+              <span class="crit-mark">100</span>
+              <span class="crit-mark">80</span>
+              <span>60</span>
+              <span>40</span>
+              <span>20</span>
+              <span>0</span>
+            </div>
+            <div class="ladder-col">
+              <div class="ladder-segments" data-ladder="5h"></div>
+              <span class="ladder-tag">5H</span>
+            </div>
+            <div class="ladder-col">
+              <div class="ladder-segments" data-ladder="wk"></div>
+              <span class="ladder-tag">WK</span>
+            </div>
+          </div>
+
+          <div class="trim-readouts">
+            <div class="trim-box">
+              <div class="trim-top">
+                <span class="trim-win-name">5H</span>
+                <span class="trim-pct" data-role="pct-5h" data-severity="normal">17%</span>
+              </div>
+              <span class="trim-rst">1h 05m</span>
+            </div>
+            <div class="trim-box">
+              <div class="trim-top">
+                <span class="trim-win-name">WK</span>
+                <span class="trim-pct" data-role="pct-wk" data-severity="normal">7%</span>
+              </div>
+              <span class="trim-rst">6d</span>
+            </div>
+          </div>
+
+          <div class="scribble-strip">
+            <div class="scribble-left">
+              <h2 class="ch-name">Gemini</h2>
+              <span class="ch-monogram">GM</span>
+              <span class="ch-plan">AI Pro</span>
+            </div>
+          </div>
+
+          <div class="xs-vu-summary">
+            <div class="xs-pillars">
+              <span class="xs-pillar-bar" data-xs-bar="5h" style="height:25%;background:var(--severity-normal)"></span>
+              <span class="xs-pillar-bar" data-xs-bar="wk" style="height:15%;background:var(--severity-normal)"></span>
+            </div>
+            <span class="xs-pct-text"><span data-role="pct-5h">17%</span><span class="xs-wk-dim">·7%</span></span>
+          </div>
+        </article>
+      </section>
+
+      <footer class="widget-footer">
+        <div class="legend-cluster">
+          <span class="legend-item"><i class="legend-led" style="background:var(--severity-normal)"></i>0-50% NOMINAL</span>
+          <span class="legend-item"><i class="legend-led" style="background:var(--severity-warning)"></i>50-80% HOT</span>
+          <span class="legend-item"><i class="legend-led" style="background:var(--severity-danger)"></i>&gt;80% CLIP</span>
+        </div>
+        <span>PPM 16-LED // VU-12</span>
+      </footer>
+
+      <!-- Draggable Resize Handle -->
+      <div class="resize-handle" id="resizeHandle" title="Drag to resize widget">
+        <svg viewBox="0 0 10 10"><line x1="2" y1="9" x2="9" y2="2"/><line x1="6" y1="9" x2="9" y2="6"/></svg>
+      </div>
+
+      <!-- Slide-in Settings Panel -->
+      <aside class="settings-overlay" id="settingsOverlay" aria-label="Widget Settings">
+        <div class="settings-top">
+          <span class="settings-title">QUOTA // STUDIO VU SETTINGS</span>
+          <button type="button" class="close-btn" id="closeSettingsBtn">× CLOSE</button>
+        </div>
+        <div class="settings-body">
+          <div class="set-group">
+            <span class="set-group-title">Palette &amp; Custom Colors</span>
+            <div class="set-row">
+              <span>Preset Palette</span>
+              <select id="panelPaletteSelect">
+                <option value="signal-orange">01 · Signal Orange</option>
+                <option value="sakura-pink">02 · Sakura Pink</option>
+                <option value="nord">03 · Nord</option>
+                <option value="solarized-dark">04 · Solarized Dark</option>
+                <option value="mono-paper">05 · Mono Paper</option>
+                <option value="matrix-green">06 · Matrix Green</option>
+                <option value="high-contrast">07 · High Contrast AAA</option>
+                <option value="okabe-ito-safe">08 · Okabe-Ito Safe</option>
+                <option value="viridis-safe">09 · Viridis Telemetry</option>
+                <option value="tol-light-safe">10 · Paul Tol Muted Safe</option>
+                <option value="catppuccin-mocha">11 · Catppuccin Mocha</option>
+                <option value="gruvbox-dark" selected>12 · Gruvbox Industrial</option>
+                <option value="tokyo-night">13 · Tokyo Night</option>
+                <option value="dracula">14 · Dracula Neon</option>
+                <option value="amber-crt">15 · Amber Phosphor</option>
+                <option value="cobalt-blueprint">16 · Cobalt Blueprint</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div class="set-row">
+              <span>Accent Color</span>
+              <input type="color" id="panelAccentPicker" value="#fe8019" />
+            </div>
+            <div class="set-row">
+              <span>Background Color</span>
+              <input type="color" id="panelBgPicker" value="#1d2021" />
+            </div>
+          </div>
+
+          <div class="set-group">
+            <span class="set-group-title">Transparency</span>
+            <div class="set-row">
+              <span>Widget Opacity</span>
+              <input type="range" id="panelWidgetOpacity" min="20" max="100" value="100" />
+            </div>
+            <div class="set-row">
+              <span>Background Opacity</span>
+              <input type="range" id="panelBgOpacity" min="0" max="100" value="95" />
+            </div>
+          </div>
+
+          <div class="set-group">
+            <span class="set-group-title">Notifications (Opt-In)</span>
+            <div class="set-row">
+              <span>Clip / Peak Alerts</span>
+              <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;">
+                <input type="checkbox" id="notifToggle" />
+                <strong id="notifStatusText">OFF</strong>
+              </label>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const PALETTES = {
+      'signal-orange': { mode: 'dark', bgWidget: '#0E0E11', bgCard: '#15151A', textPrimary: '#F4F4F6', textMuted: '#8E8E9E', accent: '#FF3B1D', ok: '#F4F4F6', warn: '#FF9E1B', danger: '#FF2A2A' },
+      'sakura-pink':   { mode: 'light', bgWidget: '#FDF2F5', bgCard: '#FCE7EE', textPrimary: '#2D121E', textMuted: '#7A4E62', accent: '#E11D74', ok: '#0D9488', warn: '#D97706', danger: '#E11D48' },
+      'nord':          { mode: 'dark', bgWidget: '#242933', bgCard: '#2E3440', textPrimary: '#ECEFF4', textMuted: '#9099AB', accent: '#88C0D0', ok: '#A3BE8C', warn: '#EBCB8B', danger: '#BF616A' },
+      'solarized-dark':{ mode: 'dark', bgWidget: '#00212B', bgCard: '#073642', textPrimary: '#FDF6E3', textMuted: '#93A1A1', accent: '#268BD2', ok: '#859900', warn: '#B58900', danger: '#DC322F' },
+      'mono-paper':    { mode: 'light', bgWidget: '#F2EFE9', bgCard: '#E6E2D8', textPrimary: '#141413', textMuted: '#5C5954', accent: '#141413', ok: '#141413', warn: '#8C5A08', danger: '#B91C1C' },
+      'matrix-green':  { mode: 'dark', bgWidget: '#030A04', bgCard: '#071409', textPrimary: '#D1FFD7', textMuted: '#4E9A57', accent: '#00FF41', ok: '#00FF41', warn: '#CCFF00', danger: '#FF3355' },
+      'high-contrast': { mode: 'dark', bgWidget: '#000000', bgCard: '#0A0A0A', textPrimary: '#FFFFFF', textMuted: '#D4D4D4', accent: '#00FFFF', ok: '#00FF66', warn: '#FFFF00', danger: '#FF3333' },
+      'okabe-ito-safe':{ mode: 'dark', bgWidget: '#0F141C', bgCard: '#171F2C', textPrimary: '#F8FAFC', textMuted: '#94A3B8', accent: '#56B4E9', ok: '#009E73', warn: '#E69F00', danger: '#D55E00' },
+      'viridis-safe':  { mode: 'dark', bgWidget: '#10111E', bgCard: '#191B2E', textPrimary: '#F5F7FA', textMuted: '#9AA1B9', accent: '#21918C', ok: '#35B779', warn: '#FDE725', danger: '#F8536B' },
+      'tol-light-safe':{ mode: 'light', bgWidget: '#F7F8FA', bgCard: '#FFFFFF', textPrimary: '#111827', textMuted: '#4B5563', accent: '#332288', ok: '#117733', warn: '#B8860B', danger: '#882255' },
+      'catppuccin-mocha':{ mode: 'dark', bgWidget: '#11111B', bgCard: '#1E1E2E', textPrimary: '#CDD6F4', textMuted: '#9399B2', accent: '#CBA6F7', ok: '#A6E3A1', warn: '#F9E2AF', danger: '#F38BA8' },
+      'gruvbox-dark':  { mode: 'dark', bgWidget: '#1D2021', bgCard: '#282828', textPrimary: '#EBDBB2', textMuted: '#A89984', accent: '#FE8019', ok: '#B8BB26', warn: '#FABD2F', danger: '#FB4934' },
+      'tokyo-night':   { mode: 'dark', bgWidget: '#16161E', bgCard: '#1A1B26', textPrimary: '#C0CAF5', textMuted: '#7982A9', accent: '#7AA2F7', ok: '#73DACA', warn: '#E0AF68', danger: '#F7768E' },
+      'dracula':       { mode: 'dark', bgWidget: '#1E1F29', bgCard: '#282A36', textPrimary: '#F8F8F2', textMuted: '#959DCB', accent: '#BD93F9', ok: '#50FA7B', warn: '#F1FA8C', danger: '#FF5555' },
+      'amber-crt':     { mode: 'dark', bgWidget: '#0C0800', bgCard: '#171002', textPrimary: '#FFE082', textMuted: '#B38822', accent: '#FFB000', ok: '#FFB000', warn: '#FF7700', danger: '#FF2200' },
+      'cobalt-blueprint':{ mode: 'dark', bgWidget: '#071A38', bgCard: '#0D274E', textPrimary: '#EBF3FF', textMuted: '#8AB0E6', accent: '#FFFFFF', ok: '#5CE1E6', warn: '#FFD166', danger: '#FF5C77' }
+    };
+
+    const SIZE_PRESETS = {
+      xs: { w: 160, h: 90 },
+      s:  { w: 260, h: 200 },
+      m:  { w: 520, h: 440 },
+      l:  { w: 680, h: 560 }
+    };
+
+    let currentWidth = 520;
+    let currentHeight = 440;
+
+    function getSeverity(pct) {
+      if (pct > 80) return 'danger';
+      if (pct >= 50) return 'warning';
+      return 'normal';
+    }
+
+    function hexToRgbTuple(hex) {
+      const clean = hex.replace('#', '');
+      const num = parseInt(clean, 16);
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function buildLadder(container, pct) {
+      if (!container) return;
+      const totalSegs = 16;
+      const activeSegs = Math.max(pct > 0 ? 1 : 0, Math.round((pct / 100) * totalSegs));
+      container.innerHTML = '';
+      for (let i = 0; i < totalSegs; i++) {
+        const seg = document.createElement('span');
+        seg.className = 'vu-seg';
+        if (i < activeSegs) {
+          // Segment vertical height threshold: 0..7 (<50%) = ok, 8..12 (50-80%) = warn, 13..15 (>80%) = crit
+          if (i >= 13) seg.classList.add('on-crit');
+          else if (i >= 8) seg.classList.add('on-warn');
+          else seg.classList.add('on-ok');
+        }
+        container.appendChild(seg);
+      }
+    }
+
+    function renderConsole() {
+      document.querySelectorAll('.channel-strip').forEach(strip => {
+        const pct5h = Number(strip.getAttribute('data-5h'));
+        const pctWk = Number(strip.getAttribute('data-wk'));
+        const pctEx = Number(strip.getAttribute('data-ex') || 0);
+
+        const sev5h = getSeverity(pct5h);
+        const sevWk = getSeverity(pctWk);
+
+        strip.querySelectorAll('[data-role="pct-5h"]').forEach(el => {
+          el.textContent = pct5h + '%';
+          el.setAttribute('data-severity', sev5h);
+        });
+        strip.querySelectorAll('[data-role="pct-wk"]').forEach(el => {
+          el.textContent = pctWk + '%';
+          el.setAttribute('data-severity', sevWk);
+        });
+
+        buildLadder(strip.querySelector('[data-ladder="5h"]'), pct5h);
+        buildLadder(strip.querySelector('[data-ladder="wk"]'), pctWk);
+        buildLadder(strip.querySelector('[data-ladder="ex"]'), pctEx);
+
+        // Top CLIP / PEAK lamp state
+        const peakPct = Math.max(pct5h, pctWk);
+        const lamp = strip.querySelector('.clip-lamp');
+        const lampText = strip.querySelector('.lamp-text');
+        lamp.classList.remove('is-warn', 'is-clip');
+        if (peakPct > 80) {
+          lamp.classList.add('is-clip');
+          lampText.textContent = 'CLIP >80%';
+        } else if (peakPct >= 50) {
+          lamp.classList.add('is-warn');
+          lampText.textContent = 'HOT -3dB';
+        } else {
+          lampText.textContent = 'NOMINAL';
+        }
+
+        // XS pillars update
+        const bar5h = strip.querySelector('[data-xs-bar="5h"]');
+        const barWk = strip.querySelector('[data-xs-bar="wk"]');
+        if (bar5h) {
+          bar5h.style.height = Math.max(15, pct5h) + '%';
+          bar5h.style.background = `var(--severity-${sev5h})`;
+        }
+        if (barWk) {
+          barWk.style.height = Math.max(15, pctWk) + '%';
+          barWk.style.background = `var(--severity-${sevWk})`;
+        }
+      });
+    }
+
+    function applyPalette(id) {
+      if (id === 'custom') return;
+      const p = PALETTES[id];
+      if (!p) return;
+      document.documentElement.setAttribute('data-theme', p.mode);
+      const [wr, wg, wb] = hexToRgbTuple(p.bgWidget);
+      const [cr, cg, cb] = hexToRgbTuple(p.bgCard);
+      const [tr, tg, tb] = hexToRgbTuple(p.textPrimary);
+      const root = document.documentElement.style;
+      root.setProperty('--bg-rgb', `${wr}, ${wg}, ${wb}`);
+      root.setProperty('--bg-card-rgb', `${cr}, ${cg}, ${cb}`);
+      root.setProperty('--text-primary', p.textPrimary);
+      root.setProperty('--text-secondary', p.textMuted);
+      root.setProperty('--text-muted', p.textMuted);
+      root.setProperty('--accent', p.accent);
+      root.setProperty('--severity-normal', p.ok);
+      root.setProperty('--severity-warning', p.warn);
+      root.setProperty('--severity-danger', p.danger);
+      root.setProperty('--border-color', `rgba(${tr}, ${tg}, ${tb}, 0.16)`);
+      root.setProperty('--led-off', `rgba(${tr}, ${tg}, ${tb}, 0.10)`);
+
+      document.getElementById('accentPicker').value = p.accent.toLowerCase();
+      document.getElementById('panelAccentPicker').value = p.accent.toLowerCase();
+      document.getElementById('bgPicker').value = p.bgWidget.toLowerCase();
+      document.getElementById('panelBgPicker').value = p.bgWidget.toLowerCase();
+      document.getElementById('paletteSelect').value = id;
+      document.getElementById('panelPaletteSelect').value = id;
+      renderConsole();
+    }
+
+    function setCustomMode() {
+      document.getElementById('paletteSelect').value = 'custom';
+      document.getElementById('panelPaletteSelect').value = 'custom';
+    }
+
+    function applyAccentColor(hex) {
+      setCustomMode();
+      document.documentElement.style.setProperty('--accent', hex);
+      document.documentElement.style.setProperty('--severity-normal', hex);
+      document.getElementById('accentPicker').value = hex;
+      document.getElementById('panelAccentPicker').value = hex;
+      renderConsole();
+    }
+
+    function applyBgColor(hex) {
+      setCustomMode();
+      const [r, g, b] = hexToRgbTuple(hex);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      const isLight = lum > 0.5;
+      const cardR = isLight ? Math.max(0, r - 12) : Math.min(255, r + 12);
+      const cardG = isLight ? Math.max(0, g - 12) : Math.min(255, g + 14);
+      const cardB = isLight ? Math.max(0, b - 14) : Math.min(255, b + 18);
+      const root = document.documentElement.style;
+      root.setProperty('--bg-rgb', `${r}, ${g}, ${b}`);
+      root.setProperty('--bg-card-rgb', `${cardR}, ${cardG}, ${cardB}`);
+      root.setProperty('--text-primary', isLight ? '#111827' : '#eceff4');
+      root.setProperty('--text-secondary', isLight ? '#4b5563' : '#94a3b8');
+      root.setProperty('--text-muted', isLight ? '#6b7280' : '#6c7686');
+      const ink = isLight ? '17, 24, 39' : '236, 239, 244';
+      root.setProperty('--border-color', `rgba(${ink}, 0.16)`);
+      root.setProperty('--led-off', `rgba(${ink}, 0.10)`);
+      document.getElementById('bgPicker').value = hex;
+      document.getElementById('panelBgPicker').value = hex;
+      renderConsole();
+    }
+
+    function applyWidgetOpacity(pct) {
+      document.documentElement.style.setProperty('--widget-opacity', (pct / 100).toFixed(2));
+      document.getElementById('widgetOpacitySlider').value = pct;
+      document.getElementById('panelWidgetOpacity').value = pct;
+      document.getElementById('widgetOpacityVal').textContent = pct + '%';
+    }
+
+    function applyBgOpacity(pct) {
+      document.documentElement.style.setProperty('--bg-opacity', (pct / 100).toFixed(2));
+      document.getElementById('bgOpacitySlider').value = pct;
+      document.getElementById('panelBgOpacity').value = pct;
+      document.getElementById('bgOpacityVal').textContent = pct + '%';
+    }
+
+    function applyDimensions(w, h, presetKey = null) {
+      currentWidth = Math.max(130, Math.min(920, Math.round(w)));
+      currentHeight = Math.max(72, Math.min(760, Math.round(h)));
+      const frame = document.getElementById('widgetFrame');
+      document.documentElement.style.setProperty('--widget-width', currentWidth + 'px');
+      document.documentElement.style.setProperty('--widget-height', currentHeight + 'px');
+
+      let tier = 'm';
+      if (currentWidth < 220 || currentHeight < 140) tier = 'xs';
+      else if (currentWidth < 320 || currentHeight < 280) tier = 's';
+      else if (currentWidth >= 620 && currentHeight >= 540) tier = 'l';
+      frame.setAttribute('data-size-tier', tier);
+
+      document.querySelectorAll('[data-size-preset]').forEach(btn => {
+        const key = btn.getAttribute('data-size-preset');
+        btn.classList.toggle('active', presetKey ? key === presetKey : key === tier);
+      });
+
+      document.getElementById('sizeBadge').textContent = `${tier.toUpperCase()} · ${currentWidth}×${currentHeight} px`;
+
+      frame.classList.toggle('shed-step-1', currentHeight < 540 || currentWidth < 480);
+      frame.classList.toggle('shed-step-2', currentHeight < 380);
+      frame.classList.toggle('shed-step-2b', currentHeight < 260 || currentWidth < 260);
+      frame.classList.toggle('shed-step-3', currentWidth < 320 || currentHeight < 260);
+      frame.classList.toggle('shed-step-4', currentWidth < 280 || currentHeight < 240);
+      frame.classList.toggle('shed-step-5', currentWidth < 240 || currentHeight < 190);
+      frame.classList.toggle('shed-step-6', currentWidth < 220 || currentHeight < 140);
+      frame.classList.toggle('shed-step-7', currentWidth < 175 || currentHeight < 105);
+
+      // Channel strips naturally want 3 side-by-side columns when width >= 340 and height >= 160
+      const activeCount = document.querySelectorAll('.channel-strip:not([hidden])').length;
+      const aspect = currentWidth / currentHeight;
+      let cols = 1;
+      if (activeCount === 2 && currentWidth >= 250 && currentHeight >= 150) {
+        cols = 2;
+      } else if (activeCount === 3 && currentWidth >= 360 && aspect >= 0.95 && currentHeight >= 150) {
+        cols = 3;
+      }
+      frame.setAttribute('data-cols', String(cols));
+    }
+
+    document.querySelectorAll('[data-size-preset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-size-preset');
+        const preset = SIZE_PRESETS[key];
+        if (preset) applyDimensions(preset.w, preset.h, key);
+      });
+    });
+
+    // Resize Handle Dragging
+    const resizeHandle = document.getElementById('resizeHandle');
+    let isDragging = false, startX = 0, startY = 0, startW = 0, startH = 0;
+    resizeHandle.addEventListener('pointerdown', e => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startW = currentWidth;
+      startH = currentHeight;
+      resizeHandle.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    resizeHandle.addEventListener('pointermove', e => {
+      if (!isDragging) return;
+      const dw = (e.clientX - startX) * 2;
+      const dh = (e.clientY - startY);
+      applyDimensions(startW + dw, startH + dh);
+    });
+    resizeHandle.addEventListener('pointerup', () => { isDragging = false; });
+
+    // Provider Toggles
+    document.querySelectorAll('[data-toggle-provider]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-toggle-provider');
+        const strip = document.querySelector(`.channel-strip[data-provider="${target}"]`);
+        const activeCount = document.querySelectorAll('.channel-strip:not([hidden])').length;
+        if (!strip.hasAttribute('hidden') && activeCount <= 1) return;
+
+        if (strip.hasAttribute('hidden')) {
+          strip.removeAttribute('hidden');
+          btn.classList.add('active');
+        } else {
+          strip.setAttribute('hidden', '');
+          btn.classList.remove('active');
+        }
+        applyDimensions(currentWidth, currentHeight);
+      });
+    });
+
+    document.getElementById('paletteSelect').addEventListener('change', e => applyPalette(e.target.value));
+    document.getElementById('panelPaletteSelect').addEventListener('change', e => applyPalette(e.target.value));
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      applyPalette(cur === 'dark' ? 'sakura-pink' : 'gruvbox-dark');
+    });
+
+    let dangerSim = false;
+    document.getElementById('dangerSimToggle').addEventListener('click', e => {
+      dangerSim = !dangerSim;
+      e.currentTarget.classList.toggle('active', dangerSim);
+      const codexStrip = document.querySelector('.channel-strip[data-provider="codex"]');
+      const nextWk = dangerSim ? codexStrip.getAttribute('data-danger-wk') : codexStrip.getAttribute('data-default-wk');
+      codexStrip.setAttribute('data-wk', nextWk);
+      document.getElementById('xsCodexWk').textContent = '·' + nextWk + '%';
+      renderConsole();
+    });
+
+    document.getElementById('accentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('panelAccentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('bgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+    document.getElementById('panelBgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+    document.getElementById('widgetOpacitySlider').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('panelWidgetOpacity').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('bgOpacitySlider').addEventListener('input', e => applyBgOpacity(e.target.value));
+    document.getElementById('panelBgOpacity').addEventListener('input', e => applyBgOpacity(e.target.value));
+
+    const settingsOverlay = document.getElementById('settingsOverlay');
+    const openSettingsBtn = document.getElementById('openSettingsBtn');
+    const miniSettingsBtn = document.getElementById('miniSettingsBtn');
+    function toggleSettings() {
+      const isOpen = settingsOverlay.classList.toggle('open');
+      openSettingsBtn.classList.toggle('active', isOpen);
+    }
+    openSettingsBtn.addEventListener('click', toggleSettings);
+    miniSettingsBtn.addEventListener('click', toggleSettings);
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+      settingsOverlay.classList.remove('open');
+      openSettingsBtn.classList.remove('active');
+    });
+
+    document.getElementById('notifToggle').addEventListener('change', e => {
+      document.getElementById('notifStatusText').textContent = e.target.checked ? 'ON' : 'OFF';
+    });
+
+    applyPalette('gruvbox-dark');
+    applyDimensions(520, 440, 'm');
+  </script>
+</body>
+</html>

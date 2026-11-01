@@ -1,0 +1,869 @@
+<!--
+  DESIGN 04 (v2): FROSTED GLASS / ACRYLIC FLOATING CARDS
+  Fixed Widget Dimensions: 440px × 520px
+  v2 Upgrades:
+  - Header: App name on far left + last updated time right next to it; Settings gear button on far right.
+  - Frosted Acrylic Settings Overlay inside the widget (Notifications OFF by default).
+  - 100% CSS-variable driven colors (custom Accent + Background color pickers).
+  - Dual opacity sliders (Widget Opacity + Background Opacity with crisp text) over a colorful CSS-only desktop wallpaper scene.
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>04 — Frosted Glass Floating Cards v2 (440×520)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-stage: #080b14;
+      --bg-rgb: 19, 25, 42;
+      --bg-card-rgb: 34, 44, 70;
+      --widget-opacity: 1;
+      --bg-opacity: 0.56;
+      --glass-shell: rgba(var(--bg-rgb), var(--bg-opacity));
+      --glass-card: rgba(var(--bg-card-rgb), calc(var(--bg-opacity) * 0.85));
+      --glass-border: rgba(255, 255, 255, 0.18);
+      --glass-highlight: rgba(255, 255, 255, 0.30);
+      --track-bg: rgba(255, 255, 255, 0.12);
+      --text-primary: #f8fafc;
+      --text-secondary: rgba(248, 250, 252, 0.78);
+      --text-muted: rgba(248, 250, 252, 0.56);
+      --accent: #38bdf8;
+      --severity-normal: var(--accent);
+      --severity-warning: #fbbf24;
+      --severity-danger: #fb7185;
+      --widget-width: 440px;
+      --widget-height: 520px;
+    }
+
+    [data-theme="light"] {
+      --bg-stage: #cfd8e8;
+      --bg-rgb: 255, 255, 255;
+      --bg-card-rgb: 241, 245, 249;
+      --glass-border: rgba(15, 23, 42, 0.16);
+      --glass-highlight: rgba(255, 255, 255, 0.95);
+      --track-bg: rgba(15, 23, 42, 0.12);
+      --text-primary: #0f172a;
+      --text-secondary: rgba(15, 23, 42, 0.75);
+      --text-muted: rgba(15, 23, 42, 0.54);
+      --accent: #0284c7;
+      --severity-normal: var(--accent);
+      --severity-warning: #d97706;
+      --severity-danger: #e11d48;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-stage);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px;
+      gap: 12px;
+    }
+
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      color: #e2e8f0;
+      max-width: 980px;
+      z-index: 20;
+    }
+    .demo-toolbar .size-badge {
+      color: var(--accent);
+      font-weight: 700;
+      padding-right: 8px;
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .demo-toolbar .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding-right: 8px;
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .demo-toolbar .toolbar-group:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+    .demo-toolbar button {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .demo-toolbar button.active {
+      background: var(--accent);
+      color: #0f172a;
+      font-weight: 700;
+      border-color: var(--accent);
+    }
+    .demo-toolbar input[type="color"] {
+      width: 22px;
+      height: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    .demo-toolbar input[type="range"] {
+      width: 64px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .swatch-pink {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ff5fa2 !important;
+      border: 1px solid #fff !important;
+      padding: 0 !important;
+    }
+    .val-readout {
+      min-width: 30px;
+      font-size: 10px;
+      color: #cbd5e1;
+    }
+
+    /* Colorful CSS-only Desktop Wallpaper Scene */
+    .wallpaper-stage {
+      padding: 28px 42px;
+      border-radius: 32px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 22% 22%, rgba(99, 102, 241, 0.65) 0%, transparent 45%),
+        radial-gradient(circle at 80% 25%, rgba(236, 72, 153, 0.58) 0%, transparent 46%),
+        radial-gradient(circle at 70% 80%, rgba(14, 165, 233, 0.60) 0%, transparent 48%),
+        radial-gradient(circle at 20% 82%, rgba(16, 185, 129, 0.45) 0%, transparent 46%),
+        linear-gradient(135deg, #0b1021 0%, #1e1b4b 50%, #0f172a 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18), 0 24px 60px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(28px);
+      pointer-events: none;
+    }
+    .orb-1 { width: 220px; height: 220px; background: rgba(99, 102, 241, 0.55); top: 8%; left: 10%; }
+    .orb-2 { width: 240px; height: 240px; background: rgba(14, 165, 233, 0.50); bottom: 6%; right: 10%; }
+    .orb-3 { width: 180px; height: 180px; background: rgba(255, 95, 162, 0.50); top: 38%; left: 36%; }
+    .wallpaper-stage::after {
+      content: "DESKTOP WALLPAPER STAGE";
+      position: absolute;
+      bottom: 8px;
+      right: 20px;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.45);
+      pointer-events: none;
+    }
+
+    .widget-frame {
+      position: relative;
+      z-index: 2;
+      width: var(--widget-width);
+      height: var(--widget-height);
+      opacity: var(--widget-opacity);
+      background: var(--glass-shell);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+    }
+
+    /* Header: App name far left, last updated right next to it, gear icon far right */
+    .glass-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 4px 6px;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .app-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+    }
+    .refresh-pill {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      padding: 3px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .refresh-pill strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .gear-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .gear-btn:hover,
+    .gear-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.14);
+    }
+    .gear-btn svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .cards-stack {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .acrylic-card {
+      flex: 1;
+      background: var(--glass-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-top-color: var(--glass-highlight);
+      border-radius: 20px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      min-height: 0;
+    }
+    .acrylic-card[hidden] {
+      display: none !important;
+    }
+    .acrylic-card.is-stale {
+      border-color: rgba(251, 113, 133, 0.55);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .title-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .provider-name {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .plan-badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--track-bg);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .tags-cluster {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .stale-pill {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(251, 113, 133, 0.22);
+      border: 1px solid var(--severity-danger);
+      color: var(--severity-danger);
+    }
+    .age-pill {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .extra-chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--track-bg);
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .extra-chip strong {
+      color: var(--severity-normal);
+      margin-left: 3px;
+    }
+
+    /* Two-column capsule meters inside each floating card */
+    .capsules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+    .capsule-box {
+      background: rgba(0, 0, 0, 0.14);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    [data-theme="light"] .capsule-box {
+      background: rgba(255, 255, 255, 0.45);
+    }
+    .capsule-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .capsule-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .capsule-pct {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .capsule-pct[data-severity="normal"] { color: var(--severity-normal); }
+    .capsule-pct[data-severity="warning"] { color: var(--severity-warning); }
+    .capsule-pct[data-severity="danger"] { color: var(--severity-danger); }
+
+    .liquid-track {
+      width: 100%;
+      height: 8px;
+      background: var(--track-bg);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .liquid-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+    .liquid-fill[data-severity="normal"] {
+      background: var(--severity-normal);
+      box-shadow: 0 0 8px var(--severity-normal);
+    }
+    .liquid-fill[data-severity="warning"] {
+      background: var(--severity-warning);
+    }
+    .liquid-fill[data-severity="danger"] {
+      background: var(--severity-danger);
+    }
+
+    .capsule-reset {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Acrylic Settings Overlay inside Widget */
+    .settings-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(var(--bg-rgb), 0.94);
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 15;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.96);
+      transition: all 0.2s ease;
+    }
+    .settings-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+    .settings-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .settings-title {
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 1px;
+      color: var(--accent);
+    }
+    .close-btn {
+      background: var(--glass-card);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .set-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .set-glass-card {
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .set-glass-card h3 {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+    }
+    .set-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .set-row input[type="range"] {
+      width: 120px;
+      accent-color: var(--accent);
+    }
+    .preset-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .preset-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.5);
+      cursor: pointer;
+    }
+    .full-link {
+      margin-top: auto;
+      text-align: center;
+      padding: 10px;
+      border-radius: 14px;
+      background: var(--glass-card);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-toolbar" role="region" aria-label="Widget Demo Controls">
+    <span class="size-badge">440×520 px</span>
+    <div class="toolbar-group">
+      <span>Providers:</span>
+      <button type="button" class="active" data-toggle-provider="claude">Claude</button>
+      <button type="button" class="active" data-toggle-provider="codex">Codex</button>
+      <button type="button" class="active" data-toggle-provider="gemini">Gemini</button>
+    </div>
+    <div class="toolbar-group">
+      <button type="button" id="themeToggle">Light / Dark</button>
+      <button type="button" id="dangerSimToggle">Test &gt;80%</button>
+    </div>
+    <div class="toolbar-group">
+      <label for="accentPicker">Accent:</label>
+      <input type="color" id="accentPicker" value="#38bdf8" />
+      <button type="button" class="swatch-pink" id="pinkPresetBtn" title="Try Pink #ff5fa2"></button>
+      <label for="bgPicker">BG:</label>
+      <input type="color" id="bgPicker" value="#13192a" />
+    </div>
+    <div class="toolbar-group">
+      <label for="widgetOpacitySlider">Widget Opacity:</label>
+      <input type="range" id="widgetOpacitySlider" min="20" max="100" value="100" />
+      <span class="val-readout" id="widgetOpacityVal">100%</span>
+    </div>
+    <div class="toolbar-group">
+      <label for="bgOpacitySlider">BG Opacity:</label>
+      <input type="range" id="bgOpacitySlider" min="0" max="100" value="56" />
+      <span class="val-readout" id="bgOpacityVal">56%</span>
+    </div>
+  </div>
+
+  <div class="wallpaper-stage">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <main class="widget-frame">
+      <!-- Header: App name far left, last updated right next to it, gear icon far right -->
+      <header class="glass-header">
+        <div class="header-left">
+          <span class="app-title">QUOTA</span>
+          <span class="refresh-pill">Refreshed <strong>23:41</strong></span>
+        </div>
+        <button type="button" class="gear-btn" id="openSettingsBtn" title="Open Settings" aria-label="Open Settings">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <section class="cards-stack">
+        <!-- CLAUDE -->
+        <article class="acrylic-card" data-provider="claude">
+          <div class="card-top">
+            <div class="title-cluster">
+              <h2 class="provider-name">Claude</h2>
+              <span class="plan-badge">Max</span>
+            </div>
+            <span class="extra-chip">Opus weekly <strong>12%</strong></span>
+          </div>
+
+          <div class="capsules-grid">
+            <div class="capsule-box" data-pct="34">
+              <div class="capsule-meta">
+                <span class="capsule-title">5-hour</span>
+                <span class="capsule-pct">34%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 2h 41m</span>
+            </div>
+
+            <div class="capsule-box" data-pct="61">
+              <div class="capsule-meta">
+                <span class="capsule-title">Weekly</span>
+                <span class="capsule-pct">61%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 3d 4h</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- CODEX -->
+        <article class="acrylic-card" data-provider="codex">
+          <div class="card-top">
+            <div class="title-cluster">
+              <h2 class="provider-name">Codex</h2>
+              <span class="plan-badge">Plus</span>
+            </div>
+          </div>
+
+          <div class="capsules-grid">
+            <div class="capsule-box" data-pct="8">
+              <div class="capsule-meta">
+                <span class="capsule-title">5-hour</span>
+                <span class="capsule-pct">8%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 4h 10m</span>
+            </div>
+
+            <div class="capsule-box" id="codexWeeklyGlass" data-pct="77" data-default-pct="77" data-danger-pct="86">
+              <div class="capsule-meta">
+                <span class="capsule-title">Weekly</span>
+                <span class="capsule-pct">77%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 1d 6h</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- GEMINI -->
+        <article class="acrylic-card is-stale" data-provider="gemini">
+          <div class="card-top">
+            <div class="title-cluster">
+              <h2 class="provider-name">Gemini</h2>
+              <span class="plan-badge">AI Pro</span>
+            </div>
+            <div class="tags-cluster">
+              <span class="stale-pill">STALE</span>
+              <span class="age-pill">updated 3h ago</span>
+            </div>
+          </div>
+
+          <div class="capsules-grid">
+            <div class="capsule-box" data-pct="17">
+              <div class="capsule-meta">
+                <span class="capsule-title">5-hour</span>
+                <span class="capsule-pct">17%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 1h 05m</span>
+            </div>
+
+            <div class="capsule-box" data-pct="7">
+              <div class="capsule-meta">
+                <span class="capsule-title">Weekly</span>
+                <span class="capsule-pct">7%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 6d</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Acrylic Settings Overlay -->
+      <aside class="settings-overlay" id="settingsOverlay" aria-label="Acrylic Settings">
+        <div class="settings-top">
+          <span class="settings-title">QUOTA // ACRYLIC SETTINGS</span>
+          <button type="button" class="close-btn" id="closeSettingsBtn">Done ×</button>
+        </div>
+
+        <div class="set-stack">
+          <div class="set-glass-card">
+            <h3>Custom Colors (CSS Variables)</h3>
+            <div class="set-row">
+              <span>Accent Color</span>
+              <div class="preset-dots">
+                <span class="preset-dot" style="background:#38bdf8" data-set-accent="#38bdf8"></span>
+                <span class="preset-dot" style="background:#ff5fa2" data-set-accent="#ff5fa2"></span>
+                <span class="preset-dot" style="background:#a855f7" data-set-accent="#a855f7"></span>
+                <span class="preset-dot" style="background:#10b981" data-set-accent="#10b981"></span>
+                <input type="color" id="panelAccentPicker" value="#38bdf8" />
+              </div>
+            </div>
+            <div class="set-row">
+              <span>Glass Tint / Background</span>
+              <input type="color" id="panelBgPicker" value="#13192a" />
+            </div>
+          </div>
+
+          <div class="set-glass-card">
+            <h3>Transparency &amp; Blur</h3>
+            <div class="set-row">
+              <span>Widget Opacity</span>
+              <input type="range" id="panelWidgetOpacity" min="20" max="100" value="100" />
+            </div>
+            <div class="set-row">
+              <span>Background Opacity (Text stays crisp)</span>
+              <input type="range" id="panelBgOpacity" min="0" max="100" value="56" />
+            </div>
+          </div>
+
+          <div class="set-glass-card">
+            <h3>Notifications (Opt-In)</h3>
+            <div class="set-row">
+              <span>Quota Alerts</span>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <input type="checkbox" id="notifToggle" style="accent-color:var(--accent)" />
+                <strong id="notifStatusText">OFF</strong>
+              </label>
+            </div>
+            <span style="font-size:10.5px;color:var(--text-muted)">Notifications are OFF by default.</span>
+          </div>
+
+          <a class="full-link" href="09-settings.html" target="_blank" rel="noopener">
+            Open Full Settings Panel (520×720) ↗
+          </a>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    function getSeverity(pct) {
+      if (pct > 80) return 'danger';
+      if (pct >= 50) return 'warning';
+      return 'normal';
+    }
+
+    function hexToRgbTuple(hex) {
+      const clean = hex.replace('#', '');
+      const num = parseInt(clean, 16);
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function applyAccentColor(hex) {
+      document.documentElement.style.setProperty('--accent', hex);
+      document.getElementById('accentPicker').value = hex;
+      document.getElementById('panelAccentPicker').value = hex;
+    }
+
+    function applyBgColor(hex) {
+      const [r, g, b] = hexToRgbTuple(hex);
+      const cardR = Math.min(255, r + 18);
+      const cardG = Math.min(255, g + 20);
+      const cardB = Math.min(255, b + 28);
+      document.documentElement.style.setProperty('--bg-rgb', `${r}, ${g}, ${b}`);
+      document.documentElement.style.setProperty('--bg-card-rgb', `${cardR}, ${cardG}, ${cardB}`);
+      document.getElementById('bgPicker').value = hex;
+      document.getElementById('panelBgPicker').value = hex;
+    }
+
+    function applyWidgetOpacity(pct) {
+      document.documentElement.style.setProperty('--widget-opacity', (pct / 100).toFixed(2));
+      document.getElementById('widgetOpacitySlider').value = pct;
+      document.getElementById('panelWidgetOpacity').value = pct;
+      document.getElementById('widgetOpacityVal').textContent = pct + '%';
+    }
+
+    function applyBgOpacity(pct) {
+      document.documentElement.style.setProperty('--bg-opacity', (pct / 100).toFixed(2));
+      document.getElementById('bgOpacitySlider').value = pct;
+      document.getElementById('panelBgOpacity').value = pct;
+      document.getElementById('bgOpacityVal').textContent = pct + '%';
+    }
+
+    function updateCapsules() {
+      document.querySelectorAll('.capsule-box').forEach(box => {
+        const pct = Number(box.getAttribute('data-pct'));
+        const sev = getSeverity(pct);
+        const pctEl = box.querySelector('.capsule-pct');
+        const fillEl = box.querySelector('.liquid-fill');
+        pctEl.textContent = pct + '%';
+        pctEl.setAttribute('data-severity', sev);
+        fillEl.style.width = pct + '%';
+        fillEl.setAttribute('data-severity', sev);
+      });
+    }
+
+    document.querySelectorAll('[data-toggle-provider]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-toggle-provider');
+        const card = document.querySelector(`.acrylic-card[data-provider="${target}"]`);
+        const activeCount = document.querySelectorAll('.acrylic-card:not([hidden])').length;
+        if (!card.hasAttribute('hidden') && activeCount <= 1) return;
+
+        const willHide = !card.hasAttribute('hidden');
+        if (willHide) {
+          card.setAttribute('hidden', '');
+          btn.classList.remove('active');
+        } else {
+          card.removeAttribute('hidden');
+          btn.classList.add('active');
+        }
+      });
+    });
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const html = document.documentElement;
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      applyBgColor(next === 'dark' ? '#13192a' : '#ffffff');
+    });
+
+    let dangerSim = false;
+    document.getElementById('dangerSimToggle').addEventListener('click', (e) => {
+      dangerSim = !dangerSim;
+      e.currentTarget.classList.toggle('active', dangerSim);
+      const box = document.getElementById('codexWeeklyGlass');
+      box.setAttribute('data-pct', dangerSim ? box.getAttribute('data-danger-pct') : box.getAttribute('data-default-pct'));
+      updateCapsules();
+    });
+
+    document.getElementById('accentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('panelAccentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('pinkPresetBtn').addEventListener('click', () => applyAccentColor('#ff5fa2'));
+    document.querySelectorAll('[data-set-accent]').forEach(el => {
+      el.addEventListener('click', () => applyAccentColor(el.getAttribute('data-set-accent')));
+    });
+
+    document.getElementById('bgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+    document.getElementById('panelBgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+
+    document.getElementById('widgetOpacitySlider').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('panelWidgetOpacity').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('bgOpacitySlider').addEventListener('input', e => applyBgOpacity(e.target.value));
+    document.getElementById('panelBgOpacity').addEventListener('input', e => applyBgOpacity(e.target.value));
+
+    const settingsOverlay = document.getElementById('settingsOverlay');
+    const openSettingsBtn = document.getElementById('openSettingsBtn');
+    openSettingsBtn.addEventListener('click', () => {
+      const isOpen = settingsOverlay.classList.toggle('open');
+      openSettingsBtn.classList.toggle('active', isOpen);
+    });
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+      settingsOverlay.classList.remove('open');
+      openSettingsBtn.classList.remove('active');
+    });
+
+    document.getElementById('notifToggle').addEventListener('change', e => {
+      document.getElementById('notifStatusText').textContent = e.target.checked ? 'ON' : 'OFF';
+    });
+
+    updateCapsules();
+  </script>
+</body>
+</html>

@@ -1,0 +1,503 @@
+<!--
+  DESIGN 04: FROSTED GLASS / ACRYLIC FLOATING CARDS
+  Fixed Widget Dimensions: 440px × 520px
+  Visual Language: Translucent layered acrylic panels, specular top-edge highlights, backdrop blur over desktop ambient orbs, smooth liquid capsule meters.
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>04 — Frosted Glass Floating Cards (440×520)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-stage: #080b14;
+      --orb-1: rgba(99, 102, 241, 0.45);
+      --orb-2: rgba(14, 165, 233, 0.38);
+      --orb-3: rgba(236, 72, 153, 0.30);
+      --glass-shell: rgba(19, 25, 42, 0.52);
+      --glass-card: rgba(255, 255, 255, 0.065);
+      --glass-border: rgba(255, 255, 255, 0.16);
+      --glass-highlight: rgba(255, 255, 255, 0.28);
+      --track-bg: rgba(255, 255, 255, 0.10);
+      --text-primary: #f8fafc;
+      --text-secondary: rgba(248, 250, 252, 0.72);
+      --text-muted: rgba(248, 250, 252, 0.48);
+      --severity-normal: #38bdf8;
+      --severity-warning: #fbbf24;
+      --severity-danger: #fb7185;
+      --widget-width: 440px;
+      --widget-height: 520px;
+    }
+
+    [data-theme="light"] {
+      --bg-stage: #cfd8e8;
+      --orb-1: rgba(99, 102, 241, 0.35);
+      --orb-2: rgba(56, 189, 248, 0.40);
+      --orb-3: rgba(244, 114, 182, 0.30);
+      --glass-shell: rgba(255, 255, 255, 0.50);
+      --glass-card: rgba(255, 255, 255, 0.62);
+      --glass-border: rgba(255, 255, 255, 0.75);
+      --glass-highlight: rgba(255, 255, 255, 0.95);
+      --track-bg: rgba(15, 23, 42, 0.10);
+      --text-primary: #0f172a;
+      --text-secondary: rgba(15, 23, 42, 0.72);
+      --text-muted: rgba(15, 23, 42, 0.50);
+      --severity-normal: #0284c7;
+      --severity-warning: #d97706;
+      --severity-danger: #e11d48;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-stage);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      gap: 14px;
+    }
+
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      color: #e2e8f0;
+      z-index: 10;
+    }
+    .demo-toolbar .size-badge {
+      color: #38bdf8;
+      font-weight: 700;
+      padding-right: 6px;
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .demo-toolbar button {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .demo-toolbar button.active {
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: 700;
+      border-color: #38bdf8;
+    }
+
+    /* Ambient Stage Wrapper to showcase translucency */
+    .ambient-stage {
+      width: var(--widget-width);
+      height: var(--widget-height);
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(36px);
+      pointer-events: none;
+    }
+    .orb-1 { width: 220px; height: 220px; background: var(--orb-1); top: -40px; left: -30px; }
+    .orb-2 { width: 240px; height: 240px; background: var(--orb-2); bottom: -50px; right: -30px; }
+    .orb-3 { width: 170px; height: 170px; background: var(--orb-3); top: 42%; left: 32%; }
+
+    .widget-frame {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      background: var(--glass-shell);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .glass-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 6px 6px;
+      flex-shrink: 0;
+    }
+    .app-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+    }
+    .refresh-pill {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .refresh-pill strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .cards-stack {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .acrylic-card {
+      flex: 1;
+      background: var(--glass-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-top-color: var(--glass-highlight);
+      border-radius: 20px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      min-height: 0;
+    }
+    .acrylic-card[hidden] {
+      display: none !important;
+    }
+    .acrylic-card.is-stale {
+      border-color: rgba(251, 113, 133, 0.45);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .provider-name {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .plan-badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--track-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+    }
+
+    .tags-cluster {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stale-pill {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(251, 113, 133, 0.22);
+      border: 1px solid var(--severity-danger);
+      color: var(--severity-danger);
+    }
+    .age-pill {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .extra-chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--track-bg);
+      color: var(--text-secondary);
+    }
+    .extra-chip strong {
+      color: var(--severity-normal);
+      margin-left: 3px;
+    }
+
+    /* Two-column capsule meters inside each floating card */
+    .capsules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+    .capsule-box {
+      background: rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    [data-theme="light"] .capsule-box {
+      background: rgba(255, 255, 255, 0.45);
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+    .capsule-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .capsule-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .capsule-pct {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .capsule-pct[data-severity="normal"] { color: var(--severity-normal); }
+    .capsule-pct[data-severity="warning"] { color: var(--severity-warning); }
+    .capsule-pct[data-severity="danger"] { color: var(--severity-danger); }
+
+    .liquid-track {
+      width: 100%;
+      height: 8px;
+      background: var(--track-bg);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .liquid-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+    .liquid-fill[data-severity="normal"] {
+      background: linear-gradient(90deg, #0ea5e9, var(--severity-normal));
+    }
+    .liquid-fill[data-severity="warning"] {
+      background: linear-gradient(90deg, #f59e0b, var(--severity-warning));
+    }
+    .liquid-fill[data-severity="danger"] {
+      background: linear-gradient(90deg, #e11d48, var(--severity-danger));
+    }
+
+    .capsule-reset {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-toolbar" role="region" aria-label="Widget Demo Controls">
+    <span class="size-badge">440×520 px</span>
+    <span>Providers:</span>
+    <button type="button" class="active" data-toggle-provider="claude">Claude</button>
+    <button type="button" class="active" data-toggle-provider="codex">Codex</button>
+    <button type="button" class="active" data-toggle-provider="gemini">Gemini</button>
+    <button type="button" id="themeToggle">Light / Dark</button>
+    <button type="button" id="dangerSimToggle">Test &gt;80% Danger</button>
+  </div>
+
+  <div class="ambient-stage">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <main class="widget-frame">
+      <header class="glass-header">
+        <span class="app-title">QUOTA</span>
+        <span class="refresh-pill">Refreshed <strong>23:41</strong></span>
+      </header>
+
+      <section class="cards-stack">
+        <!-- CLAUDE -->
+        <article class="acrylic-card" data-provider="claude">
+          <div class="card-top">
+            <div class="title-cluster">
+              <h2 class="provider-name">Claude</h2>
+              <span class="plan-badge">Max</span>
+            </div>
+            <span class="extra-chip">Opus weekly <strong>12%</strong></span>
+          </div>
+
+          <div class="capsules-grid">
+            <div class="capsule-box" data-pct="34">
+              <div class="capsule-meta">
+                <span class="capsule-title">5-hour</span>
+                <span class="capsule-pct">34%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 2h 41m</span>
+            </div>
+
+            <div class="capsule-box" data-pct="61">
+              <div class="capsule-meta">
+                <span class="capsule-title">Weekly</span>
+                <span class="capsule-pct">61%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 3d 4h</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- CODEX -->
+        <article class="acrylic-card" data-provider="codex">
+          <div class="card-top">
+            <div class="title-cluster">
+              <h2 class="provider-name">Codex</h2>
+              <span class="plan-badge">Plus</span>
+            </div>
+          </div>
+
+          <div class="capsules-grid">
+            <div class="capsule-box" data-pct="8">
+              <div class="capsule-meta">
+                <span class="capsule-title">5-hour</span>
+                <span class="capsule-pct">8%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 4h 10m</span>
+            </div>
+
+            <div class="capsule-box" id="codexWeeklyGlass" data-pct="77" data-default-pct="77" data-danger-pct="86">
+              <div class="capsule-meta">
+                <span class="capsule-title">Weekly</span>
+                <span class="capsule-pct">77%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 1d 6h</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- GEMINI -->
+        <article class="acrylic-card is-stale" data-provider="gemini">
+          <div class="card-top">
+            <div class="title-cluster">
+              <h2 class="provider-name">Gemini</h2>
+              <span class="plan-badge">AI Pro</span>
+            </div>
+            <div class="tags-cluster">
+              <span class="stale-pill">STALE</span>
+              <span class="age-pill">updated 3h ago</span>
+            </div>
+          </div>
+
+          <div class="capsules-grid">
+            <div class="capsule-box" data-pct="17">
+              <div class="capsule-meta">
+                <span class="capsule-title">5-hour</span>
+                <span class="capsule-pct">17%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 1h 05m</span>
+            </div>
+
+            <div class="capsule-box" data-pct="7">
+              <div class="capsule-meta">
+                <span class="capsule-title">Weekly</span>
+                <span class="capsule-pct">7%</span>
+              </div>
+              <div class="liquid-track"><div class="liquid-fill"></div></div>
+              <span class="capsule-reset">Resets in 6d</span>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function getSeverity(pct) {
+      if (pct > 80) return 'danger';
+      if (pct >= 50) return 'warning';
+      return 'normal';
+    }
+
+    function updateCapsules() {
+      document.querySelectorAll('.capsule-box').forEach(box => {
+        const pct = Number(box.getAttribute('data-pct'));
+        const sev = getSeverity(pct);
+        const pctEl = box.querySelector('.capsule-pct');
+        const fillEl = box.querySelector('.liquid-fill');
+        pctEl.textContent = pct + '%';
+        pctEl.setAttribute('data-severity', sev);
+        fillEl.style.width = pct + '%';
+        fillEl.setAttribute('data-severity', sev);
+      });
+    }
+
+    document.querySelectorAll('[data-toggle-provider]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-toggle-provider');
+        const card = document.querySelector(`.acrylic-card[data-provider="${target}"]`);
+        const activeCount = document.querySelectorAll('.acrylic-card:not([hidden])').length;
+        if (!card.hasAttribute('hidden') && activeCount <= 1) return;
+
+        const willHide = !card.hasAttribute('hidden');
+        if (willHide) {
+          card.setAttribute('hidden', '');
+          btn.classList.remove('active');
+        } else {
+          card.removeAttribute('hidden');
+          btn.classList.add('active');
+        }
+      });
+    });
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const html = document.documentElement;
+      html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+
+    let dangerSim = false;
+    document.getElementById('dangerSimToggle').addEventListener('click', (e) => {
+      dangerSim = !dangerSim;
+      e.currentTarget.classList.toggle('active', dangerSim);
+      const box = document.getElementById('codexWeeklyGlass');
+      box.setAttribute('data-pct', dangerSim ? box.getAttribute('data-danger-pct') : box.getAttribute('data-default-pct'));
+      updateCapsules();
+    });
+
+    updateCapsules();
+  </script>
+</body>
+</html>

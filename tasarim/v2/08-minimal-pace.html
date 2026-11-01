@@ -1,0 +1,960 @@
+<!--
+  DESIGN 08 (v2): MINIMAL LINE BARS WITH PACE MARKER
+  Fixed Widget Dimensions: 460px × 520px
+  v2 Upgrades:
+  - Header: App name on far left + last updated time right next to it; Settings gear icon on far right.
+  - Minimal Slide-in Settings Panel inside widget (Notifications OFF by default).
+  - 100% CSS-variable driven colors (custom Accent + Background color pickers).
+  - Dual opacity sliders (Widget Opacity + Background Opacity with crisp text) over a CSS-only desktop wallpaper scene.
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>08 — Minimal Line Bars with Pace Marker v2 (460×520)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-stage: #09090b;
+      --bg-rgb: 17, 17, 20;
+      --bg-card-rgb: 26, 26, 32;
+      --widget-opacity: 1;
+      --bg-opacity: 0.90;
+      --bg-widget: rgba(var(--bg-rgb), var(--bg-opacity));
+      --bg-card: rgba(var(--bg-card-rgb), var(--bg-opacity));
+      --bg-track: rgba(161, 161, 170, 0.22);
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --border-hairline: rgba(255, 255, 255, 0.14);
+      --pace-marker: #ffffff;
+      --accent: #10b981;
+      --severity-normal: var(--accent);
+      --severity-warning: #f59e0b;
+      --severity-danger: #f43f5e;
+      --widget-width: 460px;
+      --widget-height: 520px;
+    }
+
+    [data-theme="light"] {
+      --bg-stage: #e4e4e7;
+      --bg-rgb: 255, 255, 255;
+      --bg-card-rgb: 244, 244, 245;
+      --bg-track: rgba(24, 24, 27, 0.14);
+      --text-primary: #18181b;
+      --text-secondary: #52525b;
+      --text-muted: #71717a;
+      --border-hairline: rgba(24, 24, 27, 0.14);
+      --pace-marker: #18181b;
+      --accent: #059669;
+      --severity-normal: var(--accent);
+      --severity-warning: #d97706;
+      --severity-danger: #e11d48;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-stage);
+      color: var(--text-primary);
+      font-family: 'Instrument Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px;
+      gap: 12px;
+    }
+
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      background: #18181b;
+      border: 1px solid #2e2e36;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #d4d4d8;
+      max-width: 980px;
+      z-index: 20;
+    }
+    .demo-toolbar .size-badge {
+      color: var(--accent);
+      font-weight: 700;
+      padding-right: 8px;
+      border-right: 1px solid #2e2e36;
+    }
+    .demo-toolbar .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding-right: 8px;
+      border-right: 1px solid #2e2e36;
+    }
+    .demo-toolbar .toolbar-group:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+    .demo-toolbar button {
+      background: #27272a;
+      color: #f4f4f5;
+      border: 1px solid #3f3f46;
+      border-radius: 5px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .demo-toolbar button.active {
+      background: var(--accent);
+      color: #051b11;
+      font-weight: 700;
+      border-color: var(--accent);
+    }
+    .demo-toolbar input[type="color"] {
+      width: 22px;
+      height: 22px;
+      border: 1px solid #3f3f46;
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    .demo-toolbar input[type="range"] {
+      width: 64px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .swatch-pink {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ff5fa2 !important;
+      border: 1px solid #fff !important;
+      padding: 0 !important;
+    }
+    .val-readout {
+      min-width: 30px;
+      font-size: 10px;
+      color: #a1a1aa;
+    }
+
+    /* Colorful CSS-only Desktop Wallpaper Scene */
+    .wallpaper-stage {
+      padding: 28px 42px;
+      border-radius: 26px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 22%, rgba(16, 185, 129, 0.45) 0%, transparent 45%),
+        radial-gradient(circle at 82% 28%, rgba(255, 95, 162, 0.42) 0%, transparent 46%),
+        radial-gradient(circle at 52% 84%, rgba(99, 102, 241, 0.44) 0%, transparent 48%),
+        linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #0f172a 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 24px 60px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wallpaper-stage::after {
+      content: "DESKTOP WALLPAPER STAGE // LINEAR PACE";
+      position: absolute;
+      bottom: 8px;
+      right: 18px;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.36);
+      pointer-events: none;
+    }
+
+    /* Fixed Widget Container */
+    .widget-frame {
+      width: var(--widget-width);
+      height: var(--widget-height);
+      opacity: var(--widget-opacity);
+      background: var(--bg-widget);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-hairline);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    /* Header: App name far left, last updated right next to it, gear icon far right */
+    .min-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-hairline);
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .refresh-stamp {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      padding: 2px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .refresh-stamp strong {
+      color: var(--accent);
+    }
+    .pace-key {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .key-tick {
+      display: inline-block;
+      width: 2px;
+      height: 10px;
+      background: var(--pace-marker);
+    }
+
+    .gear-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .gear-btn:hover,
+    .gear-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .gear-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Providers List */
+    .providers-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      min-height: 0;
+    }
+
+    .provider-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-hairline);
+      min-height: 0;
+    }
+    .provider-section:last-child {
+      border-bottom: none;
+    }
+    .provider-section[hidden] {
+      display: none !important;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .head-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .prov-name {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .prov-plan {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 1px 7px;
+      border-radius: 4px;
+    }
+    .head-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      white-space: nowrap;
+    }
+    .tag-stale {
+      color: var(--severity-danger);
+      border: 1px solid var(--severity-danger);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .tag-age {
+      color: var(--text-muted);
+    }
+
+    /* Minimal Line Bar + Pace Marker Row */
+    .pace-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .pace-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .row-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .row-title-cluster {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .win-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .win-reset {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+    .row-stats-cluster {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .pace-delta {
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+    .pace-delta.over-pace {
+      color: var(--severity-warning);
+    }
+    .win-pct {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .win-pct[data-severity="normal"] { color: var(--severity-normal); }
+    .win-pct[data-severity="warning"] { color: var(--severity-warning); }
+    .win-pct[data-severity="danger"] { color: var(--severity-danger); }
+
+    /* Hairline Track with Pace Marker Tick */
+    .hairline-track {
+      position: relative;
+      width: 100%;
+      height: 4px;
+      background: var(--bg-track);
+      border-radius: 2px;
+    }
+    .hairline-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+    .hairline-fill[data-severity="normal"] { background: var(--severity-normal); }
+    .hairline-fill[data-severity="warning"] { background: var(--severity-warning); }
+    .hairline-fill[data-severity="danger"] { background: var(--severity-danger); }
+
+    .pace-tick {
+      position: absolute;
+      top: -5px;
+      width: 2px;
+      height: 14px;
+      background: var(--pace-marker);
+      transform: translateX(-1px);
+      z-index: 2;
+    }
+    .pace-tick::after {
+      content: "";
+      position: absolute;
+      top: -3px;
+      left: -2px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--pace-marker);
+    }
+
+    .min-footer {
+      padding-top: 10px;
+      border-top: 1px solid var(--border-hairline);
+      display: flex;
+      justify-content: space-between;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    /* Slide-in Minimal Settings Overlay */
+    .settings-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(var(--bg-rgb), 0.96);
+      backdrop-filter: blur(18px);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 15;
+      transform: translateX(100%);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .settings-overlay.open {
+      transform: translateX(0);
+    }
+    .settings-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .settings-title {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+    }
+    .close-btn {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-hairline);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .set-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .set-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .set-section h3 {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .set-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .set-row input[type="range"] {
+      width: 120px;
+      accent-color: var(--accent);
+    }
+    .preset-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .preset-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.4);
+      cursor: pointer;
+    }
+    .full-link {
+      margin-top: auto;
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-toolbar" role="region" aria-label="Widget Demo Controls">
+    <span class="size-badge">460×520 px</span>
+    <div class="toolbar-group">
+      <span>Providers:</span>
+      <button type="button" class="active" data-toggle-provider="claude">Claude</button>
+      <button type="button" class="active" data-toggle-provider="codex">Codex</button>
+      <button type="button" class="active" data-toggle-provider="gemini">Gemini</button>
+    </div>
+    <div class="toolbar-group">
+      <button type="button" id="themeToggle">Light / Dark</button>
+      <button type="button" id="dangerSimToggle">Test &gt;80%</button>
+    </div>
+    <div class="toolbar-group">
+      <label for="accentPicker">Accent:</label>
+      <input type="color" id="accentPicker" value="#10b981" />
+      <button type="button" class="swatch-pink" id="pinkPresetBtn" title="Try Pink #ff5fa2"></button>
+      <label for="bgPicker">BG:</label>
+      <input type="color" id="bgPicker" value="#111114" />
+    </div>
+    <div class="toolbar-group">
+      <label for="widgetOpacitySlider">Widget Opacity:</label>
+      <input type="range" id="widgetOpacitySlider" min="20" max="100" value="100" />
+      <span class="val-readout" id="widgetOpacityVal">100%</span>
+    </div>
+    <div class="toolbar-group">
+      <label for="bgOpacitySlider">BG Opacity:</label>
+      <input type="range" id="bgOpacitySlider" min="0" max="100" value="90" />
+      <span class="val-readout" id="bgOpacityVal">90%</span>
+    </div>
+  </div>
+
+  <div class="wallpaper-stage">
+    <main class="widget-frame">
+      <!-- Header: App name far left, last updated right next to it, gear icon far right -->
+      <header class="min-header">
+        <div class="header-left">
+          <span class="app-title">QUOTA</span>
+          <span class="refresh-stamp">Updated <strong>23:41</strong></span>
+          <span class="pace-key"><i class="key-tick"></i> Pace = elapsed %</span>
+        </div>
+        <button type="button" class="gear-btn" id="openSettingsBtn" title="Open Settings" aria-label="Open Settings">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <section class="providers-list">
+        <!-- CLAUDE -->
+        <article class="provider-section" data-provider="claude">
+          <div class="section-head">
+            <div class="head-left">
+              <h2 class="prov-name">Claude</h2>
+              <span class="prov-plan">Max</span>
+            </div>
+            <div class="head-right">
+              <span style="color:var(--text-secondary)">3 windows</span>
+            </div>
+          </div>
+
+          <div class="pace-rows">
+            <div class="pace-row" data-pct="34" data-pace="46">
+              <div class="row-meta">
+                <div class="row-title-cluster">
+                  <span class="win-title">5-hour</span>
+                  <span class="win-reset">resets in 2h 41m</span>
+                </div>
+                <div class="row-stats-cluster">
+                  <span class="pace-delta"></span>
+                  <span class="win-pct">34%</span>
+                </div>
+              </div>
+              <div class="hairline-track">
+                <div class="hairline-fill"></div>
+                <div class="pace-tick" title="Expected pace: 46%"></div>
+              </div>
+            </div>
+
+            <div class="pace-row" data-pct="61" data-pace="55">
+              <div class="row-meta">
+                <div class="row-title-cluster">
+                  <span class="win-title">Weekly</span>
+                  <span class="win-reset">resets in 3d 4h</span>
+                </div>
+                <div class="row-stats-cluster">
+                  <span class="pace-delta"></span>
+                  <span class="win-pct">61%</span>
+                </div>
+              </div>
+              <div class="hairline-track">
+                <div class="hairline-fill"></div>
+                <div class="pace-tick" title="Expected pace: 55%"></div>
+              </div>
+            </div>
+
+            <div class="pace-row" data-pct="12" data-pace="55">
+              <div class="row-meta">
+                <div class="row-title-cluster">
+                  <span class="win-title">Opus weekly</span>
+                  <span class="win-reset">extra window</span>
+                </div>
+                <div class="row-stats-cluster">
+                  <span class="pace-delta"></span>
+                  <span class="win-pct">12%</span>
+                </div>
+              </div>
+              <div class="hairline-track">
+                <div class="hairline-fill"></div>
+                <div class="pace-tick" title="Expected pace: 55%"></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CODEX -->
+        <article class="provider-section" data-provider="codex">
+          <div class="section-head">
+            <div class="head-left">
+              <h2 class="prov-name">Codex</h2>
+              <span class="prov-plan">Plus</span>
+            </div>
+          </div>
+
+          <div class="pace-rows">
+            <div class="pace-row" data-pct="8" data-pace="17">
+              <div class="row-meta">
+                <div class="row-title-cluster">
+                  <span class="win-title">5-hour</span>
+                  <span class="win-reset">resets in 4h 10m</span>
+                </div>
+                <div class="row-stats-cluster">
+                  <span class="pace-delta"></span>
+                  <span class="win-pct">8%</span>
+                </div>
+              </div>
+              <div class="hairline-track">
+                <div class="hairline-fill"></div>
+                <div class="pace-tick" title="Expected pace: 17%"></div>
+              </div>
+            </div>
+
+            <div class="pace-row" id="codexWeeklyPace" data-pct="77" data-default-pct="77" data-danger-pct="90" data-pace="82">
+              <div class="row-meta">
+                <div class="row-title-cluster">
+                  <span class="win-title">Weekly</span>
+                  <span class="win-reset">resets in 1d 6h</span>
+                </div>
+                <div class="row-stats-cluster">
+                  <span class="pace-delta"></span>
+                  <span class="win-pct">77%</span>
+                </div>
+              </div>
+              <div class="hairline-track">
+                <div class="hairline-fill"></div>
+                <div class="pace-tick" title="Expected pace: 82%"></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- GEMINI -->
+        <article class="provider-section" data-provider="gemini">
+          <div class="section-head">
+            <div class="head-left">
+              <h2 class="prov-name">Gemini</h2>
+              <span class="prov-plan">AI Pro</span>
+            </div>
+            <div class="head-right">
+              <span class="tag-stale">STALE</span>
+              <span class="tag-age">updated 3h ago</span>
+            </div>
+          </div>
+
+          <div class="pace-rows">
+            <div class="pace-row" data-pct="17" data-pace="78">
+              <div class="row-meta">
+                <div class="row-title-cluster">
+                  <span class="win-title">5-hour</span>
+                  <span class="win-reset">resets 1h 05m</span>
+                </div>
+                <div class="row-stats-cluster">
+                  <span class="pace-delta"></span>
+                  <span class="win-pct">17%</span>
+                </div>
+              </div>
+              <div class="hairline-track">
+                <div class="hairline-fill"></div>
+                <div class="pace-tick" title="Expected pace: 78%"></div>
+              </div>
+            </div>
+
+            <div class="pace-row" data-pct="7" data-pace="14">
+              <div class="row-meta">
+                <div class="row-title-cluster">
+                  <span class="win-title">Weekly</span>
+                  <span class="win-reset">resets 6d</span>
+                </div>
+                <div class="row-stats-cluster">
+                  <span class="pace-delta"></span>
+                  <span class="win-pct">7%</span>
+                </div>
+              </div>
+              <div class="hairline-track">
+                <div class="hairline-fill"></div>
+                <div class="pace-tick" title="Expected pace: 14%"></div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <footer class="min-footer">
+        <span>&lt;50% normal · 50–80% warning · &gt;80% danger</span>
+        <span>LINEAR // PACE</span>
+      </footer>
+
+      <!-- Minimal Slide-in Settings Panel -->
+      <aside class="settings-overlay" id="settingsOverlay" aria-label="Minimal Settings">
+        <div class="settings-top">
+          <span class="settings-title">QUOTA // LINEAR SETTINGS</span>
+          <button type="button" class="close-btn" id="closeSettingsBtn">Done ×</button>
+        </div>
+
+        <div class="set-list">
+          <div class="set-section">
+            <h3>Custom Colors (CSS Variables)</h3>
+            <div class="set-row">
+              <span>Accent Color</span>
+              <div class="preset-dots">
+                <span class="preset-dot" style="background:#10b981" data-set-accent="#10b981"></span>
+                <span class="preset-dot" style="background:#ff5fa2" data-set-accent="#ff5fa2"></span>
+                <span class="preset-dot" style="background:#38bdf8" data-set-accent="#38bdf8"></span>
+                <span class="preset-dot" style="background:#a855f7" data-set-accent="#a855f7"></span>
+                <input type="color" id="panelAccentPicker" value="#10b981" />
+              </div>
+            </div>
+            <div class="set-row">
+              <span>Background Color</span>
+              <input type="color" id="panelBgPicker" value="#111114" />
+            </div>
+          </div>
+
+          <div class="set-section">
+            <h3>Transparency</h3>
+            <div class="set-row">
+              <span>Widget Opacity</span>
+              <input type="range" id="panelWidgetOpacity" min="20" max="100" value="100" />
+            </div>
+            <div class="set-row">
+              <span>Background Opacity</span>
+              <input type="range" id="panelBgOpacity" min="0" max="100" value="90" />
+            </div>
+          </div>
+
+          <div class="set-section">
+            <h3>Notifications (Opt-In)</h3>
+            <div class="set-row">
+              <span>Over-Pace &amp; Threshold Alerts</span>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <input type="checkbox" id="notifToggle" style="accent-color:var(--accent)" />
+                <strong id="notifStatusText">OFF</strong>
+              </label>
+            </div>
+            <span style="font-size:10.5px;color:var(--text-muted)">Disabled by default. Opt-in only.</span>
+          </div>
+
+          <a class="full-link" href="09-settings.html" target="_blank" rel="noopener">
+            Open Full Settings Panel (520×720) ↗
+          </a>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    function getSeverity(pct) {
+      if (pct > 80) return 'danger';
+      if (pct >= 50) return 'warning';
+      return 'normal';
+    }
+
+    function hexToRgbTuple(hex) {
+      const clean = hex.replace('#', '');
+      const num = parseInt(clean, 16);
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function applyAccentColor(hex) {
+      document.documentElement.style.setProperty('--accent', hex);
+      document.getElementById('accentPicker').value = hex;
+      document.getElementById('panelAccentPicker').value = hex;
+    }
+
+    function applyBgColor(hex) {
+      const [r, g, b] = hexToRgbTuple(hex);
+      const cardR = Math.min(255, r + 10);
+      const cardG = Math.min(255, g + 10);
+      const cardB = Math.min(255, b + 12);
+      document.documentElement.style.setProperty('--bg-rgb', `${r}, ${g}, ${b}`);
+      document.documentElement.style.setProperty('--bg-card-rgb', `${cardR}, ${cardG}, ${cardB}`);
+      document.getElementById('bgPicker').value = hex;
+      document.getElementById('panelBgPicker').value = hex;
+    }
+
+    function applyWidgetOpacity(pct) {
+      document.documentElement.style.setProperty('--widget-opacity', (pct / 100).toFixed(2));
+      document.getElementById('widgetOpacitySlider').value = pct;
+      document.getElementById('panelWidgetOpacity').value = pct;
+      document.getElementById('widgetOpacityVal').textContent = pct + '%';
+    }
+
+    function applyBgOpacity(pct) {
+      document.documentElement.style.setProperty('--bg-opacity', (pct / 100).toFixed(2));
+      document.getElementById('bgOpacitySlider').value = pct;
+      document.getElementById('panelBgOpacity').value = pct;
+      document.getElementById('bgOpacityVal').textContent = pct + '%';
+    }
+
+    function updatePaceBars() {
+      document.querySelectorAll('.pace-row').forEach(row => {
+        const pct = Number(row.getAttribute('data-pct'));
+        const pace = Number(row.getAttribute('data-pace'));
+        const sev = getSeverity(pct);
+        const pctEl = row.querySelector('.win-pct');
+        const fillEl = row.querySelector('.hairline-fill');
+        const tickEl = row.querySelector('.pace-tick');
+        const deltaEl = row.querySelector('.pace-delta');
+
+        pctEl.textContent = pct + '%';
+        pctEl.setAttribute('data-severity', sev);
+        fillEl.style.width = pct + '%';
+        fillEl.setAttribute('data-severity', sev);
+        tickEl.style.left = pace + '%';
+
+        const diff = pct - pace;
+        if (diff > 0) {
+          deltaEl.textContent = `+${diff}% vs ${pace}% pace`;
+          deltaEl.classList.add('over-pace');
+        } else {
+          deltaEl.textContent = `${diff}% vs ${pace}% pace`;
+          deltaEl.classList.remove('over-pace');
+        }
+      });
+    }
+
+    document.querySelectorAll('[data-toggle-provider]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-toggle-provider');
+        const sec = document.querySelector(`.provider-section[data-provider="${target}"]`);
+        const activeCount = document.querySelectorAll('.provider-section:not([hidden])').length;
+        if (!sec.hasAttribute('hidden') && activeCount <= 1) return;
+
+        const willHide = !sec.hasAttribute('hidden');
+        if (willHide) {
+          sec.setAttribute('hidden', '');
+          btn.classList.remove('active');
+        } else {
+          sec.removeAttribute('hidden');
+          btn.classList.add('active');
+        }
+      });
+    });
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const html = document.documentElement;
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      applyBgColor(next === 'dark' ? '#111114' : '#ffffff');
+    });
+
+    let dangerSim = false;
+    document.getElementById('dangerSimToggle').addEventListener('click', (e) => {
+      dangerSim = !dangerSim;
+      e.currentTarget.classList.toggle('active', dangerSim);
+      const row = document.getElementById('codexWeeklyPace');
+      row.setAttribute('data-pct', dangerSim ? row.getAttribute('data-danger-pct') : row.getAttribute('data-default-pct'));
+      updatePaceBars();
+    });
+
+    document.getElementById('accentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('panelAccentPicker').addEventListener('input', e => applyAccentColor(e.target.value));
+    document.getElementById('pinkPresetBtn').addEventListener('click', () => applyAccentColor('#ff5fa2'));
+    document.querySelectorAll('[data-set-accent]').forEach(el => {
+      el.addEventListener('click', () => applyAccentColor(el.getAttribute('data-set-accent')));
+    });
+
+    document.getElementById('bgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+    document.getElementById('panelBgPicker').addEventListener('input', e => applyBgColor(e.target.value));
+
+    document.getElementById('widgetOpacitySlider').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('panelWidgetOpacity').addEventListener('input', e => applyWidgetOpacity(e.target.value));
+    document.getElementById('bgOpacitySlider').addEventListener('input', e => applyBgOpacity(e.target.value));
+    document.getElementById('panelBgOpacity').addEventListener('input', e => applyBgOpacity(e.target.value));
+
+    const settingsOverlay = document.getElementById('settingsOverlay');
+    const openSettingsBtn = document.getElementById('openSettingsBtn');
+    openSettingsBtn.addEventListener('click', () => {
+      const isOpen = settingsOverlay.classList.toggle('open');
+      openSettingsBtn.classList.toggle('active', isOpen);
+    });
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+      settingsOverlay.classList.remove('open');
+      openSettingsBtn.classList.remove('active');
+    });
+
+    document.getElementById('notifToggle').addEventListener('change', e => {
+      document.getElementById('notifStatusText').textContent = e.target.checked ? 'ON' : 'OFF';
+    });
+
+    updatePaceBars();
+  </script>
+</body>
+</html>

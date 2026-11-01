@@ -1,0 +1,30 @@
+# Local working notes and agent task files (contain personal paths)
+AGENTS.md
+CLAUDE.md
+gorevler/
+gemini-*.json
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Local state / secrets
+.env
+secrets.json
+snapshot.json
+config.json
+*.db
+
+# Node / Tauri (later)
+node_modules/
+target/
+
+# Agent reports (contain local paths)
+tasarim/**/RAPOR*.md
+tasarim/RAPOR*.md
