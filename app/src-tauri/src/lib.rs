@@ -74,6 +74,8 @@ fn current_monitor(window: &tauri::WebviewWindow) -> Result<tauri::Monitor, Stri
 }
 #[tauri::command]
 fn resize_widget(window: tauri::WebviewWindow, scale: u16) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    if linux::layered() { return linux::resize_layer(&window, Some((340.0 * scale.clamp(50,300) as f64 / 100.0).round() as i32), None); }
     let scale=scale.clamp(50,300) as f64/100.0; let factor=window.scale_factor().map_err(|e|e.to_string())?;
     let old=window.inner_size().map_err(|e|e.to_string())?; let width=(340.0*scale*factor).round() as u32;
     window.set_size(tauri::PhysicalSize::new(width,old.height)).map_err(|e|e.to_string())?;
@@ -83,6 +85,8 @@ fn resize_widget(window: tauri::WebviewWindow, scale: u16) -> Result<(), String>
 #[tauri::command]
 fn fit_window_height(window: tauri::WebviewWindow, height_css_px: f64) -> Result<(), String> {
     if !load_settings().fit_height { return Ok(()); }
+    #[cfg(target_os = "linux")]
+    if linux::layered() { return linux::resize_layer(&window, None, Some(height_css_px)); }
     let factor=window.scale_factor().map_err(|e|e.to_string())?; let monitor=current_monitor(&window)?; let area=monitor.work_area();
     let height=((height_css_px.max(80.0)*factor).round() as u32).min(area.size.height);
     let old_position=window.outer_position().unwrap_or(tauri::PhysicalPosition::new(0,0)); let old_size=window.inner_size().map_err(|e|e.to_string())?;
@@ -106,6 +110,9 @@ fn snap_window(window: tauri::WebviewWindow, corner: String) -> Result<(), Strin
 }
 #[tauri::command]
 fn save_window_state(app: tauri::AppHandle) -> Result<(), String> {
+    // Layer geometry belongs to the compositor and settings, not window.json.
+    #[cfg(target_os = "linux")]
+    if linux::layered() { return Ok(()); }
     let window = app.get_webview_window("main").ok_or("Main window unavailable")?;
     let position = window.outer_position().map_err(|e| e.to_string())?; let size = window.outer_size().map_err(|e| e.to_string())?;
     let path = window_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?;
@@ -169,5 +176,5 @@ async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> 
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { #[cfg(target_os="linux")] linux::configure_python(app); if let Some(window)=app.get_webview_window("main") { restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { #[cfg(target_os="linux")] linux::configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
 }

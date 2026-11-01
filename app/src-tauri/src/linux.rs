@@ -50,6 +50,10 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
                 // Validate every symbol before opting in; old libraries fall back cleanly.
                 let complete = [b"gtk_layer_set_layer\0".as_slice(),b"gtk_layer_set_anchor\0",b"gtk_layer_set_margin\0",b"gtk_layer_set_exclusive_zone\0",b"gtk_layer_set_keyboard_mode\0",b"gtk_layer_set_monitor\0"].iter().all(|name| lib.get::<*mut c_void>(name).is_ok());
                 if complete && supported.map(|f|f()!=0).unwrap_or(false) && init.is_some() {
+                    // A layer surface has no xdg ConfigureNotify to complete GTK's
+                    // normal resize handshake. Give GTK a requisition before map,
+                    // and update that requisition for subsequent content resizes.
+                    gtk.set_size_request(340, 640);
                     init.unwrap()(gtk.upcast_ref::<gtk::Window>().to_glib_none().0);
                     SHELL.with(|slot| *slot.borrow_mut()=Some(lib));
                     LAYER.store(true,Ordering::Relaxed);
@@ -64,7 +68,26 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
     apply(window, options, corner);
     // Explicitly clear WebKitGTK's backing surface; opacity belongs to the CSS widget.
     let _ = window.set_background_color(Some(tauri::window::Color(0,0,0,0)));
-    gtk.show_all();
+    // Tao queues the initial visible=false request. A direct GTK show here is
+    // undone when that queue drains; enqueue our show through Tao as well.
+    let _ = window.show();
+}
+pub fn resize_layer(window: &tauri::WebviewWindow, width: Option<i32>, height: Option<f64>) -> Result<(), String> {
+    let target = window.clone();
+    window.run_on_main_thread(move || {
+        let Ok(gtk) = target.gtk_window() else { return };
+        let (old_width, old_height) = gtk.size_request();
+        let display = gtk.display();
+        let settings = super::load_settings();
+        let monitor = settings.linux.monitor.and_then(|i| display.monitor(i))
+            .or_else(|| display.primary_monitor()).or_else(|| display.monitor(0));
+        let max_height = monitor
+            .map(|m| m.workarea().height() - 2 * settings.linux.margin.clamp(0,64))
+            .unwrap_or(640).max(80);
+        let height = height.map(|h| h.ceil().clamp(80.0, max_height as f64) as i32)
+            .unwrap_or(old_height).clamp(80, max_height);
+        gtk.set_size_request(width.unwrap_or(old_width), height);
+    }).map_err(|e| e.to_string())
 }
 pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
     let corner=if corner=="Free" {"Top right"} else {corner};
