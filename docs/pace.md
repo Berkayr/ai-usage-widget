@@ -11,3 +11,5 @@ Optional pacing ceilings can be set in `pace.json` beside `snapshot.json` in the
 Recent stale snapshots remain usable up to `max_age_minutes`; older or undated stale data is reported as `UNKNOWN`. Expired windows are treated as reset, with zero usage for the new period.
 
 Other providers default to a 90% ceiling. Pace runs append compact records to `pace-log.jsonl`; profile history is stored in `pace-state.json` to preserve SPARE hysteresis.
+
+History is private (Unix 0600), pruned to 30 days and 1 MiB on each logged run; no rotated backup is retained. `quotacore pace --purge` removes both history and pace state without collection. `--no-log` prevents history writes but still saves profile state for hysteresis. Idle files are not expired automatically, and deletion is not secure erasure.

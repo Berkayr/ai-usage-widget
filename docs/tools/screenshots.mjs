@@ -66,6 +66,21 @@ edgeData.providers[0].windows.push({id:'extra',label:'Extra window',used_percent
 edgeData.providers[1].state = 'AUTH_REQUIRED'; edgeData.providers[1].windows = [{id:'unknown',label:'Unknown quota',used_percent:null,resets_at:null}];
 edgeData.providers[2].state = 'RATE_LIMITED';
 for (const id of themeIds) scenes.set(`checks/${id}-states`, {w:1000,h:1600,autoHeight:true,html:shell(heading('DATA CONTRACT',id,'Hidden extra window / visible extra window / unknown values')+`<div class="row">${[false,true].map(showExtraWindows=>frame(showExtraWindows?'Extra visible':'Extra hidden',340,1300,{theme:id,showExtraWindows},{snapshot:edgeData})).join('')}</div>`)});
+const consentDisclosures = {
+ claude: 'Reads ~/.claude/.credentials.json, ~/.claude.json and local observations; connects to api.anthropic.com',
+ codex: 'Runs codex app-server; the installed CLI manages credentials and OpenAI connections',
+ gemini: 'Reads local gemini-kota.json; explicit refresh runs agy with its own credentials and Google connections',
+ copilot: 'Runs gh auth token; connects to api.github.com',
+ openrouter: 'Reads OPENROUTER_API_KEY or local secrets.json; connects to openrouter.ai',
+ deepseek: 'Reads DEEPSEEK_API_KEY or local secrets.json; connects to api.deepseek.com',
+ jetbrains: 'Reads JetBrains quota XML under the platform config directory; no network',
+};
+const providerConfig = { initialized:false, disclosures:consentDisclosures,
+ providers:Object.fromEntries(Object.keys(consentDisclosures).map(id=>[id,{enabled:false}])),
+ detected:Object.fromEntries(Object.keys(consentDisclosures).map(id=>[id,true])) };
+for(const appearance of ['dark','light']) scenes.set(`checks/providers-${appearance}`, {
+ w:1552,h:1700,autoHeight:true,html:shell(heading('PRIVACY','Choose what to track','Synthetic detection; all providers off until Start')+
+ [0,4].map(start=>`<div class="row">${themeIds.slice(start,start+4).map(id=>frame(id,340,780,{theme:id,appearance},{snapshot:{providers:[]},providerConfig})).join('')}</div>`).join(''),appearance==='light') });
 function measure(d) {
  const w=d.defaultView;
  const visible=el=>el.getClientRects().length && w.getComputedStyle(el).visibility!=='hidden' && el.getBoundingClientRect().width>0;
@@ -105,7 +120,7 @@ const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence
 try {
  server.listen(0,'127.0.0.1');await once(server,'listening');
  const base=`http://127.0.0.1:${server.address().port}`;
- chrome=spawn(process.env.CHROME_BIN||'google-chrome-stable',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--no-first-run','--no-default-browser-check','--disable-background-networking','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
+ chrome=spawn(process.env.CHROME_BIN||'google-chrome-stable',['--headless=new',...(process.env.SCREENSHOT_NO_SANDBOX === '1' ? ['--no-sandbox'] : []),'--disable-dev-shm-usage','--disable-gpu','--no-first-run','--no-default-browser-check','--disable-background-networking','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
  const port = await new Promise((resolve,reject)=>{let log='';const timer=setTimeout(()=>reject(Error('Chrome startup timed out')),20000);chrome.once('error',error=>{clearTimeout(timer);reject(error)});chrome.stderr.on('data',chunk=>{log+=chunk;const m=log.match(/DevTools listening on ws:\/\/127\.0\.0\.1:(\d+)/);if(m){clearTimeout(timer);resolve(Number(m[1]));}});});
  const targets=await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
  ws=new WebSocket(targets.find(t=>t.type==='page').webSocketDebuggerUrl);await once(ws,'open');
@@ -116,7 +131,7 @@ try {
  await cdp('Emulation.setTimezoneOverride',{timezoneId:'UTC'});await cdp('Emulation.setLocaleOverride',{locale:'en-US'});
  await cdp('Page.addScriptToEvaluateOnNewDocument',{source:`const NativeDate=Date;window.Date=class extends NativeDate{constructor(...args){super(...(args.length?args:['2026-11-01T12:00:00Z']))}static now(){return 1793534400000}}; const raw=new URLSearchParams(location.search).get('docs');if(raw)window.__QUOTA_DOCS_FIXTURE__=JSON.parse(raw);`});
  for(const [name,scene] of scenes){
-  if(process.env.SCENE && name!==process.env.SCENE)continue;
+  if(process.env.SCENE && !name.startsWith(process.env.SCENE))continue;
   errors.length=0;
   await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:scene.h,deviceScaleFactor:scene.dpr||2,mobile:false});
   await cdp('Page.navigate',{url:`${base}/scene/${name}`});
@@ -124,7 +139,7 @@ try {
   if(result.exceptionDetails||errors.length)throw Error(`${name}: ${JSON.stringify(result.exceptionDetails||errors)}`);
   if(result.result.value.some(frame=>frame.cards!==frame.expected || frame.overflow.length || frame.styles!==1))throw Error(`${name}: layout failure ${JSON.stringify(result.result.value)}`);
   checks.push({scene:name,frames:result.result.value});
-  if(name.startsWith('checks/') && !name.endsWith('-states') && name!=='checks/vivid' && result.result.value.some(f=>f.metrics.minFont<11*f.metrics.scale/100-.01 || f.metrics.numberFont<15*f.metrics.scale/100-.01 || f.metrics.minContrast<4.5))throw Error(`${name}: readability failure ${JSON.stringify(result.result.value)}`);
+  if(name.startsWith('checks/') && !name.startsWith('checks/providers-') && !name.endsWith('-states') && name!=='checks/vivid' && result.result.value.some(f=>f.metrics.minFont<11*f.metrics.scale/100-.01 || f.metrics.numberFont<15*f.metrics.scale/100-.01 || f.metrics.minContrast<4.5))throw Error(`${name}: readability failure ${JSON.stringify(result.result.value)}`);
   if(scene.autoHeight){
    const bounds=await cdp('Runtime.evaluate',{expression:`Math.ceil(Math.max(...[...document.body.children].map(el=>el.getBoundingClientRect().bottom)))+48`,returnByValue:true});
    await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:bounds.result.value,deviceScaleFactor:scene.dpr||2,mobile:false});
@@ -136,6 +151,23 @@ try {
   await writeFile(resolve(output,`${name}.png`),png);
   console.log(`${name}.png (${png.readUInt32BE(16)} × ${png.readUInt32BE(20)})`);
  }
+ if(process.env.SCENE?.startsWith('checks/providers-')) {
+   const consentChecks=await cdp('Runtime.evaluate',{expression:`(async()=>{
+     for(const f of document.querySelectorAll('iframe')) {
+       const d=f.contentDocument,w=f.contentWindow;
+       const inputs=[...d.querySelectorAll('#provider-onboarding input')];
+       if(inputs.length!==7 || inputs.some(i=>i.checked))throw Error('Provider defaults');
+       if([...d.querySelectorAll('#provider-onboarding label')].some(el=>el.scrollWidth>el.clientWidth+2))throw Error('Disclosure overflow');
+       inputs[0].checked=true;d.querySelector('#provider-onboarding button').click();
+       await new Promise(r=>setTimeout(r,50));
+       if(w.__QUOTA_DOCS_PROVIDER_SELECTION__.join(',')!=='claude' || !d.querySelector('#provider-onboarding').hidden)throw Error('Consent save');
+     }
+     return 'All eight themes: seven unchecked providers, wrapped disclosures and explicit Start selection';
+   })()`,awaitPromise:true,returnByValue:true});
+   if(consentChecks.exceptionDetails)throw Error(JSON.stringify(consentChecks.exceptionDetails));
+   await writeFile(resolve(output,'checks/provider-results.json'),JSON.stringify({checks,consent:consentChecks.result.value},null,2)+'\n');
+   console.log(consentChecks.result.value);
+ } else {
  // Exercise switching in the same webview; a screenshot alone cannot detect
  // cached CSS accumulating or a selector failing after repeated switches.
  const interactions = await cdp('Runtime.evaluate',{expression:`(async()=>{
@@ -168,6 +200,7 @@ try {
  if(interactions.exceptionDetails)throw Error(JSON.stringify(interactions.exceptionDetails));
  await writeFile(resolve(output,'checks/results.json'),JSON.stringify({checks,interactions:interactions.result.value},null,2)+'\n');
  console.log(interactions.result.value);
+ }
 } finally {
  if(ws)ws.close();for(const call of pending.values())clearTimeout(call.timer);
  if(chrome&&chrome.exitCode===null){chrome.kill('SIGTERM');await Promise.race([once(chrome,'exit'),new Promise(r=>setTimeout(r,3000))]);if(chrome.exitCode===null)chrome.kill('SIGKILL');}

@@ -47,11 +47,12 @@ XS/S/M/L are descriptive responsive layouts, not selectable settings. Current CS
 
 Linux data: `$XDG_STATE_HOME/quotacore` or `~/.local/state/quotacore`. Linux config: `$XDG_CONFIG_HOME/quotacore` or `~/.config/quotacore`. On Windows both use `%LOCALAPPDATA%/quotacore`. `QUOTACORE_HOME` overrides both for the collector and the shared snapshot location for the widget.
 
-`config.json` configures enabled providers, display ordering and daemon collection interval (minimum 30 seconds; default 300). The native widget currently refreshes on startup and every 300 seconds independently of that daemon setting. Initial creation uses provider detection. Explicit provider entries default disabled when `enabled` is omitted.
+`config.json` configures enabled providers, display ordering and daemon collection interval (minimum 30 seconds; default 300). The native widget currently refreshes on startup and every 300 seconds independently of that daemon setting. Initial creation disables every provider until the shared consent screen or `quotacore init` is completed. `quotacore configure claude codex` explicitly selects providers, while `quotacore configure` disables all. Newly introduced providers and entries without `enabled` default off. Existing explicit configurations are preserved.
 
 ```json
 {
   "interval": 300,
+  "initialized": true,
   "providers": {
     "claude": {"enabled": true, "order": 0},
     "codex": {"enabled": true, "order": 1},
@@ -74,3 +75,7 @@ The state directory contains `snapshot.json`, provider observations/caches, and 
 | `GDK_BACKEND` | Optional Linux backend selection, e.g. `x11` when XWayland exists. |
 
 Provider CLIs must be discoverable in the desktop process environment, which can differ from a terminal. See [providers](providers.md) and [Linux integration](linux.md).
+
+`doctor` uses cached data and reports resolved Python/module/CLI paths. Use `doctor --live` only when you want credential/network checks of enabled providers. `key set` stores plaintext keys with Unix 0600 or a current-user protected Windows DACL. See the [security model](security-model.md).
+
+Hook chaining uses a JSON argv array: `quotacore hook claude --chain-cmd '["program", "argument"]'`. `--chain` is now an alias for the same JSON format; old shell strings must be migrated explicitly to `--chain-shell`. Both receive raw stdin, allow 5 seconds and at most 64 KiB stdout. Only trust commands you select.
