@@ -135,3 +135,15 @@ Linux uses system Python 3.10+: deb/rpm declare the minimum version. AppImage
 cannot enforce a package dependency and reports installation guidance if Python
 is missing or too old. A host interpreter avoids duplicating the distribution's
 Python security maintenance and matches the existing CLI/panel integration.
+
+## Installation footprint
+
+For a small Linux installation, prefer deb/rpm or the source AUR recipe: these
+reuse the distribution's WebKitGTK and Python. AppImage carries WebKitGTK,
+JavaScriptCore, GTK and supporting libraries, so its download can exceed 100 MB
+even when the widget executable is only a few MB; those bundled libraries also
+have a separate update lifecycle. The KDE/GNOME/Waybar integrations can read the
+shared snapshot without starting the widget or a webview: their incremental
+**widget-process** memory is zero, while the existing panel and periodic Python
+collector still consume resources. Measurements and a bounded, synthetic-data
+benchmark are described in [performance notes](../docs/performance.md).
