@@ -1,0 +1,37 @@
+name: Bug report
+description: Report incorrect behavior with a reproducible example.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: Use invented quota data. Never attach tokens, raw snapshots, personal paths, usernames or account screenshots. For vulnerabilities, follow SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: Version or source revision
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system and desktop
+      description: Include Windows version or Linux desktop, X11/Wayland, scaling and packaging format; omit machine identifiers.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Include provider state/source and a minimal fictional fixture or screenshot, if relevant.

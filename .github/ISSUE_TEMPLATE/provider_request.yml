@@ -1,0 +1,27 @@
+name: Provider request
+description: Propose a quota or balance source.
+title: "[Provider]: "
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Provider and tool
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Documented data source
+      description: Link public usage/CLI documentation; distinguish subscription limits from API credits. Do not include credentials or real responses.
+    validations:
+      required: true
+  - type: textarea
+    id: auth
+    attributes:
+      label: Setup and authentication boundary
+      description: Explain whether local files, a CLI or a network request supplies quota.
+  - type: textarea
+    id: sample
+    attributes:
+      label: Fictional schema example and limitations
+      render: json
