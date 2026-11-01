@@ -7,6 +7,7 @@ mod autostart;
 use notify::{RecursiveMode, Watcher};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+mod snapshot_watch;
 mod collector;
 mod runtime;
 use std::io::Write;
@@ -20,9 +21,9 @@ fn default_fit_height() -> bool { true } fn default_scale() -> u16 { 100 } fn de
 impl Default for Settings { fn default() -> Self { Self { #[cfg(target_os = "linux")] linux: linux::Options::default(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
-struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32, style: String, theme: String }
+struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32, style: String, theme: String, color_mode: String, dot_count: u8 }
 impl Default for TaskbarSettings {
-    fn default() -> Self { Self { enabled: false, providers: vec!["claude".into(), "codex".into(), "gemini".into()], window: "session".into(), show_bars: false, offset_x: 0, style: "transparent".into(), theme: default_auto() } }
+    fn default() -> Self { Self { enabled: false, providers: vec!["claude".into(), "codex".into(), "gemini".into()], window: "session".into(), show_bars: false, offset_x: 0, style: "transparent".into(), theme: default_auto(), color_mode: "calm".into(), dot_count: 20 } }
 }
 #[derive(Clone, Serialize)]
 struct SnapshotEvent { snapshot: Option<Value> }
@@ -74,7 +75,23 @@ fn configure_python(app: &tauri::App) {
     runtime::configure(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../.."));
 }
 
-fn emit_snapshot(app: &tauri::AppHandle) { let snapshot = read_snapshot(); #[cfg(windows)] taskbar::update_snapshot(snapshot.clone()); let _ = app.emit("snapshot", SnapshotEvent { snapshot }); }
+fn emit_snapshot(app: &tauri::AppHandle) {
+    static LAST: std::sync::Mutex<Option<snapshot_watch::Fingerprint>> = std::sync::Mutex::new(None);
+    let mut last = LAST.lock().unwrap_or_else(|e| e.into_inner());
+    let snapshot = read_snapshot();
+    if !last.get_or_insert_with(Default::default).changed(&snapshot) { return; }
+    #[cfg(windows)] taskbar::update_snapshot(snapshot.clone());
+    if std::env::var_os("AI_USAGE_SNAPSHOT_TRACE").is_some() {
+        eprintln!("snapshot-emit {}", snapshot.as_ref().and_then(|s|s["generated_at"].as_str()).unwrap_or("none"));
+    }
+    let _ = app.emit("snapshot", SnapshotEvent { snapshot });
+}
+#[tauri::command]
+fn snapshot_rendered(generated_at: String) {
+    if std::env::var_os("AI_USAGE_SNAPSHOT_TRACE").is_some() {
+        eprintln!("snapshot-rendered {}", generated_at.chars().filter(|c| !c.is_control()).take(64).collect::<String>());
+    }
+}
 #[tauri::command]
 fn get_snapshot() -> Value { json!({"snapshot": read_snapshot()}) }
 #[tauri::command]
@@ -85,16 +102,18 @@ fn load_settings() -> Settings { fs::read(settings_path()).ok().and_then(|data| 
 fn save_settings(window: tauri::WebviewWindow, settings: Settings) -> Result<(), String> { #[cfg(target_os = "linux")] { let options=settings.linux.clone(); let corner=settings.position.clone(); let target=window.clone(); let _=window.run_on_main_thread(move ||linux::apply(&target,&options,&corner)); } let path = settings_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?; private_write(path, serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?; #[cfg(windows)] taskbar::update_settings(settings.taskbar); Ok(()) }
 fn current_monitor(window: &tauri::WebviewWindow) -> Result<tauri::Monitor, String> {
     #[cfg(target_os = "linux")]
-    if linux::wayland() { let options=load_settings().linux; let monitors=window.available_monitors().map_err(|e|e.to_string())?; return options.monitor.and_then(|i|monitors.get(i as usize).cloned()).or_else(||window.primary_monitor().ok().flatten()).or_else(||monitors.into_iter().next()).ok_or_else(||"No monitor available".into()); }
+    if linux::wayland() { let options=load_settings().linux; let monitors=window.available_monitors().map_err(|e|e.to_string())?; return options.monitor.as_ref().and_then(|selection| monitors.iter().enumerate().find(|(i,m)| selection.matches(*i as i32, m.name().map(String::as_str).unwrap_or(""))).map(|(_,m)|m.clone())).or_else(||window.primary_monitor().ok().flatten()).or_else(||monitors.into_iter().next()).ok_or_else(||"No monitor available".into()); }
     if let Some(monitor)=window.current_monitor().map_err(|e|e.to_string())? { return Ok(monitor); }
     let position = window.outer_position().map_err(|e| e.to_string())?;
     window.available_monitors().map_err(|e| e.to_string())?.into_iter().min_by_key(|monitor| { let area=monitor.work_area(); let cx=position.x+window.outer_size().map(|s|s.width as i32/2).unwrap_or(0); let cy=position.y+window.outer_size().map(|s|s.height as i32/2).unwrap_or(0); let x=(cx-(area.position.x+area.size.width as i32/2)).abs(); let y=(cy-(area.position.y+area.size.height as i32/2)).abs(); x.saturating_add(y) }).ok_or_else(||"No monitor available".into())
 }
 #[tauri::command]
+fn get_monitor_scale(window: tauri::WebviewWindow) -> Result<f64, String> { window.scale_factor().map_err(|e|e.to_string()) }
+#[tauri::command]
 fn resize_widget(window: tauri::WebviewWindow, scale: u16) -> Result<(), String> {
     #[cfg(target_os = "linux")]
-    if linux::layered() { return linux::resize_layer(&window, Some((340.0 * scale.clamp(50,300) as f64 / 100.0).round() as i32), None); }
-    let scale=scale.clamp(50,300) as f64/100.0; let factor=window.scale_factor().map_err(|e|e.to_string())?;
+    if linux::layered() { return linux::resize_layer(&window, Some((340.0 * scale.clamp(10,300) as f64 / 100.0).round() as i32), None); }
+    let scale=scale.clamp(10,300) as f64/100.0; let factor=window.scale_factor().map_err(|e|e.to_string())?;
     let old=window.inner_size().map_err(|e|e.to_string())?; let width=(340.0*scale*factor).round() as u32;
     window.set_size(tauri::PhysicalSize::new(width,old.height)).map_err(|e|e.to_string())?;
     let settings=load_settings(); if settings.position!="Free" { snap_window(window,settings.position)?; }
@@ -147,25 +166,40 @@ fn restore_window(window: &tauri::WebviewWindow) {
     }
 }
 fn start_background(app: tauri::AppHandle) {
-    let path=snapshot_path(); let callback_app=app.clone();
+    let path = snapshot_path();
+    if let Some(parent) = path.parent() { let _ = fs::create_dir_all(parent); }
+    let (sender, receiver) = std::sync::mpsc::sync_channel(1);
     let watcher = path.parent().and_then(|parent| {
-        let mut watcher=notify::recommended_watcher(move |_event: Result<notify::Event,notify::Error>| { emit_snapshot(&callback_app); }).ok()?;
-        watcher.watch(parent,RecursiveMode::NonRecursive).ok()?;
+        let target = path.clone();
+        let mut watcher = notify::recommended_watcher(move |event: Result<notify::Event,notify::Error>| {
+            if event.as_ref().map(|e| snapshot_watch::relevant(e, &target)).unwrap_or(false) {
+                let _ = sender.try_send(());
+            }
+        }).ok()?;
+        watcher.watch(parent, RecursiveMode::NonRecursive).ok()?;
         Some(watcher)
     });
+    let reader = app.clone();
     thread::spawn(move || {
-        let _watcher=watcher;
-        if let Err(error)=refresh() { let _=app.emit("refresh-error",error); }
-        emit_snapshot(&app);
-        let mut last=read_snapshot().and_then(|s| s.get("generated_at").cloned());
-        let mut refresh_elapsed=0_u64;
+        let _watcher = watcher;
+        emit_snapshot(&reader);
         loop {
-            thread::sleep(Duration::from_secs(30));
-            let current=read_snapshot().and_then(|s| s.get("generated_at").cloned());
-            if current!=last { emit_snapshot(&app); last=current; }
-            refresh_elapsed+=30;
-            if refresh_elapsed>=300 { if let Err(error)=refresh() { let _=app.emit("refresh-error",error); } refresh_elapsed=0; }
+            match receiver.recv_timeout(Duration::from_secs(30)) {
+                Ok(()) => {
+                    // Fixed coalescing window bounds latency even under continuous writes.
+                    thread::sleep(Duration::from_millis(400));
+                    while receiver.try_recv().is_ok() {}
+                }
+                Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => thread::sleep(Duration::from_secs(30)),
+                Err(_) => (),
+            }
+            emit_snapshot(&reader);
         }
+    });
+    thread::spawn(move || loop {
+        if let Err(error) = refresh() { let _ = app.emit("refresh-error", error); }
+        emit_snapshot(&app);
+        thread::sleep(Duration::from_secs(300));
     });
 }
 #[tauri::command]
@@ -194,5 +228,5 @@ async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> 
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
 }

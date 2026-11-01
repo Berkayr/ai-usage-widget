@@ -10,7 +10,38 @@ static SETTINGS_OPEN: AtomicBool = AtomicBool::new(false);
 static LAYER: AtomicBool = AtomicBool::new(false);
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
-pub struct Options { pub layer: String, pub margin: i32, pub monitor: Option<i32> }
+pub struct Options { pub layer: String, pub margin: i32, pub monitor: Option<MonitorSelection> }
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum MonitorSelection { Index(i32), Name(String) }
+impl MonitorSelection {
+    pub fn matches(&self, index: i32, name: &str) -> bool {
+        match self { Self::Index(i) => *i == index, Self::Name(n) => n == name }
+    }
+}
+fn monitor_name(display: &gtk::gdk::Display, index: i32, monitor: &gtk::gdk::Monitor) -> String {
+    // GTK3's deprecated screen API still exposes connector names on Wayland/X11.
+    // Resolve the screen index by geometry: it need not equal GdkDisplay's index.
+    let screen = display.default_screen();
+    let geometry = monitor.geometry();
+    unsafe {
+        let screen_ptr = screen.to_glib_none().0;
+        let screen_index = gtk::gdk::ffi::gdk_screen_get_monitor_at_point(screen_ptr, geometry.x()+1, geometry.y()+1);
+        let name = gtk::gdk::ffi::gdk_screen_get_monitor_plug_name(screen_ptr, screen_index);
+        if !name.is_null() {
+            let text = std::ffi::CStr::from_ptr(name).to_string_lossy().into_owned();
+            gtk::glib::ffi::g_free(name.cast());
+            if !text.is_empty() { return text; }
+        }
+    }
+    format!("{}@{},{}:{}x{}", monitor.model().map(|s|s.to_string()).unwrap_or_else(||format!("Monitor {}",index+1)), geometry.x(),geometry.y(),geometry.width(),geometry.height())
+}
+fn selected_monitor(display: &gtk::gdk::Display, selection: &Option<MonitorSelection>) -> Option<gtk::gdk::Monitor> {
+    (0..display.n_monitors()).find_map(|index| {
+        let monitor = display.monitor(index)?;
+        selection.as_ref().filter(|s|s.matches(index,&monitor_name(display,index,&monitor))).map(|_|monitor)
+    }).or_else(||display.primary_monitor()).or_else(||display.monitor(0))
+}
 impl Default for Options {
     fn default() -> Self { Self { layer: "bottom".into(), margin: 12, monitor: None } }
 }
@@ -71,8 +102,7 @@ pub fn resize_layer(window: &tauri::WebviewWindow, width: Option<i32>, height: O
         let (old_width, old_height) = gtk.size_request();
         let display = gtk.display();
         let settings = super::load_settings();
-        let monitor = settings.linux.monitor.and_then(|i| display.monitor(i))
-            .or_else(|| display.primary_monitor()).or_else(|| display.monitor(0));
+        let monitor = selected_monitor(&display, &settings.linux.monitor);
         let max_height = monitor
             .map(|m| m.workarea().height() - 2 * settings.linux.margin.clamp(0,64))
             .unwrap_or(640).max(80);
@@ -101,8 +131,8 @@ pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
         }
         call::<unsafe extern "C" fn(Window,i32)>(lib,b"gtk_layer_set_exclusive_zone\0").unwrap()(ptr,0);
         let display=gtk.display();
-        let monitor=options.monitor.and_then(|i|display.monitor(i)).or_else(||display.primary_monitor()).or_else(||display.monitor(0));
-        if let Some(monitor)=monitor { call::<unsafe extern "C" fn(Window,*mut gtk::gdk::ffi::GdkMonitor)>(lib,b"gtk_layer_set_monitor\0").unwrap()(ptr,monitor.to_glib_none().0); }
+        let monitor=selected_monitor(&display, &options.monitor);
+        if let Some(monitor)=monitor { if std::env::var_os("AI_USAGE_SNAPSHOT_TRACE").is_some() { let g=monitor.geometry(); eprintln!("monitor-selected {} {},{} {}x{}", (0..display.n_monitors()).find_map(|i|display.monitor(i).filter(|m|m==&monitor).map(|m|monitor_name(&display,i,&m))).unwrap_or_default(),g.x(),g.y(),g.width(),g.height()); } call::<unsafe extern "C" fn(Window,*mut gtk::gdk::ffi::GdkMonitor)>(lib,b"gtk_layer_set_monitor\0").unwrap()(ptr,monitor.to_glib_none().0); }
         call::<unsafe extern "C" fn(Window,u32)>(lib,b"gtk_layer_set_keyboard_mode\0").unwrap()(ptr,if SETTINGS_OPEN.load(Ordering::Relaxed) {2} else {0});
     }); }
 }
@@ -135,7 +165,7 @@ pub const SCRIPT: &str = r#"(() => {
 pub fn desktop_info() -> serde_json::Value {
     let monitors = gtk::gdk::Display::default().map(|display| {
         (0..display.n_monitors()).filter_map(|index| display.monitor(index).map(|monitor| {
-            let name = monitor.model().map(|s|s.to_string()).unwrap_or_else(||format!("Monitor {}", index + 1));
+            let name = monitor_name(&display,index,&monitor);
             serde_json::json!({"index": index, "name": name})
         })).collect::<Vec<_>>()
     }).unwrap_or_default();
@@ -185,6 +215,16 @@ fn write_autostart(path: &std::path::Path, exe: &std::path::Path, enabled: bool)
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn monitor_settings_accept_names_and_legacy_indices() {
+        let named: Options = serde_json::from_str(r#"{"monitor":"DP-2"}"#).unwrap();
+        assert!(named.monitor.as_ref().unwrap().matches(1,"DP-2"));
+        assert!(!named.monitor.as_ref().unwrap().matches(1,"HDMI-A-1"));
+        let indexed: Options = serde_json::from_str(r#"{"monitor":2}"#).unwrap();
+        assert!(indexed.monitor.as_ref().unwrap().matches(2,"fixture"));
+        assert!(!indexed.monitor.as_ref().unwrap().matches(1,"fixture"));
+        assert_eq!(serde_json::to_value(named).unwrap()["monitor"],"DP-2");
+    }
     #[test]
     fn autostart_is_quoted_and_only_removes_its_own_file() {
         let root=std::env::temp_dir().join(format!("aiquota-autostart-{}",std::process::id()));
