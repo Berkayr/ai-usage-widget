@@ -11,11 +11,10 @@ from datetime import datetime, timezone
 
 from . import __version__
 from .paths import atomic_json, config_dir, data_path, load_config
-from .providers import PROVIDERS
+from .providers import METADATA, PROVIDERS
 from .schema import provider_record, snapshot
 from .pace import calculate_pace, reset_events
 
-claude, codex, gemini = (PROVIDERS[x] for x in ("claude", "codex", "gemini"))
 
 
 def detect_all() -> dict[str, bool]:
@@ -32,7 +31,7 @@ def _config():
 
 
 def collect() -> dict:
-    detected, config = _config()
+    config = load_config()
     previous = {}
     try:
         prior = json.loads(data_path("snapshot.json").read_text(encoding="utf-8"))
@@ -43,20 +42,35 @@ def collect() -> dict:
     ordered = sorted(PROVIDERS, key=lambda key: settings.get(key, {}).get("order", 999))
     records = []
     for key in ordered:
+        meta = METADATA[key]
         if not config["initialized"] or not settings[key]["enabled"]:
-            records.append(provider_record(key, PROVIDERS[key].META["label"], state="DISABLED"))
-        elif not detected[key]:
-            records.append(PROVIDERS[key].read(previous.get(key)))
+            records.append(provider_record(key, meta["label"], state="DISABLED"))
         else:
             records.append(PROVIDERS[key].read(previous.get(key)))
-        meta = PROVIDERS[key].META
         records[-1].update(category=meta["category"], experimental=meta["experimental"], auth=meta["auth"])
     return snapshot(records)
 
 
 def write_snapshot() -> dict:
     result = collect()
-    atomic_json(data_path("snapshot.json"), result)
+    return store_snapshot(result)
+
+
+def store_snapshot(result: dict) -> dict:
+    """Keep the file/inotify quiet when only the collection timestamp changed.
+
+    Provider timestamps remain significant: a successful fresh observation must
+    still advance freshness even when its quota percentage has not changed.
+    """
+    path = data_path("snapshot.json")
+    try:
+        prior = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(prior, dict) and isinstance(prior.get("generated_at"), str) and {k: v for k, v in prior.items() if k != "generated_at"} == {
+                k: v for k, v in result.items() if k != "generated_at"}:
+            return prior
+    except (OSError, ValueError):
+        pass
+    atomic_json(path, result)
     return result
 
 
@@ -85,7 +99,7 @@ def doctor(live: bool = False) -> dict:
                        "state": record.get("state"), "source": record.get("source"), "age_seconds": age})
     return {"version": __version__, "providers": result, "live": live,
             "paths": {"python": sys.executable, "module": str(__file__),
-                      "codex": codex._executable(), "agy": gemini._agy(),
+                      "codex": PROVIDERS["codex"]._executable(), "agy": PROVIDERS["gemini"]._agy(),
                       "gh": shutil.which("gh"),
                       "python_override": os.environ.get("QUOTACORE_PYTHON"),
                       "runtime_source": os.environ.get("QUOTACORE_RUNTIME_SOURCE", "direct"),
@@ -96,14 +110,13 @@ def daemon(interval: int) -> int:
     backoff = {key: 0 for key in PROVIDERS}
     while True:
         try:
-            result = collect()
-            atomic_json(data_path("snapshot.json"), result)
+            result = write_snapshot()
             for record in result["providers"]:
                 key = record["id"]
                 if record["state"] in ("OK", "STALE"):
                     backoff[key] = 0
-                elif key == "claude" and claude.RETRY_AFTER:
-                    backoff[key] = min(1800, max(backoff[key], int(claude.RETRY_AFTER)))
+                elif key == "claude" and record["state"] != "DISABLED" and PROVIDERS["claude"].RETRY_AFTER:
+                    backoff[key] = min(1800, max(backoff[key], int(PROVIDERS["claude"].RETRY_AFTER)))
                 else:
                     backoff[key] = min(1800, max(30, backoff[key] * 2 if backoff[key] else 30))
             delay = max([interval, *backoff.values()])
@@ -245,7 +258,7 @@ def main(argv: list[str] | None = None) -> int:
         config["initialized"] = True
         atomic_json(config_dir() / "config.json", config)
     elif args.command == "refresh-gemini":
-        return gemini.refresh_gemini()
+        return PROVIDERS["gemini"].refresh_gemini()
     elif args.command == "key":
         path = config_dir() / "secrets.json"
         try:
