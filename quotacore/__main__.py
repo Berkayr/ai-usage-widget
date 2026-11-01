@@ -12,6 +12,7 @@ from . import __version__
 from .paths import atomic_json, config_dir, data_path, load_config
 from .providers import PROVIDERS
 from .schema import provider_record, snapshot
+from .pace import calculate_pace, reset_events
 
 claude, codex, gemini = (PROVIDERS[x] for x in ("claude", "codex", "gemini"))
 
@@ -100,6 +101,67 @@ def daemon(interval: int) -> int:
             time.sleep(min(1800, max(30, interval)))
 
 
+def _pace(snapshot_value: dict, *, no_log: bool, mode: str) -> int:
+    from .paths import atomic_json
+    config_path = data_path("pace.json")
+    state_path = data_path("pace-state.json")
+    try:
+        options = json.loads(config_path.read_text(encoding="utf-8"))
+        if not isinstance(options, dict): options = {}
+    except (OSError, ValueError): options = {}
+    ceilings = options.get("ceilings", {}) if isinstance(options.get("ceilings", {}), dict) else {}
+    try:
+        max_age_minutes = max(0.0, float(options.get("max_age_minutes", 30)))
+    except (TypeError, ValueError):
+        max_age_minutes = 30
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        previous_profiles = state.get("profiles", {}) if isinstance(state, dict) else {}
+        previous_record = state.get("last", {}) if isinstance(state, dict) else {}
+    except (OSError, ValueError):
+        previous_profiles, previous_record = {}, {}
+    report = calculate_pace(snapshot_value, ceilings=ceilings, previous_profiles=previous_profiles,
+                            max_age_minutes=max_age_minutes)
+    if not no_log:
+        log_path = data_path("pace-log.jsonl")
+        events = reset_events(report, previous_record)
+        with log_path.open("a", encoding="utf-8", newline="\n") as handle:
+            handle.write(json.dumps({"event": "run", **report}, ensure_ascii=False, separators=(",", ":")) + "\n")
+            for event in events:
+                handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\n")
+        atomic_json(state_path, {"profiles": {p["id"]: p["profile"] for p in report["providers"]}, "last": report})
+    else:
+        atomic_json(state_path, {"profiles": {p["id"]: p["profile"] for p in report["providers"]}, "last": previous_record})
+    if mode == "json":
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    elif mode == "line":
+        pieces = []
+        for p in report["providers"]:
+            windows = [w for w in p["windows"] if w["status"] == "known"]
+            details = []
+            for w in windows:
+                short = w["window_minutes"] <= 300
+                if short:
+                    details.append(f"5h{w['used']:.0f}%")
+                else:
+                    days = w["hours_left"] / 24
+                    left = f"{w['hours_left']:.0f}h" if w["hours_left"] < 48 else f"{days:.0f}d"
+                    details.append(f"w{w['gap']:+.0f} {left}")
+            pieces.append(" ".join([p["id"], p["profile"], *details]))
+        print("QUOTA " + " | ".join(pieces))
+    else:
+        print(f"{'PROVIDER':12} {'PROFILE':10} {'WINDOW':24} {'USED':>7} {'GAP':>7} {'LEFT':>7} {'UNUSED':>8}")
+        for p in report["providers"]:
+            for w in p["windows"]:
+                if w["status"] == "unknown":
+                    label = str(w.get('label') or w.get('id')).replace("·", "-")
+                    print(f"{p['id']:12} {p['profile']:10} {label:24} unknown")
+                else:
+                    label = str(w.get('label') or w.get('id')).replace("·", "-")
+                    print(f"{p['id']:12} {p['profile']:10} {label:24} {w['used']:6.1f}% {w['gap']:+6.1f} {w['hours_left']:6.1f}h {w['projected_unused']:7.1f}%")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="quotacore")
     parser.add_argument("--version", action="version", version=__version__)
@@ -120,6 +182,12 @@ def main(argv: list[str] | None = None) -> int:
     hook_parser = sub.add_parser("hook")
     hook_parser.add_argument("provider", choices=("claude", "agy"))
     hook_parser.add_argument("--chain", default=None)
+    pace_parser = sub.add_parser("pace")
+    pace_mode = pace_parser.add_mutually_exclusive_group()
+    pace_mode.add_argument("--json", action="store_true")
+    pace_mode.add_argument("--line", action="store_true")
+    pace_parser.add_argument("--from-file")
+    pace_parser.add_argument("--no-log", action="store_true")
     args = parser.parse_args(argv)
     if args.command == "snapshot":
         print(json.dumps(collect(), ensure_ascii=False, indent=2))
@@ -155,6 +223,16 @@ def main(argv: list[str] | None = None) -> int:
     elif args.command == "hook":
         from .hooks import run_hook
         return run_hook(args.provider, args.chain)
+    elif args.command == "pace":
+        if args.from_file:
+            try:
+                value = json.loads(open(args.from_file, encoding="utf-8").read())
+            except (OSError, ValueError) as exc:
+                print(f"Unable to read snapshot: {exc}", file=sys.stderr)
+                return 2
+        else:
+            value = collect()
+        return _pace(value, no_log=args.no_log, mode="json" if args.json else "line" if args.line else "table")
     return 0
 
 
