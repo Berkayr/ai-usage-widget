@@ -1,0 +1,39 @@
+{
+  "id": "terminal",
+  "name": "Terminal",
+  "sizeTiers": {
+    "xs": 219,
+    "s": 319,
+    "m": 519,
+    "l": 960
+  },
+  "palettes": {
+    "default": {
+      "name": "Phosphor",
+      "bgWidget": "#0a0e0c",
+      "bgCard": "#101813",
+      "bgTrackOff": "#365948",
+      "textPrimary": "#ecfdf5",
+      "textSecondary": "#a7f3d0",
+      "textMuted": "#6ee7b7",
+      "border": "#28513b",
+      "accent": "#34d399",
+      "severityNormal": "#34d399",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f5f2eb",
+        "bgCard": "#ebe6dc",
+        "bgTrackOff": "#cbd5e1",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#c2cbd7",
+        "accent": "#08766b",
+        "severityNormal": "#08766b",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c"
+      }
+    }
+  }
+}

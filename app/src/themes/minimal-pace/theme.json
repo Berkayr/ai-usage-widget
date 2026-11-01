@@ -1,0 +1,39 @@
+{
+  "id": "minimal-pace",
+  "name": "Minimal Pace",
+  "sizeTiers": {
+    "xs": 219,
+    "s": 319,
+    "m": 519,
+    "l": 960
+  },
+  "palettes": {
+    "default": {
+      "name": "Emerald",
+      "bgWidget": "#111114",
+      "bgCard": "#1a1a20",
+      "bgTrackOff": "#354248",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#3f4b60",
+      "accent": "#34d399",
+      "severityNormal": "#34d399",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#ffffff",
+        "bgCard": "#f4f4f5",
+        "bgTrackOff": "#cbd5e1",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#c2cbd7",
+        "accent": "#067d5b",
+        "severityNormal": "#067d5b",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c"
+      }
+    }
+  }
+}

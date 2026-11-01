@@ -1,0 +1,5 @@
+@import '../shared/layout.css';
+.widget{border-radius:16px;padding:18px}.header{padding-bottom:16px}.app-title{font-size:16px;letter-spacing:.04em}.beacon{display:none}.provider-card{border:0;border-bottom:1px solid var(--border);border-radius:0;padding:12px 0 16px;background:transparent}.provider-heading h2{font-size:16px;font-weight:400}.provider-list{gap:8px}.windows{gap:16px}.window-top b{font-size:19px;font-weight:400}.meter{height:3px;border-radius:0;margin-top:8px}.footer{border:0;padding-top:5px}.pace{color:var(--textSecondary)}.plan{border:0;background:var(--bgCard)}.window-bottom{margin-top:9px;font-size:8px}
+@container (max-width:319px){.widget{padding:10px}.windows{gap:10px}.provider-card{padding:6px 0 10px}.provider-heading h2{font-size:12px}.window-top b{font-size:17px}.window-bottom{font-size:7px}}
+
+.widget{font-family:Inter,JetBrainsMono,sans-serif}.reset,.pace,.plan,.status-badge,.sync-line{font-family:JetBrainsMono,monospace}

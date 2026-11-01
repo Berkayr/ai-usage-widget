@@ -1,0 +1,39 @@
+{
+  "id": "brutalist",
+  "name": "Brutalist",
+  "sizeTiers": {
+    "xs": 219,
+    "s": 319,
+    "m": 519,
+    "l": 960
+  },
+  "palettes": {
+    "default": {
+      "name": "Acid",
+      "bgWidget": "#121212",
+      "bgCard": "#1a1a1a",
+      "bgTrackOff": "#454541",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b5b5ae",
+      "textMuted": "#99a5b8",
+      "border": "#f5f5f0",
+      "accent": "#c8ff00",
+      "severityNormal": "#c8ff00",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f4f1ea",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#cbd5e1",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#0d0d0d",
+        "accent": "#137a37",
+        "severityNormal": "#137a37",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c"
+      }
+    }
+  }
+}

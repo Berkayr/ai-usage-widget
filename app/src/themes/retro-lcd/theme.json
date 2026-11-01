@@ -1,0 +1,39 @@
+{
+  "id": "retro-lcd",
+  "name": "Retro LCD",
+  "sizeTiers": {
+    "xs": 219,
+    "s": 319,
+    "m": 519,
+    "l": 960
+  },
+  "palettes": {
+    "default": {
+      "name": "Liquid Crystal",
+      "bgWidget": "#1c1f26",
+      "bgCard": "#0d1917",
+      "bgTrackOff": "#28443b",
+      "textPrimary": "#2dd4bf",
+      "textSecondary": "#a1c7b9",
+      "textMuted": "#89afa1",
+      "border": "#3f5d54",
+      "accent": "#2dd4bf",
+      "severityNormal": "#2dd4bf",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#30333a",
+        "bgCard": "#9ead8c",
+        "bgTrackOff": "#839773",
+        "textPrimary": "#172114",
+        "textSecondary": "#263720",
+        "textMuted": "#34492c",
+        "border": "#34492c",
+        "accent": "#172114",
+        "severityNormal": "#172114",
+        "severityWarning": "#6b3400",
+        "severityDanger": "#7f1111"
+      }
+    }
+  }
+}

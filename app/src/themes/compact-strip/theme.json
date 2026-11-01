@@ -1,0 +1,39 @@
+{
+  "id": "compact-strip",
+  "name": "Compact Strip",
+  "sizeTiers": {
+    "xs": 219,
+    "s": 319,
+    "m": 519,
+    "l": 960
+  },
+  "palettes": {
+    "default": {
+      "name": "Indigo",
+      "bgWidget": "#10141d",
+      "bgCard": "#181f2c",
+      "bgTrackOff": "#354248",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#3f4b60",
+      "accent": "#9396ff",
+      "severityNormal": "#9396ff",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f8fafc",
+        "bgCard": "#ecf1f7",
+        "bgTrackOff": "#cbd5e1",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#c2cbd7",
+        "accent": "#4f46e5",
+        "severityNormal": "#4f46e5",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c"
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "frosted-glass",
+  "name": "Frosted Glass",
+  "sizeTiers": {
+    "xs": 219,
+    "s": 319,
+    "m": 519,
+    "l": 960
+  },
+  "palettes": {
+    "default": {
+      "name": "Acrylic",
+      "bgWidget": "#13192a",
+      "bgCard": "#222c46",
+      "bgTrackOff": "#354248",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#3f4b60",
+      "accent": "#38bdf8",
+      "severityNormal": "#38bdf8",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f4f7fc",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#cbd5e1",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#c2cbd7",
+        "accent": "#036b9e",
+        "severityNormal": "#036b9e",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c"
+      }
+    }
+  }
+}

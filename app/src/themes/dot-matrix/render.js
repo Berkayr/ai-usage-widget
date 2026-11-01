@@ -66,3 +66,5 @@ export function renderSnapshot(root, snapshot, { noData = false, showExtraWindow
   const providers = Array.isArray(snapshot?.providers) ? snapshot.providers.filter(p => !hiddenStates.has(String(p.state).toUpperCase())) : [];
   root.innerHTML = providers.map(provider => providerCard(provider, showExtraWindows)).join('') || `<div class="no-data"><span class="no-data-dot">●</span><strong>${noData ? 'NO DATA YET' : 'NO ACTIVE PROVIDERS'}</strong><small>${noData ? 'Waiting for quotacore snapshot' : 'Enable a provider in quotacore'}</small></div>`;
 }
+
+export { escapeHtml, severity, countdown, pctOf, shortWindowLabel, hiddenStates, providerNames };
