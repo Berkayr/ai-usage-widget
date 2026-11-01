@@ -15,6 +15,7 @@ use std::{fs, path::PathBuf, thread, time::Duration};
 use tauri::{Emitter, Manager};
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(default)]
 struct Settings { #[cfg(target_os = "linux")] #[serde(default)] linux: linux::Options, #[serde(default="default_auto")] appearance: String, palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale")] scale: u16, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default)] taskbar: TaskbarSettings }
 fn default_auto() -> String { "auto".into() }
 fn default_fit_height() -> bool { true } fn default_scale() -> u16 { 100 } fn default_position() -> String { "Top right".into() }
@@ -229,4 +230,27 @@ async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> 
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
     tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
+}
+
+#[cfg(test)]
+mod settings_tests {
+    use super::*;
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn partial_settings_preserve_explicit_monitor() {
+        let settings: Settings = serde_json::from_str(
+            r#"{"linux":{"layer":"top","margin":16,"monitor":"HDMI-A-1"}}"#,
+        ).unwrap();
+        assert!(settings.linux.monitor.as_ref().unwrap().matches(1, "HDMI-A-1"));
+        assert_eq!(settings.palette, Settings::default().palette);
+        assert_eq!(settings.widget_opacity, 100);
+        assert_eq!(settings.background_opacity, 100);
+        assert_eq!(settings.position, "Top right");
+        let settings: Settings = serde_json::from_str(r#"{"linux":{"monitor":2},"widgetOpacity":75}"#).unwrap();
+        assert!(settings.linux.monitor.as_ref().unwrap().matches(2, "DP-2"));
+        assert_eq!(settings.widget_opacity, 75);
+        // Invalid explicit values must still be rejected.
+        assert!(serde_json::from_str::<Settings>(r#"{"widgetOpacity":"invalid"}"#).is_err());
+    }
 }

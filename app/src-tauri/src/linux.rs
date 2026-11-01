@@ -5,7 +5,10 @@ use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, ffi::c_void, fs, sync::atomic::{AtomicBool, Ordering}};
 
 type Window = *mut gtk::ffi::GtkWindow;
-thread_local! { static SHELL: RefCell<Option<Library>> = const { RefCell::new(None) }; }
+thread_local! {
+    static SHELL: RefCell<Option<Library>> = const { RefCell::new(None) };
+    static MONITOR_WARNING: RefCell<Option<String>> = const { RefCell::new(None) };
+}
 static SETTINGS_OPEN: AtomicBool = AtomicBool::new(false);
 static LAYER: AtomicBool = AtomicBool::new(false);
 #[derive(Clone, Serialize, Deserialize)]
@@ -20,27 +23,47 @@ impl MonitorSelection {
     }
 }
 fn monitor_name(display: &gtk::gdk::Display, index: i32, monitor: &gtk::gdk::Monitor) -> String {
-    // GTK3's deprecated screen API still exposes connector names on Wayland/X11.
-    // Resolve the screen index by geometry: it need not equal GdkDisplay's index.
+    // GTK >= 3.22 implements screen monitor lookup with
+    // gdk_display_get_monitor(display, index). Use that identity directly:
+    // point lookup is ambiguous when mixed-scale monitor rectangles overlap.
     let screen = display.default_screen();
     let geometry = monitor.geometry();
-    unsafe {
-        let screen_ptr = screen.to_glib_none().0;
-        let screen_index = gtk::gdk::ffi::gdk_screen_get_monitor_at_point(screen_ptr, geometry.x()+1, geometry.y()+1);
-        let name = gtk::gdk::ffi::gdk_screen_get_monitor_plug_name(screen_ptr, screen_index);
-        if !name.is_null() {
-            let text = std::ffi::CStr::from_ptr(name).to_string_lossy().into_owned();
-            gtk::glib::ffi::g_free(name.cast());
-            if !text.is_empty() { return text; }
-        }
-    }
+    if let Some(name) = connector_at_index(index, |screen_index| unsafe {
+        let name = gtk::gdk::ffi::gdk_screen_get_monitor_plug_name(screen.to_glib_none().0, screen_index);
+        if name.is_null() { return None; }
+        let text = std::ffi::CStr::from_ptr(name).to_string_lossy().into_owned();
+        gtk::glib::ffi::g_free(name.cast());
+        Some(text)
+    }) { return name; }
     format!("{}@{},{}:{}x{}", monitor.model().map(|s|s.to_string()).unwrap_or_else(||format!("Monitor {}",index+1)), geometry.x(),geometry.y(),geometry.width(),geometry.height())
 }
+fn connector_at_index(index: i32, lookup: impl FnOnce(i32) -> Option<String>) -> Option<String> {
+    lookup(index).filter(|name| !name.is_empty())
+}
+fn selection_index(selection: &MonitorSelection, available: &[(i32, String)]) -> Result<i32, String> {
+    available.iter().find(|(index, name)| selection.matches(*index, name))
+        .map(|(index, _)| *index).ok_or_else(|| {
+            let requested = match selection { MonitorSelection::Index(i) => i.to_string(), MonitorSelection::Name(n) => n.clone() };
+            let message = format!("monitor '{}' not found; available: {}", requested,
+                available.iter().map(|(i, name)| format!("{} ({})", name, i)).collect::<Vec<_>>().join(", "));
+            message.chars().map(|c| if c.is_control() { ' ' } else { c }).collect()
+        })
+}
 fn selected_monitor(display: &gtk::gdk::Display, selection: &Option<MonitorSelection>) -> Option<gtk::gdk::Monitor> {
-    (0..display.n_monitors()).find_map(|index| {
-        let monitor = display.monitor(index)?;
-        selection.as_ref().filter(|s|s.matches(index,&monitor_name(display,index,&monitor))).map(|_|monitor)
-    }).or_else(||display.primary_monitor()).or_else(||display.monitor(0))
+    let available = (0..display.n_monitors()).filter_map(|index| {
+        display.monitor(index).map(|monitor| (index, monitor_name(display, index, &monitor)))
+    }).collect::<Vec<_>>();
+    let result = selection.as_ref().map(|selection| selection_index(selection, &available));
+    let warning = result.as_ref().and_then(|result| result.as_ref().err()).cloned();
+    MONITOR_WARNING.with(|slot| {
+        let mut previous = slot.borrow_mut();
+        if *previous != warning {
+            if let Some(message) = &warning { eprintln!("{}", message); }
+            *previous = warning;
+        }
+    });
+    result.and_then(Result::ok).and_then(|index| display.monitor(index))
+        .or_else(||display.primary_monitor()).or_else(||display.monitor(0))
 }
 impl Default for Options {
     fn default() -> Self { Self { layer: "bottom".into(), margin: 12, monitor: None } }
@@ -114,6 +137,8 @@ pub fn resize_layer(window: &tauri::WebviewWindow, width: Option<i32>, height: O
 pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
     let corner=if corner=="Free" {"Top right"} else {corner};
     let Ok(gtk) = window.gtk_window() else { return };
+    let display = gtk.display();
+    let monitor = selected_monitor(&display, &options.monitor);
     if !layered() {
         gtk.set_keep_above(options.layer == "top");
         gtk.set_keep_below(options.layer != "top");
@@ -130,8 +155,6 @@ pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
             call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_margin\0").unwrap()(ptr,edge,options.margin.clamp(0,64));
         }
         call::<unsafe extern "C" fn(Window,i32)>(lib,b"gtk_layer_set_exclusive_zone\0").unwrap()(ptr,0);
-        let display=gtk.display();
-        let monitor=selected_monitor(&display, &options.monitor);
         if let Some(monitor)=monitor { if std::env::var_os("AI_USAGE_SNAPSHOT_TRACE").is_some() { let g=monitor.geometry(); eprintln!("monitor-selected {} {},{} {}x{}", (0..display.n_monitors()).find_map(|i|display.monitor(i).filter(|m|m==&monitor).map(|m|monitor_name(&display,i,&m))).unwrap_or_default(),g.x(),g.y(),g.width(),g.height()); } call::<unsafe extern "C" fn(Window,*mut gtk::gdk::ffi::GdkMonitor)>(lib,b"gtk_layer_set_monitor\0").unwrap()(ptr,monitor.to_glib_none().0); }
         call::<unsafe extern "C" fn(Window,u32)>(lib,b"gtk_layer_set_keyboard_mode\0").unwrap()(ptr,if SETTINGS_OPEN.load(Ordering::Relaxed) {2} else {0});
     }); }
@@ -169,7 +192,8 @@ pub fn desktop_info() -> serde_json::Value {
             serde_json::json!({"index": index, "name": name})
         })).collect::<Vec<_>>()
     }).unwrap_or_default();
-    serde_json::json!({"platform": "linux", "layerShell": layered(), "monitors": monitors})
+    serde_json::json!({"platform": "linux", "layerShell": layered(), "monitors": monitors,
+        "monitorWarning": MONITOR_WARNING.with(|slot| slot.borrow().clone())})
 }
 pub fn get_autostart() -> Result<bool,String> {
     let path=dirs::config_dir().ok_or("Config directory unavailable")?.join("autostart/dev.aiquota.widget.desktop");
@@ -224,6 +248,34 @@ mod tests {
         assert!(indexed.monitor.as_ref().unwrap().matches(2,"fixture"));
         assert!(!indexed.monitor.as_ref().unwrap().matches(1,"fixture"));
         assert_eq!(serde_json::to_value(named).unwrap()["monitor"],"DP-2");
+    }
+    #[test]
+    fn connector_identity_survives_overlapping_scaled_geometry() {
+        // Mixed-scale rectangles may overlap: point lookup loses identity.
+        let fixtures = [
+            ("eDP-1", gtk::gdk::Rectangle::new(2240, 85, 1536, 960), 2),
+            ("HDMI-A-1", gtk::gdk::Rectangle::new(960, 0, 2560, 1440), 2),
+            ("DP-2", gtk::gdk::Rectangle::new(0, 82, 1920, 1080), 1),
+        ];
+        assert!(fixtures[2].1.intersect(&fixtures[1].1).is_some());
+        let available = fixtures.iter().enumerate().map(|(index, _)| {
+            let name = connector_at_index(index as i32, |i| Some(fixtures[i as usize].0.into())).unwrap();
+            (index as i32, name)
+        }).collect::<Vec<_>>();
+        for (index, (name, _, _)) in fixtures.iter().enumerate() {
+            assert_eq!(selection_index(&MonitorSelection::Name((*name).into()), &available), Ok(index as i32));
+        }
+        assert_eq!(selection_index(&MonitorSelection::Index(1), &available), Ok(1));
+        assert!(connector_at_index(0, |_| None).is_none());
+        assert!(connector_at_index(0, |_| Some(String::new())).is_none());
+    }
+    #[test]
+    fn unknown_monitor_reports_available_names_and_indices() {
+        let available = vec![(0, "eDP-1".into()), (1, "HDMI-A-1".into())];
+        assert_eq!(selection_index(&MonitorSelection::Name("missing".into()), &available),
+            Err("monitor 'missing' not found; available: eDP-1 (0), HDMI-A-1 (1)".into()));
+        assert!(selection_index(&MonitorSelection::Index(9), &available).unwrap_err().contains("monitor '9' not found"));
+        assert!(!selection_index(&MonitorSelection::Name("bad\nname".into()), &[]).unwrap_err().contains('\n'));
     }
     #[test]
     fn autostart_is_quoted_and_only_removes_its_own_file() {
