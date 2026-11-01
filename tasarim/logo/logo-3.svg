@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad3" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#15151C"/>
+      <stop offset="100%" stop-color="#0A0A0D"/>
+    </radialGradient>
+  </defs>
+
+  <!-- App Icon Base Squircle -->
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="url(#bgGrad3)" stroke="#282835" stroke-width="4"/>
+
+  <!-- Battery Terminal Cap -->
+  <rect x="216" y="94" width="80" height="20" rx="6" fill="#2E2E3C" stroke="#454556" stroke-width="3"/>
+
+  <!-- Battery Outer Casing -->
+  <rect x="144" y="124" width="224" height="288" rx="28" fill="#121217" stroke="#2D2D3B" stroke-width="5"/>
+
+  <!-- Left Side Calibration Notches -->
+  <line x1="124" y1="206" x2="136" y2="206" stroke="#FF5A1F" stroke-width="3" stroke-linecap="round"/>
+  <line x1="128" y1="294" x2="136" y2="294" stroke="#454556" stroke-width="3" stroke-linecap="round"/>
+  <line x1="128" y1="382" x2="136" y2="382" stroke="#454556" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- 4x6 Dot-Matrix Energy Grid -->
+  <!-- Row 0 (Top / Remaining Capacity - Dim) -->
+  <circle cx="176" cy="162" r="13" fill="#25252E"/>
+  <circle cx="229" cy="162" r="13" fill="#25252E"/>
+  <circle cx="283" cy="162" r="13" fill="#25252E"/>
+  <circle cx="336" cy="162" r="13" fill="#25252E"/>
+
+  <!-- Row 1 (Threshold Level - High Alert Signal Orange) -->
+  <circle cx="176" cy="206" r="13" fill="#FF5A1F"/>
+  <circle cx="229" cy="206" r="13" fill="#FF5A1F"/>
+  <circle cx="283" cy="206" r="13" fill="#FF5A1F"/>
+  <circle cx="336" cy="206" r="13" fill="#FF5A1F"/>
+
+  <!-- Row 2 (Active Fill) -->
+  <circle cx="176" cy="250" r="13" fill="#F4F4F6"/>
+  <circle cx="229" cy="250" r="13" fill="#F4F4F6"/>
+  <circle cx="283" cy="250" r="13" fill="#F4F4F6"/>
+  <circle cx="336" cy="250" r="13" fill="#F4F4F6"/>
+
+  <!-- Row 3 (Active Fill) -->
+  <circle cx="176" cy="294" r="13" fill="#F4F4F6"/>
+  <circle cx="229" cy="294" r="13" fill="#F4F4F6"/>
+  <circle cx="283" cy="294" r="13" fill="#F4F4F6"/>
+  <circle cx="336" cy="294" r="13" fill="#F4F4F6"/>
+
+  <!-- Row 4 (Active Fill) -->
+  <circle cx="176" cy="338" r="13" fill="#F4F4F6"/>
+  <circle cx="229" cy="338" r="13" fill="#F4F4F6"/>
+  <circle cx="283" cy="338" r="13" fill="#F4F4F6"/>
+  <circle cx="336" cy="338" r="13" fill="#F4F4F6"/>
+
+  <!-- Row 5 (Base / Active Fill) -->
+  <circle cx="176" cy="382" r="13" fill="#F4F4F6"/>
+  <circle cx="229" cy="382" r="13" fill="#F4F4F6"/>
+  <circle cx="283" cy="382" r="13" fill="#F4F4F6"/>
+  <circle cx="336" cy="382" r="13" fill="#F4F4F6"/>
+</svg>

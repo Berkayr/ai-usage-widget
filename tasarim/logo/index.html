@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Usage // Logo Adayları Karşılaştırma Matrisi (18 SVG)</title>
+  <style>
+    :root {
+      --bg-stage: #09090c;
+      --bg-panel: #111116;
+      --bg-card-dark: #0e0e12;
+      --bg-card-light: #f4f3ef;
+      --border-dark: #262633;
+      --border-light: #d5d4ce;
+      --text-main: #f2f2f5;
+      --text-muted: #888896;
+      --accent: #ff5a1f;
+      --accent-glow: rgba(255, 90, 31, 0.25);
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+      --dot-pattern: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-stage);
+      background-image: var(--dot-pattern);
+      background-size: 8px 8px;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      padding: 24px 20px 80px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      border: 1px solid var(--border-dark);
+      background: var(--bg-panel);
+      border-left: 4px solid var(--accent);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .title-area h1 {
+      font-size: 20px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-area h1 .beacon {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .title-area p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .meta-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      font-size: 11px;
+      border: 1px solid var(--border-dark);
+      padding: 4px 10px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .pill.highlight {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Size quick test bar */
+    .size-guide-strip {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-dark);
+      border-radius: 8px;
+      padding: 12px 18px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .size-guide-strip .sizes-list {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .size-guide-strip span strong {
+      color: var(--text-main);
+    }
+
+    /* Candidate Section */
+    .candidate-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+
+    .candidate-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .candidate-header .left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .num-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+
+    .candidate-title {
+      font-size: 16px;
+      letter-spacing: 0.8px;
+    }
+
+    .concept-tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      border: 1px solid var(--border-dark);
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    /* Grid of 3 Variants per candidate */
+    .variants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 1px;
+      background: var(--border-dark);
+    }
+
+    .variant-col {
+      background: var(--bg-panel);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .variant-col.col-light-sample {
+      background: #18181f;
+    }
+
+    .col-title {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--border-dark);
+      padding-bottom: 8px;
+    }
+
+    .col-title span.badge {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    /* Preview Canvas Stages */
+    .preview-stage-dark {
+      background-color: var(--bg-card-dark);
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+      background-size: 6px 6px;
+      border: 1px solid var(--border-dark);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      min-height: 280px;
+    }
+
+    .preview-stage-light {
+      background-color: var(--bg-card-light);
+      background-image: radial-gradient(circle, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+      background-size: 6px 6px;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      min-height: 280px;
+    }
+
+    /* Multi-Size Comparison Row */
+    .sizes-comparison-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      padding: 12px 14px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-dark);
+      border-radius: 8px;
+    }
+
+    .size-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .size-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .img-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dotted rgba(255, 255, 255, 0.15);
+      background: #000;
+    }
+
+    .img-box.light-border {
+      border: 1px dotted rgba(0, 0, 0, 0.2);
+      background: #faf9f6;
+    }
+
+    .img-box img {
+      display: block;
+      object-fit: contain;
+    }
+
+    /* Specific scale classes */
+    .scale-240 { width: 240px; height: 240px; }
+    .scale-128 { width: 128px; height: 128px; }
+    .scale-64  { width: 64px; height: 64px; }
+    .scale-32  { width: 32px; height: 32px; }
+    .scale-16  { width: 16px; height: 16px; }
+
+    /* Summary bar */
+    .candidate-desc {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-dark);
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .candidate-desc strong {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Main Header -->
+    <header>
+      <div class="title-area">
+        <h1><span class="beacon"></span> AI-Usage // Logo Adayları Karşılaştırma Matrisi</h1>
+        <p>Windows + Linux Dot-Matrix Masaüstü Widget'ı için 6 Farklı Tasarım Yönü ve 18 SVG İkon Adayı</p>
+      </div>
+      <div class="meta-pills">
+        <span class="pill">Tasarım Dili: Dot-Matrix Mono</span>
+        <span class="pill highlight">Vurgu: #FF5A1F</span>
+        <span class="pill">6 Aday × 3 Varyant = 18 SVG</span>
+      </div>
+    </header>
+
+    <!-- Size Guide Info -->
+    <div class="size-guide-strip">
+      <span>Ölçek Test Noktaları: <strong>512px</strong> (Master), <strong>128px</strong> (Launcher/Store), <strong>32px</strong> (Dock/App List), <strong>16px</strong> (System Tray / Favicon)</span>
+      <div class="sizes-list">
+        <span>Koyu: <code>logo-N.svg</code></span>
+        <span>Açık: <code>logo-N-light.svg</code></span>
+        <span>Small/Tray: <code>logo-N-small.svg</code></span>
+      </div>
+    </div>
+
+    <!-- CANDIDATE 1 -->
+    <section class="candidate-card" id="c1">
+      <div class="candidate-header">
+        <div class="left">
+          <span class="num-tag">ADAY 01</span>
+          <h2 class="candidate-title">Nokta Matrisi Dolum Göstergesi (Matrix Meter)</h2>
+        </div>
+        <span class="concept-tag">Fikir 1: 7×7 LED Matris Telemetri Barı + Turuncu Seviye Cursor'ı</span>
+      </div>
+
+      <div class="variants-grid">
+        <!-- Variant Dark -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge">KOYU ZEMİN</span>
+            <span>logo-1.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-240">
+              <img src="logo-1.svg" alt="Logo 1 Dark" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-128"><img src="logo-1.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-1.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16"><img src="logo-1.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Light -->
+        <div class="variant-col col-light-sample">
+          <div class="col-title">
+            <span class="badge" style="color:#d5d4ce;">AÇIK ZEMİN</span>
+            <span style="color:#a0a0aa;">logo-1-light.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-light">
+            <div class="img-box light-border scale-240">
+              <img src="logo-1-light.svg" alt="Logo 1 Light" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row" style="background:#e4e3dc;">
+            <div class="size-box">
+              <div class="img-box light-border scale-128"><img src="logo-1-light.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label" style="color:#555;">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-32"><img src="logo-1-light.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label" style="color:#555;">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-16"><img src="logo-1-light.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:#555;">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Small / Tray -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge" style="color:var(--accent);">SADELEŞTİRİLMİŞ (TRAY / SMALL)</span>
+            <span>logo-1-small.svg (64×64)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-128" style="background:transparent; border:1px dashed #333;">
+              <img src="logo-1-small.svg" alt="Logo 1 Small" width="128" height="128">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-64"><img src="logo-1-small.svg" alt="64px" width="64" height="64"></div>
+              <span class="size-label">64px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-1-small.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16" style="outline:1px solid var(--accent);"><img src="logo-1-small.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:var(--accent);">16px (Tray)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="candidate-desc">
+        <span>Matris telemetri ekranı; alt satırlardan yukarıya doğru dolan kota seviyesini ve tepe noktasındaki canlı turuncu uyarı noktasını gösterir.</span>
+        <span>SVG: <code>logo-1.svg</code> | <code>logo-1-light.svg</code> | <code>logo-1-small.svg</code></span>
+      </div>
+    </section>
+
+    <!-- CANDIDATE 2 -->
+    <section class="candidate-card" id="c2">
+      <div class="candidate-header">
+        <div class="left">
+          <span class="num-tag">ADAY 02</span>
+          <h2 class="candidate-title">Geri Sayım Radyal Yayı + Nokta (Radial Countdown Arc)</h2>
+        </div>
+        <span class="concept-tag">Fikir 2: 16 Noktalı Kadran Döngüsü + Eşik Ucu + Merkez Çekirdek Beacon</span>
+      </div>
+
+      <div class="variants-grid">
+        <!-- Variant Dark -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge">KOYU ZEMİN</span>
+            <span>logo-2.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-240">
+              <img src="logo-2.svg" alt="Logo 2 Dark" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-128"><img src="logo-2.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-2.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16"><img src="logo-2.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Light -->
+        <div class="variant-col col-light-sample">
+          <div class="col-title">
+            <span class="badge" style="color:#d5d4ce;">AÇIK ZEMİN</span>
+            <span style="color:#a0a0aa;">logo-2-light.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-light">
+            <div class="img-box light-border scale-240">
+              <img src="logo-2-light.svg" alt="Logo 2 Light" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row" style="background:#e4e3dc;">
+            <div class="size-box">
+              <div class="img-box light-border scale-128"><img src="logo-2-light.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label" style="color:#555;">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-32"><img src="logo-2-light.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label" style="color:#555;">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-16"><img src="logo-2-light.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:#555;">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Small / Tray -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge" style="color:var(--accent);">SADELEŞTİRİLMİŞ (TRAY / SMALL)</span>
+            <span>logo-2-small.svg (64×64)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-128" style="background:transparent; border:1px dashed #333;">
+              <img src="logo-2-small.svg" alt="Logo 2 Small" width="128" height="128">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-64"><img src="logo-2-small.svg" alt="64px" width="64" height="64"></div>
+              <span class="size-label">64px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-2-small.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16" style="outline:1px solid var(--accent);"><img src="logo-2-small.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:var(--accent);">16px (Tray)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="candidate-desc">
+        <span>5 saatlik kota penceresi ve haftalık sıfırlanma geri sayımını dairesel radyal bir yay ile simgeler; merkezdeki turuncu çekirdek sürekli canlı sinyal verir.</span>
+        <span>SVG: <code>logo-2.svg</code> | <code>logo-2-light.svg</code> | <code>logo-2-small.svg</code></span>
+      </div>
+    </section>
+
+    <!-- CANDIDATE 3 -->
+    <section class="candidate-card" id="c3">
+      <div class="candidate-header">
+        <div class="left">
+          <span class="num-tag">ADAY 03</span>
+          <h2 class="candidate-title">Nokta Matris Pil / Kota Göstergesi (Battery Gauge Grid)</h2>
+        </div>
+        <span class="concept-tag">Fikir 3: Dikey Pil Silueti + 4×6 LED Matris Şarj/Kota Seviyesi + Kalibrasyon Tırnakları</span>
+      </div>
+
+      <div class="variants-grid">
+        <!-- Variant Dark -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge">KOYU ZEMİN</span>
+            <span>logo-3.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-240">
+              <img src="logo-3.svg" alt="Logo 3 Dark" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-128"><img src="logo-3.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-3.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16"><img src="logo-3.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Light -->
+        <div class="variant-col col-light-sample">
+          <div class="col-title">
+            <span class="badge" style="color:#d5d4ce;">AÇIK ZEMİN</span>
+            <span style="color:#a0a0aa;">logo-3-light.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-light">
+            <div class="img-box light-border scale-240">
+              <img src="logo-3-light.svg" alt="Logo 3 Light" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row" style="background:#e4e3dc;">
+            <div class="size-box">
+              <div class="img-box light-border scale-128"><img src="logo-3-light.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label" style="color:#555;">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-32"><img src="logo-3-light.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label" style="color:#555;">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-16"><img src="logo-3-light.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:#555;">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Small / Tray -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge" style="color:var(--accent);">SADELEŞTİRİLMİŞ (TRAY / SMALL)</span>
+            <span>logo-3-small.svg (64×64)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-128" style="background:transparent; border:1px dashed #333;">
+              <img src="logo-3-small.svg" alt="Logo 3 Small" width="128" height="128">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-64"><img src="logo-3-small.svg" alt="64px" width="64" height="64"></div>
+              <span class="size-label">64px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-3-small.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16" style="outline:1px solid var(--accent);"><img src="logo-3-small.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:var(--accent);">16px (Tray)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="candidate-desc">
+        <span>Geliştiricinin AI "enerji/kota" tüketimini doğrudan pil metaforuyla birleştirir; turuncu satır limit eşiğini ve şarj/tükenme hissini verir.</span>
+        <span>SVG: <code>logo-3.svg</code> | <code>logo-3-light.svg</code> | <code>logo-3-small.svg</code></span>
+      </div>
+    </section>
+
+    <!-- CANDIDATE 4 -->
+    <section class="candidate-card" id="c4">
+      <div class="candidate-header">
+        <div class="left">
+          <span class="num-tag">ADAY 04</span>
+          <h2 class="candidate-title">3 Sağlayıcı / 3 Sütun Matrisi (Triple Provider Pillars)</h2>
+        </div>
+        <span class="concept-tag">Fikir 4: Claude, Codex ve Gemini Sütunları + Equalizer Telemetrisi + Tepe Alarm Noktası</span>
+      </div>
+
+      <div class="variants-grid">
+        <!-- Variant Dark -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge">KOYU ZEMİN</span>
+            <span>logo-4.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-240">
+              <img src="logo-4.svg" alt="Logo 4 Dark" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-128"><img src="logo-4.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-4.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16"><img src="logo-4.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Light -->
+        <div class="variant-col col-light-sample">
+          <div class="col-title">
+            <span class="badge" style="color:#d5d4ce;">AÇIK ZEMİN</span>
+            <span style="color:#a0a0aa;">logo-4-light.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-light">
+            <div class="img-box light-border scale-240">
+              <img src="logo-4-light.svg" alt="Logo 4 Light" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row" style="background:#e4e3dc;">
+            <div class="size-box">
+              <div class="img-box light-border scale-128"><img src="logo-4-light.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label" style="color:#555;">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-32"><img src="logo-4-light.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label" style="color:#555;">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-16"><img src="logo-4-light.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:#555;">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Small / Tray -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge" style="color:var(--accent);">SADELEŞTİRİLMİŞ (TRAY / SMALL)</span>
+            <span>logo-4-small.svg (64×64)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-128" style="background:transparent; border:1px dashed #333;">
+              <img src="logo-4-small.svg" alt="Logo 4 Small" width="128" height="128">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-64"><img src="logo-4-small.svg" alt="64px" width="64" height="64"></div>
+              <span class="size-label">64px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-4-small.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16" style="outline:1px solid var(--accent);"><img src="logo-4-small.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:var(--accent);">16px (Tray)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="candidate-desc">
+        <span>Uygulamanın ana vaadi olan 3 sağlayıcıyı (Claude, Codex, Gemini) 3 dikey sütun halinde temsil eder; farklı kullanım seviyeleri eşzamanlı izlemeyi simgeler.</span>
+        <span>SVG: <code>logo-4.svg</code> | <code>logo-4-light.svg</code> | <code>logo-4-small.svg</code></span>
+      </div>
+    </section>
+
+    <!-- CANDIDATE 5 -->
+    <section class="candidate-card" id="c5">
+      <div class="candidate-header">
+        <div class="left">
+          <span class="num-tag">ADAY 05</span>
+          <h2 class="candidate-title">Kum Saati Nokta Matrisi (Hourglass Matrix)</h2>
+        </div>
+        <span class="concept-tag">Fikir 5: Simetrik Kum Saati Izgarası + Akan Turuncu Damla + Sıfırlanma Sayacı</span>
+      </div>
+
+      <div class="variants-grid">
+        <!-- Variant Dark -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge">KOYU ZEMİN</span>
+            <span>logo-5.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-240">
+              <img src="logo-5.svg" alt="Logo 5 Dark" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-128"><img src="logo-5.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-5.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16"><img src="logo-5.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Light -->
+        <div class="variant-col col-light-sample">
+          <div class="col-title">
+            <span class="badge" style="color:#d5d4ce;">AÇIK ZEMİN</span>
+            <span style="color:#a0a0aa;">logo-5-light.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-light">
+            <div class="img-box light-border scale-240">
+              <img src="logo-5-light.svg" alt="Logo 5 Light" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row" style="background:#e4e3dc;">
+            <div class="size-box">
+              <div class="img-box light-border scale-128"><img src="logo-5-light.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label" style="color:#555;">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-32"><img src="logo-5-light.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label" style="color:#555;">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-16"><img src="logo-5-light.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:#555;">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Small / Tray -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge" style="color:var(--accent);">SADELEŞTİRİLMİŞ (TRAY / SMALL)</span>
+            <span>logo-5-small.svg (64×64)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-128" style="background:transparent; border:1px dashed #333;">
+              <img src="logo-5-small.svg" alt="Logo 5 Small" width="128" height="128">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-64"><img src="logo-5-small.svg" alt="64px" width="64" height="64"></div>
+              <span class="size-label">64px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-5-small.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16" style="outline:1px solid var(--accent);"><img src="logo-5-small.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:var(--accent);">16px (Tray)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="candidate-desc">
+        <span>Zamanın akışını, 5 saatlik pencereyi ve kota sıfırlanmasını simgeler; üst hazneden alt hazneye akan turuncu nokta zaman ve kullanım telemetrisini vurgular.</span>
+        <span>SVG: <code>logo-5.svg</code> | <code>logo-5-light.svg</code> | <code>logo-5-small.svg</code></span>
+      </div>
+    </section>
+
+    <!-- CANDIDATE 6 -->
+    <section class="candidate-card" id="c6">
+      <div class="candidate-header">
+        <div class="left">
+          <span class="num-tag">ADAY 06</span>
+          <h2 class="candidate-title">Soyut "Q" Harfi Matrisi (Abstract Quota "Q")</h2>
+        </div>
+        <span class="concept-tag">Fikir 6: "Quota" İçin Tipografik Olmayan Saf Nokta Matris Glifi + Canlı Turuncu Kuyruk</span>
+      </div>
+
+      <div class="variants-grid">
+        <!-- Variant Dark -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge">KOYU ZEMİN</span>
+            <span>logo-6.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-240">
+              <img src="logo-6.svg" alt="Logo 6 Dark" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-128"><img src="logo-6.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-6.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16"><img src="logo-6.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Light -->
+        <div class="variant-col col-light-sample">
+          <div class="col-title">
+            <span class="badge" style="color:#d5d4ce;">AÇIK ZEMİN</span>
+            <span style="color:#a0a0aa;">logo-6-light.svg (512×512)</span>
+          </div>
+          <div class="preview-stage-light">
+            <div class="img-box light-border scale-240">
+              <img src="logo-6-light.svg" alt="Logo 6 Light" width="240" height="240">
+            </div>
+          </div>
+          <div class="sizes-comparison-row" style="background:#e4e3dc;">
+            <div class="size-box">
+              <div class="img-box light-border scale-128"><img src="logo-6-light.svg" alt="128px" width="128" height="128"></div>
+              <span class="size-label" style="color:#555;">128px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-32"><img src="logo-6-light.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label" style="color:#555;">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box light-border scale-16"><img src="logo-6-light.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:#555;">16px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variant Small / Tray -->
+        <div class="variant-col">
+          <div class="col-title">
+            <span class="badge" style="color:var(--accent);">SADELEŞTİRİLMİŞ (TRAY / SMALL)</span>
+            <span>logo-6-small.svg (64×64)</span>
+          </div>
+          <div class="preview-stage-dark">
+            <div class="img-box scale-128" style="background:transparent; border:1px dashed #333;">
+              <img src="logo-6-small.svg" alt="Logo 6 Small" width="128" height="128">
+            </div>
+          </div>
+          <div class="sizes-comparison-row">
+            <div class="size-box">
+              <div class="img-box scale-64"><img src="logo-6-small.svg" alt="64px" width="64" height="64"></div>
+              <span class="size-label">64px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-32"><img src="logo-6-small.svg" alt="32px" width="32" height="32"></div>
+              <span class="size-label">32px</span>
+            </div>
+            <div class="size-box">
+              <div class="img-box scale-16" style="outline:1px solid var(--accent);"><img src="logo-6-small.svg" alt="16px" width="16" height="16"></div>
+              <span class="size-label" style="color:var(--accent);">16px (Tray)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="candidate-desc">
+        <span>"AI Quota" çalışma adının "Q" harfini saf nokta matrisinden bir glife dönüştürür; sağ alttaki turuncu kuyruk hem radar anteni hem de dinamik sinyal etkisi verir.</span>
+        <span>SVG: <code>logo-6.svg</code> | <code>logo-6-light.svg</code> | <code>logo-6-small.svg</code></span>
+      </div>
+    </section>
+  </div>
+
+</body>
+</html>

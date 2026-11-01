@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <!-- Minimalist Small Dot-Matrix Meter (16px Legible Icon Glyph) -->
+  <!-- Row 0 (Top / Inactive) -->
+  <circle cx="11" cy="11" r="5" fill="#40404C"/>
+  <circle cx="25" cy="11" r="5" fill="#40404C"/>
+  <circle cx="39" cy="11" r="5" fill="#40404C"/>
+  <circle cx="53" cy="11" r="5" fill="#40404C"/>
+
+  <!-- Row 1 (Threshold with Signal Orange Beacon) -->
+  <circle cx="11" cy="25" r="5" fill="#F4F4F6"/>
+  <circle cx="25" cy="25" r="5" fill="#F4F4F6"/>
+  <circle cx="39" cy="25" r="5.6" fill="#FF5A1F"/>
+  <circle cx="53" cy="25" r="5" fill="#40404C"/>
+
+  <!-- Row 2 (Active Quota Fill) -->
+  <circle cx="11" cy="39" r="5" fill="#F4F4F6"/>
+  <circle cx="25" cy="39" r="5" fill="#F4F4F6"/>
+  <circle cx="39" cy="39" r="5" fill="#F4F4F6"/>
+  <circle cx="53" cy="39" r="5" fill="#F4F4F6"/>
+
+  <!-- Row 3 (Base / Full Fill) -->
+  <circle cx="11" cy="53" r="5" fill="#F4F4F6"/>
+  <circle cx="25" cy="53" r="5" fill="#F4F4F6"/>
+  <circle cx="39" cy="53" r="5" fill="#F4F4F6"/>
+  <circle cx="53" cy="53" r="5" fill="#F4F4F6"/>
+</svg>
