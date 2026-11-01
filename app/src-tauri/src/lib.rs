@@ -2,6 +2,8 @@
 mod linux;
 #[cfg(windows)]
 mod taskbar;
+#[cfg(windows)]
+mod autostart;
 use notify::{RecursiveMode, Watcher};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -95,7 +97,7 @@ fn snap_window(window: tauri::WebviewWindow, corner: String) -> Result<(), Strin
     if corner=="Free" { return Ok(()); }
     let monitor=current_monitor(&window)?; let area=monitor.work_area(); let size=window.outer_size().map_err(|e|e.to_string())?;
     let left=corner.ends_with("left"); let top=corner.starts_with("Top");
-    #[cfg(target_os="linux")] let margin=(load_settings().linux.margin.clamp(0,500) as f64 * monitor.scale_factor()).round() as i32;
+    #[cfg(target_os="linux")] let margin=(load_settings().linux.margin.clamp(0,64) as f64 * monitor.scale_factor()).round() as i32;
     #[cfg(not(target_os="linux"))] let margin=0;
 
     let x=if left {area.position.x+margin} else {area.position.x+area.size.width as i32-size.width as i32-margin};
@@ -144,9 +146,28 @@ fn start_background(app: tauri::AppHandle) {
 #[tauri::command]
 fn get_linux_hint() -> Option<&'static str> { #[cfg(target_os="linux")] { return linux::placement_hint(); } #[cfg(not(target_os="linux"))] { None } }
 #[tauri::command]
-fn set_autostart(enabled: bool) -> Result<(),String> { #[cfg(target_os="linux")] { return linux::set_autostart(enabled); } #[cfg(not(target_os="linux"))] { let _=enabled; Err("Autostart command is currently supported on Linux".into()) } }
+fn set_autostart(enabled: bool) -> Result<(),String> {
+    #[cfg(target_os="linux")] { linux::set_autostart(enabled) }
+    #[cfg(windows)] { autostart::set(enabled) }
+    #[cfg(not(any(target_os="linux", windows)))] { let _=enabled; Err("Start at login is unavailable on this platform".into()) }
+}
+#[tauri::command]
+fn get_autostart() -> Result<bool,String> {
+    #[cfg(target_os="linux")] { linux::get_autostart() }
+    #[cfg(windows)] { autostart::get() }
+    #[cfg(not(any(target_os="linux", windows)))] { Err("Start at login is unavailable on this platform".into()) }
+}
+#[tauri::command]
+async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> {
+    #[cfg(target_os="linux")] {
+        let (sender, receiver) = std::sync::mpsc::channel();
+        window.run_on_main_thread(move || { let _ = sender.send(linux::desktop_info()); }).map_err(|e|e.to_string())?;
+        receiver.recv().map_err(|e|e.to_string())
+    }
+    #[cfg(not(target_os="linux"))] { let _=window; Ok(json!({"platform": std::env::consts::OS, "layerShell": false, "monitors": []})) }
+}
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { #[cfg(target_os="linux")] linux::configure_python(app); if let Some(window)=app.get_webview_window("main") { restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { #[cfg(target_os="linux")] linux::configure_python(app); if let Some(window)=app.get_webview_window("main") { restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
 }

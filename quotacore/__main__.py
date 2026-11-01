@@ -168,7 +168,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     bar_parser = sub.add_parser("bar", help="read the shared snapshot for a desktop panel")
     bar_parser.add_argument("--format", choices=("plain", "waybar", "polybar", "i3blocks", "json"), default="plain")
-    bar_parser.add_argument("--providers", default="claude,codex")
+    bar_parser.add_argument("--providers", help="comma-separated IDs; defaults to all OK/STALE providers")
     bar_parser.add_argument("--window", choices=("session", "weekly", "both"), default="session")
     sub.add_parser("snapshot")
     write_parser = sub.add_parser("write")
@@ -195,8 +195,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "bar":
         from .bar import render
-        providers = list(dict.fromkeys(x.strip() for x in args.providers.split(",") if x.strip()))
-        if not providers or any(x not in PROVIDERS for x in providers):
+        providers = None if args.providers is None else list(dict.fromkeys(x.strip() for x in args.providers.split(",") if x.strip()))
+        if providers is not None and (not providers or any(x not in PROVIDERS for x in providers)):
             parser.error("--providers must be a comma-separated list of known provider IDs")
         print(render(args.format, providers, args.window))
     elif args.command == "snapshot":

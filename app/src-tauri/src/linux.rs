@@ -82,7 +82,7 @@ pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
         for edge in 0..4 {
             let active=match edge {0=>corner.ends_with("left"),1=>!corner.ends_with("left"),2=>corner.starts_with("Top"),_=>!corner.starts_with("Top")};
             call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_anchor\0").unwrap()(ptr,edge,active as i32);
-            call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_margin\0").unwrap()(ptr,edge,options.margin.clamp(0,500));
+            call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_margin\0").unwrap()(ptr,edge,options.margin.clamp(0,64));
         }
         call::<unsafe extern "C" fn(Window,i32)>(lib,b"gtk_layer_set_exclusive_zone\0").unwrap()(ptr,0);
         let display=gtk.display();
@@ -117,6 +117,43 @@ pub const SCRIPT: &str = r#"(() => {
  new MutationObserver(update).observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['hidden']}); update();
 })()"#;
 
+pub fn desktop_info() -> serde_json::Value {
+    let monitors = gtk::gdk::Display::default().map(|display| {
+        (0..display.n_monitors()).filter_map(|index| display.monitor(index).map(|monitor| {
+            let name = monitor.model().map(|s|s.to_string()).unwrap_or_else(||format!("Monitor {}", index + 1));
+            serde_json::json!({"index": index, "name": name})
+        })).collect::<Vec<_>>()
+    }).unwrap_or_default();
+    serde_json::json!({"platform": "linux", "layerShell": layered(), "monitors": monitors})
+}
+pub fn get_autostart() -> Result<bool,String> {
+    let path=dirs::config_dir().ok_or("Config directory unavailable")?.join("autostart/dev.aiquota.widget.desktop");
+    read_autostart(&path)
+}
+fn read_autostart(path: &std::path::Path) -> Result<bool,String> {
+    let content = match fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(false),
+        Err(e) => return Err(e.to_string()),
+    };
+    let mut entry = false;
+    let mut enabled = true;
+    let mut executable = false;
+    for line in content.lines().map(str::trim) {
+        if line.starts_with('[') { entry = line == "[Desktop Entry]"; continue; }
+        if !entry { continue; }
+        if let Some((key, value)) = line.split_once('=') {
+            match key.trim() {
+                "Hidden" if value.trim() == "true" => enabled = false,
+                "X-GNOME-Autostart-enabled" if value.trim() == "false" => enabled = false,
+                "Exec" => executable = !value.trim().is_empty(),
+                _ => (),
+            }
+        }
+    }
+    Ok(enabled && executable)
+}
+
 pub fn set_autostart(enabled: bool) -> Result<(),String> {
     let path=dirs::config_dir().ok_or("Config directory unavailable")?.join("autostart/dev.aiquota.widget.desktop");
     let exe=std::env::var_os("APPIMAGE").map(std::path::PathBuf::from).unwrap_or(std::env::current_exe().map_err(|e|e.to_string())?);
@@ -139,13 +176,24 @@ mod tests {
         fs::create_dir_all(&root).unwrap();
         let path=root.join("widget.desktop");
         let other=root.join("other.desktop"); fs::write(&other,"fixture").unwrap();
+        assert!(!read_autostart(&path).unwrap());
         write_autostart(&path,std::path::Path::new("/opt/A B/widget%\"$`"),true).unwrap();
+        assert!(read_autostart(&path).unwrap());
         let value=fs::read_to_string(&path).unwrap();
         assert!(value.contains("Exec=\"/opt/A B/widget%%\\\"\\$\\`\""));
         write_autostart(&path,std::path::Path::new("/unused"),false).unwrap();
-        assert!(!path.exists()); assert_eq!(fs::read_to_string(&other).unwrap(),"fixture");
+        assert!(!path.exists()); assert!(!read_autostart(&path).unwrap()); assert_eq!(fs::read_to_string(&other).unwrap(),"fixture");
         write_autostart(&path,std::path::Path::new("/unused"),false).unwrap();
         fs::remove_dir_all(root).unwrap();
+    }
+    #[test]
+    fn autostart_respects_disabled_desktop_entries() {
+        let path = std::env::temp_dir().join(format!("aiquota-disabled-{}", std::process::id()));
+        for flag in ["Hidden=true", "X-GNOME-Autostart-enabled=false"] {
+            fs::write(&path, format!("[Desktop Entry]\nExec=/fixture/widget\n{flag}\n")).unwrap();
+            assert!(!read_autostart(&path).unwrap());
+        }
+        fs::remove_file(path).unwrap();
     }
     #[test]
     fn autostart_rejects_newline_in_executable() {

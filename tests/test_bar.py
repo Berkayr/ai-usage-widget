@@ -20,7 +20,7 @@ class BarTests(unittest.TestCase):
         self.env.start()
         self.addCleanup(self.env.stop)
         self.now = datetime(2030, 1, 1, tzinfo=timezone.utc)
-        self.value = {'providers': [{'id': 'claude', 'state': 'OK', 'windows': [
+        self.value = {'providers': [{'id': 'claude', 'state': 'OK', 'plan': 'Example', 'windows': [
             {'kind': 'session', 'label': 'Session', 'used_percent': 34, 'resets_at': '2030-01-01T02:41:00Z'},
             {'kind': 'weekly', 'label': 'Weekly', 'used_percent': 85, 'resets_at': None},
             {'kind': 'session', 'label': 'Extra', 'used_percent': 99, 'hidden_by_default': True}]}]}
@@ -30,7 +30,33 @@ class BarTests(unittest.TestCase):
         self.assertEqual(result['text'], 'CL 34% · 2h41')
         self.assertEqual(result['class'], 'ok')
         self.assertIn('Weekly: 85%', result['tooltip'])
-        self.assertEqual(len(result['providers'][0]['windows']), 3)
+        self.assertEqual(len(result['providers'][0]['windows']), 2)
+        self.assertNotIn('Extra', result['tooltip'])
+        self.assertIn('Claude: OK', result['tooltip'])
+        self.assertEqual(result['providers'][0]['label'], 'Claude')
+        self.assertEqual(result['providers'][0]['short'], 'CL')
+        self.assertEqual(result['providers'][0]['plan'], 'Example')
+
+    def test_default_providers_follow_snapshot_states(self):
+        self.value['providers'] += [
+            {'id': 'gemini', 'state': 'OK', 'windows': []},
+            {'id': 'codex', 'state': 'STALE', 'windows': []},
+            {'id': 'copilot', 'state': 'AUTH_REQUIRED', 'windows': []}]
+        (Path(self.temp.name) / 'snapshot.json').write_text(json.dumps(self.value))
+        with redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(main(['bar', '--format', 'json']), 0)
+        self.assertEqual([p['id'] for p in json.loads(output.getvalue())['providers']], ['claude', 'gemini', 'codex'])
+
+    def test_empty_hidden_and_invalid_windows_are_absent(self):
+        self.value['providers'][0]['windows'] += [
+            {'label': 'Credits', 'used_percent': None},
+            {'label': 'Invalid', 'used_percent': float('nan')},
+            {'label': 'Zero', 'kind': 'weekly', 'used_percent': 0}]
+        result = report(self.value, ['claude'])
+        self.assertEqual([w['label'] for w in result['providers'][0]['windows']], ['Session', 'Weekly', 'Zero'])
+        for label in ['Credits', 'Extra', 'Invalid']:
+            self.assertNotIn(label, result['tooltip'])
+        self.assertIn('Zero: 0%', result['tooltip'])
 
     def test_weekly_and_both(self):
         self.assertEqual(report(self.value, ['claude'], 'weekly')['percentage'], 85)
@@ -50,7 +76,7 @@ class BarTests(unittest.TestCase):
         self.assertEqual(list(Path(self.temp.name).iterdir()), [])
         for content in ['broken', '[]', '{"providers":null}']:
             path.write_text(content)
-            self.assertIn('CL ?', render())
+            self.assertEqual(render(), 'Quota ?')
             self.assertEqual(path.read_text(), content)
 
     def test_malformed_windows_are_unknown(self):

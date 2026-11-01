@@ -1,4 +1,8 @@
-/* Shell theme supplies the normal foreground. Text also carries percentage/state. */
-.quota-unknown { opacity: 0.65; }
-.quota-warn { font-weight: bold; }
-.quota-crit { font-weight: bold; text-decoration: underline; }
+/* No fixed palette: warning/error classes and St's symbolic theme colors. */
+.quota-panel { spacing: 12px; }
+.quota-panel-provider { spacing: 4px; }
+.quota-window { spacing: 6px; min-width: 240px; padding-bottom: 6px; }
+.quota-bar { height: 3px; }
+.quota-reset { font-size: 0.85em; opacity: 0.65; }
+.quota-panel .warning, .quota-panel .error,
+.quota-window .warning, .quota-window .error { font-weight: bold; }

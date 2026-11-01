@@ -11,13 +11,14 @@ const systemAppearance = matchMedia('(prefers-color-scheme: light)');
 let settings = { appearance: 'auto', taskbar: { ...defaultTaskbar }, palette: 'signal-orange', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 94, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
 try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
 let currentSnapshot = null;
+let desktopInfo = null;
 
 document.querySelector('#app').innerHTML = `
   <main class="widget" id="widget">
     <header class="header" data-tauri-drag-region><div class="title-block"><div class="app-title">AI QUOTA</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
     <div class="provider-list" id="providers"></div>
     <footer class="footer"><span>QUOTA MONITOR</span><span>MATRIX//01</span></footer>
-    <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><label>Appearance<select id="appearance"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label><fieldset class="taskbar-settings" id="taskbar-settings"><legend>Taskbar strip</legend><label class="toggle-setting">Enable taskbar strip<input id="taskbar-enabled" type="checkbox"></label><div class="taskbar-providers"><label class="toggle-setting">Claude<input type="checkbox" data-taskbar-provider="claude"></label><label class="toggle-setting">Codex<input type="checkbox" data-taskbar-provider="codex"></label><label class="toggle-setting">Gemini<input type="checkbox" data-taskbar-provider="gemini"></label><label class="toggle-setting">Copilot<input type="checkbox" data-taskbar-provider="copilot"></label></div><label>Style<select id="taskbar-style"><option value="transparent">Transparent</option><option value="chip">Chip</option></select></label><label>Theme<select id="taskbar-theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Quota window<select id="taskbar-window"><option value="session">Session</option><option value="weekly">Weekly</option><option value="both">Both</option></select></label><label class="toggle-setting">Show mini bars<input id="taskbar-bars" type="checkbox"></label></fieldset></section>
+    <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><label>Appearance<select id="appearance"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label><label class="toggle-setting">Start at login<input id="start-at-login" type="checkbox" disabled></label><p id="autostart-status" class="setting-note" role="status" hidden></p><section id="linux-settings" hidden><fieldset class="desktop-settings" id="desktop-layer" hidden><legend>Desktop layer</legend><label>Layer<select id="linux-layer"><option value="top">Above windows</option><option value="bottom">On desktop</option></select></label><label>Margin <output id="linux-margin-out"></output><input id="linux-margin" type="range" min="0" max="64" step="1"></label><label>Monitor<select id="linux-monitor"><option value="">Auto</option></select></label></fieldset><p id="desktop-layer-unavailable" class="setting-note" hidden>Desktop layer controls require layer-shell support. Use your desktop's panel integration for a fixed position.</p></section><fieldset class="taskbar-settings" id="taskbar-settings"><legend>Taskbar strip</legend><label class="toggle-setting">Enable taskbar strip<input id="taskbar-enabled" type="checkbox"></label><div class="taskbar-providers"><label class="toggle-setting">Claude<input type="checkbox" data-taskbar-provider="claude"></label><label class="toggle-setting">Codex<input type="checkbox" data-taskbar-provider="codex"></label><label class="toggle-setting">Gemini<input type="checkbox" data-taskbar-provider="gemini"></label><label class="toggle-setting">Copilot<input type="checkbox" data-taskbar-provider="copilot"></label></div><label>Style<select id="taskbar-style"><option value="transparent">Transparent</option><option value="chip">Chip</option></select></label><label>Theme<select id="taskbar-theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Quota window<select id="taskbar-window"><option value="session">Session</option><option value="weekly">Weekly</option><option value="both">Both</option></select></label><label class="toggle-setting">Show mini bars<input id="taskbar-bars" type="checkbox"></label></fieldset></section>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
     <div class="toast" id="toast" hidden></div>
   </main>`;
@@ -37,6 +38,16 @@ function applySettings() {
   document.querySelector('#app').style.zoom = String(settings.scale / 100);
   document.documentElement.classList.toggle('fit-height', Boolean(settings.fitHeight)); lastFitHeight = 0;
   settings.taskbar = { ...defaultTaskbar, ...settings.taskbar };
+  if (desktopInfo?.platform === 'linux') {
+    settings.linux = { layer: 'bottom', margin: 12, monitor: null, ...settings.linux };
+    $('#linux-layer').value = settings.linux.layer;
+    $('#linux-margin').value = Math.max(0, Math.min(64, settings.linux.margin));
+    $('#linux-margin-out').value = `${$('#linux-margin').value} px`;
+    const monitor = settings.linux.monitor;
+    if (monitor !== null && ![...$('#linux-monitor').options].some(option => option.value === String(monitor)))
+      $('#linux-monitor').add(new Option(`Monitor ${monitor + 1} (unavailable)`, monitor));
+    $('#linux-monitor').value = monitor ?? '';
+  }
   $('#appearance').value = settings.appearance;
   $('#taskbar-style').value = settings.taskbar.style;
   $('#taskbar-theme').value = settings.taskbar.theme;
@@ -86,6 +97,48 @@ $('#taskbar-enabled').onchange = async event => { settings.taskbar.enabled = eve
 $('#taskbar-window').onchange = async event => { settings.taskbar.window = event.target.value; await persist(); };
 $('#taskbar-bars').onchange = async event => { settings.taskbar.showBars = event.target.checked; await persist(); };
 document.querySelectorAll('[data-taskbar-provider]').forEach(input => input.onchange = async () => { settings.taskbar.providers = [...document.querySelectorAll('[data-taskbar-provider]:checked')].map(input => input.dataset.taskbarProvider); await persist(); });
+$('#start-at-login').onchange = async event => {
+  const enabled = event.target.checked;
+  event.target.disabled = true;
+  try {
+    if (!isSample) await invoke('set_autostart', { enabled });
+    event.target.checked = isSample ? enabled : await invoke('get_autostart');
+    $('#autostart-status').hidden = true;
+  } catch (error) {
+    event.target.checked = !enabled;
+    $('#autostart-status').textContent = `Unable to change start at login: ${error}`;
+    $('#autostart-status').hidden = false;
+  } finally { event.target.disabled = false; }
+};
+for (const key of ['layer', 'margin', 'monitor']) $(`#linux-${key}`).onchange = async event => {
+  const raw = event.target.value;
+  settings.linux[key] = key === 'margin' ? Math.max(0, Math.min(64, Number(raw))) : key === 'monitor' ? (raw === '' ? null : Number(raw)) : raw;
+  applySettings();
+  await persist();
+};
+$('#linux-margin').oninput = event => { $('#linux-margin-out').value = `${event.target.value} px`; };
+async function loadDesktopSettings() {
+  try {
+    desktopInfo = await invoke('get_desktop_info');
+    $('#taskbar-settings').hidden = desktopInfo.platform !== 'windows';
+    $('#linux-settings').hidden = desktopInfo.platform !== 'linux';
+    $('#desktop-layer').hidden = !desktopInfo.layerShell;
+    $('#desktop-layer-unavailable').hidden = desktopInfo.layerShell;
+    for (const monitor of desktopInfo.monitors) $('#linux-monitor').add(new Option(monitor.name, monitor.index));
+    if (desktopInfo.layerShell) {
+      const free = [...$('#position').options].find(option => option.value === 'Free');
+      free.disabled = true;
+    }
+    applySettings();
+  } catch (error) { showToast(`Unable to read desktop capabilities: ${error}`); }
+  try {
+    $('#start-at-login').checked = await invoke('get_autostart');
+    $('#start-at-login').disabled = false;
+  } catch (error) {
+    $('#autostart-status').textContent = `Start at login unavailable: ${error}`;
+    $('#autostart-status').hidden = false;
+  }
+}
 $('#gear').onclick = () => { $('#settings').hidden = !$('#settings').hidden; };
 $('#close-settings').onclick = () => { $('#settings').hidden = true; };
 $('#palette').onchange = async (event) => { settings.palette = event.target.value; settings.accent = null; settings.background = null; applySettings(); await persist(); };
@@ -110,6 +163,7 @@ if (isSample) draw(currentSample());
 else {
   try {
     settings = { ...settings, ...(await invoke('load_settings')) }; applySettings();
+    await loadDesktopSettings();
     const initial = await invoke('get_snapshot'); draw(initial.snapshot, !initial.snapshot);
     await listen('snapshot', event => draw(event.payload.snapshot, !event.payload.snapshot));
     await listen('open-settings', () => { $('#settings').hidden = false; });
