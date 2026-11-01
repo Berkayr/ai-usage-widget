@@ -4,27 +4,30 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 jobs:
   release:
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
     runs-on: ubuntu-22.04
-    outputs:
-      created: ${{ steps.release.outputs.release_created }}
-      tag: ${{ steps.release.outputs.tag_name }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4
         id: release
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-  # GITHUB_TOKEN-created tags do not trigger push workflows. Call the same build
-  # workflow explicitly so automatic releases also receive their installers.
-  bundles:
-    needs: release
-    if: needs.release.outputs.created == 'true'
-    uses: ./.github/workflows/build.yml
-    with:
-      tag: ${{ needs.release.outputs.tag }}
-    permissions:
-      contents: write
+      # GITHUB_TOKEN tags do not trigger push workflows; workflow_dispatch does.
+      - name: Dispatch installer build for the released tag
+        if: steps.release.outputs.release_created == 'true'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag_name }}
+        with:
+          script: |
+            const tag = process.env.RELEASE_TAG;
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner, repo: context.repo.repo,
+              workflow_id: 'build.yml', ref: tag, inputs: {tag}
+            });

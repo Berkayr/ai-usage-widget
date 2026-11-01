@@ -1,5 +1,5 @@
 # Source package draft. Place a reviewed source release beside this PKGBUILD.
-# Replace SKIP with the release SHA-256 before publishing to the AUR.
+# Replace REPLACE_WITH_VERIFIED_SHA256 with the release SHA-256 before publishing to the AUR.
 pkgname=ai-quota-widget
 pkgver=0.1.0
 pkgrel=1
@@ -12,7 +12,7 @@ optdepends=('gtk-layer-shell: native Wayland corner placement'
             'plasma5support: Plasma panel widget'
             'waybar: wlroots panel integration')
 source=("$pkgname-$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('REPLACE_WITH_VERIFIED_SHA256')
 
 build() {
   cd "$pkgname-$pkgver"

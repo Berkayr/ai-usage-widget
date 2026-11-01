@@ -66,3 +66,17 @@ The Rust command `set_autostart(enabled: bool)` writes/removes only `dev.aiquota
 Screenshot slots are documented in each integration README. Populate them only with fictional quota data after Claude's review.
 
 Dependency reference: [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) (tray packages in the upstream generic list are not required by this widget).
+
+## AUR checksum release gate
+
+The recipes deliberately contain `REPLACE_WITH_VERIFIED_SHA256`; they must fail
+checksum validation until reviewed release artifacts exist. Before publication:
+
+1. Obtain the intended source archive / AppImage from the reviewed release and verify its provenance.
+2. Calculate `sha256sum <artifact>` and replace each placeholder with that exact 64-digit digest; review source filenames and versions too.
+3. Run `python3 packaging/check-release.py`; it must exit 0. It currently exits 1 for unpublished drafts, by design.
+4. Run `makepkg --verifysource` for each recipe against the actual artifacts, then perform a clean package build.
+
+CI warns if `SKIP` is reintroduced. Do not replace a placeholder with `SKIP` or
+publish the drafts before these checks. Checksums alone do not authenticate a
+release publisher.

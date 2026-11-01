@@ -1,5 +1,5 @@
 # Binary package draft. Place the reviewed AppImage beside this file.
-# Save as PKGBUILD and replace SKIP with the published checksum before use.
+# Save as PKGBUILD and replace REPLACE_WITH_VERIFIED_SHA256 with the published checksum before use.
 pkgname=ai-quota-widget-bin
 pkgver=0.1.0
 pkgrel=1
@@ -11,7 +11,7 @@ conflicts=('ai-quota-widget')
 depends=('fuse2' 'python')
 optdepends=('gtk-layer-shell: native Wayland corner placement')
 source=("ai-quota-widget-$pkgver-x86_64.AppImage")
-sha256sums=('SKIP')
+sha256sums=('REPLACE_WITH_VERIFIED_SHA256')
 
 package() {
   install -Dm755 "ai-quota-widget-$pkgver-x86_64.AppImage" "$pkgdir/opt/ai-quota-widget/ai-quota-widget.AppImage"
