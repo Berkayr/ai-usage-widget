@@ -8,8 +8,9 @@ use notify::{RecursiveMode, Watcher};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 mod collector;
+mod runtime;
 use std::io::Write;
-use std::{fs, path::PathBuf, process::Command, thread, time::Duration};
+use std::{fs, path::PathBuf, thread, time::Duration};
 use tauri::{Emitter, Manager};
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -36,23 +37,14 @@ fn window_path() -> PathBuf { settings_path().parent().unwrap().join("window.jso
 fn read_snapshot() -> Option<Value> { fs::read(snapshot_path()).ok().and_then(|bytes| serde_json::from_slice(&bytes).ok()) }
 const COLLECTOR_TIMEOUT: u64 = 120;
 fn collector(operation: &str, extra: &[String]) -> Result<Value, String> {
-    let cwd = std::env::var_os("QUOTACORE_PYTHONPATH").map(PathBuf::from);
-    #[cfg(windows)] let executables = [("py", true), ("python", false)];
-    #[cfg(not(windows))] let executables = [("python3", false)];
-    for (executable, launcher) in executables {
-        let mut command = Command::new(executable);
-        if launcher { command.arg("-3"); }
-        command.args(["-m", "quotacore", operation]).args(extra).env("PYTHONDONTWRITEBYTECODE", "1");
-        if let Some(ref path) = cwd { command.current_dir(path).env("PYTHONPATH", path); }
-        let bytes = match collector::run(command, Duration::from_secs(COLLECTOR_TIMEOUT)) {
-            Ok(bytes) => bytes,
-            Err(error) if error == "Collector could not start" => continue,
-            Err(error) => return Err(error),
-        };
-        return if bytes.is_empty() { Ok(Value::Null) } else { serde_json::from_slice(&bytes).map_err(|_| "Collector returned invalid JSON".into()) };
-    }
-    Err("No Python interpreter found".into())
+    let root = runtime::resources()?;
+    let runtime = runtime::select(root)?;
+    let bytes = collector::run(runtime.collector(root, operation, extra), Duration::from_secs(COLLECTOR_TIMEOUT))?;
+    if bytes.is_empty() { Ok(Value::Null) } else { serde_json::from_slice(&bytes).map_err(|_| "Collector returned invalid JSON".into()) }
 }
+#[tauri::command]
+fn get_runtime_diagnostics() -> Result<Value, String> { collector("doctor", &[]) }
+
 fn refresh() -> Result<(), String> { collector("write", &[]).map(|_| ()) }
 #[tauri::command]
 fn get_provider_config() -> Result<Value, String> { collector("provider-config", &[]) }
@@ -74,12 +66,14 @@ fn private_write(path: PathBuf, bytes: Vec<u8>) -> Result<(), String> {
     file.write_all(&bytes).map_err(|e|e.to_string())
 }
 fn configure_python(app: &tauri::App) {
-    if std::env::var_os("QUOTACORE_PYTHONPATH").is_none() {
-        if let Ok(root)=app.path().resource_dir() {
-            if root.join("quotacore/__main__.py").is_file() { std::env::set_var("QUOTACORE_PYTHONPATH", root); }
-        }
+    if let Ok(root) = app.path().resource_dir() {
+        if root.join("quotacore/__main__.py").is_file() { runtime::configure(root); return; }
     }
+    // Source development only; release builds never use a compile-machine path.
+    #[cfg(debug_assertions)]
+    runtime::configure(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../.."));
 }
+
 fn emit_snapshot(app: &tauri::AppHandle) { let snapshot = read_snapshot(); #[cfg(windows)] taskbar::update_snapshot(snapshot.clone()); let _ = app.emit("snapshot", SnapshotEvent { snapshot }); }
 #[tauri::command]
 fn get_snapshot() -> Value { json!({"snapshot": read_snapshot()}) }
@@ -200,5 +194,5 @@ async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> 
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
 }

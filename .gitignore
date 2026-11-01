@@ -39,3 +39,6 @@ app/src-tauri/icons/ios/
 docs/about.md
 docs/tools/.capture-*/
 docs/screenshots/checks/
+
+# Verified build-time Windows runtime; never commit downloaded binaries
+app/src-tauri/python/

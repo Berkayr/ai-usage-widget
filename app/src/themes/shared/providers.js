@@ -1,3 +1,5 @@
+const providerLabels = { claude: 'Claude Code', codex: 'Codex', gemini: 'Gemini CLI', copilot: 'GitHub Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains AI' };
+
 // Common consent/settings surface for every theme. DOM text nodes only.
 export function mountProviders(parent, config, save, onSaved = () => {}) {
   parent.replaceChildren();
@@ -15,7 +17,11 @@ export function mountProviders(parent, config, save, onSaved = () => {}) {
     input.type = 'checkbox';
     input.checked = config.initialized && provider.enabled;
     const text = document.createElement('span');
-    text.textContent = `${id}${config.detected[id] ? ' (detected)' : ''}: ${config.disclosures[id]}`;
+    const name = document.createElement('strong');
+    name.textContent = `${providerLabels[id] || id}${config.detected[id] ? ' (detected)' : ''}`;
+    const description = document.createElement('small');
+    description.textContent = config.disclosures[id];
+    text.append(name, description);
     label.append(input, text); choices.append(label); checks.push([id, input]);
   }
   const status = document.createElement('p');

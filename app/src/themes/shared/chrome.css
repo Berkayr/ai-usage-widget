@@ -77,3 +77,8 @@
 .provider-consent-actions button { padding:.5rem 1rem; color:var(--textPrimary); background:var(--bgCard); border:1px solid var(--border); border-radius:.25rem; cursor:pointer; font:inherit; }
 .provider-consent-actions .setting-note { margin:.25rem 0 0; color:var(--chromeSecondary, var(--textSecondary)); }
 #provider-onboarding[hidden], #providers[hidden] { display:none !important; }
+
+.provider-choice strong, .provider-choice small { display:block; }
+.provider-choice strong { font-weight:700; }
+.provider-choice small { color:var(--chromeSecondary, var(--textSecondary)); font-size:.75rem; line-height:1.5; }
+#runtime-diagnostics { overflow-wrap:anywhere; }

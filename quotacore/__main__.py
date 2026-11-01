@@ -87,7 +87,9 @@ def doctor(live: bool = False) -> dict:
             "paths": {"python": sys.executable, "module": str(__file__),
                       "codex": codex._executable(), "agy": gemini._agy(),
                       "gh": shutil.which("gh"),
-                      "python_override": os.environ.get("QUOTACORE_PYTHONPATH")}}
+                      "python_override": os.environ.get("QUOTACORE_PYTHON"),
+                      "runtime_source": os.environ.get("QUOTACORE_RUNTIME_SOURCE", "direct"),
+                      "python_version": sys.version.split()[0]}}
 
 
 def daemon(interval: int) -> int:
