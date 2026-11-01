@@ -1,6 +1,6 @@
 # Security model
 
-AI Quota Widget runs as the current user. Do not run it elevated. It reads quota
+AI Usage runs as the current user. Do not run it elevated. It reads quota
 metadata and, after provider selection, may use existing credentials to retrieve
 usage or balances. It does not scan conversation history or request model
 completions. There is no application telemetry, analytics, developer upload,

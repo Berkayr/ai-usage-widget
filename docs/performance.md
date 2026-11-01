@@ -12,7 +12,7 @@ Build with `cd app && npx tauri build --no-bundle`, then from the repository roo
 
 ```sh
 python3 scripts/footprint.py \
-  --binary app/src-tauri/target/release/ai-quota-widget \
+  --binary app/src-tauri/target/release/ai-usage \
   --output /tmp/ai-usage-footprint.json
 bash scripts/memory-soak.sh
 ```

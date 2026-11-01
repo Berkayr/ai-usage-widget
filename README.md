@@ -1,11 +1,11 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo-light.svg">
-    <img src="docs/assets/logo.svg" width="104" alt="AI Quota Widget logo">
+    <img src="docs/assets/logo.svg" width="104" alt="AI Usage logo">
   </picture>
 </p>
-<h1 align="center">AI Quota Widget</h1>
-<p align="center">Your AI quotas, right on your desktop — usage windows and reset countdowns for Windows and Linux.</p>
+<h1 align="center">AI Usage</h1>
+<p align="center">Your usage limits, right on your desktop — usage windows and reset countdowns for Windows and Linux.</p>
 <p align="center">
   <a href="#install"><img src="docs/assets/release.svg" alt="Release: v0.1 coming"></a>
   <a href="#platforms"><img src="docs/assets/platforms.svg" alt="Platforms: Windows and Linux"></a>
@@ -14,14 +14,15 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/hero-light.png">
-    <img src="docs/screenshots/hero-dark.png" width="1000" alt="System theme on a desktop background with fictional quota data">
+    <img src="docs/screenshots/hero-dark.png" width="1000" alt="AI Usage logo beside Dot Matrix in the orange Ember palette; fictional data">
   </picture>
 </p>
+<p align="center"><sub>Dot Matrix · Ember · Vivid · fictional data</sub></p>
 <p align="center"><a href="#install">Download</a> · <a href="#quick-start">Quick start</a> · <a href="docs/providers.md">Docs</a></p>
 
 Keep Claude Code, Codex and Gemini quota windows visible while you work. A compact desktop widget shows how much is used, when limits reset, and when a source needs attention. Resize it for a small glanceable display or keep detailed cards beside your editor. Panel integrations share the same local snapshot.
 
-Pre-release: installers are coming with v0.1. The working name is provisional. Gallery values are fictional; provider and desktop validation are listed below.
+Pre-release: installers are coming with v0.1. Gallery values are fictional; provider and desktop validation are listed below.
 
 ## Install
 
@@ -54,34 +55,53 @@ Open Vite's displayed URL with `?sample` to see fictional data. For a native sou
 
 ## Make it yours
 
-### Themes
+### A size for every workspace
 
-System is the default: it fits your desktop with system fonts, light/dark appearance and the system accent where supported. Choose from nine built-in themes: System, Dot Matrix, Circular Rings, Terminal, Frosted Glass, Brutalist, Compact Strip, Retro LCD and Minimal Pace. The Theme cards at the top of Settings switch the layout immediately. Each theme supports Auto, Light and Dark appearance; the palette list follows the selected theme. Compact Strip becomes horizontal in wide windows. Minimal Pace compares usage with elapsed session or weekly time; unknown intervals remain marked unavailable.
+Keep a compact row beside your editor or expand into detailed cards. Each theme uses the same local data.
 
-<picture>
-  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/themes-light.png">
-  <img src="docs/screenshots/themes.png" alt="Nine selectable application themes with fictional quota data" width="1100">
-</picture>
+![Four different themes at XS, S, M and L window sizes](docs/screenshots/sizes.png)
+<sub>XS: Terminal / Phosphor · S: Retro LCD / Liquid Crystal, Light · M: Frosted Glass / Acrylic · L: Brutalist / Acid. Vivid, fictional data.</sub>
 
-[Individual dark and light captures](docs/screenshots/themes/) · [Light gallery](docs/screenshots/themes-light.png)
+Scale text and spacing together from 50% to 300%, with presets or Ctrl +/− and Ctrl+0. Numbers keep their proportions at every size.
 
-### Colors and sizing
+![Three themes at 75, 100 and 150 percent scale](docs/screenshots/scale.png)
+<sub>75%: Circular Rings / Ocean · 100%: Dot Matrix / Sakura Pink, Light · 150%: Minimal Pace / Emerald, Light. Vivid, fictional data.</sub>
 
-Dot Matrix starts with neutral Slate and includes Signal Orange, Sakura Pink, Nord and Mono Paper; the other themes include a palette matched to their design. Calm is the default: neutral usage below 50%, soft amber from 50%, and muted red from 80%. Choose Vivid in Settings → Look for the original colors, or Mono for pure black and white surfaces with hollow warning marks and inverse percentage capsules from 80%. The accent edge starts off; Auto follows the selected left/right corner and disappears in Free placement, or you can choose a fixed side. Accent and background colors can be overridden. Separate widget and background opacity controls let you tune transparency while keeping text readable. These controls change opacity, not monitor brightness or compositor blur.
+### Find your signal
 
-![All nine themes in Mono with fictional quota data](docs/screenshots/mono.png)
+Choose a quiet Calm look, colorful Vivid palettes or pure black and white Mono. Nine themes change the layout as well as the colors. Theme cards in Settings switch designs immediately; every theme supports Auto, Light and Dark appearance.
 
-![Four palette variants of the real widget](docs/screenshots/palettes.png)
+![Pink, Nord, blue glass and acid palette examples](docs/screenshots/palettes.png)
+<sub>Dot Matrix / Sakura Pink, Light · Dot Matrix / Nord · Frosted Glass / Acrylic · Brutalist / Acid. Vivid, fictional data.</sub>
 
-Scale from 50% to 300% with presets or Ctrl +/− and Ctrl+0. Text, spacing and meter marks scale through rem-based layout without CSS zoom. Dot count is fixed at 20 (10 in XS), with 10/20/30 choices under Look. Optional “Match physical size across monitors” compensates the reported monitor scale factor; see the [design standard and DPI limits](docs/design-spec.md). Fit height to content, choose a corner, or use supported free placement.
+### Know when data needs attention
 
-![Widget at 75, 100 and 150 percent scale](docs/screenshots/scale.png)
-![XS, S, M and L responsive layouts](docs/screenshots/sizes.png)
+Cached data stays marked, sign-in failures ask for attention, and unavailable quotas never become zero. Providers without an active subscription stay hidden.
+
+![Terminal and Retro LCD show cached, sign-in and rate-limit states](docs/screenshots/states.png)
+<sub>Terminal / Phosphor, Dark · Retro LCD / Liquid Crystal, Light. Vivid, fictional data.</sub>
+
+### Your desktop, your settings
+
+Change palette, opacity, scale and placement in one panel. Calm uses neutral usage ink below 50%, soft amber from 50% and muted red from 80%. Mono adds hollow warning marks and inverse percentage labels. Choose 10, 20 or 30 meter marks; XS uses 10. Optional monitor scale compensation and the fixed type scale are explained in the [design standard](docs/design-spec.md).
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/settings-light.png">
-  <img src="docs/screenshots/settings-dark.png" alt="Widget and scrollable display settings panel" width="900">
+  <img src="docs/screenshots/settings-dark.png" alt="AI Usage widget and display settings in two theme variants" width="980">
 </picture>
+<sub>Dark: Circular Rings / Ocean · Light: Frosted Glass / Acrylic. Vivid, fictional data.</sub>
+
+Prefer the familiar? System uses your desktop font, light/dark appearance and system accent where supported. It is the default theme.
+
+![System theme adapts to light and dark desktop appearance](docs/screenshots/system.png)
+<sub>System / Desktop · Light and Dark · Calm · fictional data.</sub>
+
+### Nine designs, one snapshot
+
+![Nine themes in two rows, mixing light and dark appearance](docs/screenshots/themes.png)
+<sub>Top: System, Dot Matrix / Sakura Pink, Circular Rings, Terminal, Frosted Glass. Bottom: Brutalist, Compact Strip, Retro LCD, Minimal Pace. Alternating Dark / Light, Vivid, fictional data.</sub>
+
+[Individual light and dark captures](docs/screenshots/themes/) · [Alternate gallery](docs/screenshots/themes-light.png) · [All themes in Mono](docs/screenshots/mono.png)
 
 Windows has an optional taskbar strip with independent provider, window and theme settings. Linux integrations include KDE Plasma, GNOME Shell, Waybar, Polybar and i3blocks. The following taskbar/panel images are HTML illustrations using fictional data; native rendering and desktop compatibility need separate testing.
 
@@ -89,9 +109,12 @@ Windows has an optional taskbar strip with independent provider, window and them
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/taskbar-light.png">
   <img src="docs/screenshots/taskbar-dark.png" alt="Windows 11 taskbar strip layout illustration" width="1100">
 </picture>
+<sub>Windows taskbar strip · desktop Light / Dark · HTML illustration, fictional data.</sub>
 
 ![KDE Breeze compact panel layout illustration](docs/screenshots/kde-panel.png)
+<sub>KDE Breeze Light · HTML illustration, fictional data.</sub>
 ![Waybar compact output illustration](docs/screenshots/waybar.png)
+<sub>Waybar Dark · HTML illustration, fictional data.</sub>
 
 See [configuration](docs/configuration.md) for every setting and environment override.
 

@@ -6,7 +6,7 @@ Theme defaults to System when no choice is stored; an existing explicit theme is
 
 ## Display settings
 
-`settings.json` lives in the operating system's config directory under `ai-quota-widget`: Linux `$XDG_CONFIG_HOME/ai-quota-widget` (normally `~/.config/ai-quota-widget`); Windows `%APPDATA%/ai-quota-widget`. Window geometry is saved separately in `window.json`. `QUOTACORE_HOME` does **not** relocate display settings.
+`settings.json` lives in the operating system's config directory under `ai-usage`: Linux `$XDG_CONFIG_HOME/ai-usage` (normally `~/.config/ai-usage`); Windows `%APPDATA%/ai-usage`. Window geometry is saved separately in `window.json`. `QUOTACORE_HOME` does **not** relocate display settings. First launch copies legacy settings and window geometry once, preserving the originals and any existing new settings.
 
 | Field | Default | Meaning |
 | --- | --- | --- |

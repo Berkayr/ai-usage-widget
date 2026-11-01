@@ -78,3 +78,18 @@ XS tier: their count is explicit rather than derived from monitor width.
 QML lint, JavaScript syntax checks and Windows cross compilation validate these
 integrations statically. Native KDE/GNOME/Windows visual validation is separate
 from the Chromium desktop-gallery checks.
+
+## Numeric typography
+
+Text must not use transform scale, font-stretch or viewport/container width
+units (vw/cqw) for font size. Large numbers use fixed rem steps, tabular numerals,
+letter spacing no tighter than -0.02em and line height at least 1.0. Scale changes
+the root rem size. Narrow windows select a separate fixed step rather than
+continuously stretching type. Numeric font family and weight stay consistent
+across responsive tiers. Retro LCD uses the bundled OFL JetBrains Mono for
+numbers; DotGothic16 remains on decorative headings.
+
+The documentation capture measures a single “8” in each visible numeric style
+using getBoundingClientRect at 200/340/520/700 CSS px and 75/100/150% scale.
+The height/width ratio must stay within ±3% for each theme. Raw measurements
+are written to ignored screenshots/checks/typography.json.

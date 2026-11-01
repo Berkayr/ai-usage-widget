@@ -19,7 +19,7 @@ Install the distribution's **GTK3** layer-shell runtime (`libgtk-layer-shell.so.
 
 The settings panel exposes layer, margin and monitor when layer-shell is available. Default is bottom layer, top-right, 12 logical-pixel margin, Auto monitor. The widget reserves no panel space. Free placement is unavailable for layer surfaces. Monitor indices may change after reconnecting displays. Fractional scaling and multiple monitors still need real-session acceptance.
 
-Mutter does not supply this layer-shell path. Use the GNOME panel integration, move the normal window manually, or explicitly try `GDK_BACKEND=x11 ai-quota-widget` if XWayland is installed. The application does not force an X11 fallback. Window managers can override EWMH positioning hints.
+Mutter does not supply this layer-shell path. Use the GNOME panel integration, move the normal window manually, or explicitly try `GDK_BACKEND=x11 ai-usage` if XWayland is installed. The application does not force an X11 fallback. Window managers can override EWMH positioning hints.
 
 ## Shared panel data
 
