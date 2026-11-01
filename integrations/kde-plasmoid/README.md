@@ -13,3 +13,5 @@ The compact display adapts to horizontal/vertical panels and available height. O
 Periodic reads are passive. The **Refresh** button explicitly runs `quotacore write`, which can contact configured providers using existing local credentials, then rereads the snapshot. It does not initiate login. Refresh errors keep the previous cards visible with an error message. No providers selected shows an empty state.
 
 Screenshot location: `docs/screenshots/kde-panel.png` (pending Claude review; fictional data only).
+
+Severity colors default to **Classic**: amber at 50–80% and red above 80%, with darker tones on light panels. Choose **Color scheme** in configuration to use Kirigami neutral/negative text colors instead.

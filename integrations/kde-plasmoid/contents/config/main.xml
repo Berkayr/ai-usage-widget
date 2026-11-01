@@ -7,6 +7,7 @@
     <entry name="geminiEnabled" type="Bool"><default>true</default></entry>
     <entry name="windowMode" type="Int"><default>0</default><min>0</min><max>2</max></entry>
     <entry name="miniBarType" type="Int"><default>1</default><min>0</min><max>2</max></entry>
+    <entry name="severityColors" type="Int"><default>0</default><min>0</min><max>1</max></entry>
     <entry name="refreshInterval" type="Int"><default>30</default><min>10</min><max>3600</max></entry>
   </group>
 </kcfg>

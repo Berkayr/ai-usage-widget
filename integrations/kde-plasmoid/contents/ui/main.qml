@@ -24,10 +24,14 @@ PlasmoidItem {
     readonly property string command: launch("bar --format json --window " + windowKind + (providerIds ? " --providers " + providerIds : ""))
     readonly property string refreshCommand: launch("write")
     readonly property var providers: providerIds ? quota.providers || [] : []
+    readonly property color schemeBackground: Kirigami.Theme.backgroundColor
+    readonly property bool lightBackground: (0.2126 * schemeBackground.r + 0.7152 * schemeBackground.g + 0.0722 * schemeBackground.b) > 0.5
+    readonly property color warningColor: config.severityColors === 1 ? Kirigami.Theme.neutralTextColor : lightBackground ? "#925C00" : "#E8A317"
+    readonly property color dangerColor: config.severityColors === 1 ? Kirigami.Theme.negativeTextColor : lightBackground ? "#B4232B" : "#E5484D"
     function severity(value) {
         return value === null || value === undefined ? Kirigami.Theme.disabledTextColor
-             : value >= 80 ? Kirigami.Theme.negativeTextColor
-             : value >= 50 ? Kirigami.Theme.neutralTextColor : Kirigami.Theme.textColor
+             : value > 80 ? dangerColor
+             : value >= 50 ? warningColor : Kirigami.Theme.textColor
     }
     function visibleWindows(provider) {
         return (provider.windows || []).filter(function(w) { return !w.hidden && !w.hidden_by_default && Number.isFinite(w.used_percent); });
