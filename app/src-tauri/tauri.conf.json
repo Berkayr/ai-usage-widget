@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "AI Quota Widget",
+  "productName": "AI Usage",
   "version": "0.1.0",
-  "identifier": "dev.aiquota.widget",
+  "identifier": "ai-usage",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:5173",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "AI Quota Widget",
+        "title": "AI Usage",
         "width": 340,
         "height": 640,
         "decorations": false,
@@ -68,5 +68,6 @@
       "../../quotacore/*.py": "quotacore/",
       "../../quotacore/providers/*.py": "quotacore/providers/"
     }
-  }
+  },
+  "mainBinaryName": "ai-usage"
 }

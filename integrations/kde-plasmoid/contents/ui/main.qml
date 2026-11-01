@@ -140,7 +140,7 @@ PlasmoidItem {
         implicitWidth: Kirigami.Units.gridUnit * 22
         implicitHeight: Kirigami.Units.gridUnit * 27
         spacing: 10
-        Controls.Label { text: "AI QUOTA  /  USAGE"; font.family: "monospace"; font.bold: true; Layout.margins: 12 }
+        Controls.Label { text: "AI USAGE  /  USAGE"; font.family: "monospace"; font.bold: true; Layout.margins: 12 }
         Controls.Label {
             visible: !!root.error || !root.providers.length || !root.quota.generated_at
             text: root.error || (!root.quota.generated_at && root.providerIds ? "No snapshot yet. Choose Refresh or run quotacore write." : root.providerIds ? "No active quota windows. Run quotacore write to create a snapshot." : "Choose providers in the widget settings.")

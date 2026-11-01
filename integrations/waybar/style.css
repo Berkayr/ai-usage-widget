@@ -1,4 +1,4 @@
 /* Uses the GTK theme's foreground; severity is also available in the tooltip. */
-#custom-ai-quota { padding: 0 8px; color: @theme_fg_color; }
-#custom-ai-quota.warn { color: @warning_color; }
-#custom-ai-quota.crit { color: @error_color; }
+#custom-ai-usage { padding: 0 8px; color: @theme_fg_color; }
+#custom-ai-usage.warn { color: @warning_color; }
+#custom-ai-usage.crit { color: @error_color; }

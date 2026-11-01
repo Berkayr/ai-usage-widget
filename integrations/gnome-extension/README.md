@@ -3,9 +3,9 @@
 Requires the `quotacore` package launcher on GNOME's PATH, or quotacore installed for GNOME's `python3` (see ../../packaging/README.md). From the repository root:
 
 ```sh
-mkdir -p ~/.local/share/gnome-shell/extensions/ai-quota@aiquota.dev
-cp integrations/gnome-extension/{metadata.json,extension.js,stylesheet.css} ~/.local/share/gnome-shell/extensions/ai-quota@aiquota.dev/
-gnome-extensions enable ai-quota@aiquota.dev
+mkdir -p ~/.local/share/gnome-shell/extensions/ai-usage@aiusage.dev
+cp integrations/gnome-extension/{metadata.json,extension.js,stylesheet.css} ~/.local/share/gnome-shell/extensions/ai-usage@aiusage.dev/
+gnome-extensions enable ai-usage@aiusage.dev
 ```
 
 Log out and back in on Wayland if GNOME has not discovered the new extension yet, then enable it. Shows session usage for every OK/STALE provider in the shared snapshot; click for provider labels, plans, states and visible quota windows. Hidden extra windows and windows without values are omitted. Menu windows have a thin drawn bar, percentage and reset countdown. Polls the shared snapshot asynchronously every 30 seconds. Disabling cancels the timer/process. Shell theme supplies normal colors. Warning (50–79%) and error (80%+) classes and the Shell symbolic warning/error palette color only usage values and bar fills; there are no fixed RGB colors. Theme changes repaint the bars and update percentage text.

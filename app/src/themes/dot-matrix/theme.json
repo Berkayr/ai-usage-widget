@@ -167,6 +167,33 @@
         "severityWarning": "#FF9E1B",
         "severityDanger": "#FF2A2A"
       }
+    },
+    "ember": {
+      "name": "Ember",
+      "mode": "dark",
+      "bgWidget": "#191a1d",
+      "bgCard": "#222428",
+      "bgTrackOff": "#292930",
+      "textPrimary": "#F4F4F6",
+      "textSecondary": "#B0B0BA",
+      "textMuted": "#8E8E9E",
+      "border": "#303039",
+      "accent": "#ff5a1f",
+      "severityNormal": "#F4F4F6",
+      "severityWarning": "#ff9e65",
+      "severityDanger": "#FF2A2A",
+      "light": {
+        "bgWidget": "#f4f3ef",
+        "bgCard": "#faf9f6",
+        "bgTrackOff": "#0000001a",
+        "textPrimary": "#1b1b1b",
+        "textSecondary": "#484846",
+        "textMuted": "#63635f",
+        "border": "#d5d4ce",
+        "severityNormal": "#1b1b1b",
+        "severityWarning": "#855500",
+        "severityDanger": "#b91c1c"
+      }
     }
   }
 }

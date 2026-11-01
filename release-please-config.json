@@ -35,7 +35,7 @@
         {
           "type": "toml",
           "path": "app/src-tauri/Cargo.lock",
-          "jsonpath": "$.package[?(@.name == 'ai-quota-widget')].version"
+          "jsonpath": "$.package[?(@.name == 'ai-usage-widget')].version"
         }
       ]
     }

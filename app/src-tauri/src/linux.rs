@@ -130,7 +130,7 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
     }
     if !layered() {
         gtk.set_type_hint(gtk::gdk::WindowTypeHint::Utility);
-        if wayland() { eprintln!("AI Quota Widget: layer-shell unavailable; fixed corners require XWayland or a panel integration."); }
+        if wayland() { eprintln!("AI Usage: layer-shell unavailable; fixed corners require XWayland or a panel integration."); }
     }
     apply(window, options, corner);
     // Explicitly clear WebKitGTK's backing surface; opacity belongs to the CSS widget.
@@ -217,7 +217,7 @@ pub fn desktop_info() -> serde_json::Value {
         "monitorWarning": MONITOR_WARNING.with(|slot| slot.borrow().clone())})
 }
 pub fn get_autostart() -> Result<bool,String> {
-    let path=dirs::config_dir().ok_or("Config directory unavailable")?.join("autostart/dev.aiquota.widget.desktop");
+    let path=dirs::config_dir().ok_or("Config directory unavailable")?.join("autostart/ai-usage.desktop");
     read_autostart(&path)
 }
 fn read_autostart(path: &std::path::Path) -> Result<bool,String> {
@@ -245,16 +245,16 @@ fn read_autostart(path: &std::path::Path) -> Result<bool,String> {
 }
 
 pub fn set_autostart(enabled: bool) -> Result<(),String> {
-    let path=dirs::config_dir().ok_or("Config directory unavailable")?.join("autostart/dev.aiquota.widget.desktop");
+    let path=dirs::config_dir().ok_or("Config directory unavailable")?.join("autostart/ai-usage.desktop");
     let exe=std::env::var_os("APPIMAGE").map(std::path::PathBuf::from).unwrap_or(std::env::current_exe().map_err(|e|e.to_string())?);
     write_autostart(&path,&exe,enabled)
 }
-fn write_autostart(path: &std::path::Path, exe: &std::path::Path, enabled: bool) -> Result<(),String> {
+pub(crate) fn write_autostart(path: &std::path::Path, exe: &std::path::Path, enabled: bool) -> Result<(),String> {
     if !enabled { return match fs::remove_file(path) { Ok(())=>Ok(()),Err(e) if e.kind()==std::io::ErrorKind::NotFound=>Ok(()),Err(e)=>Err(e.to_string()) }; }
     let escaped=exe.to_string_lossy().replace('\\',"\\\\").replace('"',"\\\"").replace('`',"\\`").replace('$',"\\$").replace('%',"%%");
     if escaped.contains(['\n','\r']) { return Err("Invalid executable path".into()); }
     fs::create_dir_all(path.parent().unwrap()).map_err(|e|e.to_string())?;
-    fs::write(path,format!("[Desktop Entry]\nType=Application\nName=AI Quota Widget\nExec=\"{escaped}\"\nIcon=dev.aiquota.widget\nTerminal=false\nX-GNOME-Autostart-enabled=true\n")).map_err(|e|e.to_string())
+    fs::write(path,format!("[Desktop Entry]\nType=Application\nName=AI Usage\nExec=\"{escaped}\"\nIcon=ai-usage\nTerminal=false\nX-GNOME-Autostart-enabled=true\n")).map_err(|e|e.to_string())
 }
 
 #[cfg(test)]
@@ -300,7 +300,7 @@ mod tests {
     }
     #[test]
     fn autostart_is_quoted_and_only_removes_its_own_file() {
-        let root=std::env::temp_dir().join(format!("aiquota-autostart-{}",std::process::id()));
+        let root=std::env::temp_dir().join(format!("aiusage-autostart-{}",std::process::id()));
         fs::create_dir_all(&root).unwrap();
         let path=root.join("widget.desktop");
         let other=root.join("other.desktop"); fs::write(&other,"fixture").unwrap();
@@ -316,7 +316,7 @@ mod tests {
     }
     #[test]
     fn autostart_respects_disabled_desktop_entries() {
-        let path = std::env::temp_dir().join(format!("aiquota-disabled-{}", std::process::id()));
+        let path = std::env::temp_dir().join(format!("aiusage-disabled-{}", std::process::id()));
         for flag in ["Hidden=true", "X-GNOME-Autostart-enabled=false"] {
             fs::write(&path, format!("[Desktop Entry]\nExec=/fixture/widget\n{flag}\n")).unwrap();
             assert!(!read_autostart(&path).unwrap());

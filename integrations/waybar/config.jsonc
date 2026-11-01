@@ -1,6 +1,6 @@
 {
-  "modules-right": ["custom/ai-quota"],
-  "custom/ai-quota": {
+  "modules-right": ["custom/ai-usage"],
+  "custom/ai-usage": {
     "exec": "python3 -m quotacore bar --format waybar --providers claude,codex --window session",
     "return-type": "json",
     "interval": 30,

@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=AI Quota Widget
+Name=AI Usage
 Comment=Track local AI subscription quotas
-Exec=ai-quota-widget
-Icon=dev.aiquota.widget
+Exec=ai-usage
+Icon=ai-usage
 Terminal=false
 Categories=System;Monitor;
-StartupWMClass=ai-quota-widget
+StartupWMClass=ai-usage

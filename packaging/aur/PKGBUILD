@@ -1,6 +1,6 @@
 # Source package draft. Place a reviewed source release beside this PKGBUILD.
 # Replace REPLACE_WITH_VERIFIED_SHA256 with the release SHA-256 before publishing to the AUR.
-pkgname=ai-quota-widget
+pkgname=ai-usage-widget
 pkgver=0.1.0
 pkgrel=1
 pkgdesc='Desktop AI subscription quota widget and panel reader'
@@ -27,9 +27,9 @@ package() {
   cd "$pkgname-$pkgver"
   python -m installer --destdir="$pkgdir" dist/*.whl
   install -Dm755 packaging/bin/quotacore "$pkgdir/usr/bin/quotacore"
-  install -Dm755 app/src-tauri/target/release/ai-quota-widget "$pkgdir/usr/bin/ai-quota-widget"
-  install -Dm644 packaging/dev.aiquota.widget.desktop "$pkgdir/usr/share/applications/dev.aiquota.widget.desktop"
-  install -Dm644 app/src-tauri/icons/128x128.png "$pkgdir/usr/share/icons/hicolor/128x128/apps/dev.aiquota.widget.png"
-  install -dm755 "$pkgdir/usr/share/ai-quota-widget"
-  cp -r integrations "$pkgdir/usr/share/ai-quota-widget/"
+  install -Dm755 app/src-tauri/target/release/ai-usage "$pkgdir/usr/bin/ai-usage"
+  install -Dm644 packaging/ai-usage.desktop "$pkgdir/usr/share/applications/ai-usage.desktop"
+  install -Dm644 app/src-tauri/icons/128x128.png "$pkgdir/usr/share/icons/hicolor/128x128/apps/ai-usage.png"
+  install -dm755 "$pkgdir/usr/share/ai-usage-widget"
+  cp -r integrations "$pkgdir/usr/share/ai-usage-widget/"
 }

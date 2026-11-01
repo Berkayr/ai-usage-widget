@@ -951,7 +951,7 @@ fn spawn_strip(app: tauri::AppHandle) -> std::thread::JoinHandle<()> {
             let class = WNDCLASSW {
                 lpfnWndProc: Some(procedure),
                 hInstance: instance,
-                lpszClassName: w!("AIQuotaTaskbarStrip"),
+                lpszClassName: w!("AIUsageTaskbarStrip"),
                 hCursor: LoadCursorW(null_mut(), IDC_ARROW),
                 ..Default::default()
             };
@@ -959,7 +959,7 @@ fn spawn_strip(app: tauri::AppHandle) -> std::thread::JoinHandle<()> {
             let hwnd = CreateWindowExW(
                 WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_NOACTIVATE,
                 class.lpszClassName,
-                w!("AI Quota"),
+                w!("AI Usage"),
                 WS_POPUP,
                 0,
                 0,

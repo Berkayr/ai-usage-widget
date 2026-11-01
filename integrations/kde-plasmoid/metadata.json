@@ -1,7 +1,7 @@
 {
   "KPlugin": {
-    "Id": "io.github.aiquota.panel",
-    "Name": "AI Quota",
+    "Id": "io.github.aiusage.panel",
+    "Name": "AI Usage",
     "Description": "AI subscription quotas from the shared quotacore snapshot",
     "Version": "0.1.0",
     "Icon": "office-chart-bar"

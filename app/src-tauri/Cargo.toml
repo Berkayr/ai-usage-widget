@@ -1,12 +1,16 @@
 [package]
-name = "ai-quota-widget"
+name = "ai-usage-widget"
 version = "0.1.0"
 description = "A transparent desktop quota widget"
 authors = ["AI Usage contributors"]
 edition = "2021"
 
+[[bin]]
+name = "ai-usage"
+path = "src/main.rs"
+
 [lib]
-name = "ai_quota_widget_lib"
+name = "ai_usage_widget_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

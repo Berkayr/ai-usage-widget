@@ -1,6 +1,6 @@
 {
-  "uuid": "ai-quota@aiquota.dev",
-  "name": "AI Quota",
+  "uuid": "ai-usage@aiusage.dev",
+  "name": "AI Usage",
   "description": "AI subscription quotas from the shared quotacore snapshot",
   "shell-version": ["45", "46", "47", "48", "49"],
   "version": 1

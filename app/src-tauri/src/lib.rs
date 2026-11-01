@@ -10,6 +10,7 @@ use serde_json::{json, Value};
 mod snapshot_watch;
 mod collector;
 mod runtime;
+mod migration;
 use std::io::Write;
 use std::{fs, path::PathBuf, thread, time::Duration};
 use tauri::{Emitter, Manager};
@@ -34,7 +35,7 @@ fn snapshot_path() -> PathBuf {
     #[cfg(target_os = "windows")] { return std::env::var_os("LOCALAPPDATA").map(PathBuf::from).unwrap_or_else(|| dirs::data_local_dir().unwrap_or_else(|| dirs::home_dir().unwrap())).join("quotacore").join("snapshot.json"); }
     #[cfg(not(target_os = "windows"))] { std::env::var_os("XDG_STATE_HOME").map(PathBuf::from).unwrap_or_else(|| dirs::home_dir().unwrap().join(".local").join("state")).join("quotacore").join("snapshot.json") }
 }
-fn settings_path() -> PathBuf { dirs::config_dir().unwrap_or_else(|| dirs::home_dir().unwrap()).join("ai-quota-widget").join("settings.json") }
+fn settings_path() -> PathBuf { dirs::config_dir().unwrap_or_else(|| dirs::home_dir().unwrap()).join("ai-usage").join("settings.json") }
 fn window_path() -> PathBuf { settings_path().parent().unwrap().join("window.json") }
 fn read_snapshot() -> Option<Value> { fs::read(snapshot_path()).ok().and_then(|bytes| serde_json::from_slice(&bytes).ok()) }
 const COLLECTOR_TIMEOUT: u64 = 120;
@@ -229,7 +230,7 @@ async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> 
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Quota Widget");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=load_settings(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
 }
 
 #[cfg(test)]

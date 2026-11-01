@@ -52,11 +52,11 @@ function usageBar(value, mono = false, count = 20) {
     return area;
 }
 
-export default class AIQuota extends Extension {
+export default class AIUsage extends Extension {
     enable() {
         this._mono = false;
         this._dotCount = 20;
-        this._button = new PanelMenu.Button(0.0, 'AI Quota');
+        this._button = new PanelMenu.Button(0.0, 'AI Usage');
         this._box = new St.BoxLayout({style_class: 'quota-panel'});
         this._box.add_child(new St.Label({text: 'Quota —', y_align: Clutter.ActorAlign.CENTER}));
         this._button.add_child(this._box);

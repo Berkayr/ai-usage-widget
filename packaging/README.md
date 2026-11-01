@@ -8,7 +8,7 @@ npm ci && npm run build
 npx tauri build --bundles appimage,deb,rpm
 ```
 
-Bundle targets are AppImage, deb and rpm. The no-bundle debug acceptance build does not create installers. Tauri generates the package desktop entry and uses the existing temporary icons under `app/src-tauri/icons/`; `packaging/dev.aiquota.widget.desktop` is the source-package desktop entry. Replace temporary icons after design review. No proprietary font or brand asset is needed.
+Bundle targets are AppImage, deb and rpm. The no-bundle debug acceptance build does not create installers. Tauri generates the package desktop entry and uses the existing temporary icons under `app/src-tauri/icons/`; `packaging/ai-usage.desktop` is the source-package desktop entry. Replace temporary icons after design review. No proprietary font or brand asset is needed.
 
 The Tauri resources include the Python quotacore module. The widget resolves it from its installed resources and runs it using host `python3`. The native app always loads its packaged sources; `QUOTACORE_PYTHON` may select an interpreter executable, without arguments. Deb/rpm and the source AUR recipe also install a `quotacore` launcher. On deb/rpm it resolves the bundled Python sources; use `quotacore bar` in panel examples instead of `python3 -m quotacore bar`. Panel examples using `python3 -m` require quotacore available to that interpreter separately (the source AUR recipe installs it). For a development checkout:
 
@@ -51,13 +51,13 @@ The persisted widget settings accept a `linux` object:
 
 On X11, GTK utility type, sticky, skip-pager/taskbar and keep-above/keep-below hints are applied. Tauri positions using physical work-area coordinates and converts the logical margin using that monitor's scale. A utility hint is intentional: this is an interactive widget, not a dock reserving work area. Window managers may override EWMH hints.
 
-On native GNOME Wayland or when the library is absent, a one-time in-widget hint explains that ordinary Wayland windows cannot be positioned at fixed coordinates. Optional launch: `GDK_BACKEND=x11 ai-quota-widget`, provided XWayland is available. The app does not force X11: availability and fractional-scale quality vary. Panel integrations are the preferred GNOME solution.
+On native GNOME Wayland or when the library is absent, a one-time in-widget hint explains that ordinary Wayland windows cannot be positioned at fixed coordinates. Optional launch: `GDK_BACKEND=x11 ai-usage`, provided XWayland is available. The app does not force X11: availability and fractional-scale quality vary. Panel integrations are the preferred GNOME solution.
 
 Opacity remains controlled by the widget CSS; the WebKitGTK backing surface is explicitly transparent. At 94% background opacity, 6% visibility through the background is expected; the widget does not request compositor blur. Set 100% for a fully opaque background. Theme/CSS behavior and screenshots still require visual review.
 
 ## Autostart
 
-The Rust command `set_autostart(enabled: bool)` writes/removes only `dev.aiquota.widget.desktop` under the XDG config autostart directory. It quotes the current executable path and uses the original AppImage path when running an AppImage. Nothing is enabled during installation or testing. Claude will wire the settings toggle after the parallel theme task.
+The Rust command `set_autostart(enabled: bool)` writes/removes only `ai-usage.desktop` under the XDG config autostart directory. It quotes the current executable path and uses the original AppImage path when running an AppImage. Nothing is enabled during installation or testing. The settings toggle controls this registration. First launch migrates the application’s legacy login entry to the current executable.
 
 ## Release drafts
 
