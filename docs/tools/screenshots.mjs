@@ -36,7 +36,7 @@ for (const light of [false,true]) {
  scenes.set(`taskbar-${mode}`,{w:1100,h:380,html:shell(heading('WINDOWS 11','Small footprint. Always in sight.','Taskbar strip · transparent style · two provider rows')+`<div class="panel-area"><div class="bar"><span>▦ &nbsp; ⌕ &nbsp; ▣ &nbsp; ▤</span><div class="strip"><div>Claude &nbsp;34% <span style="color:${light?'#626262':'#b0b0ba'}">· 2h 40m</span><br>Codex &nbsp; 8% <span style="color:${light?'#626262':'#b0b0ba'}">· 3h 28m</span></div><div>⌁ &nbsp; ◖)) &nbsp; ▰</div><div>12:00<br>01 Nov</div></div></div></div>`,light)});
 }
 scenes.set('sizes',{w:1550,h:1020,html:shell(heading('RESPONSIVE BY DESIGN','From a glance to the full picture','Resize the window; the layout follows. XS / S / M / L are gallery labels.')+`<div class="row">${frame('XS · 205 px',205,100)}${frame('S · 280 px',280,230)}${frame('M · 340 px',340,650)}${frame('L · 520 px',520,700)}</div>`)});
-scenes.set('palettes',{w:1530,h:960,html:shell(heading('FOUR PALETTES','Find your signal','Every palette supports both light and dark appearance.')+`<div class="row">${[['Signal Orange','signal-orange','dark'],['Sakura Pink','sakura-pink','light'],['Nord','nord','dark'],['Mono Paper','mono-paper','light']].map(([name,palette,appearance])=>frame(name,340,650,{palette,appearance})).join('')}</div>`)});
+scenes.set('palettes',{w:1530,h:960,html:shell(heading('FOUR PALETTES','Find your signal','Every palette supports both light and dark appearance.')+`<div class="row">${[['Signal Orange','signal-orange','dark'],['Sakura Pink','sakura-pink','light'],['Nord','nord','dark'],['Mono Paper','mono-paper','light']].map(([name,palette,appearance])=>frame(name,340,650,{theme:'dot-matrix',palette,appearance})).join('')}</div>`)});
 scenes.set('scale',{w:1280,h:1320,html:shell(heading('SCALE INDEPENDENTLY','A comfortable reading distance','75% / 100% / 150% · same layout, different physical size')+`<div class="row">${frame('75%',255,485,{scale:75})}${frame('100%',340,650)}${frame('150%',510,975,{scale:150})}</div>`)});
 // NO_SUBSCRIPTION is intentionally hidden by the real renderer; explain that state outside it.
 const states = structuredClone(snapshot);
@@ -45,20 +45,20 @@ scenes.set('states',{w:1050,h:860,html:shell(heading('HONEST STATUS','Know when 
 scenes.set('kde-panel',{w:1100,h:370,html:shell(heading('KDE PLASMA 6','Part of your panel','Breeze light · compact session view · mini bars')+`<div class="panel-area"><div class="bar" style="height:44px;background:#eff0f1;color:#232629;border:1px solid #bdc3c7"><span>◉ &nbsp; ▣ &nbsp; ▤</span><div class="strip"><span>CL <b>34%</b><div class="track"><i style="width:34%"></i></div></span><span>CX <b style="color:#8a6300">77%</b><div class="track" style="color:#8a6300"><i style="width:77%"></i></div></span><span>GM <b style="color:#b42323">86%</b><div class="track" style="color:#b42323"><i style="width:86%"></i></div></span><span style="color:#232629">⌁ &nbsp; 12:00</span></div></div></div>`,true)});
 scenes.set('waybar',{w:1100,h:360,html:shell(heading('HYPRLAND / SWAY','Your bar, your workflow','Waybar · shared snapshot · session usage')+`<div class="panel-area"><div class="bar" style="height:32px;font-family:Mono;background:#20242d"><span>1 &nbsp; 2 &nbsp; 3 &nbsp; 4</span><span style="font-size:12px">CL 34% · 2h40 | CX 8% · 3h28 | GM 12% · 2h50 &nbsp; │ &nbsp; 12:00</span></div></div>`)});
 scenes.set('social-preview',{w:1280,h:640,dpr:1,html:shell(`<div class="hero"><div class="copy" style="max-width:650px"><img class="logo" src="/assets-docs/logo.svg"><small> WINDOWS + LINUX</small><h1>AI Quota Widget</h1><p style="font-size:20px">Your AI quotas, right on your desktop.</p><span class="pill">Claude Code · Codex · Gemini</span></div>${frame('Fictional quota data',280,500,{scale:75})}</div>`)});
-const themeIds = ['dot-matrix', 'circular-rings', 'terminal', 'frosted-glass', 'brutalist', 'compact-strip', 'retro-lcd', 'minimal-pace'];
-const names = ['Dot Matrix', 'Circular Rings', 'Terminal', 'Frosted Glass', 'Brutalist', 'Compact Strip', 'Retro LCD', 'Minimal Pace'];
+const themeIds = ['system', 'dot-matrix', 'circular-rings', 'terminal', 'frosted-glass', 'brutalist', 'compact-strip', 'retro-lcd', 'minimal-pace'];
+const names = ['System', 'Dot Matrix', 'Circular Rings', 'Terminal', 'Frosted Glass', 'Brutalist', 'Compact Strip', 'Retro LCD', 'Minimal Pace'];
 const oneProvider = { ...snapshot, providers: snapshot.providers.slice(0,1) };
 for (const appearance of ['dark','light']) {
  const light = appearance === 'light';
- const trio = ['circular-rings','brutalist','frosted-glass'];
- scenes.set(`hero-${appearance}`, {w:1220,h:1450,autoHeight:true,html:shell(heading('YOUR LIMITS. IN SIGHT.', 'Keep your next session in view.', 'Claude Code · Codex · Gemini / Eight themes. One local quota snapshot.') + `<div class="row">${trio.map(id=>frame(names[themeIds.indexOf(id)],340,1200,{theme:id,appearance})).join('')}</div>`,light)});
- scenes.set(light ? 'themes-light' : 'themes', {w:1570,h:3000,autoHeight:true,html:shell(heading('EIGHT THEMES', 'Find your own rhythm', 'Every design below is selectable in the application. Fictional quota data.') + `<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map((id,i)=>frame(names[i],340,1250,{theme:id,appearance})).join('')}</div>`,light)});
+ const trio = ['system','circular-rings','minimal-pace'];
+ scenes.set(`hero-${appearance}`, {w:1220,h:1450,autoHeight:true,html:shell(`<style>body{font-family:system-ui,sans-serif;background:${light?'radial-gradient(ellipse at 75% 30%,#bad8ff,transparent 65%),linear-gradient(135deg,#eef3fa,#dce8fa)':'linear-gradient(145deg,#1b2229,#34434f 55%,#232629)'} } iframe{filter:none}.system-hero{display:flex;align-items:center;gap:70px;justify-content:center}.system-hero .copy{max-width:420px}</style><div class="system-hero"><div class="copy"><img class="logo" src="/assets-docs/logo${light?'-light':''}.svg"><h1>At home on<br>your desktop.</h1><p>AI Quota Widget · Windows + Linux<br>System fonts. Quiet colors. Your workspace.</p><p>${light?'Windows 11 style · Light':'KDE Breeze style · Dark'}<br>Fictional quota data</p></div>${frame('System · '+appearance,420,1200,{theme:'system',appearance})}</div>`,light)});
+ scenes.set(light ? 'themes-light' : 'themes', {w:1570,h:3000,autoHeight:true,html:shell(heading('NINE THEMES', 'Find your own rhythm', 'Every design below is selectable in the application. Fictional quota data.') + `<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map((id,i)=>frame(names[i],340,1250,{theme:id,appearance})).join('')}</div>`,light)});
  for (const [i,id] of themeIds.entries()) {
   scenes.set(`themes/${id}-${appearance}`, {w:436,h:1450,autoHeight:true,html:shell(frame(names[i],340,1250,{theme:id,appearance}),light)});
   scenes.set(`checks/${id}-${appearance}`, {w:1260,h:1500,autoHeight:true,html:shell(heading('RESPONSIVE CHECK', `${names[i]} / ${appearance}`, 'Calm / 340 px and 200 px / 100% and 150%') + `<div class="row" style="gap:12px">${[340,200].map(width=>[100,150].map(scale=>frame(`${width}px / ${scale}%`,width,2400,{theme:id,appearance,scale})).join('')).join('')}</div>`,light)});
  }
 }
-scenes.set('social-preview', {w:1280,h:640,dpr:1,html:shell(`<div style="display:flex;align-items:center;gap:30px"><div class="copy" style="width:330px;flex:none"><img class="logo" src="/assets-docs/logo.svg"><h1 style="font-size:36px">AI Quota Widget</h1><p>Your AI quotas, on your desktop.</p><span class="pill">Windows + Linux / 8 themes</span></div>${['circular-rings','brutalist','frosted-glass'].map(id=>frame(names[themeIds.indexOf(id)],250,500,{theme:id,scale:80},{snapshot:oneProvider})).join('')}</div>`)});
+scenes.set('social-preview', {w:1280,h:640,dpr:1,html:shell(`<div style="display:flex;align-items:center;gap:30px"><div class="copy" style="width:330px;flex:none"><img class="logo" src="/assets-docs/logo.svg"><h1 style="font-size:36px">AI Quota Widget</h1><p>Your AI quotas, on your desktop.</p><span class="pill">Windows + Linux / 9 themes</span></div>${['system','circular-rings','minimal-pace'].map(id=>frame(names[themeIds.indexOf(id)],250,500,{theme:id,scale:80},{snapshot:oneProvider})).join('')}</div>`)});
 scenes.set('checks/vivid', {w:850,h:1600,autoHeight:true,html:shell(heading('COLOR MODE','Calm / Vivid')+`<div class="row">${['calm','vivid'].map(colorMode=>frame(colorMode,340,1400,{colorMode})).join('')}</div>`)});
 const edgeData = structuredClone(snapshot);
 edgeData.providers[0].stale = true;
@@ -80,7 +80,7 @@ const providerConfig = { initialized:false, disclosures:consentDisclosures,
  detected:Object.fromEntries(Object.keys(consentDisclosures).map(id=>[id,true])) };
 for(const appearance of ['dark','light']) scenes.set(`checks/providers-${appearance}`, {
  w:1552,h:1700,autoHeight:true,html:shell(heading('PRIVACY','Choose what to track','Synthetic detection; all providers off until Start')+
- [0,4].map(start=>`<div class="row">${themeIds.slice(start,start+4).map(id=>frame(id,340,780,{theme:id,appearance},{snapshot:{providers:[]},providerConfig})).join('')}</div>`).join(''),appearance==='light') });
+ [0,4,8].map(start=>`<div class="row">${themeIds.slice(start,start+4).map(id=>frame(id,340,780,{theme:id,appearance},{snapshot:{providers:[]},providerConfig})).join('')}</div>`).join(''),appearance==='light') });
 const monoSnapshot = structuredClone(snapshot);
 monoSnapshot.providers[0].stale = true;
 monoSnapshot.providers[1].windows[1].used_percent = 86;
@@ -88,7 +88,7 @@ for (const width of [200,340,520,700]) scenes.set(`checks/dots-${width}`, {
  w:4*width+192,h:3500,autoHeight:true,html:shell(heading('DOT STANDARD',`${width} CSS px / Mono`, 'Fixed marks; XS has 10, other tiers 20. Fictional data.') + `<div style="display:grid;grid-template-columns:repeat(4,${width}px);gap:24px;align-items:start">${themeIds.map(id=>frame(id,width,1600,{theme:id,colorMode:'mono'},{snapshot:monoSnapshot})).join('')}</div>`)
 });
 for (const appearance of ['dark','light']) scenes.set(appearance === 'dark' ? 'mono' : 'checks/mono-light', {
- w:1570,h:3000,autoHeight:true,html:shell(heading('MONO','Eight themes. Black and white.','Hollow marks from 50%; inverse percentage from 80%; outlined status badges.') + `<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map(id=>frame(id,340,1600,{theme:id,appearance,colorMode:'mono'},{snapshot:monoSnapshot})).join('')}</div>`,appearance==='light')
+ w:1570,h:3000,autoHeight:true,html:shell(heading('MONO','Nine themes. Black and white.','Hollow marks from 50%; inverse percentage from 80%; outlined status badges.') + `<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map(id=>frame(id,340,1600,{theme:id,appearance,colorMode:'mono'},{snapshot:monoSnapshot})).join('')}</div>`,appearance==='light')
 });
 const thresholds = {...snapshot,providers:[{...snapshot.providers[0],windows:[0,49,50,79,80,100,null].map((used_percent,i)=>({id:String(i),label:used_percent===null?'Unknown':`${used_percent}% boundary`,used_percent,resets_at:null}))}]};
 scenes.set('checks/mono-thresholds',{w:1570,h:3000,autoHeight:true,html:shell(heading('MONO THRESHOLDS','49 / 50 / 79 / 80','Normal, hollow warning, inverse danger, unknown')+`<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map(id=>frame(id,340,2000,{theme:id,colorMode:'mono'},{snapshot:thresholds})).join('')}</div>`)});
@@ -97,6 +97,10 @@ const agedSnapshot = structuredClone(snapshot);
 agedSnapshot.generated_at = '2026-11-01T11:49:00Z';
 agedSnapshot.providers.forEach(p => { p.state = 'OK'; p.stale = false; p.windows.forEach(w => { w.resets_at = '2026-11-01T11:50:00Z'; }); });
 scenes.set('checks/stale-age', {w:1570,h:3000,autoHeight:true,html:shell(heading('STALE SNAPSHOT','Expired resets / eleven minutes old','Synthetic snapshot; every active card must show STALE.')+`<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map(id=>frame(id,340,1600,{theme:id},{snapshot:agedSnapshot})).join('')}</div>`)});
+for (const appearance of ['dark','light']) scenes.set(`checks/system-matrix-${appearance}`, {
+ w:1250,h:2400,autoHeight:true,appearance,html:shell(heading('SYSTEM', `${appearance} / Calm + Mono`, '200 / 340 / 520 CSS px · automatic OS appearance')+
+ ['calm','mono'].map(colorMode=>`<div class="row">${[200,340,520].map(width=>frame(`${width}px / ${colorMode}`,width,1600,{theme:'system',appearance:'auto',colorMode})).join('')}</div>`).join(''),appearance==='light')
+});
 function measure(d) {
  const w=d.defaultView;
  const visible=el=>el.getClientRects().length && w.getComputedStyle(el).visibility!=='hidden' && el.getBoundingClientRect().width>0;
@@ -152,15 +156,21 @@ try {
   if(process.env.SCENE && !name.startsWith(process.env.SCENE))continue;
   errors.length=0;
   await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:scene.h,deviceScaleFactor:scene.dpr||2,mobile:false});
+  await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:scene.appearance || 'dark'}]});
   await cdp('Page.navigate',{url:`${base}/scene/${name}`});
   const result=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let attempt=0;attempt<150;attempt++){const frames=[...document.querySelectorAll('iframe')];if(location.pathname==='/scene/${name}'&&document.readyState==='complete'&&frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){await document.fonts.ready;await Promise.all(frames.map(f=>f.contentDocument.fonts.ready));for(const f of frames){if(f.contentDocument.documentElement.classList.contains('fit-height')) f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return frames.map(f=>{const d=f.contentDocument;const expected=JSON.parse(new URL(f.src).searchParams.get('docs')).snapshot.providers.length;const overflow=[...d.querySelectorAll('.provider-list,.provider-card,.quota-window,.provider-heading,.windows')].filter(el=>el.scrollWidth>el.clientWidth+2).map(el=>el.className);return {cards:d.querySelectorAll('.provider-card').length,expected,overflow,theme:d.documentElement.dataset.theme,styles:d.querySelectorAll('#active-theme').length,metrics:(${measure.toString()})(d)};});}await new Promise(r=>setTimeout(r,100));}throw Error('Frame readiness timed out');})()`,awaitPromise:true,returnByValue:true});
   if(result.exceptionDetails||errors.length)throw Error(`${name}: ${JSON.stringify(result.exceptionDetails||errors)}`);
   if(result.result.value.some(frame=>frame.cards!==frame.expected || frame.overflow.length || frame.styles!==1))throw Error(`${name}: layout failure ${JSON.stringify(result.result.value.map(({theme,overflow,cards,expected})=>({theme,overflow,cards,expected})))}`);
+  if(name.startsWith('checks/system-matrix-')) {
+   const systemCheck=await cdp('Runtime.evaluate',{expression:`[...document.querySelectorAll('iframe')].map(f=>{const d=f.contentDocument,w=f.contentWindow;const css=w.getComputedStyle(d.querySelector('.widget'));if(d.documentElement.dataset.mode!=='${scene.appearance}' || d.querySelectorAll('.segments,.dot-bar').length || !d.querySelectorAll('.meter').length || !css.fontFamily.includes('system-ui') || css.borderRadius!=='8px')throw Error('System geometry / OS appearance');return {mode:d.documentElement.dataset.mode,font:css.fontFamily,accent:css.getPropertyValue('--accent'),nativeAccent:w.CSS.supports('color','AccentColor'),meters:d.querySelectorAll('.meter').length};})`,returnByValue:true});
+   if(systemCheck.exceptionDetails)throw Error(JSON.stringify(systemCheck.exceptionDetails));
+   result.result.value.forEach((f,i)=>f.system=systemCheck.result.value[i]);
+  }
   checks.push({scene:name,frames:result.result.value});
-  if(name.startsWith('checks/dots-') && result.result.value.some(f=>!f.metrics.dotCounts.length || f.metrics.dotCounts.some(count=>count!==(f.metrics.width<220?10:20))))throw Error(`${name}: dot count failure ${JSON.stringify(result.result.value)}`);
+  if(name.startsWith('checks/dots-') && result.result.value.some(f=>f.theme!=='system' && (!f.metrics.dotCounts.length || f.metrics.dotCounts.some(count=>count!==(f.metrics.width<220?10:20)))))throw Error(`${name}: dot count failure ${JSON.stringify(result.result.value)}`);
   if(name.startsWith('checks/') && !name.startsWith('checks/providers-') && !name.endsWith('-states') && name!=='checks/vivid' && !name.startsWith('checks/dots-') && result.result.value.some(f=>f.metrics.minFont<11*f.metrics.scale/100-.01 || f.metrics.numberFont<15*f.metrics.scale/100-.01 || f.metrics.minContrast<4.5))throw Error(`${name}: readability failure ${JSON.stringify(result.result.value)}`);
   if(name==='checks/mono-thresholds') {
-    const thresholdResult=await cdp('Runtime.evaluate',{expression:`[...document.querySelectorAll('iframe')].map(f=>{const d=f.contentDocument;const values=[...d.querySelectorAll('.quota-window .window-top b')].map(el=>el.dataset.severity);if(values.join(',')!=='normal,normal,warning,warning,danger,danger,unknown')throw Error('Thresholds: '+d.documentElement.dataset.theme);const rows=[...d.querySelectorAll('.quota-window .dot-bar,.quota-window .segments')];if(rows[1].querySelectorAll('.threshold').length || !rows[2].querySelectorAll('.threshold').length)throw Error('Hollow boundary');return d.documentElement.dataset.theme;})`,returnByValue:true});
+    const thresholdResult=await cdp('Runtime.evaluate',{expression:`[...document.querySelectorAll('iframe')].map(f=>{const d=f.contentDocument;const values=[...d.querySelectorAll('.quota-window .window-top b')].map(el=>el.dataset.severity);if(values.join(',')!=='normal,normal,warning,warning,danger,danger,unknown')throw Error('Thresholds: '+d.documentElement.dataset.theme);const rows=[...d.querySelectorAll('.quota-window .dot-bar,.quota-window .segments')];if(d.documentElement.dataset.theme!=='system' && (rows[1].querySelectorAll('.threshold').length || !rows[2].querySelectorAll('.threshold').length))throw Error('Hollow boundary');return d.documentElement.dataset.theme;})`,returnByValue:true});
     if(thresholdResult.exceptionDetails)throw Error(JSON.stringify(thresholdResult.exceptionDetails));
   }
   if (name === 'checks/stale-age') {
@@ -216,7 +226,7 @@ try {
   for(const count of [10,20,30]) {
    const select=d.querySelector('#dot-count');select.value=count;select.dispatchEvent(new Event('change'));await rendered();
    const rows=[...d.querySelectorAll('.dot-bar,.segments')].filter(el=>el.getBoundingClientRect().width>0);
-   if(!rows.length || rows.some(el=>el.querySelectorAll('i').length!==count))throw Error('Dot setting: '+id+' / '+count);
+   if(id!=='system' && (!rows.length || rows.some(el=>el.querySelectorAll('i').length!==count)))throw Error('Dot setting: '+id+' / '+count);
   }
   d.querySelector('#dot-count').value=20;d.querySelector('#dot-count').dispatchEvent(new Event('change'));
   f.width=200;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));

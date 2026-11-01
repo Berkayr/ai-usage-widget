@@ -14,14 +14,14 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/hero-light.png">
-    <img src="docs/screenshots/hero-dark.png" width="1000" alt="Circular Rings, Brutalist and Frosted Glass themes showing fictional quota data">
+    <img src="docs/screenshots/hero-dark.png" width="1000" alt="System theme on a desktop background with fictional quota data">
   </picture>
 </p>
 <p align="center"><a href="#install">Download</a> · <a href="#quick-start">Quick start</a> · <a href="docs/providers.md">Docs</a></p>
 
 Keep Claude Code, Codex and Gemini quota windows visible while you work. A compact desktop widget shows how much is used, when limits reset, and when a source needs attention. Resize it for a small glanceable display or keep detailed cards beside your editor. Panel integrations share the same local snapshot.
 
-Pre-release: installers are coming with v0.1. The name and logo are provisional. Gallery values are fictional; provider and desktop validation are listed below.
+Pre-release: installers are coming with v0.1. The working name is provisional. Gallery values are fictional; provider and desktop validation are listed below.
 
 ## Install
 
@@ -56,20 +56,20 @@ Open Vite's displayed URL with `?sample` to see fictional data. For a native sou
 
 ### Themes
 
-Choose from eight built-in themes: Dot Matrix, Circular Rings, Terminal, Frosted Glass, Brutalist, Compact Strip, Retro LCD and Minimal Pace. The Theme cards at the top of Settings switch the layout immediately. Each theme supports Auto, Light and Dark appearance; the palette list follows the selected theme. Compact Strip becomes horizontal in wide windows. Minimal Pace compares usage with elapsed session or weekly time; unknown intervals remain marked unavailable.
+System is the default: it fits your desktop with system fonts, light/dark appearance and the system accent where supported. Choose from nine built-in themes: System, Dot Matrix, Circular Rings, Terminal, Frosted Glass, Brutalist, Compact Strip, Retro LCD and Minimal Pace. The Theme cards at the top of Settings switch the layout immediately. Each theme supports Auto, Light and Dark appearance; the palette list follows the selected theme. Compact Strip becomes horizontal in wide windows. Minimal Pace compares usage with elapsed session or weekly time; unknown intervals remain marked unavailable.
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/themes-light.png">
-  <img src="docs/screenshots/themes.png" alt="Eight selectable application themes with fictional quota data" width="1100">
+  <img src="docs/screenshots/themes.png" alt="Nine selectable application themes with fictional quota data" width="1100">
 </picture>
 
 [Individual dark and light captures](docs/screenshots/themes/) · [Light gallery](docs/screenshots/themes-light.png)
 
 ### Colors and sizing
 
-Dot Matrix includes Signal Orange, Sakura Pink, Nord and Mono Paper; the other themes include a palette matched to their design. Calm is the default: neutral usage below 50%, soft amber from 50%, and muted red from 80%. Choose Vivid in Settings → Look for the original colors, or Mono for pure black and white surfaces with hollow warning marks and inverse percentage capsules from 80%. The accent edge starts off; Auto follows the selected left/right corner and disappears in Free placement, or you can choose a fixed side. Accent and background colors can be overridden. Separate widget and background opacity controls let you tune transparency while keeping text readable. These controls change opacity, not monitor brightness or compositor blur.
+Dot Matrix starts with neutral Slate and includes Signal Orange, Sakura Pink, Nord and Mono Paper; the other themes include a palette matched to their design. Calm is the default: neutral usage below 50%, soft amber from 50%, and muted red from 80%. Choose Vivid in Settings → Look for the original colors, or Mono for pure black and white surfaces with hollow warning marks and inverse percentage capsules from 80%. The accent edge starts off; Auto follows the selected left/right corner and disappears in Free placement, or you can choose a fixed side. Accent and background colors can be overridden. Separate widget and background opacity controls let you tune transparency while keeping text readable. These controls change opacity, not monitor brightness or compositor blur.
 
-![All eight themes in Mono with fictional quota data](docs/screenshots/mono.png)
+![All nine themes in Mono with fictional quota data](docs/screenshots/mono.png)
 
 ![Four palette variants of the real widget](docs/screenshots/palettes.png)
 
@@ -123,7 +123,7 @@ Stable marks recorded live-source checks; beta adapters still need live-account 
 
 ## Privacy & security
 
-First launch asks which providers to track; nothing is enabled until you choose **Start**. CLI users run `quotacore init`. New providers default off. The widget reads a local snapshot. Collection can contact provider services using existing credentials: Claude's `~/.claude/.credentials.json`, Codex/agy CLI-managed authentication, GitHub CLI's token, or optional OpenRouter/DeepSeek API keys from environment variables or local `secrets.json`. JetBrains reads a local quota XML file.
+First launch asks which providers to track; all providers stay disabled until you choose **Start**. CLI users run `quotacore init`. New providers default off. The widget reads a local snapshot. Collection can contact provider services using existing credentials: Claude's `~/.claude/.credentials.json`, Codex/agy CLI-managed authentication, GitHub CLI's token, or optional OpenRouter/DeepSeek API keys from environment variables or local `secrets.json`. JetBrains reads a local quota XML file.
 
 Requests retrieve usage or balances; the collector does not submit prompts or request model completions. It does not scan chat history. Passive panel reads make no network requests; explicit refresh runs the collector. There is no application telemetry or analytics code. Third-party CLIs retain their own networking behavior. Snapshots, observations and pace history stay local and can contain sensitive usage metadata; do not attach raw files to issues. See the [security model](docs/security-model.md) for credential destinations, plaintext key storage, process limits, retention and verification; [provider data boundaries](docs/providers.md) describe adapter support.
 

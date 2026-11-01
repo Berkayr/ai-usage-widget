@@ -16,13 +16,13 @@ Hero, size, palette, scale, state and settings scenes embed the **built applicat
 
 Chrome's sandbox stays enabled by default. Restricted development environments can explicitly opt out with `SCREENSHOT_NO_SANDBOX=1`; only use that override with these trusted local fixtures. It needs loopback socket access. In an environment that denies sockets, rerun with the appropriate local execution permission. It does not need internet access once dependencies are present. Browser profile and servers are cleaned up on completion. Inspect every PNG after changing UI or fixtures; native desktop acceptance and design review remain separate.
 
-Theme captures include `themes.png`, `themes-light.png`, and `themes/<id>-dark.png` / `-light.png`. Hero and social preview compose multiple real themes. `checks/<id>-dark.png` / `-light.png` put the 340/200 px × 100/150% scale combinations side by side (64 cases total). Additional state scenes exercise stale/auth/rate-limit and extra/unknown windows. `checks/results.json` records provider counts, horizontal overflow, minimum visible text/number sizes, secondary text contrast and the one-active-theme-style invariant. The same browser then exercises every theme selector, appearance, 50/300% scale and the extra-window toggle, Color mode and all 12 Accent edge/position combinations. Fit frames are measured after font loading.
+Theme captures include `themes.png`, `themes-light.png`, and `themes/<id>-dark.png` / `-light.png`. Hero shows the System theme on Windows 11 style light and KDE Breeze style dark desktop backgrounds; social preview combines System with other real themes. `checks/<id>-dark.png` / `-light.png` put the 340/200 px × 100/150% scale combinations side by side (72 cases total). Additional state scenes exercise stale/auth/rate-limit and extra/unknown windows. `checks/results.json` records provider counts, horizontal overflow, minimum visible text/number sizes, secondary text contrast and the one-active-theme-style invariant. The same browser then exercises every theme selector, appearance, 50/300% scale and the extra-window toggle, Color mode and all 12 Accent edge/position combinations. Fit frames are measured after font loading.
 
 All widget scenes use Calm with the accent edge off. `checks/vivid.png` compares Calm and Vivid. Readability checks require labels ≥11 CSS px and primary numbers ≥15 CSS px at 100% (scaled proportionally at 150%), with secondary text contrast ≥4.5:1. Contrast is calculated from computed text colors and composited background-color layers against the least favorable black/white desktop polarity; background images and compositor effects require visual review. `checks/` remains ignored.
 
-`SCENE=checks/providers- node docs/tools/screenshots.mjs` captures first-run provider consent in all eight themes in dark/light modes and checks default-off choices, wrapped disclosures and explicit Start behavior. These controls use synthetic detection only.
+`SCENE=checks/providers- node docs/tools/screenshots.mjs` captures first-run provider consent in all nine themes in dark/light modes and checks default-off choices, wrapped disclosures and explicit Start behavior. These controls use synthetic detection only.
 
-Mono adds `mono.png` (all eight themes), `checks/mono-light.png`,
+Mono adds `mono.png` (all nine themes), `checks/mono-light.png`,
 `checks/mono-thresholds.png` (0/49/50/79/80/100/unknown), and
 `checks/dots-{200,340,520,700}.png`. Mono uses a neutral gallery background.
 Width checks assert visible per-window mark counts (10 in XS, otherwise 20)
@@ -31,3 +31,11 @@ and record mark widths alongside the other metrics. Interaction checks exercise
 warning at exactly 50%, danger at exactly 80%, and the first hollow warning mark.
 Filtered runs save their numeric results under `checks/<SCENE with slashes
 replaced by hyphens>.json`; unfiltered runs continue to write `checks/results.json`.
+
+System is the default theme. `checks/system-matrix-dark.png` and
+`checks/system-matrix-light.png` cover 200/340/520 CSS px × Calm/Mono (12 cases).
+These scenes emulate the OS color preference with Appearance set to Auto and
+assert the resolved mode, system font stack, 8 px corners and continuous bars.
+System is excluded from dot-count assertions because its meters are continuous;
+its quota severity thresholds are still checked. Native accent support is recorded
+in the results; actual WebView2/WebKitGTK desktop rendering needs platform checks.

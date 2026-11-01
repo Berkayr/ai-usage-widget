@@ -1,13 +1,14 @@
 # Meter and size standard
 
-Every quota window has 20 marks by default. Settings → Look → Dot count selects
+System uses continuous rounded progress bars, system fonts and 8 px card corners.
+All other themes have 20 marks per quota window by default. Settings → Look → Dot count selects
 10, 20 or 30. XS (below 220 design pixels) always uses 10. Marks represent used
 quota, rounded to the nearest mark; the percentage remains the precise label.
 Unknown quota has an explicitly unknown appearance and label. Widening a window
 never increases mark count or mark diameter. Rows center within their available
 space and may wrap at extreme sizes instead of shrinking the marks.
 
-Dot Matrix uses circles. Other themes use rectangular segments while retaining
+Dot Matrix uses circles. The other themes use rectangular segments while retaining
 their typography, borders and layouts. Circular Rings retains its additional
 continuous rings; Minimal Pace retains the elapsed-time marker.
 
@@ -25,11 +26,11 @@ pure black surfaces and white ink (reversed in Light); secondary ink and tracks
 are gray. Theme identity comes from geometry and typography, rather than hue.
 
 From 50%, the last portion of active marks, beginning at the midpoint, becomes
-hollow. From 80%, percentage labels use an inverse capsule as well. Stale and
+hollow; System uses a warning hatch on its continuous bar. From 80%, percentage labels use an inverse capsule as well. Stale and
 other status badges have monochrome outlines. Unknown marks stay distinct.
 No pulse animation is used, including with reduced motion enabled.
 
-See [the eight-theme Mono gallery](screenshots/mono.png). All data in documentation
+See [the nine-theme Mono gallery](screenshots/mono.png). All data in documentation
 captures is fictional. `node docs/tools/screenshots.mjs` captures the gallery and
 `checks/dots-{200,340,520,700}.png`; checks and numeric results are ignored by Git.
 Each visible row is measured in the browser, with counts recorded per theme.

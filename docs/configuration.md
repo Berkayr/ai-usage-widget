@@ -2,7 +2,7 @@
 
 Display settings and quota collection settings are separate. Change display settings using the gear button; do not edit files while the widget is saving them. The browser's `?sample` mode uses synthetic data and never saves native settings.
 
-New Look fields default to Calm/Off when missing. Until the native settings schema supports them, these two fields also persist in the local webview store; they are not portable by copying `settings.json` alone.
+Theme defaults to System when no choice is stored; an existing explicit theme is preserved. Theme and newer Look fields persist in the local webview store until the native settings schema supports them, so copying `settings.json` alone does not transfer them.
 
 ## Display settings
 
@@ -10,10 +10,11 @@ New Look fields default to Calm/Off when missing. Until the native settings sche
 
 | Field | Default | Meaning |
 | --- | --- | --- |
+| `theme` | `system` | System, Dot Matrix and seven other designs; selected in Settings → Theme. |
 | `appearance` | `auto` | `auto`, `light`, `dark`; auto follows OS color preference live. |
-| `colorMode` | `calm` | Neutral usage through 50%, soft amber above 50%, muted red from 80%; `vivid` restores theme colors. |
+| `colorMode` | `calm` | Neutral or system-accent usage below 50%, soft amber from 50%, muted red from 80%; `vivid` restores theme colors. |
 | `accentEdge` | `off` | `off`, `auto`, `left`, `right`; Auto follows the selected corner, with no edge in Free placement. |
-| `palette` | `signal-orange` | `signal-orange`, `sakura-pink`, `nord`, `mono-paper`. |
+| `palette` | Theme dependent | System: `default` (Desktop). Dot Matrix: `slate` (neutral default), `signal-orange`, `sakura-pink`, `nord`, `mono-paper`. Existing palette choices remain available. |
 | `accent`, `background` | `null` | Optional CSS color overrides; choosing a palette clears these overrides. |
 | `widgetOpacity` | `100` | Opacity of the entire widget, including text; UI range 20–100. |
 | `backgroundOpacity` | `100` | Background opacity, 0–100; this does not enable compositor blur. |
@@ -79,3 +80,5 @@ Provider CLIs must be discoverable in the desktop process environment, which can
 `doctor` uses cached data and reports resolved Python/module/CLI paths. Use `doctor --live` only when you want credential/network checks of enabled providers. `key set` stores plaintext keys with Unix 0600 or a current-user protected Windows DACL. See the [security model](security-model.md).
 
 Hook chaining uses a JSON argv array: `quotacore hook claude --chain-cmd '["program", "argument"]'`. `--chain` is now an alias for the same JSON format; old shell strings must be migrated explicitly to `--chain-shell`. Both receive raw stdin, allow 5 seconds and at most 64 KiB stdout. Only trust commands you select.
+
+System uses a system-ui font stack without bundled theme fonts, 8 px cards and continuous rounded bars. Auto appearance follows `prefers-color-scheme`; supported webviews use CSS `AccentColor` and `AccentColorText`, with a neutral blue-gray fallback. Mono retains continuous bars and adds a warning hatch / inverse danger label. System keeps one column at wide sizes.
