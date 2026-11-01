@@ -185,13 +185,13 @@ fn start_background(app: tauri::AppHandle) {
         let _watcher = watcher;
         emit_snapshot(&reader);
         loop {
-            match receiver.recv_timeout(Duration::from_secs(30)) {
+            match receiver.recv_timeout(Duration::from_secs(300)) {
                 Ok(()) => {
                     // Fixed coalescing window bounds latency even under continuous writes.
                     thread::sleep(Duration::from_millis(400));
                     while receiver.try_recv().is_ok() {}
                 }
-                Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => thread::sleep(Duration::from_secs(30)),
+                Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => thread::sleep(Duration::from_secs(300)),
                 Err(_) => (),
             }
             emit_snapshot(&reader);

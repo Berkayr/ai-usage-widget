@@ -29,6 +29,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "webkit2gtk",
  "windows-sys 0.61.2",
 ]
 

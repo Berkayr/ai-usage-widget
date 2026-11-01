@@ -8,6 +8,11 @@ let themeRequest = 0;
 const themeStyle = document.createElement('style');
 themeStyle.id = 'active-theme';
 document.head.append(themeStyle);
+// Wayland does not expose layer-bottom occlusion. Avoid continuous animation
+// even if the compositor keeps the document's visibility state as visible.
+const motionStyle = document.createElement('style');
+motionStyle.textContent = '*::before,*::after,*{animation:none!important} @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}';
+document.head.append(motionStyle);
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 const unlisteners = [];
@@ -24,7 +29,7 @@ function dispose() {
   unlisteners.splice(0).forEach(stop => stop());
   clearInterval(pollTimer); clearTimeout(toastTimer);
   cancelAnimationFrame(drawFrame);
-  fitObserver?.disconnect(); meterObserver.disconnect(); themeStyle.remove();
+  fitObserver?.disconnect(); meterObserver.disconnect(); themeStyle.remove(); motionStyle.remove();
   systemAppearance.removeEventListener('change', appearanceChanged);
 }
 if (import.meta.hot) { import.meta.hot.dispose(dispose); import.meta.hot.accept(() => location.reload()); }
@@ -160,7 +165,7 @@ function draw(snapshot, noData = false) {
   if (disposed) return;
   currentSnapshot = snapshot;
   currentNoData = noData;
-  if (drawFrame) return;
+  if (drawFrame || document.hidden) return;
   drawFrame = requestAnimationFrame(() => {
     drawFrame = 0;
     if (disposed) return;
@@ -181,7 +186,7 @@ let lastFitHeight = 0;
 let fitPending = false;
 async function requestFit() {
   // Measure the content's natural height (the widget is height:auto in fit mode), not the window.
-  if (!settings.fitHeight || isSample || fitPending) return;
+  if (!settings.fitHeight || isSample || fitPending || document.hidden) return;
   fitPending = true;
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   fitPending = false;
@@ -343,9 +348,23 @@ else {
     await loadProviders();
     await subscribe('snapshot', event => acceptSnapshot(event.payload.snapshot));
     const initial = await invoke('get_snapshot'); acceptSnapshot(initial.snapshot);
-    pollTimer = setInterval(async () => {
+    // Events deliver writes immediately; poll only as recovery and age check.
+    const recoverSnapshot = async () => {
       try { acceptSnapshot((await invoke('get_snapshot')).snapshot); } catch {}
-    }, 60000);
+    };
+    const updateVisibility = () => {
+      clearInterval(pollTimer);
+      if (document.hidden) {
+        cancelAnimationFrame(drawFrame); drawFrame = 0;
+        clearTimeout(toastTimer); $('#toast').hidden = true;
+      } else {
+        draw(currentSnapshot, currentNoData);
+        recoverSnapshot();
+        pollTimer = setInterval(recoverSnapshot, 300000);
+      }
+    };
+    document.addEventListener('visibilitychange', updateVisibility, { signal: domEvents.signal });
+    updateVisibility();
     await subscribe('open-settings', () => { $('#settings').hidden = false; loadRuntimeDiagnostics(); });
     await subscribe('taskbar-settings-changed', event => { settings.taskbar = { ...defaultTaskbar, ...event.payload }; applySettings(); });
     await subscribe('refresh-error', event => showToast(event.payload));

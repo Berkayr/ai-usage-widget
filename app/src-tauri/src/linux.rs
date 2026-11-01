@@ -82,6 +82,27 @@ pub fn placement_hint() -> Option<&'static str> {
 }
 
 pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
+    // Configure the existing view on GTK's main thread; no second web context.
+    let _ = window.with_webview(|webview| {
+        use webkit2gtk::{SettingsExt, WebContextExt, WebViewExt};
+        let view = webview.inner();
+        if let Some(settings) = WebViewExt::settings(&view) {
+            settings.set_enable_webgl(false);
+            // Legacy engines support this toggle; newer WebKit treats it as a no-op.
+            #[allow(deprecated)]
+            settings.set_enable_accelerated_2d_canvas(false);
+            settings.set_enable_media(false);
+            settings.set_enable_media_stream(false);
+            settings.set_enable_mediasource(false);
+            settings.set_enable_page_cache(false);
+            settings.set_enable_developer_extras(cfg!(debug_assertions));
+        }
+        if let Some(context) = view.context() {
+            context.set_cache_model(webkit2gtk::CacheModel::DocumentViewer);
+        }
+        // Modern WebKit ignores the deprecated process-count limit. The app
+        // creates exactly one view; keep WebKit's sandbox/process isolation.
+    });
     let Ok(gtk) = window.gtk_window() else { return };
     gtk.set_skip_taskbar_hint(true);
     gtk.set_skip_pager_hint(true);
