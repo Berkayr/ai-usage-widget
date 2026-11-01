@@ -32,3 +32,13 @@
 /* Wide layouts keep cards at a readable fixed width and avoid two-plus-one rows. */
 @container (min-width: 640px) { .provider-list:has(> .provider-card:nth-child(2)):not(:has(> .provider-card:nth-child(3))) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 640px; gap: 12px; } }
 @container (min-width: 960px) { .provider-list:has(> .provider-card:nth-child(3)) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 960px; gap: 12px; } }
+
+/* Native controls and every scrollable surface follow the resolved appearance. */
+:root[data-mode="light"] { color-scheme: light; }
+:root[data-mode="dark"] { color-scheme: dark; }
+* { scrollbar-width: thin; scrollbar-color: var(--border) var(--bgCard); }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bgCard); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+:root[data-mode="light"] .dot-bar i.on { box-shadow: none; }
+:root[data-mode="light"] .settings, :root[data-mode="light"] .context-menu { box-shadow: 0 6px 18px #0002; }

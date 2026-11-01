@@ -261,6 +261,9 @@ struct Strip {
     tip: Vec<u16>,
     taskbar_created: u32,
     light: bool,
+    background: u32,
+    hover: bool,
+    chip: bool,
     bounds: RECT,
     anchor: i32,
     dpi: u32,
@@ -269,19 +272,75 @@ struct Strip {
     drag: Option<(i32, i32)>,
     dragged: bool,
 }
-unsafe fn light_theme() -> bool {
-    let mut value = 0u32;
+// Link directly to avoid adding a Cargo feature while another task owns the manifest.
+#[link(name = "dwmapi")]
+extern "system" {
+    fn DwmGetColorizationColor(color: *mut u32, opaque: *mut i32) -> i32;
+}
+unsafe fn registry_dword(path: &[u16], name: &[u16], fallback: u32) -> u32 {
+    let mut value = fallback;
     let mut size = 4;
-    RegGetValueW(
-        HKEY_CURRENT_USER,
-        w!("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize"),
-        w!("SystemUsesLightTheme"),
-        RRF_RT_REG_DWORD,
-        null_mut(),
-        &mut value as *mut _ as _,
-        &mut size,
-    );
-    value != 0
+    if RegGetValueW(HKEY_CURRENT_USER, path.as_ptr(), name.as_ptr(), RRF_RT_REG_DWORD,
+        null_mut(), &mut value as *mut _ as _, &mut size) != 0 { return fallback; }
+    value
+}
+fn luminance(color: u32) -> f64 {
+    let channel = |shift: u32| {
+        let v = ((color >> shift) & 255u32) as f64 / 255.;
+        if v <= 0.04045 { v / 12.92 } else { ((v + 0.055) / 1.055).powf(2.4) }
+    };
+    0.2126 * channel(16) + 0.7152 * channel(8) + 0.0722 * channel(0)
+}
+fn contrast(a: u32, b: u32) -> f64 {
+    let (a, b) = (luminance(a), luminance(b));
+    (a.max(b) + 0.05) / (a.min(b) + 0.05)
+}
+fn composite(foreground: u32, background: u32) -> u32 {
+    let alpha = foreground >> 24;
+    let mut result = 0xff000000;
+    for shift in [0, 8, 16] {
+        let a = (foreground >> shift) & 255;
+        let b = (background >> shift) & 255;
+        result |= ((a * alpha + b * (255 - alpha) + 127) / 255) << shift;
+    }
+    result
+}
+fn readable(color: u32, background: u32) -> u32 {
+    if contrast(color, background) >= 4.5 { return color; }
+    let target = if contrast(0xff000000, background) > contrast(0xffffffff, background) { 0 } else { 0x00ffffff };
+    // Preserve the warning hue where possible; move only as far as contrast requires.
+    for alpha in 1..=255 {
+        let adjusted = composite((alpha << 24) | target, color);
+        if contrast(adjusted, background) >= 4.5 { return adjusted; }
+    }
+    target | 0xff000000
+}
+unsafe fn surface_theme(theme: &str) -> (bool, u32) {
+    let system_light = registry_dword(&wide("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize"), &wide("SystemUsesLightTheme"), 0) != 0;
+    let light = match theme { "light" => true, "dark" => false, _ => system_light };
+    let mut background = if light { 0xfff3f3f3 } else { 0xff202020 };
+    // The taskbar toggle lives under Personalize, not DWM (that is the title bar toggle).
+    if registry_dword(&wide("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize"), &wide("ColorPrevalence"), 0) != 0 {
+        let mut color = 0;
+        let mut opaque = 0;
+        if DwmGetColorizationColor(&mut color, &mut opaque) >= 0 { background = color | 0xff000000; }
+    }
+    (light, background)
+}
+unsafe fn rounded_fill(graphics: *mut GpGraphics, color: u32, width: f32, height: f32, radius: f32) {
+    let mut path = null_mut();
+    let mut brush = null_mut();
+    if GdipCreatePath(FillModeAlternate, &mut path) != 0 { return; }
+    let d = (radius * 2.).min(height).min(width);
+    for (x, y, angle) in [(0., 0., 180.), (width-d, 0., 270.), (width-d, height-d, 0.), (0., height-d, 90.)] {
+        GdipAddPathArc(path, x, y, d, d, angle, 90.);
+    }
+    GdipClosePathFigure(path);
+    if GdipCreateSolidFill(color, &mut brush) == 0 {
+        GdipFillPath(graphics, brush.cast(), path);
+        GdipDeleteBrush(brush.cast());
+    }
+    GdipDeletePath(path);
 }
 unsafe extern "system" fn location_changed(
     _: HWINEVENTHOOK,
@@ -416,12 +475,15 @@ impl Strip {
             right: x + width,
             bottom: y + h,
         };
-        let light = light_theme();
+        let (light, background) = surface_theme(&self.model.settings.theme);
+        let chip = self.model.settings.style == "chip";
         let redraw = force
             || rows != self.rows
             || self.bars != self.model.settings.show_bars
             || dpi != self.dpi
             || light != self.light
+            || background != self.background
+            || chip != self.chip
             || (bounds.left, bounds.top, bounds.right, bounds.bottom)
                 != (
                     self.bounds.left,
@@ -433,6 +495,8 @@ impl Strip {
         self.bars = self.model.settings.show_bars;
         self.dpi = dpi;
         self.light = light;
+        self.background = background;
+        self.chip = chip;
         self.bounds = bounds;
         if self.tip != wide(&tip) {
             self.tip = wide(&tip);
@@ -505,14 +569,17 @@ impl Strip {
             }
             return;
         }
+        // A fresh DIB has unspecified contents. Never publish uninitialized alpha.
+        std::ptr::write_bytes(bits as *mut u8, 0, (width * height * 4) as usize);
         let old = SelectObject(dc, dib);
         let mut bitmap = null_mut();
         let mut graphics = null_mut();
         let mut family = null_mut();
         let mut font = null_mut();
-        // PixelFormat32bppPARGB: GDI+ writes premultiplied BGRA into the DIB, including AA alpha.
+        // Render into an owned PARGB bitmap, then explicitly copy locked pixels to the DIB.
+        // Do not assume Graphics writes are reflected in an external scan0 buffer.
         let ok =
-            GdipCreateBitmapFromScan0(width, height, width * 4, 0x000E200B, bits as _, &mut bitmap)
+            GdipCreateBitmapFromScan0(width, height, 0, 0x000E200B, null(), &mut bitmap)
                 == 0
                 && GdipGetImageGraphicsContext(bitmap.cast(), &mut graphics) == 0
                 && GdipCreateFontFamilyFromName(w!("Segoe UI"), null_mut(), &mut family) == 0
@@ -526,6 +593,18 @@ impl Strip {
         if ok {
             GdipGraphicsClear(graphics, 0);
             GdipSetTextRenderingHint(graphics, TextRenderingHintAntiAliasGridFit);
+            GdipSetSmoothingMode(graphics, SmoothingModeAntiAlias);
+            let ink_dark = contrast(0xff000000, self.background) > contrast(0xffffffff, self.background);
+            let mut text_background = self.background;
+            for (visible, overlay) in [
+                (self.chip, if ink_dark { 0x0f000000 } else { 0x14ffffff }),
+                (self.hover, if ink_dark { 0x0d000000 } else { 0x0fffffff }),
+            ] {
+                if visible {
+                    rounded_fill(graphics, overlay, width as f32, height as f32, 4. * self.dpi as f32 / 96.);
+                    text_background = composite(overlay, text_background);
+                }
+            }
             let scale = self.dpi as f32 / 96.;
             let line_height = height as f32 / self.rows.len() as f32;
             for (i, row) in self.rows.iter().enumerate() {
@@ -546,33 +625,46 @@ impl Strip {
                     }
                     _ => {
                         if self.light {
-                            0xff1a1a1a
+                            0xff1b1b1b
                         } else {
                             0xfff3f3f3
                         }
                     }
                 };
+                let color = readable(color, text_background);
                 let mut brush = null_mut();
                 if GdipCreateSolidFill(color, &mut brush) != 0 {
                     continue;
                 }
-                let text = wide(&row.text);
                 let y = i as f32 * line_height;
-                GdipDrawString(
-                    graphics,
-                    text.as_ptr(),
-                    (text.len() - 1) as i32,
-                    font,
-                    &RectF {
-                        X: 2. * scale,
-                        Y: y,
-                        Width: width as f32 - 4. * scale,
-                        Height: line_height,
-                    },
-                    null(),
-                    brush.cast(),
-                );
+                let mut x = 2. * scale;
+                let mut secondary = false;
+                let mut format = null_mut();
+                GdipStringFormatGetGenericTypographic(&mut format);
+                if !format.is_null() { GdipSetStringFormatFlags(format, StringFormatFlagsMeasureTrailingSpaces | StringFormatFlagsNoWrap); }
+                for token in row.text.split(' ') {
+                    if token == "·" { secondary = true; }
+                    if token == "|" { secondary = false; }
+                    let text = wide(&format!("{token} "));
+                    let layout = RectF { X: x, Y: y, Width: width as f32 - x, Height: line_height };
+                    if layout.Width <= 0. { break; }
+                    let mut bounds = RectF::default();
+                    GdipMeasureString(graphics, text.as_ptr(), (text.len()-1) as i32, font, &layout, format, &mut bounds, null_mut(), null_mut());
+                    let mut secondary_brush = null_mut();
+                    let secondary_color = readable(if self.light { 0xff626262 } else { 0xffb0b0ba }, text_background);
+                    GdipCreateSolidFill(secondary_color, &mut secondary_brush);
+                    GdipDrawString(graphics, text.as_ptr(), (text.len()-1) as i32, font, &layout, format,
+                        if secondary && !secondary_brush.is_null() { secondary_brush.cast() } else { brush.cast() });
+                    if !secondary_brush.is_null() { GdipDeleteBrush(secondary_brush.cast()); }
+                    x += bounds.Width;
+                }
+                if !format.is_null() { GdipDeleteStringFormat(format); }
                 if self.bars {
+                    let mut track = null_mut();
+                    if GdipCreateSolidFill(if ink_dark { 0x1f000000 } else { 0x1fffffff }, &mut track) == 0 {
+                        GdipFillRectangle(graphics, track.cast(), 4. * scale, y + line_height - 2. * scale, width as f32 - 8. * scale, scale);
+                        GdipDeleteBrush(track.cast());
+                    }
                     if let Some(p) = row.pct {
                         GdipFillRectangle(
                             graphics,
@@ -591,7 +683,14 @@ impl Strip {
         if !graphics.is_null() {
             GdipDeleteGraphics(graphics);
         }
-        if ok {
+        let mut pixels = BitmapData::default();
+        let copied = ok && GdipBitmapLockBits(bitmap, null(), ImageLockModeRead as u32, 0x000E200B, &mut pixels) == 0;
+        if copied {
+            for y in 0..height as usize {
+                std::ptr::copy_nonoverlapping((pixels.Scan0 as *const u8).offset(y as isize * pixels.Stride as isize),
+                    (bits as *mut u8).add(y * width as usize * 4), width as usize * 4);
+            }
+            GdipBitmapUnlockBits(bitmap, &mut pixels);
             UpdateLayeredWindow(
                 hwnd,
                 null_mut(),
@@ -641,7 +740,10 @@ impl Strip {
     fn persist(&mut self) {
         let mut settings = load_settings();
         settings.taskbar = self.model.settings.clone();
-        match save_settings(settings) {
+        let result = self.app.get_webview_window("main")
+            .ok_or_else(|| "Widget window is unavailable".to_string())
+            .and_then(|window| save_settings(window, settings));
+        match result {
             Ok(()) => {
                 let _ = self
                     .app
@@ -684,8 +786,19 @@ unsafe extern "system" fn procedure(hwnd: HWND, message: u32, wp: WPARAM, lp: LP
             s.refresh(hwnd, false);
             0
         }
-        WM_SETTINGCHANGE | WM_DPICHANGED | WM_DISPLAYCHANGE => {
+        WM_SETTINGCHANGE | WM_DPICHANGED | WM_DISPLAYCHANGE | WM_DWMCOLORIZATIONCOLORCHANGED => {
             s.refresh(hwnd, true);
+            0
+        }
+        WM_ERASEBKGND => 1,
+        WM_MOUSELEAVE => { s.hover = false; s.paint(hwnd); 0 }
+        WM_MOUSEMOVE if s.drag.is_none() => {
+            if !s.hover {
+                s.hover = true;
+                let mut track = TRACKMOUSEEVENT { cbSize: size_of::<TRACKMOUSEEVENT>() as u32, dwFlags: TME_LEAVE, hwndTrack: hwnd, dwHoverTime: 0 };
+                TrackMouseEvent(&mut track);
+                s.paint(hwnd);
+            }
             0
         }
         WM_MOUSEACTIVATE => MA_NOACTIVATE as isize,
@@ -857,6 +970,9 @@ pub(super) fn start(app: tauri::AppHandle) {
                 tip: wide("No quota data"),
                 taskbar_created: RegisterWindowMessageW(w!("TaskbarCreated")),
                 light: false,
+                background: 0xff202020,
+                hover: false,
+                chip: false,
                 bounds: RECT::default(),
                 anchor: 0,
                 dpi: 96,
@@ -905,6 +1021,24 @@ mod tests {
                 {"id":"copilot", "state":"NOT_INSTALLED", "windows":[{"kind":"session", "used_percent":100}]}
             ]})),
         }
+    }
+    #[test]
+    fn accent_text_meets_contrast_with_chip_and_hover() {
+        for r in (0..=255u32).step_by(17) {
+            for g in (0..=255u32).step_by(17) {
+                for b in (0..=255u32).step_by(17) {
+                    let base = 0xff000000 | r << 16 | g << 8 | b;
+                    for overlay in [0x00000000, 0x0f000000, 0x14ffffff, 0x0d000000, 0x0fffffff] {
+                        let bg = composite(overlay, base);
+                        for text in [0xff1b1b1b, 0xfff3f3f3, 0xff626262, 0xffb0b0ba, 0xff855500, 0xffffce54, 0xffb91c1c, 0xffff6969] {
+                            assert!(contrast(readable(text, bg), bg) >= 4.5);
+                        }
+                    }
+                }
+            }
+        }
+        assert_eq!(composite(0x00000000, 0xfff3f3f3), 0xfff3f3f3);
+        assert_eq!(readable(0xff1b1b1b, 0xfff3f3f3), 0xff1b1b1b);
     }
     #[test]
     fn crowded_taskbar_promotes_critical_providers_and_retains_full_tooltip() {
@@ -957,6 +1091,14 @@ mod tests {
         assert!(settings.enabled);
         assert_eq!(settings.providers.len(), 3);
         assert_eq!(settings.offset_x, 0);
+        assert_eq!(settings.style, "transparent");
+        assert_eq!(settings.theme, "auto");
+        let mut legacy = serde_json::to_value(super::super::Settings::default()).unwrap();
+        legacy.as_object_mut().unwrap().remove("appearance");
+        legacy.as_object_mut().unwrap().remove("taskbar");
+        let legacy: super::super::Settings = serde_json::from_value(legacy).unwrap();
+        assert_eq!(legacy.appearance, "auto");
+        assert_eq!(legacy.taskbar.style, "transparent");
         assert!(!TaskbarSettings::default().enabled);
     }
 }

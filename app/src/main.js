@@ -1,4 +1,4 @@
-﻿import './themes/dot-matrix/theme.css';
+import './themes/dot-matrix/theme.css';
 import { renderSnapshot } from './themes/dot-matrix/render.js';
 import sample from './sample-snapshot.json';
 import theme from './themes/dot-matrix/theme.json';
@@ -6,8 +6,9 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 
 const isSample = new URLSearchParams(location.search).has('sample') || !('__TAURI_INTERNALS__' in window);
-const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'], window: 'session', showBars: false, offsetX: 0 };
-let settings = { taskbar: { ...defaultTaskbar }, palette: 'signal-orange', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 94, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
+const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'], window: 'session', showBars: false, offsetX: 0, style: 'transparent', theme: 'auto' };
+const systemAppearance = matchMedia('(prefers-color-scheme: light)');
+let settings = { appearance: 'auto', taskbar: { ...defaultTaskbar }, palette: 'signal-orange', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 94, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
 try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
 let currentSnapshot = null;
 
@@ -16,17 +17,19 @@ document.querySelector('#app').innerHTML = `
     <header class="header" data-tauri-drag-region><div class="title-block"><div class="app-title">AI QUOTA</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
     <div class="provider-list" id="providers"></div>
     <footer class="footer"><span>QUOTA MONITOR</span><span>MATRIX//01</span></footer>
-    <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label><fieldset class="taskbar-settings" id="taskbar-settings"><legend>Taskbar strip</legend><label class="toggle-setting">Enable taskbar strip<input id="taskbar-enabled" type="checkbox"></label><div class="taskbar-providers"><label class="toggle-setting">Claude<input type="checkbox" data-taskbar-provider="claude"></label><label class="toggle-setting">Codex<input type="checkbox" data-taskbar-provider="codex"></label><label class="toggle-setting">Gemini<input type="checkbox" data-taskbar-provider="gemini"></label><label class="toggle-setting">Copilot<input type="checkbox" data-taskbar-provider="copilot"></label></div><label>Quota window<select id="taskbar-window"><option value="session">Session</option><option value="weekly">Weekly</option><option value="both">Both</option></select></label><label class="toggle-setting">Show mini bars<input id="taskbar-bars" type="checkbox"></label></fieldset></section>
+    <section class="settings" id="settings" hidden><header><strong>DISPLAY SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><label>Appearance<select id="appearance"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label><fieldset class="taskbar-settings" id="taskbar-settings"><legend>Taskbar strip</legend><label class="toggle-setting">Enable taskbar strip<input id="taskbar-enabled" type="checkbox"></label><div class="taskbar-providers"><label class="toggle-setting">Claude<input type="checkbox" data-taskbar-provider="claude"></label><label class="toggle-setting">Codex<input type="checkbox" data-taskbar-provider="codex"></label><label class="toggle-setting">Gemini<input type="checkbox" data-taskbar-provider="gemini"></label><label class="toggle-setting">Copilot<input type="checkbox" data-taskbar-provider="copilot"></label></div><label>Style<select id="taskbar-style"><option value="transparent">Transparent</option><option value="chip">Chip</option></select></label><label>Theme<select id="taskbar-theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Quota window<select id="taskbar-window"><option value="session">Session</option><option value="weekly">Weekly</option><option value="both">Both</option></select></label><label class="toggle-setting">Show mini bars<input id="taskbar-bars" type="checkbox"></label></fieldset></section>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
     <div class="toast" id="toast" hidden></div>
   </main>`;
 
 const $ = (selector) => document.querySelector(selector);
 function applySettings() {
-  const palette = theme.palettes[settings.palette] || theme.palettes['signal-orange'];
-  for (const [key, value] of Object.entries(palette)) if (key !== 'name' && key !== 'mode') document.documentElement.style.setProperty(`--${key}`, value);
+  const selected = theme.palettes[settings.palette] || theme.palettes['signal-orange'];
+  const mode = settings.appearance === 'auto' ? (systemAppearance.matches ? 'light' : 'dark') : settings.appearance;
+  const palette = { ...selected, ...(selected[mode] || {}), mode }; 
+  for (const [key, value] of Object.entries(palette)) if (typeof value === 'string' && key !== 'name' && key !== 'mode') document.documentElement.style.setProperty(`--${key}`, value);
   if (settings.accent) document.documentElement.style.setProperty('--accent', settings.accent);
-  if (settings.background) document.documentElement.style.setProperty('--bg-widget', settings.background);
+  if (settings.background) document.documentElement.style.setProperty('--bgWidget', settings.background);
   document.documentElement.dataset.mode = palette.mode;
   document.documentElement.style.setProperty('--widget-opacity', settings.widgetOpacity / 100);
   document.documentElement.style.setProperty('--background-opacity', settings.backgroundOpacity / 100);
@@ -34,6 +37,9 @@ function applySettings() {
   document.querySelector('#app').style.zoom = String(settings.scale / 100);
   document.documentElement.classList.toggle('fit-height', Boolean(settings.fitHeight)); lastFitHeight = 0;
   settings.taskbar = { ...defaultTaskbar, ...settings.taskbar };
+  $('#appearance').value = settings.appearance;
+  $('#taskbar-style').value = settings.taskbar.style;
+  $('#taskbar-theme').value = settings.taskbar.theme;
   $('#taskbar-enabled').checked = settings.taskbar.enabled;
   $('#taskbar-window').value = settings.taskbar.window;
   $('#taskbar-bars').checked = settings.taskbar.showBars;
@@ -73,6 +79,9 @@ async function persist() { if (!isSample) try { await invoke('save_settings', { 
 function showToast(message) { const el = $('#toast'); el.textContent = message; el.hidden = false; setTimeout(() => { el.hidden = true; }, 3200); }
 
 for (const [id, item] of Object.entries(theme.palettes)) $('#palette').add(new Option(item.name, id));
+systemAppearance.addEventListener('change', () => { if (settings.appearance === 'auto') applySettings(); });
+$('#appearance').onchange = async event => { settings.appearance = event.target.value; applySettings(); await persist(); };
+for (const key of ['style', 'theme']) $(`#taskbar-${key}`).onchange = async event => { settings.taskbar[key] = event.target.value; await persist(); };
 $('#taskbar-enabled').onchange = async event => { settings.taskbar.enabled = event.target.checked; await persist(); };
 $('#taskbar-window').onchange = async event => { settings.taskbar.window = event.target.value; await persist(); };
 $('#taskbar-bars').onchange = async event => { settings.taskbar.showBars = event.target.checked; await persist(); };
