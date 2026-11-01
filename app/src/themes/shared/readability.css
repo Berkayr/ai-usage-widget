@@ -78,3 +78,29 @@
   :root[data-theme=retro-lcd] .window-top>span {flex-basis:100%}
 }
 :root .widget .balance-row b, :root .widget .compact-api {font-size:15px}
+/* Fixed design units: extra width never stretches or adds meter marks. */
+:root .widget .dot-bar {--dot:.25rem;display:flex;flex-wrap:wrap;justify-content:center;gap:.125rem;max-width:100%;margin-left:auto;margin-right:auto}
+:root .widget .dot-bar i {flex:0 0 var(--dot);width:var(--dot);height:var(--dot);min-width:var(--dot);max-width:var(--dot)}
+:root .widget .segments {display:flex;flex-wrap:wrap;justify-content:center;gap:.125rem;max-width:100%;font-size:.5rem;line-height:1}
+:root .widget .segments i {flex:0 0 .25rem;min-width:.25rem;width:.25rem;height:.5rem}
+:root .widget .segments.terminal i {font-size:0;background:var(--bgTrackOff)}
+:root .widget .segments.terminal i.on {background:var(--level)}
+:root .widget .segments.terminal>span {display:none}
+@container (max-width:219px) { :root .widget .segments i:nth-of-type(n+11) {display:none} }
+/* Mono preserves geometry while replacing every theme surface and ink. */
+:root[data-color-mode=mono] .widget {background:var(--bgWidget);filter:grayscale(1)}
+:root[data-color-mode=mono] .widget * {text-shadow:none;box-shadow:none}
+:root[data-color-mode=mono] .provider-card {background:var(--bgCard);backdrop-filter:none}
+:root[data-color-mode=mono] .beacon {background:var(--textPrimary)}
+:root[data-color-mode=mono] .status-badge {color:var(--textPrimary);background:var(--bgCard);border:1px solid currentColor}
+:root[data-color-mode=mono] .dot-bar i.on.threshold,
+:root[data-color-mode=mono] .segments i.on.threshold {background:var(--bgCard);border:1px solid var(--textPrimary);box-shadow:none}
+:root[data-color-mode=mono] .meter[data-severity=warning]>i {background:repeating-linear-gradient(135deg,var(--textPrimary) 0,var(--textPrimary) 2px,var(--bgCard) 2px,var(--bgCard) 4px)}
+:root[data-color-mode=mono] .ring-value[data-severity=warning] {stroke-linecap:butt}
+:root[data-color-mode=mono] :is(b,strong,small)[data-severity=danger] {color:var(--bgCard)!important;background:var(--textPrimary);border-radius:.25em;padding:0 .2em;width:fit-content;max-width:100%}
+:root .widget .segments {position:relative;width:max-content;margin-left:auto;margin-right:auto}
+:root .widget .segments>em {position:absolute;top:-.2rem;height:.9rem;width:1px;background:var(--textPrimary)}
+:root .widget .segments.unknown i {background:transparent;border:1px dashed var(--textMuted)}
+:root[data-color-mode=mono] .ring-track {stroke:var(--bgTrackOff)}
+:root[data-color-mode=mono] .provider-card {background-image:none}
+:root[data-theme=brutalist] .window-top b {font-size:clamp(28px,8cqw,52px)}

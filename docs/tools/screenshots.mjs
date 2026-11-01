@@ -27,7 +27,7 @@ const frame = (label, width=340, height=590, settings={}, options={}) => {
 const heading = (eyebrow,title,sub='') => `<header><small>${eyebrow}</small><h1>${title}</h1><p>${sub}</p></header>`;
 const shell = (body,light=false) => `<!doctype html><html lang="en"><meta charset="utf-8"><title>AI Quota Widget • fictional demo</title><style>
 @font-face{font-family:Mono;src:url('/assets-docs/mono.woff2')}*{box-sizing:border-box}html{min-height:100%}body{min-height:100vh;margin:0;padding:48px;color:${light?'#1b1b1b':'#f4f4f6'};background:${light?'radial-gradient(ellipse at top right,#cadbdc,transparent 65%),#eceae4':'radial-gradient(ellipse at top right,#263a4c,transparent 65%),#10141c'};font-family:Mono,monospace}header{margin-bottom:32px}small{font-size:12px;letter-spacing:3px;color:${light?'#80501d':'#ff9e65'}}h1{font-size:34px;letter-spacing:-1px;margin:12px 0}p{color:${light?'#53585f':'#a9b5c5'};line-height:1.7;font-size:13px}iframe{display:block;border:0;background:transparent;filter:drop-shadow(0 18px 18px #0003)}.row{display:flex;align-items:flex-start;justify-content:center;gap:24px}.specimen{flex:none}.specimen>p{text-align:center;margin:16px 0}.hero{display:flex;align-items:center;justify-content:space-around;gap:60px}.copy{max-width:420px}.copy h1{font-size:48px;line-height:1.15}.logo{width:88px;height:88px}.pill{display:inline-block;margin-top:20px;padding:9px 14px;border:1px solid #8994a744;border-radius:30px;font-size:12px}.bar{height:60px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:${light?'#f3f3f3e8':'#202020ed'};box-shadow:0 16px 40px #0003;font-family:Arial,sans-serif;color:${light?'#1b1b1b':'#f4f4f6'}}.strip{font-size:12px;line-height:1.6;display:flex;gap:24px}.warn{color:${light?'#855500':'#ff9e1b'}}.danger{color:${light?'#b91c1c':'#ff2a2a'}}.track{width:60px;height:3px;background:${light?'#0000001f':'#ffffff1f'};margin-top:4px}.track i{display:block;height:3px;background:currentColor}.panel-area{margin-top:80px}.note{font-size:11px;margin-top:24px}
-</style>${body}</html>`;
+</style>${/MONO|DOT STANDARD/.test(body) ? '<style>body{background:#101010;color:#eeeeee}body p{color:#aaaaaa}header small{color:#aaa}</style>' : ''}${body}</html>`;
 const scenes = new Map();
 for (const light of [false,true]) {
  const mode=light?'light':'dark';
@@ -81,6 +81,22 @@ const providerConfig = { initialized:false, disclosures:consentDisclosures,
 for(const appearance of ['dark','light']) scenes.set(`checks/providers-${appearance}`, {
  w:1552,h:1700,autoHeight:true,html:shell(heading('PRIVACY','Choose what to track','Synthetic detection; all providers off until Start')+
  [0,4].map(start=>`<div class="row">${themeIds.slice(start,start+4).map(id=>frame(id,340,780,{theme:id,appearance},{snapshot:{providers:[]},providerConfig})).join('')}</div>`).join(''),appearance==='light') });
+const monoSnapshot = structuredClone(snapshot);
+monoSnapshot.providers[0].stale = true;
+monoSnapshot.providers[1].windows[1].used_percent = 86;
+for (const width of [200,340,520,700]) scenes.set(`checks/dots-${width}`, {
+ w:4*width+192,h:3500,autoHeight:true,html:shell(heading('DOT STANDARD',`${width} CSS px / Mono`, 'Fixed marks; XS has 10, other tiers 20. Fictional data.') + `<div style="display:grid;grid-template-columns:repeat(4,${width}px);gap:24px;align-items:start">${themeIds.map(id=>frame(id,width,1600,{theme:id,colorMode:'mono'},{snapshot:monoSnapshot})).join('')}</div>`)
+});
+for (const appearance of ['dark','light']) scenes.set(appearance === 'dark' ? 'mono' : 'checks/mono-light', {
+ w:1570,h:3000,autoHeight:true,html:shell(heading('MONO','Eight themes. Black and white.','Hollow marks from 50%; inverse percentage from 80%; outlined status badges.') + `<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map(id=>frame(id,340,1600,{theme:id,appearance,colorMode:'mono'},{snapshot:monoSnapshot})).join('')}</div>`,appearance==='light')
+});
+const thresholds = {...snapshot,providers:[{...snapshot.providers[0],windows:[0,49,50,79,80,100,null].map((used_percent,i)=>({id:String(i),label:used_percent===null?'Unknown':`${used_percent}% boundary`,used_percent,resets_at:null}))}]};
+scenes.set('checks/mono-thresholds',{w:1570,h:3000,autoHeight:true,html:shell(heading('MONO THRESHOLDS','49 / 50 / 79 / 80','Normal, hollow warning, inverse danger, unknown')+`<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map(id=>frame(id,340,2000,{theme:id,colorMode:'mono'},{snapshot:thresholds})).join('')}</div>`)});
+// An expired reset with an old snapshot must be visibly STALE in every theme.
+const agedSnapshot = structuredClone(snapshot);
+agedSnapshot.generated_at = '2026-11-01T11:49:00Z';
+agedSnapshot.providers.forEach(p => { p.state = 'OK'; p.stale = false; p.windows.forEach(w => { w.resets_at = '2026-11-01T11:50:00Z'; }); });
+scenes.set('checks/stale-age', {w:1570,h:3000,autoHeight:true,html:shell(heading('STALE SNAPSHOT','Expired resets / eleven minutes old','Synthetic snapshot; every active card must show STALE.')+`<div style="display:grid;grid-template-columns:repeat(4,340px);gap:32px;align-items:start">${themeIds.map(id=>frame(id,340,1600,{theme:id},{snapshot:agedSnapshot})).join('')}</div>`)});
 function measure(d) {
  const w=d.defaultView;
  const visible=el=>el.getClientRects().length && w.getComputedStyle(el).visibility!=='hidden' && el.getBoundingClientRect().width>0;
@@ -99,7 +115,9 @@ function measure(d) {
   for(const layer of layers)bg=bg.map((v,i)=>layer[i]*layer[3]+v*(1-layer[3]));
   return {selector:el.className||el.tagName,ratio:contrast(rgba(w.getComputedStyle(el).color),bg)};
  });
- return {minFont,numberFont,minContrast:Math.min(...ratios.map(r=>r.ratio)),ratios,scale:Number(d.querySelector('#scale').value),width:w.innerWidth,zoom:w.getComputedStyle(d.querySelector('#app')).zoom};
+ const dotCounts=[...d.querySelectorAll('.dot-bar,.segments')].filter(visible).map(el=>[...el.querySelectorAll('i')].filter(visible).length);
+ const dotSizes=[...d.querySelectorAll('.dot-bar i,.segments i')].filter(visible).map(el=>el.getBoundingClientRect().width);
+ return {dotCounts,dotSizes,minFont,numberFont,minContrast:Math.min(...ratios.map(r=>r.ratio)),ratios,scale:Number(d.querySelector('#scale').value),width:w.innerWidth,zoom:w.getComputedStyle(d.querySelector('#app')).zoom};
 }
 const server = createServer(async (req,res)=>{
  try {
@@ -137,9 +155,18 @@ try {
   await cdp('Page.navigate',{url:`${base}/scene/${name}`});
   const result=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let attempt=0;attempt<150;attempt++){const frames=[...document.querySelectorAll('iframe')];if(location.pathname==='/scene/${name}'&&document.readyState==='complete'&&frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){await document.fonts.ready;await Promise.all(frames.map(f=>f.contentDocument.fonts.ready));for(const f of frames){if(f.contentDocument.documentElement.classList.contains('fit-height')) f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return frames.map(f=>{const d=f.contentDocument;const expected=JSON.parse(new URL(f.src).searchParams.get('docs')).snapshot.providers.length;const overflow=[...d.querySelectorAll('.provider-list,.provider-card,.quota-window,.provider-heading,.windows')].filter(el=>el.scrollWidth>el.clientWidth+2).map(el=>el.className);return {cards:d.querySelectorAll('.provider-card').length,expected,overflow,theme:d.documentElement.dataset.theme,styles:d.querySelectorAll('#active-theme').length,metrics:(${measure.toString()})(d)};});}await new Promise(r=>setTimeout(r,100));}throw Error('Frame readiness timed out');})()`,awaitPromise:true,returnByValue:true});
   if(result.exceptionDetails||errors.length)throw Error(`${name}: ${JSON.stringify(result.exceptionDetails||errors)}`);
-  if(result.result.value.some(frame=>frame.cards!==frame.expected || frame.overflow.length || frame.styles!==1))throw Error(`${name}: layout failure ${JSON.stringify(result.result.value)}`);
+  if(result.result.value.some(frame=>frame.cards!==frame.expected || frame.overflow.length || frame.styles!==1))throw Error(`${name}: layout failure ${JSON.stringify(result.result.value.map(({theme,overflow,cards,expected})=>({theme,overflow,cards,expected})))}`);
   checks.push({scene:name,frames:result.result.value});
-  if(name.startsWith('checks/') && !name.startsWith('checks/providers-') && !name.endsWith('-states') && name!=='checks/vivid' && result.result.value.some(f=>f.metrics.minFont<11*f.metrics.scale/100-.01 || f.metrics.numberFont<15*f.metrics.scale/100-.01 || f.metrics.minContrast<4.5))throw Error(`${name}: readability failure ${JSON.stringify(result.result.value)}`);
+  if(name.startsWith('checks/dots-') && result.result.value.some(f=>!f.metrics.dotCounts.length || f.metrics.dotCounts.some(count=>count!==(f.metrics.width<220?10:20))))throw Error(`${name}: dot count failure ${JSON.stringify(result.result.value)}`);
+  if(name.startsWith('checks/') && !name.startsWith('checks/providers-') && !name.endsWith('-states') && name!=='checks/vivid' && !name.startsWith('checks/dots-') && result.result.value.some(f=>f.metrics.minFont<11*f.metrics.scale/100-.01 || f.metrics.numberFont<15*f.metrics.scale/100-.01 || f.metrics.minContrast<4.5))throw Error(`${name}: readability failure ${JSON.stringify(result.result.value)}`);
+  if(name==='checks/mono-thresholds') {
+    const thresholdResult=await cdp('Runtime.evaluate',{expression:`[...document.querySelectorAll('iframe')].map(f=>{const d=f.contentDocument;const values=[...d.querySelectorAll('.quota-window .window-top b')].map(el=>el.dataset.severity);if(values.join(',')!=='normal,normal,warning,warning,danger,danger,unknown')throw Error('Thresholds: '+d.documentElement.dataset.theme);const rows=[...d.querySelectorAll('.quota-window .dot-bar,.quota-window .segments')];if(rows[1].querySelectorAll('.threshold').length || !rows[2].querySelectorAll('.threshold').length)throw Error('Hollow boundary');return d.documentElement.dataset.theme;})`,returnByValue:true});
+    if(thresholdResult.exceptionDetails)throw Error(JSON.stringify(thresholdResult.exceptionDetails));
+  }
+  if (name === 'checks/stale-age') {
+   const stale = await cdp('Runtime.evaluate',{expression:`[...document.querySelectorAll('iframe')].map(f=>{const d=f.contentDocument;const badges=[...d.querySelectorAll('.status-badge')];if(badges.length!==3||badges.some(b=>b.textContent!=='STALE'))throw Error('Old snapshot not marked STALE: '+d.documentElement.dataset.theme);return d.documentElement.dataset.theme;})`,returnByValue:true});
+   if(stale.exceptionDetails)throw Error(JSON.stringify(stale.exceptionDetails));
+  }
   if(scene.autoHeight){
    const bounds=await cdp('Runtime.evaluate',{expression:`Math.ceil(Math.max(...[...document.body.children].map(el=>el.getBoundingClientRect().bottom)))+48`,returnByValue:true});
    await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:bounds.result.value,deviceScaleFactor:scene.dpr||2,mobile:false});
@@ -172,6 +199,7 @@ try {
  // cached CSS accumulating or a selector failing after repeated switches.
  const interactions = await cdp('Runtime.evaluate',{expression:`(async()=>{
  const f=document.querySelector('iframe'),w=f.contentWindow,d=f.contentDocument;
+ const rendered = () => new Promise(r=>w.requestAnimationFrame(()=>w.requestAnimationFrame(r)));
  for(const id of ${JSON.stringify(themeIds)}){
   d.querySelector('#theme-picker [data-theme="'+id+'"]').click();
   for(let n=0;d.documentElement.dataset.theme!==id&&n<100;n++) await new Promise(r=>setTimeout(r,20));
@@ -179,11 +207,21 @@ try {
   const p=d.querySelector('#palette'); if(!p.value || !p.options.length)throw Error('Missing palette: '+id);
   const fit=d.querySelector('#fit-height');for(const checked of [false,true]){fit.checked=checked;fit.dispatchEvent(new Event('change'));if(d.documentElement.classList.contains('fit-height')!==checked)throw Error('Fit height: '+id);}
   d.querySelector('#gear').click();await new Promise(r=>requestAnimationFrame(r));if(d.querySelector('#settings').hidden || d.querySelector('#widget').getBoundingClientRect().height<540)throw Error('Settings height: '+id);d.querySelector('#close-settings').click();
-  const extra=d.querySelector('#show-extra-windows');extra.checked=true;extra.dispatchEvent(new Event('change')); if(!d.body.textContent.includes('Extra window'))throw Error('Extra window: '+id);
-  extra.checked=false;extra.dispatchEvent(new Event('change'));if(d.body.textContent.includes('Extra window'))throw Error('Hidden extra: '+id);
+  const extra=d.querySelector('#show-extra-windows');extra.checked=true;extra.dispatchEvent(new Event('change')); await rendered(); const fixture=JSON.parse(new URL(f.src).searchParams.get('docs'));if(fixture.snapshot.providers.some(p=>p.windows?.some(w=>w.label==='Extra window'))&&!d.body.textContent.includes('Extra window'))throw Error('Extra window: '+id);
+  extra.checked=false;extra.dispatchEvent(new Event('change'));await rendered();if(d.body.textContent.includes('Extra window'))throw Error('Hidden extra: '+id);
   for(const appearance of ['light','dark','auto']) {const a=d.querySelector('#appearance');a.value=appearance;a.dispatchEvent(new Event('change'));if(appearance!=='auto'&&d.documentElement.dataset.mode!==appearance)throw Error('Appearance: '+id);}
   for(const scale of [50,300]){const a=d.querySelector('#scale');a.value=scale;a.dispatchEvent(new Event('input'));if(parseFloat(d.documentElement.style.fontSize)!==16*scale/100 || d.querySelector('#app').style.zoom)throw Error('Scale: '+id);}
   const scale=d.querySelector('#scale');scale.value=100;scale.dispatchEvent(new Event('input'));
+  const oldWidth=f.width; f.width=340; await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  for(const count of [10,20,30]) {
+   const select=d.querySelector('#dot-count');select.value=count;select.dispatchEvent(new Event('change'));await rendered();
+   const rows=[...d.querySelectorAll('.dot-bar,.segments')].filter(el=>el.getBoundingClientRect().width>0);
+   if(!rows.length || rows.some(el=>el.querySelectorAll('i').length!==count))throw Error('Dot setting: '+id+' / '+count);
+  }
+  d.querySelector('#dot-count').value=20;d.querySelector('#dot-count').dispatchEvent(new Event('change'));
+  f.width=200;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  if([...d.querySelectorAll('.dot-bar,.segments')].filter(el=>el.getBoundingClientRect().width>0).some(el=>el.querySelectorAll('i').length!==10))throw Error('XS dot count: '+id);
+  f.width=oldWidth;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
  }
  for(const value of ['off','auto','left','right']) {
    const edge=d.querySelector('#accent-edge');edge.value=value;edge.dispatchEvent(new Event('change'));
@@ -194,11 +232,11 @@ try {
    }
   }
   const color=d.querySelector('#color-mode');
-  for(const value of ['vivid','calm']) {color.value=value;color.dispatchEvent(new Event('change'));if(d.documentElement.dataset.colorMode!==value)throw Error('Color mode: '+value);}
+  for(const value of ['vivid','mono','calm']) {color.value=value;color.dispatchEvent(new Event('change'));if(d.documentElement.dataset.colorMode!==value)throw Error('Color mode: '+value);}
  return 'Accent edge (12 combinations), color mode, theme switching, palette, appearance, fit/settings height, scale and extra-window checks passed';
  })()`,awaitPromise:true,returnByValue:true});
  if(interactions.exceptionDetails)throw Error(JSON.stringify(interactions.exceptionDetails));
- await writeFile(resolve(output,'checks/results.json'),JSON.stringify({checks,interactions:interactions.result.value},null,2)+'\n');
+ await writeFile(resolve(output,`checks/${process.env.SCENE?.replaceAll('/','-') || 'results'}.json`),JSON.stringify({checks,interactions:interactions.result.value},null,2)+'\n');
  console.log(interactions.result.value);
  }
 } finally {

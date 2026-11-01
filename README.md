@@ -67,11 +67,13 @@ Choose from eight built-in themes: Dot Matrix, Circular Rings, Terminal, Frosted
 
 ### Colors and sizing
 
-Dot Matrix includes Signal Orange, Sakura Pink, Nord and Mono Paper; the other themes include a palette matched to their design. Calm is the default: neutral usage up to 50%, soft amber above 50%, and muted red from 80%. Choose Vivid in Settings → Look for the original colors. The accent edge starts off; Auto follows the selected left/right corner and disappears in Free placement, or you can choose a fixed side. Accent and background colors can be overridden. Separate widget and background opacity controls let you tune transparency while keeping text readable. These controls change opacity, not monitor brightness or compositor blur.
+Dot Matrix includes Signal Orange, Sakura Pink, Nord and Mono Paper; the other themes include a palette matched to their design. Calm is the default: neutral usage below 50%, soft amber from 50%, and muted red from 80%. Choose Vivid in Settings → Look for the original colors, or Mono for pure black and white surfaces with hollow warning marks and inverse percentage capsules from 80%. The accent edge starts off; Auto follows the selected left/right corner and disappears in Free placement, or you can choose a fixed side. Accent and background colors can be overridden. Separate widget and background opacity controls let you tune transparency while keeping text readable. These controls change opacity, not monitor brightness or compositor blur.
+
+![All eight themes in Mono with fictional quota data](docs/screenshots/mono.png)
 
 ![Four palette variants of the real widget](docs/screenshots/palettes.png)
 
-Scale from 50% to 300% with presets or Ctrl +/− and Ctrl+0. Text and spacing scale through rem-based layout without CSS zoom. Fit height to content, choose a corner, or use supported free placement.
+Scale from 50% to 300% with presets or Ctrl +/− and Ctrl+0. Text, spacing and meter marks scale through rem-based layout without CSS zoom. Dot count is fixed at 20 (10 in XS), with 10/20/30 choices under Look. Optional “Match physical size across monitors” compensates the reported monitor scale factor; see the [design standard and DPI limits](docs/design-spec.md). Fit height to content, choose a corner, or use supported free placement.
 
 ![Widget at 75, 100 and 150 percent scale](docs/screenshots/scale.png)
 ![XS, S, M and L responsive layouts](docs/screenshots/sizes.png)

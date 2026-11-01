@@ -28,9 +28,14 @@ PlasmoidItem {
     readonly property bool lightBackground: (0.2126 * schemeBackground.r + 0.7152 * schemeBackground.g + 0.0722 * schemeBackground.b) > 0.5
     readonly property color warningColor: config.severityColors === 1 ? Kirigami.Theme.neutralTextColor : lightBackground ? "#925C00" : "#E8A317"
     readonly property color dangerColor: config.severityColors === 1 ? Kirigami.Theme.negativeTextColor : lightBackground ? "#B4232B" : "#E5484D"
+    readonly property bool mono: config.severityColors === 2
+    readonly property color ink: lightBackground ? "#000000" : "#ffffff"
+    readonly property color paper: lightBackground ? "#ffffff" : "#000000"
+    readonly property int dotCount: [10,20,30].includes(config.dotCount) ? config.dotCount : 20
     function severity(value) {
+        if (mono) return ink;
         return value === null || value === undefined ? Kirigami.Theme.disabledTextColor
-             : value > 80 ? dangerColor
+             : value >= 80 ? dangerColor
              : value >= 50 ? warningColor : Kirigami.Theme.textColor
     }
     function visibleWindows(provider) {
@@ -74,14 +79,17 @@ PlasmoidItem {
         id: strip
         required property int count
         required property var percent
-        property int dotSize: 5
-        spacing: 3
+        property real dotSize: Kirigami.Theme.defaultFont.pixelSize * 0.35
+        spacing: Kirigami.Theme.defaultFont.pixelSize * 0.15
         Repeater {
             model: strip.count
             Rectangle {
                 required property int index
                 width: strip.dotSize; height: width; radius: width / 2
-                color: index < Math.round((strip.percent || 0) * strip.count / 100) ? root.severity(strip.percent) : Kirigami.Theme.textColor
+                readonly property bool hollow: root.mono && strip.percent >= 50 && index < Math.round(strip.percent * strip.count / 100) && index >= Math.floor(strip.count / 2) - 1
+                border.width: hollow ? 1 : 0
+                border.color: root.ink
+                color: hollow ? root.paper : index < Math.round((strip.percent || 0) * strip.count / 100) ? root.severity(strip.percent) : Kirigami.Theme.textColor
                 opacity: index < Math.round((strip.percent || 0) * strip.count / 100) ? 1 : 0.12
             }
         }
@@ -111,17 +119,18 @@ PlasmoidItem {
                         Controls.Label { text: mini.modelData.short; font.family: "monospace"; font.pixelSize: 11; textFormat: Text.PlainText }
                         Controls.Label {
                             text: (mini.modelData.percentage === null ? "?" : Math.round(mini.modelData.percentage) + "%") + (mini.modelData.stale ? "*" : "")
-                            color: root.severity(mini.modelData.percentage)
+                            color: root.mono && mini.modelData.percentage >= 80 ? root.paper : root.severity(mini.modelData.percentage)
+                            background: Rectangle { radius: 3; color: root.mono && mini.modelData.percentage >= 80 ? root.ink : "transparent" }
                             font.family: "monospace"; font.pixelSize: 11; textFormat: Text.PlainText
                         }
                     }
                     Rectangle {
-                        visible: root.config.miniBarType === 0
+                        visible: !root.mono && root.config.miniBarType === 0
                         Layout.fillWidth: true
                         implicitHeight: 2; color: Kirigami.Theme.alternateBackgroundColor
                         Rectangle { height: 2; width: parent.width * (mini.modelData.percentage || 0) / 100; color: root.severity(mini.modelData.percentage) }
                     }
-                    DotStrip { visible: root.config.miniBarType === 1; count: 10; percent: mini.modelData.percentage; dotSize: 2 }
+                    DotStrip { visible: root.config.miniBarType === 1 || (root.mono && root.config.miniBarType === 0); count: root.dotCount; percent: mini.modelData.percentage; dotSize: Kirigami.Theme.defaultFont.pixelSize * 0.18 }
                 }
             }
             Controls.Label { visible: !root.providers.length; text: root.error ? "Quota !" : "Quota —"; textFormat: Text.PlainText }
@@ -153,7 +162,7 @@ PlasmoidItem {
                         Layout.fillWidth: true
                         implicitHeight: cardContent.implicitHeight + 24
                         radius: 10
-                        color: Kirigami.Theme.backgroundColor
+                        color: root.mono ? root.paper : Kirigami.Theme.backgroundColor
                         border.color: Kirigami.Theme.disabledTextColor
                         ColumnLayout {
                             id: cardContent
@@ -162,8 +171,8 @@ PlasmoidItem {
                             RowLayout {
                                 Layout.fillWidth: true
                                 Controls.Label { text: card.modelData.label; font.bold: true; font.family: "monospace"; textFormat: Text.PlainText; Layout.fillWidth: true }
-                                Controls.Label { visible: !!card.modelData.plan; text: card.modelData.plan || ""; font.pixelSize: 10; textFormat: Text.PlainText; padding: 4; background: Rectangle { radius: 4; color: Kirigami.Theme.alternateBackgroundColor } }
-                                Controls.Label { visible: card.modelData.state !== "OK" || card.modelData.stale; text: card.modelData.stale && card.modelData.state === "OK" ? "STALE" : card.modelData.state; font.pixelSize: 10; textFormat: Text.PlainText; padding: 4; background: Rectangle { radius: 4; color: Kirigami.Theme.alternateBackgroundColor } }
+                                Controls.Label { visible: !!card.modelData.plan; text: card.modelData.plan || ""; font.pixelSize: 10; textFormat: Text.PlainText; padding: 4; color: root.mono ? root.ink : Kirigami.Theme.textColor; background: Rectangle { radius: 4; border.width: root.mono ? 1 : 0; border.color: root.ink; color: root.mono ? root.paper : Kirigami.Theme.alternateBackgroundColor } }
+                                Controls.Label { visible: card.modelData.state !== "OK" || card.modelData.stale; text: card.modelData.stale && card.modelData.state === "OK" ? "STALE" : card.modelData.state; font.pixelSize: 10; textFormat: Text.PlainText; padding: 4; color: root.mono ? root.ink : Kirigami.Theme.textColor; background: Rectangle { radius: 4; border.width: root.mono ? 1 : 0; border.color: root.ink; color: root.mono ? root.paper : Kirigami.Theme.alternateBackgroundColor } }
                             }
                             Repeater {
                                 model: root.visibleWindows(card.modelData)
@@ -175,9 +184,9 @@ PlasmoidItem {
                                     RowLayout {
                                         Layout.fillWidth: true
                                         Controls.Label { text: quotaWindow.modelData.label; textFormat: Text.PlainText; Layout.fillWidth: true; elide: Text.ElideRight }
-                                        Controls.Label { text: Math.round(quotaWindow.modelData.used_percent) + "%"; color: root.severity(quotaWindow.modelData.used_percent); font.family: "monospace"; textFormat: Text.PlainText }
+                                        Controls.Label { text: Math.round(quotaWindow.modelData.used_percent) + "%"; color: root.mono && quotaWindow.modelData.used_percent >= 80 ? root.paper : root.severity(quotaWindow.modelData.used_percent); padding: 2; background: Rectangle { radius: 3; color: root.mono && quotaWindow.modelData.used_percent >= 80 ? root.ink : "transparent" } font.family: "monospace"; textFormat: Text.PlainText }
                                     }
-                                    DotStrip { count: 20; percent: quotaWindow.modelData.used_percent }
+                                    DotStrip { count: root.dotCount; percent: quotaWindow.modelData.used_percent }
                                     Controls.Label { text: quotaWindow.modelData.remaining === "?" ? "Reset time unknown" : "Resets in " + quotaWindow.modelData.remaining; opacity: 0.65; font.pixelSize: 11; textFormat: Text.PlainText }
                                 }
                             }

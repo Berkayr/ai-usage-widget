@@ -21,3 +21,13 @@ Theme captures include `themes.png`, `themes-light.png`, and `themes/<id>-dark.p
 All widget scenes use Calm with the accent edge off. `checks/vivid.png` compares Calm and Vivid. Readability checks require labels ≥11 CSS px and primary numbers ≥15 CSS px at 100% (scaled proportionally at 150%), with secondary text contrast ≥4.5:1. Contrast is calculated from computed text colors and composited background-color layers against the least favorable black/white desktop polarity; background images and compositor effects require visual review. `checks/` remains ignored.
 
 `SCENE=checks/providers- node docs/tools/screenshots.mjs` captures first-run provider consent in all eight themes in dark/light modes and checks default-off choices, wrapped disclosures and explicit Start behavior. These controls use synthetic detection only.
+
+Mono adds `mono.png` (all eight themes), `checks/mono-light.png`,
+`checks/mono-thresholds.png` (0/49/50/79/80/100/unknown), and
+`checks/dots-{200,340,520,700}.png`. Mono uses a neutral gallery background.
+Width checks assert visible per-window mark counts (10 in XS, otherwise 20)
+and record mark widths alongside the other metrics. Interaction checks exercise
+10/20/30 selection and resize the same frame into XS. Boundary checks assert
+warning at exactly 50%, danger at exactly 80%, and the first hollow warning mark.
+Filtered runs save their numeric results under `checks/<SCENE with slashes
+replaced by hyphens>.json`; unfiltered runs continue to write `checks/results.json`.

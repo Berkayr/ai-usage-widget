@@ -1,5 +1,5 @@
 import { safeState } from './safety.js';
-import { escapeHtml as esc, severity, countdown, pctOf, shortWindowLabel, hiddenStates, providerNames } from '../dot-matrix/render.js';
+import { escapeHtml as esc, severity, countdown, pctOf, shortWindowLabel, hiddenStates, providerNames, dotCount } from '../dot-matrix/render.js';
 
 function pace(window) {
   // Match quotacore's documented session/weekly lengths; unknown intervals
@@ -15,12 +15,8 @@ function meter(window, type) {
   const level = pct === null ? 'unknown' : severity(pct);
   const style = `--used:${pct ?? 0}%;--level:var(--severity${level === 'warning' ? 'Warning' : level === 'danger' ? 'Danger' : 'Normal'})`;
   const label = pct === null ? 'Usage unknown' : `${Math.round(pct)}% used`;
-  if (type === 'terminal' || type === 'retro-lcd') {
-    const count = type === 'terminal' ? 16 : 12;
-    const active = pct === null ? 0 : Math.round(pct * count / 100);
-    return `<div class="segments ${type}" style="${style}" role="img" aria-label="${label}">${type === 'terminal' ? '<span>[</span>' : ''}${Array.from({length: count}, (_,i) => `<i class="${i < active ? 'on' : ''}">${type === 'terminal' ? (i < active ? '█' : '░') : ''}</i>`).join('')}${type === 'terminal' ? '<span>]</span>' : ''}</div>`;
-  }
-  return `<div class="meter ${pct === null ? 'unknown' : ''}" style="${style}" role="img" aria-label="${label}"><i></i>${type === 'minimal-pace' && elapsed !== null ? `<em style="left:${elapsed}%" title="${Math.round(elapsed)}% of interval elapsed"></em>` : ''}</div>`;
+  const count = dotCount(), active = pct === null ? 0 : Math.round(pct * count / 100);
+  return `<div class="segments ${type} ${pct === null ? 'unknown' : ''}" style="${style}" role="img" aria-label="${label}">${Array.from({length: count}, (_,i) => `<i class="${i < active ? `on ${pct >= 50 && i >= Math.floor(count / 2) - 1 ? 'threshold' : ''}` : ''}"></i>`).join('')}${type === 'minimal-pace' && elapsed !== null ? `<em style="left:${elapsed}%" title="${Math.round(elapsed)}% of interval elapsed"></em>` : ''}</div>`;
 }
 function row(window, type) {
   const pct = pctOf(window), elapsed = pace(window);

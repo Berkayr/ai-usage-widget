@@ -631,7 +631,9 @@ impl Strip {
             let scale = self.dpi as f32 / 96.;
             let line_height = height as f32 / self.rows.len() as f32;
             for (i, row) in self.rows.iter().enumerate() {
+                let mono = self.model.settings.color_mode == "mono";
                 let color = match row.pct {
+                    _ if mono => if self.light { 0xff000000 } else { 0xffffffff },
                     Some(p) if p >= 80. => {
                         if self.light {
                             0xffb91c1c
@@ -676,28 +678,34 @@ impl Strip {
                     let mut secondary_brush = null_mut();
                     let secondary_color = readable(if self.light { 0xff626262 } else { 0xffb0b0ba }, text_background);
                     GdipCreateSolidFill(secondary_color, &mut secondary_brush);
+                    let inverse = mono && token.trim_end_matches('*').trim_end_matches('%').parse::<f64>().map(|p|p >= 80.).unwrap_or(false) && token.contains('%');
+                    let mut inverse_brush = null_mut();
+                    if inverse {
+                        GdipFillRectangle(graphics, brush.cast(), x, y, bounds.Width, line_height);
+                        GdipCreateSolidFill(if self.light { 0xffffffff } else { 0xff000000 }, &mut inverse_brush);
+                    }
                     GdipDrawString(graphics, text.as_ptr(), (text.len()-1) as i32, font, &layout, format,
-                        if secondary && !secondary_brush.is_null() { secondary_brush.cast() } else { brush.cast() });
+                        if inverse && !inverse_brush.is_null() { inverse_brush.cast() } else if secondary && !secondary_brush.is_null() { secondary_brush.cast() } else { brush.cast() });
+                    if !inverse_brush.is_null() { GdipDeleteBrush(inverse_brush.cast()); }
                     if !secondary_brush.is_null() { GdipDeleteBrush(secondary_brush.cast()); }
                     x += bounds.Width;
                 }
                 if !format.is_null() { GdipDeleteStringFormat(format); }
                 if self.bars {
-                    let mut track = null_mut();
-                    if GdipCreateSolidFill(if ink_dark { 0x1f000000 } else { 0x1fffffff }, &mut track) == 0 {
-                        GdipFillRectangle(graphics, track.cast(), 4. * scale, y + line_height - 2. * scale, width as f32 - 8. * scale, scale);
-                        GdipDeleteBrush(track.cast());
+                    let count = match self.model.settings.dot_count { 10 => 10, 30 => 30, _ => 20 };
+                    let active = (row.pct.unwrap_or(0.) * count as f64 / 100.).round() as i32;
+                    let mut pen = null_mut();
+                    GdipCreatePen1(color, scale, UnitPixel, &mut pen);
+                    for dot in 0..count {
+                        let dx = 4. * scale + dot as f32 * 3. * scale;
+                        let dy = y + line_height - 3. * scale;
+                        if dot < active {
+                            if mono && row.pct.unwrap_or(0.) >= 50. && dot >= count / 2 - 1 && !pen.is_null() {
+                                GdipDrawEllipse(graphics, pen, dx, dy, 2. * scale, 2. * scale);
+                            } else { GdipFillEllipse(graphics, brush.cast(), dx, dy, 2. * scale, 2. * scale); }
+                        } else if !pen.is_null() { GdipDrawEllipse(graphics, pen, dx, dy, scale, scale); }
                     }
-                    if let Some(p) = row.pct {
-                        GdipFillRectangle(
-                            graphics,
-                            brush.cast(),
-                            4. * scale,
-                            y + line_height - 2. * scale,
-                            (width as f32 - 8. * scale) * p as f32 / 100.,
-                            scale,
-                        );
-                    }
+                    if !pen.is_null() { GdipDeletePen(pen); }
                 }
                 GdipDeleteBrush(brush.cast());
             }
@@ -806,7 +814,7 @@ unsafe extern "system" fn procedure(hwnd: HWND, message: u32, wp: WPARAM, lp: LP
     }
     match message {
         UPDATE | WM_TIMER => {
-            s.refresh(hwnd, false);
+            s.refresh(hwnd, message == UPDATE);
             0
         }
         WM_SETTINGCHANGE | WM_DPICHANGED | WM_DISPLAYCHANGE | WM_DWMCOLORIZATIONCOLORCHANGED => {

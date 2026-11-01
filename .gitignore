@@ -42,3 +42,4 @@ docs/screenshots/checks/
 
 # Verified build-time Windows runtime; never commit downloaded binaries
 app/src-tauri/python/
+target-release/

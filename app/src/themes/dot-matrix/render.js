@@ -3,9 +3,10 @@ const hiddenStates = new Set(['DISABLED', 'NOT_INSTALLED', 'NO_SUBSCRIPTION']);
 const abbreviations = { claude: 'CL', codex: 'CX', gemini: 'GM', copilot: 'CP', openrouter: 'OR', deepseek: 'DS', jetbrains: 'JB', 'jetbrains-ai': 'JB' };
 const providerNames = { claude: 'Claude', codex: 'Codex', gemini: 'Gemini', copilot: 'Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains' };
 
-const severity = pct => {
-  const calm = typeof document !== 'undefined' && document.documentElement.dataset.colorMode === 'calm';
-  return (calm ? pct >= 80 : pct > 80) ? 'danger' : (calm ? pct > 50 : pct >= 50) ? 'warning' : 'normal';
+const severity = pct => pct >= 80 ? 'danger' : pct >= 50 ? 'warning' : 'normal';
+export const dotCount = () => {
+  if (document.querySelector('#app').clientWidth < 220 * parseFloat(getComputedStyle(document.documentElement).fontSize) / 16) return 10;
+  return [10,20,30].includes(Number(document.documentElement.dataset.dotCount)) ? Number(document.documentElement.dataset.dotCount) : 20;
 };
 function countdown(value) {
   if (!value) return 'RESET UNKNOWN';
@@ -16,10 +17,10 @@ function countdown(value) {
   if (minutes < 1440) return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
   return `${Math.floor(minutes / 1440)}d ${Math.floor((minutes % 1440) / 60)}h`;
 }
-function dots(pct, count = 20) {
+function dots(pct, count = dotCount()) {
   if (!Number.isFinite(pct)) return `<div class="dot-bar unknown" aria-label="Usage unknown">${'<i></i>'.repeat(count)}</div>`;
   const active = pct > 0 ? Math.max(1, Math.round(count * pct / 100)) : 0;
-  return `<div class="dot-bar" role="img" aria-label="${pct}% used">${Array.from({ length: count }, (_, i) => `<i class="${i < active ? 'on' : ''}" data-severity="${severity(pct)}"></i>`).join('')}</div>`;
+  return `<div class="dot-bar" role="img" aria-label="${pct}% used">${Array.from({ length: count }, (_, i) => `<i class="${i < active ? `on ${pct >= 50 && i >= Math.floor(count / 2) - 1 ? 'threshold' : ''}` : ''}" data-severity="${severity(pct)}"></i>`).join('')}</div>`;
 }
 function pctOf(window) {
   return typeof window?.used_percent === 'number' && Number.isFinite(window.used_percent) ? Math.max(0, Math.min(100, window.used_percent)) : null;
@@ -55,12 +56,12 @@ function providerCard(provider, showExtraWindows) {
   const weekly = windows.find(w => w.kind === 'weekly');
   const compactLine = (label, window) => {
     const pct = pctOf(window);
-    return `<div class="compact-line"><span>${label}</span>${dots(pct, 10)}<b data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : `${Math.round(pct)}%`}</b></div>`;
+    return `<div class="compact-line"><span>${label}</span>${dots(pct)}<b data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : `${Math.round(pct)}%`}</b></div>`;
   };
   const compact = apiBalance
     ? `<div class="compact-api">${escapeHtml(abbreviation)} ${meters.filter(m => m.unit === 'USD').map(m => `$${typeof m.remaining === 'number' ? m.remaining.toFixed(2) : '—'}`).join(' ') || '—'}</div>`
     : `<div class="compact-content">${compactLine('5H', primary)}${compactLine('WK', weekly)}</div>`;
-  const xs = apiBalance ? '' : `<div class="xs-content"><span class="xs-name">${issue ? '! ' : ''}${escapeHtml(abbreviation)}</span>${dots(pctOf(primary), 8)}<b data-severity="${pctOf(primary) === null ? 'unknown' : severity(pctOf(primary))}">${pctOf(primary) === null ? '—' : `${Math.round(pctOf(primary))}%`}</b><small data-severity="${weekly && pctOf(weekly) !== null ? severity(pctOf(weekly)) : 'unknown'}">${weekly && pctOf(weekly) !== null ? `${Math.round(pctOf(weekly))}%` : '—'}</small></div>`;
+  const xs = apiBalance ? '' : `<div class="xs-content"><span class="xs-name">${issue ? '! ' : ''}${escapeHtml(abbreviation)}</span>${dots(pctOf(primary), 10)}<b data-severity="${pctOf(primary) === null ? 'unknown' : severity(pctOf(primary))}">${pctOf(primary) === null ? '—' : `${Math.round(pctOf(primary))}%`}</b><small data-severity="${weekly && pctOf(weekly) !== null ? severity(pctOf(weekly)) : 'unknown'}">${weekly && pctOf(weekly) !== null ? `${Math.round(pctOf(weekly))}%` : '—'}</small></div>`;
   const details = apiBalance ? '' : windows.map(windowRow).join('') || '';
   const otherMeters = !apiBalance ? meters.map(m => `<div class="balance-row"><span>${escapeHtml(m.label)}</span><b>${m.remaining == null ? '—' : `${escapeHtml(m.remaining)} ${escapeHtml(m.unit || '')}`}</b></div>`).join('') : '';
   const providerName = providerNames[String(provider.id || '').toLowerCase()] || provider.label || provider.id;
@@ -71,4 +72,4 @@ export function renderSnapshot(root, snapshot, { noData = false, showExtraWindow
   root.innerHTML = providers.map(provider => providerCard(provider, showExtraWindows)).join('') || `<div class="no-data"><span class="no-data-dot">●</span><strong>${noData ? 'NO DATA YET' : 'NO ACTIVE PROVIDERS'}</strong><small>${noData ? 'Waiting for quotacore snapshot' : 'Enable a provider in quotacore'}</small></div>`;
 }
 
-export { escapeHtml, severity, countdown, pctOf, shortWindowLabel, hiddenStates, providerNames };
+export { dots, escapeHtml, severity, countdown, pctOf, shortWindowLabel, hiddenStates, providerNames };
