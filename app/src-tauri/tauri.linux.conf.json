@@ -1,0 +1,12 @@
+{
+  "productName": "ai-usage",
+  "build": {
+    "beforeBundleCommand": "node scripts/prepare-linux-bundle.mjs"
+  },
+  "bundle": {
+    "linux": {
+      "deb": { "desktopTemplate": "../../packaging/ai-usage.desktop" },
+      "rpm": { "desktopTemplate": "../../packaging/ai-usage.desktop" }
+    }
+  }
+}

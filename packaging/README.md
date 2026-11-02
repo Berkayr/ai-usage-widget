@@ -147,3 +147,25 @@ shared snapshot without starting the widget or a webview: their incremental
 **widget-process** memory is zero, while the existing panel and periodic Python
 collector still consume resources. Measurements and a bounded, synthetic-data
 benchmark are described in [performance notes](../docs/performance.md).
+
+## Linux AppImage identity and staging
+
+The platform override `app/src-tauri/tauri.linux.conf.json` uses `ai-usage` as
+Tauri's Linux product name. Tauri names the AppImage root icon and desktop entry
+after that value, while `Icon` uses the main binary name; keeping both equal
+prevents appimagetool's missing-icon error. The desktop template retains the
+human-readable name **AI Usage**.
+
+The Linux `beforeBundleCommand` runs `app/scripts/prepare-linux-bundle.mjs` for
+both `tauri build` and `tauri bundle`, including release CI. It clears only
+`bundle/appimage` and `bundle/appimage_deb` in the selected Cargo target/profile
+locations. Tauri otherwise reuses the latter and can copy an old product's
+binaries and resources into a new AppImage. Cargo's compiled binaries and caches
+are retained. `CARGO_TARGET_DIR`, explicit target triples and debug bundles are
+supported. Run `node tests/linux-bundle.mjs` to check this cleanup independently.
+
+```sh
+cd app
+NO_STRIP=true npm run tauri -- build --locked --bundles appimage
+# Expected: ai-usage_0.1.0_amd64.AppImage (version/architecture vary)
+```

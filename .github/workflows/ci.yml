@@ -36,6 +36,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_security.py
       - run: npm ci
         working-directory: app
+      - name: Linux bundle staging regression
+        run: node tests/linux-bundle.mjs
       - name: Renderer security tests
         run: node tests/render-security.mjs
       - name: Check AUR draft checksums
