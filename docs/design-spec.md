@@ -200,3 +200,17 @@ footer rule, keeping both away from text. Display sizes derive from rem tokens,
 without stretching glyphs. Below a viewport width of 18 root-font units, these
 layouts switch to one column and preserve scroll access. Compact Strip retains
 its independent horizontal contract. See `docs/tools/theme-identity-check.mjs`.
+
+## Theme implementation boundary
+
+Built-in desktop themes live in `app/src/themes/<id>/`. Each theme provides
+`theme.json` metadata and palettes, `theme.css` styles, and a `render.js` module.
+The registry loads one renderer and replaces the active theme stylesheet;
+shared layout and readability rules retain the size and contrast contracts.
+Themes bind to the same provider snapshot and consent state.
+
+Theme renderers are bundled application code, not user-supplied plugins.
+There is no supported external declarative theme-file format. The panel
+integrations have their own host-specific renderers and settings; they do not
+load the desktop theme modules. Theme changes must preserve unknown, stale,
+authentication and rate-limit states as well as usage percentages and resets.

@@ -25,9 +25,8 @@ config.json
 node_modules/
 target/
 
-# Agent reports (contain local paths)
-tasarim/**/RAPOR*.md
-tasarim/RAPOR*.md
+# Local design archive (not distributed)
+/tasarim/
 
 # App build output
 app/dist/
