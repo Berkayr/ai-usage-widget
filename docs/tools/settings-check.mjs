@@ -19,14 +19,22 @@ try {
     a.nextElementSibling.click();assert(a.value!=='#123456','Reset palette');
     $('#save').click();await new Promise(r=>setTimeout(r,50));assert($('#dirty').textContent==='All changes saved','Save');
     $('[data-theme="terminal"]').click();$('#revert').click();assert($('[data-theme="dot-matrix"]').getAttribute('aria-pressed')==='true','Revert theme');
-    $('[data-category=layout]').click();$('#place').click();
+    $('[data-category=layout]').click();
+    const sizes=[...document.querySelectorAll('[data-size]')];
+    assert(sizes.map(b=>b.dataset.size).join(',')==='Small,Medium,Large,X-Large,2X-Large','Five size choices');
+    for(const button of sizes){button.click();assert(button.getAttribute('aria-pressed')==='true'&&$('#scale').value==='100','Preset selection / reset');}
+    $('#scale').value=90;$('#scale').dispatchEvent(new Event('input'));
+    $('[data-theme="terminal"]').click();
+    assert($('#scale').value==='90'&&$('[data-size="2X-Large"]').getAttribute('aria-pressed')==='true','Theme changed size');
+    $('#revert').click();
+    $('#place').click();
     assert(!$('#placement-actions').hidden&&!$('#map-widget').disabled,'Placement mode');
     [...document.querySelectorAll('#placement-presets button')].find(b=>b.textContent==='Center').click();
     assert(parseFloat($('#map-widget').style.left)>30,'Center position');
     $('#cancel-position').click();assert($('#placement-actions').hidden,'Cancel placement');
     const width=document.documentElement.scrollWidth;assert(width<=innerWidth,'Page overflow');
     $('[data-category=appearance]').click();
-    return 'PASS: categories, palette colors/selection/reset, Save, Revert, placement, Center, Cancel';
+    return 'PASS: categories, palette colors/selection/reset, Save, Revert, five sizes, fine-tune preserved across themes, placement, Center, Cancel';
   })()`);
   console.log(check);
   for(const scheme of ['light','dark']) {

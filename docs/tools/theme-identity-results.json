@@ -1,0 +1,3805 @@
+{
+  "rows": [
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "displayRatio": 2.4
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.47629310344827586
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.47629310344827586
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9020044543429844
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9020044543429844
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.47629310344827586
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.47629310344827586
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.47629310344827586
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.47629310344827586
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9020044543429844
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9020044543429844
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9066666666666666
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9066666666666666
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9066666666666666
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9066666666666666
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.47854077253218885
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.47854077253218885
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9113082039911308
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9113082039911308
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.47854077253218885
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.47854077253218885
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.47854077253218885
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.47854077253218885
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9113082039911308
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9113082039911308
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9066666666666666
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9066666666666666
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.4774193548387097
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9066666666666666
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9066666666666666
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.47809278350515466
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.47809278350515466
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9094540612516645
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9094540612516645
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.47809278350515466
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.47809278350515466
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.47809278350515466
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.47809278350515466
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {
+        "ringRatio": 0.9094540612516645
+      },
+      "failures": []
+    },
+    {
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {
+        "ringRatio": 0.9094540612516645
+      },
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    }
+  ],
+  "failures": []
+}

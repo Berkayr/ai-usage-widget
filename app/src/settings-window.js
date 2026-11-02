@@ -1,3 +1,4 @@
+import { normalizeSize, sizePresets, widgetWidth } from './sizing.js';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -30,7 +31,7 @@ function preview() {
 
 function changed() { return saved && (JSON.stringify(draft)!==JSON.stringify(saved) || JSON.stringify(providers)!==JSON.stringify(savedProviders) || autostart!==savedAutostart); }
 function mark() { const dirty=changed(); $('#revert').disabled=!dirty; $('#dirty').textContent=dirty?'Unsaved changes':'All changes saved'; document.title=`AI Usage · Settings${dirty?' · Unsaved changes':''}`; if(!sample) getCurrentWindow().setTitle(document.title).catch(error); }
-function update() { renderControls(); mark(); preview().catch(()=>{}); }
+function update() { draft=normalizeSize(draft); renderControls(); mark(); preview().catch(()=>{}); }
 const groups=[['providers','Providers'],['appearance','Appearance / Theme'],['layout','Layout & Position'],['taskbar','Taskbar strip'],['desktop','Desktop (Linux)'],['about','About / Diagnostics']];
 document.querySelector('#app').innerHTML=`<div class="settings-shell"><nav aria-label="Settings categories">${groups.map(([id,label])=>`<button data-category="${id}" aria-selected="false">${label}</button>`).join('')}</nav><main class="settings-content">${settingsMarkup}</main><div id="close-prompt" hidden role="alert"><strong>Save changes?</strong><button id="close-save">Save</button><button id="close-discard">Discard</button><button id="close-cancel">Cancel</button></div><footer class="settings-actions"><span id="dirty" role="status"></span><span id="status" role="status"></span><button id="revert">Revert</button><button class="primary" id="save">Save</button></footer></div>`;
 const panel=$('#settings'); panel.inert=true;$('#save').disabled=true;$('#revert').disabled=true;panel.hidden=false; panel.querySelector('header').remove();
@@ -68,6 +69,7 @@ function previewInk(ink, paper) {
 }
 function renderControls() {
   for(const [id,key]of Object.entries(bindings)) {const el=$(`#${id}`);const value=get(key);if(el.type==='checkbox')el.checked=!!value;else el.value=value??'';const output=$(`#${id.replace('-opacity','')}-out`)||$(`#${id}-out`);if(output)output.value=`${value}${id==='linux-margin'?' px':'%'}`;}
+  document.querySelectorAll('[data-size]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.size===draft.sizePreset));b.querySelector('small').textContent=`${Math.round(widgetWidth(draft,Math.max(1,providers.length))*sizePresets[b.dataset.size]/100)} px`;});
   const p=themePalette();$('#accent').value=draft.accent||p.accent;$('#background').value=draft.background||p.bgWidget;
   document.querySelectorAll('[data-theme]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.theme===draft.theme));const colors=themePalette(themes.find(t=>t.id===b.dataset.theme));b.querySelector('.theme-preview').style.cssText=`background:${colors.bgWidget};color:${previewInk(colors.accent,colors.bgWidget)};border-color:${colors.border}`;});
   paletteGrid.replaceChildren();const t=themes.find(t=>t.id===draft.theme)||themes[0];
@@ -75,12 +77,12 @@ function renderControls() {
   document.querySelectorAll('[data-taskbar-provider]').forEach(el=>el.checked=draft.taskbar.providers.includes(el.dataset.taskbarProvider));
   $('#placement-actions').hidden=!positionBefore;$('#place').disabled=!!positionBefore;$('#map-widget').disabled=!positionBefore;renderMap();
 }
-const bindings={'color-mode':'colorMode','dot-count':'dotCount','match-physical-size':'matchPhysicalSize','accent-edge':'accentEdge',appearance:'appearance',accent:'accent',background:'background','widget-opacity':'widgetOpacity','background-opacity':'backgroundOpacity',scale:'scale',position:'position','fit-height':'fitHeight','show-extra-windows':'showExtraWindows','taskbar-enabled':'taskbar.enabled','taskbar-style':'taskbar.style','taskbar-theme':'taskbar.theme','taskbar-window':'taskbar.window','taskbar-bars':'taskbar.showBars','linux-layer':'linux.layer','linux-margin':'linux.margin','linux-monitor':'linux.monitor','lock-position':'lockPosition','placement-monitor':'placement.monitor',snap:'placement.snap',disconnected:'placement.disconnected','fallback-monitor':'placement.fallbackMonitor'};
+const bindings={'color-mode':'colorMode','dot-count':'dotCount','match-physical-size':'matchPhysicalSize','accent-edge':'accentEdge',appearance:'appearance',accent:'accent',background:'background','widget-opacity':'widgetOpacity','background-opacity':'backgroundOpacity',scale:'fineTune',position:'position','fit-height':'fitHeight','show-extra-windows':'showExtraWindows','taskbar-enabled':'taskbar.enabled','taskbar-style':'taskbar.style','taskbar-theme':'taskbar.theme','taskbar-window':'taskbar.window','taskbar-bars':'taskbar.showBars','linux-layer':'linux.layer','linux-margin':'linux.margin','linux-monitor':'linux.monitor','lock-position':'lockPosition','placement-monitor':'placement.monitor',snap:'placement.snap',disconnected:'placement.disconnected','fallback-monitor':'placement.fallbackMonitor'};
 const get=path=>path.split('.').reduce((v,k)=>v?.[k],draft);
 function set(path,value) {const keys=path.split('.');const key=keys.pop();let obj=draft;for(const k of keys)obj=obj[k]??={};obj[key]=value;}
 for(const [id,key]of Object.entries(bindings)) {const el=$(`#${id}`);el.addEventListener(el.type==='range'||el.type==='color'?'input':'change',()=>{let value=el.type==='checkbox'?el.checked:el.type==='range'||id==='dot-count'?Number(el.value):el.value;if(id==='placement-monitor'&&value==='')value=null;if(id==='linux-monitor'&&value==='')value=null;set(key,value);update();},{signal:abort.signal});}
 document.querySelectorAll('[data-taskbar-provider]').forEach(el=>el.onchange=()=>{draft.taskbar.providers=[...document.querySelectorAll('[data-taskbar-provider]:checked')].map(el=>el.dataset.taskbarProvider);update();});
-document.querySelectorAll('[data-scale]').forEach(b=>b.onclick=()=>{draft.scale=Number(b.dataset.scale);update();});
+document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{draft.sizePreset=b.dataset.size;draft.fineTune=100;update();});
 $('#start-at-login').onchange=event=>{autostart=event.target.checked;mark();};
 function renderProviders() {if(!providerConfig)return;const config=structuredClone(providerConfig);for(const [id,p]of Object.entries(config.providers))p.enabled=providers.includes(id);config.initialized=true;mountProviders($('#provider-settings'),config,async()=>{});$('#provider-settings .provider-consent-actions').hidden=true;$('#provider-settings').onchange=()=>{providers=[...$('#provider-settings').querySelectorAll('input')].flatMap((el,i)=>el.checked?[Object.keys(config.providers).filter(id=>id in config.disclosures)[i]]:[]);mark();preview().catch(()=>{});};}
 let providerConfig;let autostartAvailable=true;
@@ -135,6 +137,7 @@ async function loadSession(){
   positionBefore=null;mapMoved=false;drag=null;previewPending=null;error('');
   await previewWork;
   draft={...defaults,...(sample?{}:await invoke('load_settings'))};draft.providerPreview=null;draft.placement=normalizePlacement(draft.placement||{});for(const key of ['taskbar','linux','placement'])draft[key]={...defaults[key],...draft[key]};if(!themes.some(t=>t.id===draft.theme))draft.theme='system';const manifest=themes.find(t=>t.id===draft.theme);if(!manifest.palettes[draft.palette])draft.palette=Object.keys(manifest.palettes)[0];
+  draft=normalizeSize(draft);
   saved=structuredClone(draft);
   if(!sample){
     try {providerConfig=await invoke('get_provider_config');} catch(e){providerConfig={initialized:true,providers:{},disclosures:{},detected:{}};error(`Provider settings unavailable: ${e}`);}

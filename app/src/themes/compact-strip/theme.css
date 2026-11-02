@@ -1,7 +1,2 @@
 @import '../shared/layout.css';
-.widget{border-radius:12px;padding:9px}.app-title{font-size:13px}.header{padding-bottom:7px}.sync-line{font-size:8px}.provider-list{gap:4px;padding:0}.provider-card{padding:7px 9px;border-radius:7px}.provider-heading{margin-bottom:5px}.provider-heading h2{font-size:11px}.windows{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.window-top{font-size:8px}.window-top b{font-size:11px}.window-bottom{font-size:7px}.meter{height:3px;margin-top:3px}.footer{display:none}.plan,.status-badge{font-size:7px;padding:1px 3px}
-@container (min-width:520px){.provider-list{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.widget{padding:9px}}
-@container (min-width:960px){.widget{display:grid;grid-template-columns:155px minmax(0,1fr);gap:12px;padding:8px}.header{padding:0}.provider-list{display:flex;align-items:stretch}.provider-card{flex:1}.provider-heading{margin-bottom:2px}.settings{position:fixed;inset:8px;max-width:420px;max-height:calc(100vh - 16px)}}
-@container (max-width:219px){.windows{gap:7px}.window-top{flex-wrap:wrap;gap:2px}.window-top b{font-size:11px}.provider-card{padding:6px}}
-
-.widget{font-family:Inter,JetBrainsMono,sans-serif}.reset,.pace,.plan,.status-badge,.sync-line{font-family:JetBrainsMono,monospace}
+.widget{border-radius:12px}.provider-card{border-radius:7px}

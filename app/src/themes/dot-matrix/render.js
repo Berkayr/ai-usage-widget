@@ -67,9 +67,6 @@ function providerCard(provider, showExtraWindows) {
   const providerName = providerNames[String(provider.id || '').toLowerCase()] || provider.label || provider.id;
   return `<article class="provider-card ${provider.stale ? 'is-stale' : ''} ${apiBalance ? 'api-balance' : ''}"><div class="provider-heading"><div><h2>${escapeHtml(providerName)}</h2>${provider.plan ? `<span class="plan">${escapeHtml(String(provider.plan).toUpperCase())}</span>` : ''}</div>${badge}</div><div class="compact-view">${compact}</div>${xs}${details}${apiBalance ? balanceRows(provider) : otherMeters}</article>`;
 }
-export function renderSnapshot(root, snapshot, { noData = false, showExtraWindows = false } = {}) {
-  const providers = Array.isArray(snapshot?.providers) ? snapshot.providers.filter(p => !hiddenStates.has(String(p.state).toUpperCase())) : [];
-  root.innerHTML = providers.map(provider => providerCard(provider, showExtraWindows)).join('') || `<div class="no-data"><span class="no-data-dot">●</span><strong>${noData ? 'NO DATA YET' : 'NO ACTIVE PROVIDERS'}</strong><small>${noData ? 'Waiting for quotacore snapshot' : 'Enable a provider in quotacore'}</small></div>`;
-}
+export { renderSnapshot } from './snapshot.js';
 
 export { dots, escapeHtml, severity, countdown, pctOf, shortWindowLabel, hiddenStates, providerNames };

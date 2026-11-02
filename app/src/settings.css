@@ -6,3 +6,5 @@
 input,select,option{background:var(--control);color:var(--ink);border:1px solid var(--line);accent-color:var(--accent)}
 input:disabled,select:disabled{opacity:1;color:var(--disabled);-webkit-text-fill-color:var(--disabled)}
 .setting-note,.provider-choice small{color:var(--muted)}
+
+.scale-presets{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.scale-presets button{min-height:76px;font-weight:600}.scale-presets small{display:block;margin-top:8px;font-weight:400}.scale-presets button[aria-pressed=true]{outline:3px solid var(--accent);background:var(--selected)}

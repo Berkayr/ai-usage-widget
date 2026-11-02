@@ -18,6 +18,46 @@ a mark is 4 CSS pixels wide on every monitor, regardless of window width. Scale
 changes fonts, spacing and marks together through rem units, without CSS zoom.
 XS breakpoints scale with these same design units.
 
+## Widget size contract
+
+Size owns geometry; a theme owns fonts, colors, borders and meter style.
+Five presets multiply all logical dimensions uniformly: Small 75%, Medium 100%,
+Large 150%, X-Large 200%, 2X-Large 250%. Base widths are 255, 340, 510, 680,
+and 850 CSS pixels. Fine-tune is a multiplier (50–150%, default 100%);
+the wider range preserves legacy 50–300% scales without changing their size.
+Legacy Normal maps to Medium, Huge to X-Large. Other old scales choose the nearest
+preset plus an exact multiplier: 90 becomes Medium × 90%.
+
+At Medium, with n = max(1, visible provider count), vertical widgets request
+**width = 340, height = 116 + 210 × n**. The 116px chrome consists of 28px outer
+padding, 2px border, 60px header and 26px footer. Each provider contributes a
+200px card and 10px gap (including the final gap). Empty and error cards keep
+the same block height. All themes currently use one column in this orientation;
+Circular Rings keeps an additional ring inside its card. Extra windows and long
+content scroll inside the card instead of changing the outer box.
+
+Compact Strip is an independent horizontal orientation. At Medium it requests
+**width = 30 + 310 × n, height = 326**: 300px cards, 10px gaps, the same chrome.
+For each provider count, all five presets preserve its aspect ratio as well.
+Every dimension is multiplied by preset × fineTune / 10000, then divided by the
+monitor scale only when Match physical size is enabled. Shared rem tokens drive
+fonts, rows, padding, gaps and meters; no theme defines separate size metrics.
+
+Fit height caps the box at the viewport/monitor work area; the provider list
+scrolls when capped, keeping header and footer reachable. Disabling fit height
+keeps the user's window height, while retaining the same card metrics.
+`size-audit.mjs` checks all nine themes × five sizes × 0/1/3/6 providers against
+these formulas with at most 2 CSS pixels of rounding tolerance, including error
+cards, title font matching and type stretch. It writes `size-audit.json` and
+`size-sheet.png`, with an enlarged header for every theme. These are synthetic
+review artifacts. README screenshots are generated with `screenshots.mjs`.
+
+Titles read AI USAGE with one literal word space, nonnegative letter spacing,
+a modest extra word gap and the same family as the body. Title size is a shared
+token. JetBrains Mono is used by Dot Matrix and Retro LCD as well as other mono
+themes; System uses the OS family, Brutalist uses Inter throughout. No title uses
+transforms or font stretching. The footer uses AI USAGE.
+
 ## Color modes and thresholds
 
 Calm, Vivid and Mono use the same boundaries: below 50% normal, 50% through
@@ -83,11 +123,11 @@ from the Chromium desktop-gallery checks.
 
 Text must not use transform scale, font-stretch or viewport/container width
 units (vw/cqw) for font size. Large numbers use fixed rem steps, tabular numerals,
-letter spacing no tighter than -0.02em and line height at least 1.0. Scale changes
+nonnegative letter spacing and line height at least 1.0. Scale changes
 the root rem size. Narrow windows select a separate fixed step rather than
 continuously stretching type. Numeric font family and weight stay consistent
 across responsive tiers. Retro LCD uses the bundled OFL JetBrains Mono for
-numbers; DotGothic16 remains on decorative headings.
+numbers; JetBrains Mono also supplies its title and headings.
 
 The documentation capture measures a single “8” in each visible numeric style
 using getBoundingClientRect at 200/340/520/700 CSS px and 75/100/150% scale.
@@ -142,5 +182,21 @@ preview glyphs preserve their palette hue with a contrast correction when needed
 
 For themes using shared layout (including System), fit-height stops at the
 viewport height. Header and footer remain in normal flex flow; the provider list
-shrinks and scrolls within its paint boundary. Native height requests include the
-list's natural scroll extent so the window can grow again after an empty snapshot.
+shrinks and scrolls within its paint boundary. Native height requests use the size contract and visible provider count so
+the window can grow again after an empty snapshot without depending on content.
+
+
+### Theme identity inside the size contract
+
+The size contract fixes the outer shell, not every provider cell. Brutalist and
+Circular Rings use two columns within the unchanged total provider height budget;
+an odd last provider spans both columns. Brutalist has square, heavy grid lines,
+uppercase labels and `--size-font-display` (2.25 rem, 2.4× body) percentages.
+Circular Rings shows concentric rings with a centered percentage and session label,
+then quota rows; a full-width last card puts its ring beside the rows.
+Frosted Glass uses paired rounded quota capsules, and Retro LCD uses two columns
+of large monospaced figures. Terminal draws only a bottom header rule and a top
+footer rule, keeping both away from text. Display sizes derive from rem tokens,
+without stretching glyphs. Below a viewport width of 18 root-font units, these
+layouts switch to one column and preserve scroll access. Compact Strip retains
+its independent horizontal contract. See `docs/tools/theme-identity-check.mjs`.

@@ -1,3 +1,4 @@
+import { normalizeSize, widgetWidth, widgetHeight } from './sizing.js';
 import { repairTextContrast } from './text-contrast.js';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { mountProviders } from './themes/shared/providers.js';
@@ -52,7 +53,7 @@ document.querySelector('#app').innerHTML = `
   <main class="widget" id="widget">
     <header class="header"><div class="title-block"><div class="app-title">AI USAGE</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
     <section id="provider-onboarding" hidden></section><div class="provider-list" id="providers"></div>
-    <footer class="footer"><span>QUOTA MONITOR</span><span>SYSTEM</span></footer>
+    <footer class="footer"><span>AI USAGE</span><span>SYSTEM</span></footer>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
     <div class="toast" id="toast" hidden></div>
   </main>`;
@@ -70,8 +71,14 @@ function readable(color, background) {
   }
   return target;
 }
+function updateNarrowViewport() {
+  // Container font-relative queries can retain a previous scale during resize.
+  const unit = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  document.documentElement.dataset.narrowViewport = String($('#app').clientWidth < 18 * unit);
+}
 function applySettings() {
   if (!theme) return;
+  settings = normalizeSize(settings);
   const selected = theme.palettes[settings.palette] || Object.values(theme.palettes)[0];
   const mode = settings.appearance === 'auto' ? (systemAppearance.matches ? 'light' : 'dark') : settings.appearance;
   const palette = { ...selected, ...(selected[mode] || {}), mode }; 
@@ -115,6 +122,7 @@ function applySettings() {
   document.documentElement.style.setProperty('--background-opacity', settings.backgroundOpacity / 100);
   document.documentElement.style.setProperty('--ui-scale', effectiveScale / 100);
   document.documentElement.style.fontSize = `${16 * effectiveScale / 100}px`;
+  updateNarrowViewport();
   document.documentElement.classList.toggle('fit-height', Boolean(settings.fitHeight)); lastFitHeight = 0;
   settings.taskbar = { ...defaultTaskbar, ...settings.taskbar, colorMode: settings.colorMode, dotCount: settings.dotCount };
   document.documentElement.dataset.translucent = String(settings.widgetOpacity * settings.backgroundOpacity < 7000);
@@ -128,7 +136,7 @@ function applySettings() {
   const header = $('.header'); header.removeAttribute('data-tauri-drag-region');
   header.style.cursor = settings.lockPosition === false ? 'grab' : 'default';
   if (currentSnapshot || currentNoData) draw(currentSnapshot, currentNoData);
-  if (!isSample) invoke('resize_widget', { scale: Math.round(effectiveScale) }).catch(() => {});
+
 }
 let drawFrame = 0;
 let lastSnapshotKey;
@@ -159,6 +167,10 @@ function draw(snapshot, noData = false) {
     if (settings.providerPreview && visible?.providers) visible.providers=visible.providers.filter(p=>settings.providerPreview.includes(p.id));
     renderSnapshot($('#providers'), visible, { noData, showExtraWindows: settings.showExtraWindows });
     $('#updated').textContent = snapshot?.generated_at ? `SYNC ${new Date(snapshot.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'NO DATA YET';
+    const count = $('#providers').querySelectorAll('.provider-card').length;
+    $('#widget').style.setProperty('--provider-count', Math.max(1,count));
+    const width = widgetWidth(settings,count) * settings.scale / 100 / (settings.matchPhysicalSize ? monitorScale : 1);
+    if (!isSample) invoke('resize_widget', {scale:Math.round(settings.scale),widthCssPx:width}).catch(()=>{});
     repairTextContrast($('#widget'));
     requestFit();
     if (!isSample) {
@@ -171,16 +183,14 @@ let fitObserver;
 let lastFitHeight = 0;
 let fitPending = false;
 async function requestFit() {
-  // Measure the content's natural height (the widget is height:auto in fit mode), not the window.
+  // The contract is independent of theme content; native code caps it to the monitor.
   if (!settings.fitHeight || isSample || fitPending || document.hidden) return;
   fitPending = true;
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   fitPending = false;
   if (disposed) return;
-  const list = $('#providers');
-  // Include scrollable overflow so the native window can still grow after a
-  // short/empty snapshot. The native monitor cap decides the final height.
-  const height = Math.ceil($('#widget').getBoundingClientRect().height + Math.max(0, list.scrollHeight - list.clientHeight));
+  const count = $('#providers').querySelectorAll('.provider-card').length;
+  const height = widgetHeight(settings,count) * settings.scale / 100 / (settings.matchPhysicalSize ? monitorScale : 1);
   if (Math.abs(height - lastFitHeight) < 2) return;
   lastFitHeight = height;
   invoke('fit_window_height', { heightCssPx: height }).catch(() => {});
@@ -220,9 +230,9 @@ $('#menu-settings').onclick = openSettings;
 await activateTheme(settings.theme);
 $('.header').addEventListener('pointerdown', event => { if (event.button === 0 && settings.lockPosition === false && !event.target.closest('button') && !isSample) getCurrentWindow().startDragging().catch(() => showToast('Use the monitor map to place this widget.')); }, { signal: domEvents.signal });
 let lastTier;
-meterObserver = new ResizeObserver(() => { const tier = $('#app').clientWidth < 220 * parseFloat(getComputedStyle(document.documentElement).fontSize) / 16; if (tier !== lastTier) { lastTier = tier; if (currentSnapshot || currentNoData) draw(currentSnapshot,currentNoData); } });
+meterObserver = new ResizeObserver(() => { updateNarrowViewport(); const tier = $('#app').clientWidth < 220 * parseFloat(getComputedStyle(document.documentElement).fontSize) / 16; if (tier !== lastTier) { lastTier = tier; if (currentSnapshot || currentNoData) draw(currentSnapshot,currentNoData); } });
 meterObserver.observe($('#app'));
-fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === '+' || event.key === '=') settings.scale = Math.min(300, settings.scale + 10); else if (event.key === '-') settings.scale = Math.max(50, settings.scale - 10); else if (event.key === '0') settings.scale = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
+fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === '+' || event.key === '=') settings.fineTune = Math.min(150, settings.fineTune + 5); else if (event.key === '-') settings.fineTune = Math.max(50, settings.fineTune - 5); else if (event.key === '0') settings.fineTune = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
 if (isSample) draw(currentSample());
 else {
   try {
@@ -282,7 +292,7 @@ else {
 // Documentation captures can inject synthetic data only in explicit sample mode.
 if (new URLSearchParams(location.search).has('sample') && window.__QUOTA_DOCS_FIXTURE__) {
   const fixture = window.__QUOTA_DOCS_FIXTURE__;
-  settings = { ...settings, ...fixture.settings };
+  settings = { ...settings, ...normalizeSize(fixture.settings) };
   const overrides = { accent: settings.accent, background: settings.background };
   await activateTheme(settings.theme); Object.assign(settings, overrides); applySettings();
   draw(fixture.snapshot);
@@ -300,4 +310,4 @@ if (new URLSearchParams(location.search).has('sample') && window.__QUOTA_DOCS_FI
   window.__QUOTA_DOCS_READY__ = true;
 }
 
-if (isSample) window.__AI_USAGE_DEMO__ = { async setSnapshot(snapshot, noData = false) { draw(snapshot, noData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setSettings(next) { settings = {...settings,...next}; const overrides={accent:settings.accent,background:settings.background}; await activateTheme(settings.theme); Object.assign(settings,overrides); applySettings(); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, themes, getSettings:()=>structuredClone(settings) };
+if (isSample) window.__AI_USAGE_DEMO__ = { async setSnapshot(snapshot, noData = false) { draw(snapshot, noData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setSettings(next) { if ('scale' in next && !('sizePreset' in next) && !('fineTune' in next)) next = normalizeSize(next); settings = {...settings,...next}; const overrides={accent:settings.accent,background:settings.background}; await activateTheme(settings.theme); Object.assign(settings,overrides); applySettings(); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, themes, getSettings:()=>structuredClone(settings) };

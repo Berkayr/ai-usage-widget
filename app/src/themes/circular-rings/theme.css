@@ -1,7 +1,26 @@
 @import '../shared/layout.css';
-.provider-list {grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.provider-card{border-radius:16px}.ring-display{position:relative;width:160px;max-width:100%;margin:4px auto 12px;aspect-ratio:1}.ring-display svg{display:block;width:100%;height:100%;fill:none;stroke-width:9;stroke-linecap:round}.ring-track{stroke:var(--bgTrackOff)}.ring-value{stroke:currentColor;color:var(--severityNormal)}.ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px}.ring-center strong{font-size:23px}.ring-center small{font-size:8px;color:var(--textSecondary);max-width:65px;text-align:center}.window-top b{font-size:13px}.window-top{font-size:9px}.meter{height:3px}.windows{gap:7px}.widget{border-radius:22px}.footer span:last-child{color:var(--accent)}
-@container (min-width:520px){.provider-list{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.provider-card{padding:11px}.provider-heading h2{font-size:13px}}
-@container (max-width:219px){.ring-display{width:115px;margin-bottom:7px}.ring-center strong{font-size:18px}.ring-center small{font-size:7px;max-width:45px}}
-
-.widget{font-family:Inter,JetBrainsMono,sans-serif}.reset,.pace,.plan,.status-badge,.sync-line{font-family:JetBrainsMono,monospace}
-@container (max-width:219px){.provider-card{display:grid;grid-template-columns:60px minmax(0,1fr);gap:6px}.provider-heading,.balance-row,.empty-window{grid-column:1/-1}.provider-heading{margin:0}.ring-display{width:60px;margin:0;align-self:center}.ring-center strong{font-size:12px}.ring-center small{display:none}.window-top{font-size:8px;gap:3px}.window-top b{font-size:11px}.window-bottom{font-size:7px}.windows{gap:4px}.footer{font-size:7px}}
+@import '../shared/grid.css';
+.widget {font-family:Inter,sans-serif;border-radius:22px}
+.provider-card {border-radius:16px}
+.ring-display {position:relative;width:100%;aspect-ratio:1;align-self:start;margin:0 auto .375rem;pointer-events:none}
+.ring-display svg {display:block;width:100%;height:100%;fill:none;stroke-width:9;stroke-linecap:round}
+.ring-track {stroke:var(--bgTrackOff)}
+.ring-value {stroke:currentColor;color:var(--severityNormal)}
+.ring-center {position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.ring-center strong {font-size:var(--size-font-number);line-height:1.2;font-variant-numeric:tabular-nums}
+.ring-center small {font-size:var(--size-font-small);color:var(--textSecondary)}
+.windows {gap:.375rem}
+.quota-window {min-height:0}
+.window-top {gap:.25rem}
+.window-top b {font-size:var(--size-font-base)}
+.window-bottom {margin-top:.125rem}
+/* A single/odd last provider uses the full row, with the same large ring at left. */
+.provider-card:last-child:nth-child(odd) {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;column-gap:0}
+.provider-card:last-child:nth-child(odd) .provider-heading {grid-column:1/-1}
+.provider-card:last-child:nth-child(odd) .windows {align-self:center;padding-left:.5rem}
+.provider-card:last-child:nth-child(odd) :is(.balance-row,.empty-window) {grid-column:1/-1}
+.reset,.pace,.plan,.status-badge,.sync-line {font-family:JetBrainsMono,monospace}
+.provider-card:last-child:nth-child(odd) .ring-display {margin:0}
+.provider-heading {min-height:1.75rem}
+:root[data-narrow-viewport=true] .provider-card:last-child:nth-child(odd) {display:block}
+:root[data-narrow-viewport=true] .provider-card:last-child:nth-child(odd) .windows {padding-left:0}

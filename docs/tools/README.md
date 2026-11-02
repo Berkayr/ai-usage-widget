@@ -124,3 +124,26 @@ mutually exclusive empty/card DOM, header/list/footer bounds and scroll access t
 the last card. A legacy CSS fixture must fail the viewport assertion. The capture
 `widget-layout-preview.png` uses invented provider names and values. Settings
 captures are `settings-preview-light.png` and `settings-preview-dark.png`.
+
+
+## Fixed shell, theme identity
+
+`node docs/tools/size-audit.mjs` measures all nine themes × five presets ×
+0/1/3/6 providers (180 cases, ±2 CSS px) and writes `size-audit.json` and
+`size-sheet.png`. The outer size stays 340 × (116 + 210 × provider count) at
+Medium. Compact Strip retains its separate horizontal size contract.
+Brutalist and Circular Rings share the provider budget across two columns;
+an odd last card fills the last row. Their cell heights follow the row budget,
+rather than the 200 px height used by single-column cards.
+
+`node docs/tools/theme-identity-check.mjs` checks all nine themes × five presets ×
+1/2/3/5/6 providers × dark/light (450 cases) and writes
+`theme-identity-results.json`. Synthetic DEMO plans and countdowns exercise real
+text widths. It checks card overflow, signature DOM and geometry: Brutalist's
+2.4× display numbers and uppercase labels, two provider columns, concentric
+rings at least 45% of card width with visible center text, paired Frosted Glass
+capsules and LCD columns, and Terminal rules inside the shell without text
+crossings. System bars, Dot Matrix marks, Minimal Pace labels and Compact Strip's
+horizontal arrangement are also asserted. Normal preset widths preserve these
+layouts at every scale; externally narrowed viewports (below 18 root-font units) use a single column and
+scroll access. Display type uses `--size-font-display` in rem, with no glyph scaling.
