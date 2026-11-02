@@ -33,7 +33,7 @@ function rings(windows) {
   return `<div class="ring-display"><svg viewBox="0 0 160 160" aria-label="Concentric usage rings" role="img">${shown.map((window,i) => {
     const p = pctOf(window), r = 67 - i * 13;
     return `<circle class="ring-track" cx="80" cy="80" r="${r}"/><circle class="ring-value" data-severity="${p === null ? 'unknown' : severity(p)}" cx="80" cy="80" r="${r}" pathLength="100" stroke-dasharray="${p ?? 0} 100" transform="rotate(-90 80 80)"/>`;
-  }).join('')}</svg><div class="ring-center"><strong data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : Math.round(pct)+'%'}</strong><small>${esc(shortWindowLabel(primary))}</small></div></div>`;
+  }).join('')}</svg><div class="ring-center"><strong data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : Math.round(pct)+'%'}</strong><small>${esc(shortWindowLabel(primary))}</small><small class="ring-secondary">${shown.filter(w=>w!==primary).map(w=>`${esc(shortWindowLabel(w))} ${pctOf(w) === null ? "—" : Math.round(pctOf(w))+"%"}`).join(" · ")}</small></div></div>`;
 }
 export function createRenderer(type) {
   return (root, snapshot, { noData = false, showExtraWindows = false } = {}) => {

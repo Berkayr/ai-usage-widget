@@ -8,3 +8,5 @@ input:disabled,select:disabled{opacity:1;color:var(--disabled);-webkit-text-fill
 .setting-note,.provider-choice small{color:var(--muted)}
 
 .scale-presets{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.scale-presets button{min-height:76px;font-weight:600}.scale-presets small{display:block;margin-top:8px;font-weight:400}.scale-presets button[aria-pressed=true]{outline:3px solid var(--accent);background:var(--selected)}
+
+.shape-picker{display:flex;gap:10px;flex-wrap:wrap}.shape-picker button{flex:1;min-width:110px;display:grid;justify-items:center;gap:10px;padding:16px}.shape-picker [aria-pressed=true]{outline:2px solid var(--accent)}.shape-silhouette{display:block;border:2px solid currentColor;width:28px;height:42px;border-radius:3px}.shape-silhouette.landscape{width:56px;height:28px;margin-block:7px}.shape-silhouette.square{width:42px;height:42px}

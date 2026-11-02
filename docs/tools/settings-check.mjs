@@ -20,6 +20,12 @@ try {
     $('#save').click();await new Promise(r=>setTimeout(r,50));assert($('#dirty').textContent==='All changes saved','Save');
     $('[data-theme="terminal"]').click();$('#revert').click();assert($('[data-theme="dot-matrix"]').getAttribute('aria-pressed')==='true','Revert theme');
     $('[data-category=layout]').click();
+    assert(document.querySelectorAll('[data-shape]').length===3,'Three shapes');
+    $('[data-shape=landscape]').click();assert($('[data-size=Medium] small').textContent==='680 × 340 px','Landscape dimensions');assert($('#fit-height').disabled,'Fixed shape fit-height');
+    $('#save').click();await new Promise(r=>setTimeout(r,50));
+    $('[data-shape=square]').click();assert($('[data-size=Medium] small').textContent==='340 × 340 px','Square dimensions');
+    $('#revert').click();assert($('[data-shape=landscape]').getAttribute('aria-pressed')==='true','Revert shape');
+    $('[data-shape=portrait]').click();assert(!$('#fit-height').disabled,'Portrait fit-height');
     const sizes=[...document.querySelectorAll('[data-size]')];
     assert(sizes.map(b=>b.dataset.size).join(',')==='Small,Medium,Large,X-Large,2X-Large','Five size choices');
     for(const button of sizes){button.click();assert(button.getAttribute('aria-pressed')==='true'&&$('#scale').value==='100','Preset selection / reset');}
@@ -74,15 +80,15 @@ try {
     console.log(await b.evaluate(`(async()=>{
       const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
       assert(!$('#status').textContent,'Native bridge initialization: '+$('#status').textContent);
-      $('[data-category=layout]').click();const scale=$('#scale');scale.value=125;scale.dispatchEvent(new Event('input'));scale.value=150;scale.dispatchEvent(new Event('input'));
-      await new Promise(r=>setTimeout(r,40));assert(native.saves.length===0,'Preview wrote to disk');assert(native.previews.at(-1).scale===150,'Preview queue lost latest value');
+      $('[data-category=layout]').click();const scale=$('#scale');$('[data-shape=square]').click();scale.value=125;scale.dispatchEvent(new Event('input'));scale.value=150;scale.dispatchEvent(new Event('input'));
+      await new Promise(r=>setTimeout(r,40));assert(native.saves.length===0,'Preview wrote to disk');assert(native.previews.at(-1).scale===150&&native.previews.at(-1).shape==='square','Preview queue lost latest value / shape');
       await native.close();assert(!$('#close-prompt').hidden&&native.hidden===0,'Dirty close not prevented');
       $('#close-cancel').click();assert($('#close-prompt').hidden&&native.hidden===0,'Cancel closed window');
       await native.close();window.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape'}));assert($('#close-prompt').hidden,'Escape did not dismiss');
       if('${action}'==='discard') {
-        await native.close();$('#close-discard').click();await new Promise(r=>setTimeout(r,40));assert(native.hidden===1,'Discard did not close');assert(native.previews.at(-1).scale===100&&native.saves.length===0,'Discard did not restore saved settings');
+        await native.close();$('#close-discard').click();await new Promise(r=>setTimeout(r,40));assert(native.hidden===1,'Discard did not close');assert(native.previews.at(-1).scale===100&&native.previews.at(-1).shape==='portrait'&&native.saves.length===0,'Discard did not restore saved settings');
       } else {
-        window.dispatchEvent(new KeyboardEvent('keydown',{key:'s',ctrlKey:true}));await new Promise(r=>setTimeout(r,50));assert(native.saves.length===1&&native.saves[0].scale===150,'Ctrl+S failed');assert($('#dirty').textContent==='All changes saved','Saved state');await native.close();await new Promise(r=>setTimeout(r,40));assert(native.hidden===1,'Clean close blocked');
+        window.dispatchEvent(new KeyboardEvent('keydown',{key:'s',ctrlKey:true}));await new Promise(r=>setTimeout(r,50));assert(native.saves.length===1&&native.saves[0].scale===150&&native.saves[0].shape==='square','Ctrl+S failed');assert($('#dirty').textContent==='All changes saved','Saved state');await native.close();await new Promise(r=>setTimeout(r,40));assert(native.hidden===1,'Clean close blocked');
       }
       const count=native.listenerCount();assert(count===4,'Unexpected initial listener count');
       for(let cycle=0;cycle<4;cycle++){

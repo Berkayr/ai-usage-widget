@@ -7,7 +7,7 @@ const session=await browser();
 try {
   await session.navigate('/?sample','window.__AI_USAGE_DEMO__');
   const total={combinations:0,texts:0,failures:[]};
-  for(const width of [200,340,600]) {
+  for(const shape of ['portrait','landscape','square']) for(const width of (shape==='portrait'?[200,340,600]:[shape==='landscape'?680:340])) {
   await session.cdp('Emulation.setDeviceMetricsOverride',{width,height:1400,deviceScaleFactor:1,mobile:false});
   const result=await session.evaluate(`(async()=>{
     const api=window.__AI_USAGE_DEMO__;
@@ -17,7 +17,7 @@ try {
     const contrast=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
     const failures=[];let combinations=0,texts=0;
     for(const theme of api.themes)for(const palette of Object.keys(theme.palettes))for(const appearance of ['light','dark'])for(const colorMode of ['calm','vivid','mono']) {
-      await api.setSettings({theme:theme.id,palette,appearance,colorMode,widgetOpacity:100,backgroundOpacity:100,accent:null,background:null});combinations++;
+      await api.setSettings({shape:${JSON.stringify(shape)},theme:theme.id,palette,appearance,colorMode,widgetOpacity:100,backgroundOpacity:100,accent:null,background:null});combinations++;
       await document.fonts.ready;
       for(const el of document.querySelectorAll('#widget *')) {
         if(![...el.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())||!el.getClientRects().length||getComputedStyle(el).visibility==='hidden')continue;
@@ -27,12 +27,12 @@ try {
         let bg=[128,128,128];for(const l of layers)bg=bg.map((v,i)=>l[i]*l[3]+v*(1-l[3]));
         const s=getComputedStyle(el),fg=rgba(s.color),alpha=fg[3]*opacity;const painted=fg.slice(0,3).map((v,i)=>v*alpha+bg[i]*(1-alpha));
         const value=contrast(painted,bg),size=parseFloat(s.fontSize),large=size>=24||(size>=18&&Number(s.fontWeight)>=700),threshold=large?3:4.5;texts++;
-        if(value<threshold)failures.push({theme:theme.id,palette,appearance,colorMode,text:el.textContent.trim().slice(0,70),selector:el.className||el.tagName,foreground:s.color,background:bg.map(Math.round).join(','),ratio:Number(value.toFixed(3)),threshold});
+        if(value<threshold)failures.push({shape:${JSON.stringify(shape)},theme:theme.id,palette,appearance,colorMode,text:el.textContent.trim().slice(0,70),selector:el.className||el.tagName,foreground:s.color,background:bg.map(Math.round).join(','),ratio:Number(value.toFixed(3)),threshold});
       }
     }
     return {combinations,texts,failures};
   })()`);
-  total.combinations+=result.combinations;total.texts+=result.texts;total.failures.push(...result.failures.map(f=>({width,...f})));
+  total.combinations+=result.combinations;total.texts+=result.texts;total.failures.push(...result.failures.map(f=>({shape,width,...f})));
   }
   const settings=await auditSettings(session);
   total.combinations+=settings.combinations;total.texts+=settings.texts;total.failures.push(...settings.failures);

@@ -214,3 +214,41 @@ There is no supported external declarative theme-file format. The panel
 integrations have their own host-specific renderers and settings; they do not
 load the desktop theme modules. Theme changes must preserve unknown, stale,
 authentication and rate-limit states as well as usage percentages and resets.
+
+## Shapes
+
+`shape` is independent of theme and size. The selectable values are `portrait`
+(default for missing or unsupported settings), `landscape`, and `square`.
+`circle` and `pill` are reserved native schema values for a future phase; the
+frontend currently normalizes them to portrait and does not expose them.
+
+All dimensions are logical CSS pixels before DPI scaling. Multiply both axes by
+`sizePresets[sizePreset] / 100 * fineTune / 100`. Small, Medium, Large, X-Large,
+and 2X-Large use 0.75, 1, 1.5, 2, and 2.5 respectively. Physical-size matching
+also divides by monitor scale. Portrait retains its previous sizing, including
+the Compact Strip exception. Landscape is 680 × 340 and square is 340 × 340 at
+Medium, independent of provider count and theme. Native monitor bounds may cap
+these dimensions; placement ratios always refer to the remaining work area.
+Only portrait uses optional fit-to-content height; the other shapes always
+request their fixed height, even when the saved fit-height option is disabled.
+
+Landscape uses one to three equal columns, then two rows of three for four to
+six providers. Square uses one hero cell or a two-column grid for two to four
+providers. Five or six providers use explicit numbered pages (four providers on
+the first page, the remainder on the next). Paging never changes window size,
+never changes provider configuration, and does not use a background timer.
+The current page is clamped when provider availability changes. An odd final
+card fills both columns on every square page, with the two quota metrics side
+by side. Circular Rings puts its primary ring beside the secondary quota row.
+
+Dense cells first remove sync, plan, and footer metadata, abbreviate stale
+status to a warning dot, then remove reset details. Dense linear themes show
+the primary quota label, percentage, and meter. Frosted Glass and Retro LCD
+retain two adjacent quota capsules. Circular Rings retains both concentric
+tracks; only the primary percentage and tier occupy the inner circle. Secondary
+center text is omitted before shrinking core labels below 9 px. Text rectangles
+must fit inside the innermost track after subtracting half its stroke width.
+Brutalist keeps display-size
+bold numbers, Terminal its dashed frame, and Dot Matrix its round dot tracks.
+Extra quota details remain available in portrait. Visible text in the new
+shapes has a 9 CSS px floor; the floor is absolute, independent of rem scaling.

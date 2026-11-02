@@ -1,4 +1,4 @@
-import { normalizeSize, sizePresets, widgetWidth } from './sizing.js';
+import { normalizeSize, sizePresets, widgetWidth, widgetHeight, shapes } from './sizing.js';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -11,7 +11,7 @@ import { rgba, contrast, luminance } from './text-contrast.js';
 const sample = new URLSearchParams(location.search).has('sample') || !window.__TAURI_INTERNALS__;
 const $ = selector => document.querySelector(selector);
 function normalizePlacement(value) {const result={...value,xRatio:value.x_ratio??value.xRatio??1,yRatio:value.y_ratio??value.yRatio??0};delete result.x_ratio;delete result.y_ratio;return result;}
-const defaults = { theme:'system', appearance:'auto', colorMode:'calm', dotCount:20, matchPhysicalSize:false, accentEdge:'off', palette:'default', accent:null, background:null, widgetOpacity:100, backgroundOpacity:100, scale:100, fitHeight:true, position:'Top right', placementEditing:false, lockPosition:true, showExtraWindows:false, taskbar:{enabled:false,providers:['claude','codex','gemini'],window:'session',showBars:false,style:'transparent',theme:'auto'}, linux:{layer:'bottom',margin:12,monitor:null}, placement:{monitor:null,xRatio:1,yRatio:0,snap:'off',disconnected:'primary',fallbackMonitor:null} };
+const defaults = { theme:'system', shape:'portrait', appearance:'auto', colorMode:'calm', dotCount:20, matchPhysicalSize:false, accentEdge:'off', palette:'default', accent:null, background:null, widgetOpacity:100, backgroundOpacity:100, scale:100, fitHeight:true, position:'Top right', placementEditing:false, lockPosition:true, showExtraWindows:false, taskbar:{enabled:false,providers:['claude','codex','gemini'],window:'session',showBars:false,style:'transparent',theme:'auto'}, linux:{layer:'bottom',margin:12,monitor:null}, placement:{monitor:null,xRatio:1,yRatio:0,snap:'off',disconnected:'primary',fallbackMonitor:null} };
 let draft = structuredClone(defaults), saved, providers, savedProviders, autostart=false, savedAutostart=false, closing=false, saving=false, positionBefore=null;
 const abort = new AbortController(), stops = [];
 let disposed=false, previewRunning=false, previewPending=null;
@@ -43,6 +43,8 @@ sections.appearance.append($('.theme-section'),$('.look-section'));
 for(const id of ['appearance','palette','accent','background','widget-opacity','background-opacity'])move(id,'appearance');
 for(const id of ['scale','position','fit-height','show-extra-windows'])move(id,'layout');
 sections.layout.append($('.scale-presets'));
+const shapePicker=document.createElement('fieldset');shapePicker.className='shape-picker';shapePicker.innerHTML='<legend>Shape</legend>'+shapes.map(shape=>`<button data-shape="${shape}" aria-pressed="false"><i class="shape-silhouette ${shape}" aria-hidden="true"></i>${shape[0].toUpperCase()+shape.slice(1)}</button>`).join('');sections.layout.prepend(shapePicker);
+shapePicker.querySelectorAll('button').forEach(button=>button.onclick=()=>{draft.shape=button.dataset.shape;update();});
 move('start-at-login','about');move('autostart-status','about');
 sections.desktop.append($('#linux-settings'));$('#linux-settings').hidden=false;
 sections.taskbar.append($('#taskbar-settings'));
@@ -68,8 +70,10 @@ function previewInk(ink, paper) {
   return ink;
 }
 function renderControls() {
+  document.querySelectorAll('[data-shape]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.shape===draft.shape)));
+  $('#fit-height').disabled=draft.shape!=='portrait';
   for(const [id,key]of Object.entries(bindings)) {const el=$(`#${id}`);const value=get(key);if(el.type==='checkbox')el.checked=!!value;else el.value=value??'';const output=$(`#${id.replace('-opacity','')}-out`)||$(`#${id}-out`);if(output)output.value=`${value}${id==='linux-margin'?' px':'%'}`;}
-  document.querySelectorAll('[data-size]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.size===draft.sizePreset));b.querySelector('small').textContent=`${Math.round(widgetWidth(draft,Math.max(1,providers.length))*sizePresets[b.dataset.size]/100)} px`;});
+  document.querySelectorAll('[data-size]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.size===draft.sizePreset));b.querySelector('small').textContent=`${Math.round(widgetWidth(draft,Math.max(1,providers.length))*sizePresets[b.dataset.size]/100)} × ${Math.round(widgetHeight(draft,Math.max(1,providers.length))*sizePresets[b.dataset.size]/100)} px`;});
   const p=themePalette();$('#accent').value=draft.accent||p.accent;$('#background').value=draft.background||p.bgWidget;
   document.querySelectorAll('[data-theme]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.theme===draft.theme));const colors=themePalette(themes.find(t=>t.id===b.dataset.theme));b.querySelector('.theme-preview').style.cssText=`background:${colors.bgWidget};color:${previewInk(colors.accent,colors.bgWidget)};border-color:${colors.border}`;});
   paletteGrid.replaceChildren();const t=themes.find(t=>t.id===draft.theme)||themes[0];
@@ -84,11 +88,11 @@ for(const [id,key]of Object.entries(bindings)) {const el=$(`#${id}`);el.addEvent
 document.querySelectorAll('[data-taskbar-provider]').forEach(el=>el.onchange=()=>{draft.taskbar.providers=[...document.querySelectorAll('[data-taskbar-provider]:checked')].map(el=>el.dataset.taskbarProvider);update();});
 document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{draft.sizePreset=b.dataset.size;draft.fineTune=100;update();});
 $('#start-at-login').onchange=event=>{autostart=event.target.checked;mark();};
-function renderProviders() {if(!providerConfig)return;const config=structuredClone(providerConfig);for(const [id,p]of Object.entries(config.providers))p.enabled=providers.includes(id);config.initialized=true;mountProviders($('#provider-settings'),config,async()=>{});$('#provider-settings .provider-consent-actions').hidden=true;$('#provider-settings').onchange=()=>{providers=[...$('#provider-settings').querySelectorAll('input')].flatMap((el,i)=>el.checked?[Object.keys(config.providers).filter(id=>id in config.disclosures)[i]]:[]);mark();preview().catch(()=>{});};}
-let providerConfig;let autostartAvailable=true;
+function renderProviders() {if(!providerConfig)return;const config=structuredClone(providerConfig);for(const [id,p]of Object.entries(config.providers))p.enabled=providers.includes(id);config.initialized=true;mountProviders($('#provider-settings'),config,async()=>{});$('#provider-settings .provider-consent-actions').hidden=true;$('#provider-settings').onchange=()=>{providers=[...$('#provider-settings').querySelectorAll('input')].flatMap((el,i)=>el.checked?[Object.keys(config.providers).filter(id=>id in config.disclosures)[i]]:[]);renderControls();mark();preview().catch(()=>{});};}
+let providerConfig;let autostartAvailable=true;let desktopPlatform='linux';
 let geometry={monitors:[{name:'Demo display',width:1920,height:1080,primary:true,scale:1}],widgetWidth:340,widgetHeight:600};
 function selectedMonitor(){return geometry.monitors.find(m=>m.name===draft.placement.monitor)||geometry.monitors.find(m=>m.primary)||geometry.monitors[0];}
-function renderMap(){const monitor=selectedMonitor();if(!monitor){$('#monitor-map').hidden=true;return;}$('#monitor-map').hidden=false;const map=$('#monitor-map');map.style.aspectRatio=`${monitor.width}/${monitor.height}`;map.style.maxWidth=`${260*monitor.width/monitor.height}px`;const width=Math.min(1,geometry.widgetWidth/monitor.width),height=Math.min(1,geometry.widgetHeight/monitor.height);$('#map-widget').style.cssText=`width:${width*100}%;height:${height*100}%;left:${draft.placement.xRatio*(1-width)*100}%;top:${draft.placement.yRatio*(1-height)*100}%`;}
+function renderMap(){const monitor=selectedMonitor();if(monitor){const dpi=monitor.scale||1;const factor=draft.scale/100*(desktopPlatform==='windows'?dpi:1)/(draft.matchPhysicalSize?dpi:1);geometry.widgetWidth=Math.min(monitor.width,widgetWidth(draft,providers?.length)*factor);if(draft.shape!=='portrait'||draft.fitHeight)geometry.widgetHeight=Math.min(monitor.height,widgetHeight(draft,providers?.length)*factor);}if(!monitor){$('#monitor-map').hidden=true;return;}$('#monitor-map').hidden=false;const map=$('#monitor-map');map.style.aspectRatio=`${monitor.width}/${monitor.height}`;map.style.maxWidth=`${260*monitor.width/monitor.height}px`;const width=Math.min(1,geometry.widgetWidth/monitor.width),height=Math.min(1,geometry.widgetHeight/monitor.height);$('#map-widget').style.cssText=`width:${width*100}%;height:${height*100}%;left:${draft.placement.xRatio*(1-width)*100}%;top:${draft.placement.yRatio*(1-height)*100}%`;}
 function beginPlacement(){if(!positionBefore){positionBefore=structuredClone({placement:draft.placement,position:draft.position,lockPosition:draft.lockPosition});if(draft.position!=='Free'){draft.placement.xRatio=draft.position.endsWith('left')?0:1;draft.placement.yRatio=draft.position.startsWith('Top')?0:1;}draft.placementEditing=true;draft.lockPosition=false;mapMoved=false;}if(!draft.placement.monitor)draft.placement.monitor=selectedMonitor()?.name??null;}
 $('#place').onclick=()=>{beginPlacement();update();};
 function cancelPlacement(){if(positionBefore)Object.assign(draft,structuredClone(positionBefore));positionBefore=null;draft.placementEditing=false;mapMoved=false;update();}
@@ -142,7 +146,7 @@ async function loadSession(){
   if(!sample){
     try {providerConfig=await invoke('get_provider_config');} catch(e){providerConfig={initialized:true,providers:{},disclosures:{},detected:{}};error(`Provider settings unavailable: ${e}`);}
     try {autostart=await invoke('get_autostart');} catch(e){autostartAvailable=false;$('#autostart-status').hidden=false;$('#autostart-status').textContent=String(e);}
-    try {const desktop=await invoke('get_desktop_info');$('#desktop-layer').hidden=!desktop.layerShell;$('#desktop-layer-unavailable').hidden=desktop.layerShell;sections.desktop.querySelector('#linux-settings').hidden=desktop.platform!=='linux';sections.taskbar.querySelector('#taskbar-settings').hidden=desktop.platform!=='windows';}catch(e){error(e);}
+    try {const desktop=await invoke('get_desktop_info');desktopPlatform=desktop.platform;$('#desktop-layer').hidden=!desktop.layerShell;$('#desktop-layer-unavailable').hidden=desktop.layerShell;sections.desktop.querySelector('#linux-settings').hidden=desktop.platform!=='linux';sections.taskbar.querySelector('#taskbar-settings').hidden=desktop.platform!=='windows';}catch(e){error(e);}
   }
   else providerConfig={initialized:true,providers:{claude:{enabled:true},codex:{enabled:true},gemini:{enabled:false}},disclosures:{claude:'Read local quota metadata.',codex:'Read local quota metadata.',gemini:'Read local quota metadata.'},detected:{}};
   providers=Object.entries(providerConfig.providers).filter(([,p])=>p.enabled&&providerConfig.initialized).map(([id])=>id);savedProviders=structuredClone(providers);savedAutostart=autostart;$('#start-at-login').checked=autostart;$('#start-at-login').disabled=!autostartAvailable;

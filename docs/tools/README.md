@@ -128,16 +128,17 @@ captures are `settings-preview-light.png` and `settings-preview-dark.png`.
 
 ## Fixed shell, theme identity
 
-`node docs/tools/size-audit.mjs` measures all nine themes × five presets ×
-0/1/3/6 providers (180 cases, ±2 CSS px) and writes `size-audit.json` and
+`node docs/tools/size-audit.mjs` measures all nine themes × three shapes × five presets ×
+0/1/3/6 providers (540 cases, ±2 CSS px) and writes `size-audit.json` and
 `size-sheet.png`. The outer size stays 340 × (116 + 210 × provider count) at
 Medium. Compact Strip retains its separate horizontal size contract.
 Brutalist and Circular Rings share the provider budget across two columns;
 an odd last card fills the last row. Their cell heights follow the row budget,
 rather than the 200 px height used by single-column cards.
 
-`node docs/tools/theme-identity-check.mjs` checks all nine themes × five presets ×
-1/2/3/4/5/6 providers × dark/light (540 cases) and writes
+`node docs/tools/theme-identity-check.mjs` checks all nine themes × three shapes × five presets ×
+1/2/3/4/5/6 providers × dark/light, including both square pages for five/six
+providers (1800 cases), and writes
 `theme-identity-results.json`. Synthetic DEMO plans and countdowns exercise real
 text widths. It checks card overflow, signature DOM and geometry: Brutalist's
 2.4× display numbers and uppercase labels, two provider columns, concentric
@@ -148,6 +149,16 @@ horizontal arrangement are also asserted. Every card's trailing blank space is
 measured from actual text ranges and meter/ring bounds, rather than stretched
 layout wrappers, and must stay within 25% of the card height (1 px rounding
 tolerance). Space below the last card is checked against the same budget.
-The JSON records the maximum card ratio and the last-card list gap for each case. Normal preset widths preserve these
+Ring text rectangles (including three-digit percentages) must fit inside the
+innermost track, accounting for stroke width and letterboxing. Odd square cards
+must fill the last row with adjacent primary/secondary metrics; both pages are
+checked explicitly. The JSON records the maximum ring text radius ratio, card
+ratio, and last-card list gap for each case. Normal preset widths preserve these
 layouts at every scale; externally narrowed viewports (below 18 root-font units) use a single column and
 scroll access. Display type uses `--size-font-display` in rem, with no glyph scaling.
+
+`node docs/tools/shape-preview.mjs` checks square pagination and transitions and
+produces `docs/screenshots/shapes.png` from nine themes with fictional data.
+Landscape and square have fixed 680 × 340 / 340 × 340 Medium boxes. Their theme
+identity checks include the 9 CSS px text floor and 25% trailing-space budget.
+Contrast checks cover both shapes in addition to the portrait viewport matrix.

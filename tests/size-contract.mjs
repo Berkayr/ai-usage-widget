@@ -32,3 +32,13 @@ test('five sizes use proportional boxes, including the independent strip orienta
   }
  }
 });
+
+test('shape migration and fixed boxes are independent of theme and provider count',()=>{
+ assert.equal(normalizeSize({}).shape,'portrait');
+ for(const shape of ['unknown','circle','pill'])assert.equal(normalizeSize({shape}).shape,'portrait');
+ for(const theme of ['system','brutalist','circular-rings','compact-strip'])for(const count of [0,1,3,6])for(const shape of ['landscape','square']) {
+  const settings=normalizeSize({theme,shape});
+  assert.equal(widgetWidth(settings,count),shape==='landscape'?680:340);
+  assert.equal(widgetHeight(settings,count),340);
+ }
+});

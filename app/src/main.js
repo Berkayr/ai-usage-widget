@@ -1,4 +1,5 @@
 import { normalizeSize, widgetWidth, widgetHeight } from './sizing.js';
+import { hiddenStates } from './themes/dot-matrix/render.js';
 import { repairTextContrast } from './text-contrast.js';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { mountProviders } from './themes/shared/providers.js';
@@ -44,6 +45,7 @@ const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'
 const systemAppearance = matchMedia('(prefers-color-scheme: light)');
 let settings = { theme: 'system', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'default', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
 try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
+let shapePage = 0;
 let currentSnapshot = null;
 let currentNoData = false;
 let desktopInfo = null;
@@ -53,6 +55,7 @@ document.querySelector('#app').innerHTML = `
   <main class="widget" id="widget">
     <header class="header"><div class="title-block"><div class="app-title">AI USAGE</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
     <section id="provider-onboarding" hidden></section><div class="provider-list" id="providers"></div>
+    <nav class="shape-pages" aria-label="Provider pages" hidden></nav>
     <footer class="footer"><span>AI USAGE</span><span>SYSTEM</span></footer>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
     <div class="toast" id="toast" hidden></div>
@@ -79,6 +82,8 @@ function updateNarrowViewport() {
 function applySettings() {
   if (!theme) return;
   settings = normalizeSize(settings);
+  document.documentElement.dataset.shape = settings.shape;
+  document.documentElement.style.setProperty('--shape-min-font', '9px');
   const selected = theme.palettes[settings.palette] || Object.values(theme.palettes)[0];
   const mode = settings.appearance === 'auto' ? (systemAppearance.matches ? 'light' : 'dark') : settings.appearance;
   const palette = { ...selected, ...(selected[mode] || {}), mode }; 
@@ -123,7 +128,7 @@ function applySettings() {
   document.documentElement.style.setProperty('--ui-scale', effectiveScale / 100);
   document.documentElement.style.fontSize = `${16 * effectiveScale / 100}px`;
   updateNarrowViewport();
-  document.documentElement.classList.toggle('fit-height', Boolean(settings.fitHeight)); lastFitHeight = 0;
+  document.documentElement.classList.toggle('fit-height', Boolean(settings.fitHeight && settings.shape === 'portrait')); lastFitHeight = 0;
   settings.taskbar = { ...defaultTaskbar, ...settings.taskbar, colorMode: settings.colorMode, dotCount: settings.dotCount };
   document.documentElement.dataset.translucent = String(settings.widgetOpacity * settings.backgroundOpacity < 7000);
   $('#widget').classList.toggle('placing', !!settings.placementEditing);
@@ -165,10 +170,19 @@ function draw(snapshot, noData = false) {
     const filtered = settings.providerPreview && snapshot ? {...snapshot,providers:(snapshot.providers||[]).filter(p=>settings.providerPreview.includes(p.id))}:snapshot;
     const visible = snapshotOld(snapshot) ? { ...snapshot, providers: (snapshot.providers || []).map(p => ({ ...p, stale: true, state: ['OK', 'STALE'].includes(p.state) ? 'STALE' : p.state })) } : filtered;
     if (settings.providerPreview && visible?.providers) visible.providers=visible.providers.filter(p=>settings.providerPreview.includes(p.id));
-    renderSnapshot($('#providers'), visible, { noData, showExtraWindows: settings.showExtraWindows });
+    const allProviders = (visible?.providers || []).filter(p => !hiddenStates.has(String(p.state).toUpperCase()));
+    const pages = settings.shape === 'square' ? Math.ceil(allProviders.length / 4) : 1;
+    shapePage = Math.min(shapePage, Math.max(0, pages - 1));
+    const paged = pages > 1 ? {...visible, providers:allProviders.slice(shapePage*4, shapePage*4+4)} : visible;
+    const pageNav = $('.shape-pages'); pageNav.hidden = pages <= 1; pageNav.replaceChildren();
+    for (let page=0;page<pages && pages>1;page++) { const button=document.createElement('button'); button.textContent=`${page+1}`; button.setAttribute('aria-label', `Provider page ${page+1} of ${pages}`); button.setAttribute('aria-current', String(page===shapePage)); button.onclick=()=>{shapePage=page;draw(currentSnapshot,currentNoData);}; pageNav.append(button); }
+    renderSnapshot($('#providers'), paged, { noData, showExtraWindows: settings.showExtraWindows });
     $('#updated').textContent = snapshot?.generated_at ? `SYNC ${new Date(snapshot.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'NO DATA YET';
     const count = $('#providers').querySelectorAll('.provider-card').length;
     $('#widget').style.setProperty('--provider-count', Math.max(1,count));
+    document.documentElement.dataset.denseShape = String(settings.shape !== 'portrait' && (settings.shape === 'square' ? count > 1 : count > 3));
+    $('#widget').style.setProperty('--shape-columns', settings.shape === 'square' ? (count > 1 ? 2 : 1) : Math.min(3, Math.max(1,count)));
+    $('#widget').style.setProperty('--shape-rows', settings.shape === 'square' ? (count > 2 ? 2 : 1) : (count > 3 ? 2 : 1));
     const width = widgetWidth(settings,count) * settings.scale / 100 / (settings.matchPhysicalSize ? monitorScale : 1);
     if (!isSample) invoke('resize_widget', {scale:Math.round(settings.scale),widthCssPx:width}).catch(()=>{});
     repairTextContrast($('#widget'));
@@ -184,7 +198,7 @@ let lastFitHeight = 0;
 let fitPending = false;
 async function requestFit() {
   // The contract is independent of theme content; native code caps it to the monitor.
-  if (!settings.fitHeight || isSample || fitPending || document.hidden) return;
+  if ((!settings.fitHeight && settings.shape === 'portrait') || isSample || fitPending || document.hidden) return;
   fitPending = true;
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   fitPending = false;
