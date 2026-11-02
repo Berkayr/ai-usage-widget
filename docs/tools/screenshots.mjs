@@ -60,7 +60,7 @@ scenes.set('palettes',{w:1530,h:1200,autoHeight:true,html:shell(heading('FIND YO
 scenes.set('states',{w:1000,h:1400,autoHeight:true,html:shell(heading('HONEST STATUS','Know when data needs attention','Cached data stays marked. Missing values never become zero.')+`<div class="row">${frame('Terminal · Phosphor · Cached / sign-in / rate limit',400,1400,{theme:'terminal',colorMode:'vivid'},{snapshot:states})}${frame('Retro LCD · Liquid Crystal · Same source states',400,1400,{theme:'retro-lcd',appearance:'light',colorMode:'vivid'},{snapshot:states})}</div>`)});
 for(const mode of ['dark','light']) {
  const light=mode==='light',theme=light?'frosted-glass':'circular-rings';
- scenes.set(`settings-${mode}`,{w:980,h:1250,autoHeight:true,html:shell(heading('MAKE IT YOURS','A place on your desktop','Theme, color, scale and placement in one panel.')+`<div class="row">${frame(light?'Frosted Glass · Acrylic · Light':'Circular Rings · Ocean · Dark',400,1200,{theme,appearance:mode,colorMode:'vivid'})}${frame('AI Usage · Settings',400,1000,{theme,appearance:mode,colorMode:'vivid',fitHeight:false},{openSettings:true})}</div>`,light)});
+ scenes.set(`settings-${mode}`,{w:1000,h:920,appearance:mode,html:shell(heading('MAKE IT YOURS','A place on your desktop','Settings open in a separate, resizable window.')+`<iframe title="AI Usage Settings" width="900" height="680" src="/?settings&sample"></iframe>`,light)});
 }
 scenes.set('system',{w:1000,h:1400,autoHeight:true,html:shell(heading('FOLLOWS YOUR DESKTOP','At home in light and dark','System fonts and quiet colors, with the System theme.')+`<div class="row">${frame('System · Desktop · Light',400,1400,{theme:'system',appearance:'light'})}${frame('System · Desktop · Dark',400,1400,{theme:'system',appearance:'dark'})}</div>`,true)});
 scenes.set('checks/vivid', {w:850,h:1600,autoHeight:true,html:shell(heading('COLOR MODE','Calm / Vivid')+`<div class="row">${['calm','vivid'].map(colorMode=>frame(colorMode,340,1400,{colorMode})).join('')}</div>`)});
@@ -141,7 +141,7 @@ function measure(d) {
  });
  const dotCounts=[...d.querySelectorAll('.dot-bar,.segments')].filter(visible).map(el=>[...el.querySelectorAll('i')].filter(visible).length);
  const dotSizes=[...d.querySelectorAll('.dot-bar i,.segments i')].filter(visible).map(el=>el.getBoundingClientRect().width);
- return {dotCounts,dotSizes,minFont,numberFont,minContrast:Math.min(...ratios.map(r=>r.ratio)),ratios,scale:Number(d.querySelector('#scale').value),width:w.innerWidth,zoom:w.getComputedStyle(d.querySelector('#app')).zoom};
+ return {dotCounts,dotSizes,minFont,numberFont,minContrast:Math.min(...ratios.map(r=>r.ratio)),ratios,scale:w.__AI_USAGE_DEMO__.getSettings().scale,width:w.innerWidth,zoom:w.getComputedStyle(d.querySelector('#app')).zoom};
 }
 const server = createServer(async (req,res)=>{
  try {
@@ -179,11 +179,15 @@ try {
   await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:scene.h,deviceScaleFactor:scene.dpr||2,mobile:false});
   await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:scene.appearance || 'dark'}]});
   await cdp('Page.navigate',{url:`${base}/scene/${name}`});
+  if(name.startsWith('settings-')) {
+   await cdp('Runtime.evaluate',{expression:`(async()=>{for(let i=0;i<100;i++){if(document.querySelector('iframe')?.contentWindow.__SETTINGS_READY__)return;await new Promise(r=>setTimeout(r,50));}throw Error('Settings readiness');})()`,awaitPromise:true});
+   const capture=await cdp('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(resolve(output,`${name}.png`),Buffer.from(capture.data,'base64'));console.log(`${name}.png`);continue;
+  }
   const result=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let attempt=0;attempt<150;attempt++){const frames=[...document.querySelectorAll('iframe')];if(location.pathname==='/scene/${name}'&&document.readyState==='complete'&&frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){await document.fonts.ready;await Promise.all(frames.map(f=>f.contentDocument.fonts.ready));for(const f of frames){if(f.contentDocument.documentElement.classList.contains('fit-height')) f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return frames.map(f=>{const d=f.contentDocument;const expected=JSON.parse(new URL(f.src).searchParams.get('docs')).snapshot.providers.length;const overflow=[...d.querySelectorAll('.provider-list,.provider-card,.quota-window,.provider-heading,.windows')].filter(el=>el.scrollWidth>el.clientWidth+2).map(el=>el.className);return {cards:d.querySelectorAll('.provider-card').length,expected,overflow,theme:d.documentElement.dataset.theme,styles:d.querySelectorAll('#active-theme').length,metrics:(${measure.toString()})(d)};});}await new Promise(r=>setTimeout(r,100));}throw Error('Frame readiness timed out');})()`,awaitPromise:true,returnByValue:true});
   if(result.exceptionDetails||errors.length)throw Error(`${name}: ${JSON.stringify(result.exceptionDetails||errors)}`);
   if(result.result.value.some(frame=>frame.cards!==frame.expected || frame.overflow.length || frame.styles!==1))throw Error(`${name}: layout failure ${JSON.stringify(result.result.value.map(({theme,overflow,cards,expected})=>({theme,overflow,cards,expected})))}`);
   if(name.startsWith('checks/typography-')) {
-   const rows=await cdp('Runtime.evaluate',{expression:`(async()=>{const f=document.querySelector('iframe'),d=f.contentDocument,w=f.contentWindow;const rows=[];for(const width of [200,340,520,700])for(const scale of [75,100,150]){const input=d.querySelector('#scale');input.value=scale;input.dispatchEvent(new w.Event('input'));f.width=width;await new Promise(r=>setTimeout(r,100));await d.fonts.ready;rows.push({theme:d.documentElement.dataset.theme,width,scale,glyphs:(${measureGlyphs.toString()})(d)});}return rows;})()`,awaitPromise:true,returnByValue:true});
+   const rows=await cdp('Runtime.evaluate',{expression:`(async()=>{const f=document.querySelector('iframe'),d=f.contentDocument,w=f.contentWindow;const rows=[];for(const width of [200,340,520,700])for(const scale of [75,100,150]){await w.__AI_USAGE_DEMO__.setSettings({scale});f.width=width;await new Promise(r=>setTimeout(r,100));await d.fonts.ready;rows.push({theme:d.documentElement.dataset.theme,width,scale,glyphs:(${measureGlyphs.toString()})(d)});}return rows;})()`,awaitPromise:true,returnByValue:true});
    if(rows.exceptionDetails)throw Error(JSON.stringify(rows.exceptionDetails));
    const values=rows.result.value.flatMap(r=>r.glyphs.map(g=>g.ratio));
    if(!values.length || Math.max(...values)/Math.min(...values)>1.03)throw Error('Glyph ratio drift: '+name+' / '+JSON.stringify(rows.result.value));
@@ -219,7 +223,9 @@ try {
   await writeFile(resolve(output,`${name}.png`),png);
   console.log(`${name}.png (${png.readUInt32BE(16)} × ${png.readUInt32BE(20)})`);
  }
- if(process.env.SCENE?.startsWith('checks/providers-')) {
+ if(process.env.SCENE?.startsWith('settings-')) {
+  console.log('Settings images captured; use settings-check.mjs for interactions.');
+ } else if(process.env.SCENE?.startsWith('checks/providers-')) {
    const consentChecks=await cdp('Runtime.evaluate',{expression:`(async()=>{
      for(const f of document.querySelectorAll('iframe')) {
        const d=f.contentDocument,w=f.contentWindow;
@@ -239,42 +245,22 @@ try {
  // Exercise switching in the same webview; a screenshot alone cannot detect
  // cached CSS accumulating or a selector failing after repeated switches.
  const interactions = await cdp('Runtime.evaluate',{expression:`(async()=>{
- const f=document.querySelector('iframe'),w=f.contentWindow,d=f.contentDocument;
- const rendered = () => new Promise(r=>w.requestAnimationFrame(()=>w.requestAnimationFrame(r)));
- for(const id of ${JSON.stringify(themeIds)}){
-  d.querySelector('#theme-picker [data-theme="'+id+'"]').click();
-  for(let n=0;d.documentElement.dataset.theme!==id&&n<100;n++) await new Promise(r=>setTimeout(r,20));
-  if(d.documentElement.dataset.theme!==id || d.querySelectorAll('#active-theme').length!==1) throw Error('Theme switch: '+id);
-  const p=d.querySelector('#palette'); if(!p.value || !p.options.length)throw Error('Missing palette: '+id);
-  const fit=d.querySelector('#fit-height');for(const checked of [false,true]){fit.checked=checked;fit.dispatchEvent(new Event('change'));if(d.documentElement.classList.contains('fit-height')!==checked)throw Error('Fit height: '+id);}
-  d.querySelector('#gear').click();await new Promise(r=>requestAnimationFrame(r));if(d.querySelector('#settings').hidden || d.querySelector('#widget').getBoundingClientRect().height<540)throw Error('Settings height: '+id);d.querySelector('#close-settings').click();
-  const extra=d.querySelector('#show-extra-windows');extra.checked=true;extra.dispatchEvent(new Event('change')); await rendered(); const fixture=JSON.parse(new URL(f.src).searchParams.get('docs'));if(fixture.snapshot.providers.some(p=>p.windows?.some(w=>w.label==='Extra window'))&&!d.body.textContent.includes('Extra window'))throw Error('Extra window: '+id);
-  extra.checked=false;extra.dispatchEvent(new Event('change'));await rendered();if(d.body.textContent.includes('Extra window'))throw Error('Hidden extra: '+id);
-  for(const appearance of ['light','dark','auto']) {const a=d.querySelector('#appearance');a.value=appearance;a.dispatchEvent(new Event('change'));if(appearance!=='auto'&&d.documentElement.dataset.mode!==appearance)throw Error('Appearance: '+id);}
-  for(const scale of [50,300]){const a=d.querySelector('#scale');a.value=scale;a.dispatchEvent(new Event('input'));if(parseFloat(d.documentElement.style.fontSize)!==16*scale/100 || d.querySelector('#app').style.zoom)throw Error('Scale: '+id);}
-  const scale=d.querySelector('#scale');scale.value=100;scale.dispatchEvent(new Event('input'));
-  const oldWidth=f.width; f.width=340; await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-  for(const count of [10,20,30]) {
-   const select=d.querySelector('#dot-count');select.value=count;select.dispatchEvent(new Event('change'));await rendered();
-   const rows=[...d.querySelectorAll('.dot-bar,.segments')].filter(el=>el.getBoundingClientRect().width>0);
-   if(id!=='system' && (!rows.length || rows.some(el=>el.querySelectorAll('i').length!==count)))throw Error('Dot setting: '+id+' / '+count);
-  }
-  d.querySelector('#dot-count').value=20;d.querySelector('#dot-count').dispatchEvent(new Event('change'));
-  f.width=200;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-  if([...d.querySelectorAll('.dot-bar,.segments')].filter(el=>el.getBoundingClientRect().width>0).some(el=>el.querySelectorAll('i').length!==10))throw Error('XS dot count: '+id);
-  f.width=oldWidth;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+ const f=document.querySelector('iframe'),w=f.contentWindow,d=f.contentDocument,api=w.__AI_USAGE_DEMO__;
+ const assert=(v,message)=>{if(!v)throw Error(message);};
+ for(const id of ${JSON.stringify(themeIds)}) {
+  await api.setSettings({theme:id});assert(d.documentElement.dataset.theme===id && d.querySelectorAll('#active-theme').length===1,'Theme: '+id);
+  assert(api.themes.find(t=>t.id===id).palettes[api.getSettings().palette],'Palette: '+id);
+  for(const fitHeight of [false,true]) {await api.setSettings({fitHeight});assert(d.documentElement.classList.contains('fit-height')===fitHeight,'Fit: '+id);}
+  for(const showExtraWindows of [true,false]) {await api.setSettings({showExtraWindows});if(!showExtraWindows)assert(!d.body.textContent.includes('Extra window'),'Extra window: '+id);}
+  for(const appearance of ['light','dark','auto']) {await api.setSettings({appearance});if(appearance!=='auto')assert(d.documentElement.dataset.mode===appearance,'Appearance: '+id);}
+  for(const scale of [50,300,100]) {await api.setSettings({scale});assert(parseFloat(d.documentElement.style.fontSize)===16*scale/100,'Scale: '+id);}
+  const oldWidth=f.width;f.width=340;
+  for(const dotCount of [10,20,30]) {await api.setSettings({dotCount});const rows=[...d.querySelectorAll('.dot-bar,.segments')].filter(el=>el.getBoundingClientRect().width>0);if(id!=='system')assert(rows.length&&rows.every(el=>el.querySelectorAll('i').length===dotCount),'Dots: '+id);}
+  f.width=200;await api.setSettings({dotCount:20});assert([...d.querySelectorAll('.dot-bar,.segments')].filter(el=>el.getBoundingClientRect().width>0).every(el=>el.querySelectorAll('i').length===10),'XS dots: '+id);f.width=oldWidth;
  }
- for(const value of ['off','auto','left','right']) {
-   const edge=d.querySelector('#accent-edge');edge.value=value;edge.dispatchEvent(new Event('change'));
-   for(const position of ['Top left','Bottom right','Free']) {
-    const p=d.querySelector('#position');p.value=position;p.dispatchEvent(new Event('change'));
-    const expected=value==='auto'?(position.endsWith('left')?'left':position.endsWith('right')?'right':'off'):value;
-    if(d.documentElement.dataset.accentEdge!==expected)throw Error('Accent edge: '+value+' / '+position);
-   }
-  }
-  const color=d.querySelector('#color-mode');
-  for(const value of ['vivid','mono','calm']) {color.value=value;color.dispatchEvent(new Event('change'));if(d.documentElement.dataset.colorMode!==value)throw Error('Color mode: '+value);}
- return 'Accent edge (12 combinations), color mode, theme switching, palette, appearance, fit/settings height, scale and extra-window checks passed';
+ for(const accentEdge of ['off','auto','left','right'])for(const position of ['Top left','Bottom right','Free']) {await api.setSettings({accentEdge,position});const expected=accentEdge==='auto'?(position.endsWith('left')?'left':position.endsWith('right')?'right':'off'):accentEdge;assert(d.documentElement.dataset.accentEdge===expected,'Accent edge');}
+ for(const colorMode of ['vivid','mono','calm']) {await api.setSettings({colorMode});assert(d.documentElement.dataset.colorMode===colorMode,'Color mode');}
+ return 'Theme switching, palette, appearance, fit, scale, extra windows, dots, accent edges and color modes passed; settings document checks: docs/tools/settings-check.mjs';
  })()`,awaitPromise:true,returnByValue:true});
  if(interactions.exceptionDetails)throw Error(JSON.stringify(interactions.exceptionDetails));
  await writeFile(resolve(output,`checks/${process.env.SCENE?.replaceAll('/','-') || 'results'}.json`),JSON.stringify({checks,interactions:interactions.result.value},null,2)+'\n');

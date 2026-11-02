@@ -46,3 +46,81 @@ height/width ratios are measured at 200/340/520/700 CSS px × 75/100/150% for al
 nine themes. `checks/typography.json` records each measurement; the capture fails
 if the ratio range exceeds 3%. `SCENE=checks/typography` runs just this matrix.
 This measures the glyph layout box, not the image pixel ink bounding box.
+
+## Settings window and full contrast audit
+
+The settings panel is now a separate document. Run these from the repository root:
+
+```sh
+npm --prefix app run build
+node docs/tools/settings-check.mjs
+node docs/tools/contrast-audit.mjs
+```
+
+`settings-check.mjs` verifies categories, palette selection/reset, Save/Revert,
+placement/Center/Cancel and horizontal overflow at the 640 × 480 minimum size.
+It also injects a wholly synthetic IPC bridge to verify live preview without
+saving, latest-value ordering, dirty-close interception, Discard, Cancel, Esc,
+Ctrl+S and clean close. No native provider or settings command runs. It writes
+`settings-preview-light.png` and `settings-preview-dark.png` beside this file.
+These are browser previews; actual native window decorations and Wayland dragging
+need desktop review. `SCENE=settings- node docs/tools/screenshots.mjs` captures the
+separate settings view in the documentation gallery.
+
+The contrast tool uses Vite preview and a fresh headless Chrome profile. It checks
+every visible direct text node against its computed/composited background, including
+alpha and ancestor opacity. The large-text exception is 3:1; other text requires
+4.5:1. Failures print a table and return status 1. All input is synthetic. The matrix
+uses opaque widget surfaces; unknown desktop pixels below 70% surface opacity are
+handled by the documented text shadow and require native visual inspection.
+`CHROME_BIN` selects Chromium/Edge (default `/opt/google/chrome/chrome`);
+`CHROME_NO_SANDBOX=1` is only for an already isolated environment without browser
+user namespaces. The browser sandbox is enabled by default.
+
+For native memory measurements, build a **debug** binary into a temporary target
+and run the existing isolated soak with its new option:
+
+```sh
+CARGO_TARGET_DIR=/tmp/ai-usage-test-target npm --prefix app run tauri -- build --debug --no-bundle
+AI_USAGE_SETTINGS_TEST_POSITION=1920,0 python3 scripts/memory_soak.py --binary /tmp/ai-usage-test-target/debug/ai-usage --monitor eDP-1 --settings-cycles 4 --output /tmp/ai-usage-settings-soak
+```
+
+The existing 120-second scope/timeout, 1500 MB memory limit, disabled swap and
+synthetic temporary home/config/state remain mandatory. On Linux, pass an unused
+screen with `--monitor eDP-1` (replace the name for your layout). This positions the
+widget. For settings, set `AI_USAGE_SETTINGS_TEST_POSITION=x,y` to logical pixel
+coordinates on that same unused screen; `1920,0` above is only an example, verify
+your layout first. Wayland compositors may ignore requested positions for normal
+windows: verify placement on the unused screen before accepting this run. The
+variable is ignored by release builds. Never run native
+soak on the main display.
+
+One warm-up opens at 15s and hides at 19s, before the 30-second baseline. Four
+measured cycles show and hide the same lazy settings webview; each injects 20 monitor notifications into the same debounce
+path used by native monitor events. The output includes creation/reuse/open/close counts, coalesced monitor applications,
+and scope-local `ps` PID/PPID/name/RSS plus WebKit WebProcess counts. No command
+lines are collected. At 30/50/70/90/110s it compares settled memory with the warmed
+30s baseline: each later cycle must retain at most **15 MiB total** over that
+baseline (not 15 MiB per cycle). This allows allocator/compositor noise while
+rejecting the observed ~70 MiB per-cycle leak and smaller cumulative leaks.
+The separate <20 MiB range check still includes every sample after warm-up / 30s,
+including open windows; snapshot read and render latency checks remain in force.
+The instrumentation exists only in debug builds and creates no worker in normal
+operation. Real cable disconnect/reconnect and unsaved close dialogs are separate
+manual desktop checks.
+
+Settings contrast is included in `node docs/tools/contrast-audit.mjs`: light and
+dark schemes, all six categories (including a synthetic Linux layer-shell panel),
+clean/dirty/hover states, native fields and disabled controls. Enabled text requires
+4.5:1; disabled text requires 3:1. A second pass replaces CSS system color keywords
+with deliberately incompatible GTK-like values (light ButtonFace and white
+ButtonText on dark Canvas), including a fallback rule for unstyled controls.
+This models keyword resolution, rather than relying on Chrome's system palette.
+It is not a WebKitGTK execution test.
+
+`node docs/tools/widget-layout-check.mjs` exercises the production renderer with
+synthetic empty/long/short snapshots at 160/340 × 400/960 px, fit on/off. It checks
+mutually exclusive empty/card DOM, header/list/footer bounds and scroll access to
+the last card. A legacy CSS fixture must fail the viewport assertion. The capture
+`widget-layout-preview.png` uses invented provider names and values. Settings
+captures are `settings-preview-light.png` and `settings-preview-dark.png`.
