@@ -93,3 +93,54 @@ The documentation capture measures a single “8” in each visible numeric styl
 using getBoundingClientRect at 200/340/520/700 CSS px and 75/100/150% scale.
 The height/width ratio must stay within ±3% for each theme. Raw measurements
 are written to ignored screenshots/checks/typography.json.
+
+## Separate settings window
+
+The window is created lazily, then hidden on accepted close and reused. Reopening
+loads a fresh saved baseline without remounting the document or registering more
+listeners. Save / Discard / Cancel runs before hiding; hidden settings do not keep
+the widget in placement preview mode. This bounds WebKit webview creation to one
+per application session, with no second webview before settings are first opened.
+
+The gear and context menu open one decorated `settings` window (900 × 680,
+minimum 640 × 480). It follows the system light/dark appearance independently
+of the widget theme. The six categories use a persistent navigation column,
+14 px body type and controls at least 32 px high. Provider onboarding remains
+in the widget; subsequent provider selection belongs to settings.
+
+Changes preview in the widget through `settings-preview`, with a bounded queue
+that retains the latest value. Save commits settings and staged provider/login
+choices; Revert restores the saved baseline. Closing with pending changes shows
+an in-window Save / Discard / Cancel strip. Ctrl+S saves; Esc dismisses the strip.
+Provider previews filter existing snapshot data; newly enabled providers are
+collected only after Save grants consent. Palette buttons show five actual colors
+for the active appearance; accent/background overrides can reset to the palette.
+
+Text colors resolve against the composited ancestor surface after theme layout,
+including transparent cards, badges and the cardless Minimal Pace/XS layouts.
+Text opacity is never reduced with widget opacity. The latter controls the painted
+surface. At effective surface opacity below 70%, a light/dark text shadow provides
+an outline against unpredictable desktop content. Decorative background images
+under text are removed; meter geometry and theme typography are retained.
+`node docs/tools/contrast-audit.mjs` audits visible text at 200 / 340 / 600 px in
+all theme × palette × light/dark × calm/vivid/mono combinations.
+
+Placement defaults to locked. Place widget temporarily unlocks the header and
+shows Save position / Cancel in both windows. The work-area map provides the same
+placement workflow on Wayland, using layer-shell top/left anchors with logical
+pixel margins. Saved positions use a monitor name and `x_ratio` / `y_ratio` within
+the available travel area (work area minus widget dimensions). Off, 12 px edges /
+center and 8 px grid snapping are supported. Disconnect handling keeps the home
+monitor identity, falls back at the same ratios or hides, then restores on return.
+Monitor events coalesce over 400 ms; unchanged native positions are not reapplied.
+
+The separate settings window uses explicit light/dark surface, text, control,
+selection and disabled tokens selected by `prefers-color-scheme`; system color
+keywords are not used for its controls. Disabled text remains opaque and meets
+3:1, enabled text meets 4.5:1. Revert is disabled until the draft changes. Theme
+preview glyphs preserve their palette hue with a contrast correction when needed.
+
+For themes using shared layout (including System), fit-height stops at the
+viewport height. Header and footer remain in normal flex flow; the provider list
+shrinks and scrolls within its paint boundary. Native height requests include the
+list's natural scroll extent so the window can grow again after an empty snapshot.

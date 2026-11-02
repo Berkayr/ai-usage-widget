@@ -1,3 +1,5 @@
+import { repairTextContrast } from './text-contrast.js';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { mountProviders } from './themes/shared/providers.js';
 import './themes/shared/chrome.css';
 import { themes, loadTheme } from './themes/registry.js';
@@ -14,8 +16,9 @@ const motionStyle = document.createElement('style');
 motionStyle.textContent = '*::before,*::after,*{animation:none!important} @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}';
 document.head.append(motionStyle);
 import { invoke } from '@tauri-apps/api/core';
-import { listen } from '@tauri-apps/api/event';
+import { listen, emitTo } from '@tauri-apps/api/event';
 const unlisteners = [];
+let meterObserver;
 let disposed = false;
 const domEvents = new AbortController();
 async function subscribe(name, handler) {
@@ -29,7 +32,7 @@ function dispose() {
   unlisteners.splice(0).forEach(stop => stop());
   clearInterval(pollTimer); clearTimeout(toastTimer);
   cancelAnimationFrame(drawFrame);
-  fitObserver?.disconnect(); meterObserver.disconnect(); themeStyle.remove(); motionStyle.remove();
+  fitObserver?.disconnect(); meterObserver?.disconnect(); themeStyle.remove(); motionStyle.remove();
   systemAppearance.removeEventListener('change', appearanceChanged);
 }
 if (import.meta.hot) { import.meta.hot.dispose(dispose); import.meta.hot.accept(() => location.reload()); }
@@ -47,15 +50,14 @@ let monitorScale = 1;
 
 document.querySelector('#app').innerHTML = `
   <main class="widget" id="widget">
-    <header class="header" data-tauri-drag-region><div class="title-block"><div class="app-title">AI USAGE</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
+    <header class="header"><div class="title-block"><div class="app-title">AI USAGE</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
     <section id="provider-onboarding" hidden></section><div class="provider-list" id="providers"></div>
     <footer class="footer"><span>QUOTA MONITOR</span><span>SYSTEM</span></footer>
-    <section class="settings" id="settings" hidden><header><strong>AI USAGE · SETTINGS</strong><button id="close-settings" aria-label="Close">×</button></header><fieldset><legend>Providers &amp; privacy</legend><div id="provider-settings"></div></fieldset><fieldset><legend>About / Diagnostics</legend><p id="runtime-diagnostics" class="setting-note" role="status">Python diagnostics available in the desktop app.</p></fieldset><fieldset class="theme-section"><legend>Theme</legend><div class="theme-picker" id="theme-picker"></div></fieldset><fieldset class="look-section"><legend>Look</legend><label>Color mode<select id="color-mode"><option value="calm">Calm</option><option value="vivid">Vivid</option><option value="mono">Mono</option></select></label><label>Dot count<select id="dot-count"><option>10</option><option>20</option><option>30</option></select></label><label class="toggle-setting">Match physical size across monitors<input id="match-physical-size" type="checkbox"></label><label>Accent edge<select id="accent-edge"><option value="off">Off</option><option value="auto">Auto</option><option value="left">Left</option><option value="right">Right</option></select></label></fieldset><label>Appearance<select id="appearance"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Palette<select id="palette"></select></label><label>Accent color<input id="accent" type="color"></label><label>Background color<input id="background" type="color"></label><label>Widget opacity <output id="widget-out"></output><input id="widget-opacity" type="range" min="20" max="100"></label><label>Background opacity <output id="background-out"></output><input id="background-opacity" type="range" min="0" max="100"></label><label>Scale <output id="scale-out"></output><input id="scale" type="range" min="50" max="300" step="1"></label><div class="scale-presets">${[['Small',75],['Normal',100],['Large',150],['Huge',200]].map(([label,value])=>`<button data-scale="${value}">${label}</button>`).join('')}</div><label>Position<select id="position"><option>Top right</option><option>Bottom right</option><option>Top left</option><option>Bottom left</option><option>Free</option></select></label><label class="toggle-setting">Fit height to content<input id="fit-height" type="checkbox"></label><label class="toggle-setting">Show extra windows<input id="show-extra-windows" type="checkbox"></label><label class="toggle-setting">Start at login<input id="start-at-login" type="checkbox" disabled></label><p id="autostart-status" class="setting-note" role="status" hidden></p><section id="linux-settings" hidden><fieldset class="desktop-settings" id="desktop-layer" hidden><legend>Desktop layer</legend><label>Layer<select id="linux-layer"><option value="top">Above windows</option><option value="bottom">On desktop</option></select></label><label>Margin <output id="linux-margin-out"></output><input id="linux-margin" type="range" min="0" max="64" step="1"></label><label>Monitor<select id="linux-monitor"><option value="">Auto</option></select></label></fieldset><p id="desktop-layer-unavailable" class="setting-note" hidden>Desktop layer controls require layer-shell support. Use your desktop's panel integration for a fixed position.</p></section><fieldset class="taskbar-settings" id="taskbar-settings"><legend>Taskbar strip</legend><label class="toggle-setting">Enable taskbar strip<input id="taskbar-enabled" type="checkbox"></label><div class="taskbar-providers"><label class="toggle-setting">Claude<input type="checkbox" data-taskbar-provider="claude"></label><label class="toggle-setting">Codex<input type="checkbox" data-taskbar-provider="codex"></label><label class="toggle-setting">Gemini<input type="checkbox" data-taskbar-provider="gemini"></label><label class="toggle-setting">Copilot<input type="checkbox" data-taskbar-provider="copilot"></label></div><label>Style<select id="taskbar-style"><option value="transparent">Transparent</option><option value="chip">Chip</option></select></label><label>Theme<select id="taskbar-theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Quota window<select id="taskbar-window"><option value="session">Session</option><option value="weekly">Weekly</option><option value="both">Both</option></select></label><label class="toggle-setting">Show mini bars<input id="taskbar-bars" type="checkbox"></label></fieldset></section>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
     <div class="toast" id="toast" hidden></div>
   </main>`;
 
-const $ = (selector) => document.querySelector(selector);
+const $ = selector => document.querySelector(selector);
 // Palette files use opaque hex colors. Correct text against its actual surface.
 const rgb = hex => hex.replace('#', '').match(/../g).slice(0, 3).map(n => parseInt(n, 16));
 function mix(a, b, weight) { return '#' + rgb(a).map((v, i) => Math.round(v * weight + rgb(b)[i] * (1 - weight)).toString(16).padStart(2, '0')).join(''); }
@@ -108,43 +110,24 @@ function applySettings() {
   }
   settings.dotCount = [10,20,30].includes(Number(settings.dotCount)) ? Number(settings.dotCount) : 20;
   document.documentElement.dataset.dotCount = settings.dotCount;
-  $('#dot-count').value = settings.dotCount;
-  $('#match-physical-size').checked = Boolean(settings.matchPhysicalSize);
   const effectiveScale = settings.scale / (settings.matchPhysicalSize ? monitorScale : 1);
-  $('#color-mode').value = settings.colorMode;
-  $('#accent-edge').value = settings.accentEdge;
   document.documentElement.style.setProperty('--widget-opacity', settings.widgetOpacity / 100);
   document.documentElement.style.setProperty('--background-opacity', settings.backgroundOpacity / 100);
   document.documentElement.style.setProperty('--ui-scale', effectiveScale / 100);
   document.documentElement.style.fontSize = `${16 * effectiveScale / 100}px`;
   document.documentElement.classList.toggle('fit-height', Boolean(settings.fitHeight)); lastFitHeight = 0;
   settings.taskbar = { ...defaultTaskbar, ...settings.taskbar, colorMode: settings.colorMode, dotCount: settings.dotCount };
-  if (desktopInfo?.platform === 'linux') {
-    settings.linux = { layer: 'bottom', margin: 12, monitor: null, ...settings.linux };
-    $('#linux-layer').value = settings.linux.layer;
-    $('#linux-margin').value = Math.max(0, Math.min(64, settings.linux.margin));
-    $('#linux-margin-out').value = `${$('#linux-margin').value} px`;
-    const monitor = settings.linux.monitor;
-    if (monitor !== null && ![...$('#linux-monitor').options].some(option => option.value === String(monitor)))
-      $('#linux-monitor').add(new Option(`${typeof monitor === 'number' ? `Monitor ${monitor + 1}` : monitor} (unavailable)`, monitor));
-    $('#linux-monitor').value = monitor ?? '';
+  document.documentElement.dataset.translucent = String(settings.widgetOpacity * settings.backgroundOpacity < 7000);
+  $('#widget').classList.toggle('placing', !!settings.placementEditing);
+  document.querySelector('.placement-bar')?.remove();
+  if (settings.placementEditing) {
+    const bar = document.createElement('div'); bar.className='placement-bar'; bar.append(document.createTextNode('Drag to place · '));
+    for (const [label,action] of [['Save position','save'],['Cancel','cancel']]) { const b=document.createElement('button'); b.textContent=label; b.onclick=()=>emitTo('settings','placement-action',action); bar.append(b); }
+    $('#widget').prepend(bar);
   }
-  $('#appearance').value = settings.appearance;
-  $('#taskbar-style').value = settings.taskbar.style;
-  $('#taskbar-theme').value = settings.taskbar.theme;
-  $('#taskbar-enabled').checked = settings.taskbar.enabled;
-  $('#taskbar-window').value = settings.taskbar.window;
-  $('#taskbar-bars').checked = settings.taskbar.showBars;
-  document.querySelectorAll('[data-taskbar-provider]').forEach(input => { input.checked = settings.taskbar.providers.includes(input.dataset.taskbarProvider); });
-  $('#palette').value = settings.palette;
-  $('#accent').value = settings.accent || palette.accent;
-  $('#background').value = settings.background || palette.bgWidget;
-  $('#widget-opacity').value = settings.widgetOpacity; $('#widget-out').value = `${settings.widgetOpacity}%`;
-  $('#background-opacity').value = settings.backgroundOpacity; $('#background-out').value = `${settings.backgroundOpacity}%`;
-  $('#show-extra-windows').checked = Boolean(settings.showExtraWindows);
-  $('#scale').value = settings.scale; $('#scale-out').value = `${settings.scale}%`;
-  $('#fit-height').checked = Boolean(settings.fitHeight); $('#position').value = settings.position;
-  if (currentSnapshot) draw(currentSnapshot, currentNoData);
+  const header = $('.header'); header.removeAttribute('data-tauri-drag-region');
+  header.style.cursor = settings.lockPosition === false ? 'grab' : 'default';
+  if (currentSnapshot || currentNoData) draw(currentSnapshot, currentNoData);
   if (!isSample) invoke('resize_widget', { scale: Math.round(effectiveScale) }).catch(() => {});
 }
 let drawFrame = 0;
@@ -171,9 +154,12 @@ function draw(snapshot, noData = false) {
     if (disposed) return;
     const snapshot = currentSnapshot;
     const noData = currentNoData;
-    const visible = snapshotOld(snapshot) ? { ...snapshot, providers: (snapshot.providers || []).map(p => ({ ...p, stale: true, state: ['OK', 'STALE'].includes(p.state) ? 'STALE' : p.state })) } : snapshot;
+    const filtered = settings.providerPreview && snapshot ? {...snapshot,providers:(snapshot.providers||[]).filter(p=>settings.providerPreview.includes(p.id))}:snapshot;
+    const visible = snapshotOld(snapshot) ? { ...snapshot, providers: (snapshot.providers || []).map(p => ({ ...p, stale: true, state: ['OK', 'STALE'].includes(p.state) ? 'STALE' : p.state })) } : filtered;
+    if (settings.providerPreview && visible?.providers) visible.providers=visible.providers.filter(p=>settings.providerPreview.includes(p.id));
     renderSnapshot($('#providers'), visible, { noData, showExtraWindows: settings.showExtraWindows });
     $('#updated').textContent = snapshot?.generated_at ? `SYNC ${new Date(snapshot.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'NO DATA YET';
+    repairTextContrast($('#widget'));
     requestFit();
     if (!isSample) {
       console.debug('snapshot-rendered', snapshot?.generated_at);
@@ -191,7 +177,10 @@ async function requestFit() {
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   fitPending = false;
   if (disposed) return;
-  const height = Math.ceil($('#widget').getBoundingClientRect().height);
+  const list = $('#providers');
+  // Include scrollable overflow so the native window can still grow after a
+  // short/empty snapshot. The native monitor cap decides the final height.
+  const height = Math.ceil($('#widget').getBoundingClientRect().height + Math.max(0, list.scrollHeight - list.clientHeight));
   if (Math.abs(height - lastFitHeight) < 2) return;
   lastFitHeight = height;
   invoke('fit_window_height', { heightCssPx: height }).catch(() => {});
@@ -204,15 +193,6 @@ async function persist() { if (!isSample) try { localStorage.setItem('widgetThem
 let toastTimer;
 function showToast(message) { clearTimeout(toastTimer); const el = $('#toast'); el.textContent = message; el.hidden = false; toastTimer = setTimeout(() => { el.hidden = true; }, 3200); }
 
-const previews = { system: '━━━━', 'dot-matrix': '••••••', 'circular-rings': '◉ ◎', terminal: '[▓▓░░]', 'frosted-glass': '▰ ▰', brutalist: '84%', 'compact-strip': '━ ━ ━', 'retro-lcd': '▮▮▮▯▯', 'minimal-pace': '──┊──' };
-for (const item of themes) {
-  const button = document.createElement('button');
-  button.type = 'button'; button.dataset.theme = item.id; button.setAttribute('aria-pressed', 'false');
-  const preview = document.createElement('span'); preview.className = 'theme-preview'; preview.textContent = previews[item.id]; preview.setAttribute('aria-hidden', 'true');
-  button.append(preview, document.createTextNode(item.name.replace(/^01 /, '')));
-  button.onclick = async () => { try { await activateTheme(item.id); await persist(); } catch (error) { showToast(`Unable to load theme: ${error}`); } };
-  $('#theme-picker').append(button);
-}
 async function activateTheme(id) {
   const request = ++themeRequest;
   const loaded = await loadTheme(id);
@@ -221,103 +201,26 @@ async function activateTheme(id) {
   settings.theme = theme.id;
   themeStyle.textContent = loaded.css;
   document.documentElement.dataset.theme = theme.id;
-  $('#palette').replaceChildren();
-  for (const [key, value] of Object.entries(theme.palettes)) $('#palette').add(new Option(value.name, key));
   if (!theme.palettes[settings.palette]) settings.palette = Object.keys(theme.palettes)[0];
   settings.accent = null; settings.background = null;
-  document.querySelectorAll('.theme-picker [data-theme]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.theme === theme.id)));
   $('.footer span:last-child').textContent = theme.name.toUpperCase();
   applySettings();
-  if (currentSnapshot) draw(currentSnapshot, currentNoData);
+  if (currentSnapshot || currentNoData) draw(currentSnapshot, currentNoData);
   requestFit();
 }
 function appearanceChanged() { if (settings.appearance === 'auto') applySettings(); }
 systemAppearance.addEventListener('change', appearanceChanged);
-for (const [id, key] of [['color-mode', 'colorMode'], ['accent-edge', 'accentEdge']]) $(`#${id}`).onchange = async event => { settings[key] = event.target.value; applySettings(); await persist(); };
-$('#dot-count').onchange = async event => { settings.dotCount = Number(event.target.value); applySettings(); await persist(); };
-$('#match-physical-size').onchange = async event => { settings.matchPhysicalSize = event.target.checked; applySettings(); await persist(); };
-$('#appearance').onchange = async event => { settings.appearance = event.target.value; applySettings(); await persist(); };
-for (const key of ['style', 'theme']) $(`#taskbar-${key}`).onchange = async event => { settings.taskbar[key] = event.target.value; await persist(); };
-$('#taskbar-enabled').onchange = async event => { settings.taskbar.enabled = event.target.checked; await persist(); };
-$('#taskbar-window').onchange = async event => { settings.taskbar.window = event.target.value; await persist(); };
-$('#taskbar-bars').onchange = async event => { settings.taskbar.showBars = event.target.checked; await persist(); };
-document.querySelectorAll('[data-taskbar-provider]').forEach(input => input.onchange = async () => { settings.taskbar.providers = [...document.querySelectorAll('[data-taskbar-provider]:checked')].map(input => input.dataset.taskbarProvider); await persist(); });
-$('#start-at-login').onchange = async event => {
-  const enabled = event.target.checked;
-  event.target.disabled = true;
-  try {
-    if (!isSample) await invoke('set_autostart', { enabled });
-    event.target.checked = isSample ? enabled : await invoke('get_autostart');
-    $('#autostart-status').hidden = true;
-  } catch (error) {
-    event.target.checked = !enabled;
-    $('#autostart-status').textContent = `Unable to change start at login: ${error}`;
-    $('#autostart-status').hidden = false;
-  } finally { event.target.disabled = false; }
-};
-for (const key of ['layer', 'margin', 'monitor']) $(`#linux-${key}`).onchange = async event => {
-  const raw = event.target.value;
-  settings.linux[key] = key === 'margin' ? Math.max(0, Math.min(64, Number(raw))) : key === 'monitor' ? (raw === '' ? null : /^\d+$/.test(raw) ? Number(raw) : raw) : raw;
-  applySettings();
-  await persist();
-};
-$('#linux-margin').oninput = event => { $('#linux-margin-out').value = `${event.target.value} px`; };
-async function loadDesktopSettings() {
-  try {
-    desktopInfo = await invoke('get_desktop_info');
-    $('#taskbar-settings').hidden = desktopInfo.platform !== 'windows';
-    $('#linux-settings').hidden = desktopInfo.platform !== 'linux';
-    $('#desktop-layer').hidden = !desktopInfo.layerShell;
-    $('#desktop-layer-unavailable').hidden = desktopInfo.layerShell;
-    for (const monitor of desktopInfo.monitors) $('#linux-monitor').add(new Option(monitor.name, monitor.name));
-    if (desktopInfo.layerShell) {
-      const free = [...$('#position').options].find(option => option.value === 'Free');
-      free.disabled = true;
-    }
-    applySettings();
-  } catch (error) { showToast(`Unable to read desktop capabilities: ${error}`); }
-  try {
-    $('#start-at-login').checked = await invoke('get_autostart');
-    $('#start-at-login').disabled = false;
-  } catch (error) {
-    $('#autostart-status').textContent = `Start at login unavailable: ${error}`;
-    $('#autostart-status').hidden = false;
-  }
-}
-async function loadRuntimeDiagnostics() {
-  if (isSample) return;
-  const target = $('#runtime-diagnostics');
-  target.textContent = 'Checking runtime diagnostics…';
-  const [runtime, desktop] = await Promise.allSettled([
-    invoke('get_runtime_diagnostics'), invoke('get_desktop_info'),
-  ]);
-  const runtimeText = runtime.status === 'fulfilled'
-    ? `Python ${runtime.value.paths.python_version} (${runtime.value.paths.runtime_source}) — ${runtime.value.paths.python}`
-    : String(runtime.reason);
-  const monitorWarning = desktop.status === 'fulfilled' ? desktop.value.monitorWarning : null;
-  target.textContent = [runtimeText, monitorWarning].filter(Boolean).join(' • ');
-}
-$('#gear').onclick = () => { $('#settings').hidden = !$('#settings').hidden; if (!$('#settings').hidden) loadRuntimeDiagnostics(); };
-$('#close-settings').onclick = () => { $('#settings').hidden = true; };
-$('#palette').onchange = async (event) => { settings.palette = event.target.value; settings.accent = null; settings.background = null; applySettings(); await persist(); };
-$('#accent').oninput = async (event) => { settings.accent = event.target.value; applySettings(); await persist(); };
-$('#background').oninput = async (event) => { settings.background = event.target.value; applySettings(); await persist(); };
-$('#widget-opacity').oninput = async (event) => { settings.widgetOpacity = Number(event.target.value); applySettings(); await persist(); };
-$('#background-opacity').oninput = async (event) => { settings.backgroundOpacity = Number(event.target.value); applySettings(); await persist(); };
-$('#show-extra-windows').onchange = async (event) => { settings.showExtraWindows = event.target.checked; try { localStorage.setItem('showExtraWindows', String(settings.showExtraWindows)); } catch {} draw(currentSnapshot, currentNoData); await persist(); };
-$('#scale').oninput = async event => { settings.scale = Number(event.target.value); applySettings(); requestFit(); await persist(); };
-document.querySelectorAll('[data-scale]').forEach(button => button.onclick = async () => { settings.scale = Number(button.dataset.scale); applySettings(); requestFit(); await persist(); });
-$('#fit-height').onchange = async event => { settings.fitHeight = event.target.checked; applySettings(); if (settings.fitHeight) requestFit(); await persist(); };
-$('#position').onchange = async event => { settings.position = event.target.value; applySettings(); if (!isSample) try { await invoke('snap_window', { corner: settings.position }); } catch (error) { showToast(String(error)); } await persist(); };
+const openSettings = () => isSample ? window.open('/?settings&sample', 'settings', 'width=900,height=680') : invoke('open_settings').catch(error => showToast(String(error)));
+$('#gear').onclick = openSettings;
 $('#widget').addEventListener('contextmenu', event => { event.preventDefault(); $('#context-menu').hidden = false; $('#context-menu').style.left = `${event.clientX}px`; $('#context-menu').style.top = `${event.clientY}px`; }, { signal: domEvents.signal });
 document.addEventListener('click', event => { if (!event.target.closest('#context-menu')) $('#context-menu').hidden = true; }, { signal: domEvents.signal });
 $('#refresh').onclick = async () => { if (isSample) return draw(currentSample()); try { await invoke('refresh_now'); } catch (error) { showToast(String(error)); } };
-$('#menu-settings').onclick = () => { $('#settings').hidden = false; loadRuntimeDiagnostics(); };
+$('#menu-settings').onclick = openSettings;
 
-$('#taskbar-settings').hidden = !isSample && !/Windows/i.test(navigator.userAgent);
 await activateTheme(settings.theme);
+$('.header').addEventListener('pointerdown', event => { if (event.button === 0 && settings.lockPosition === false && !event.target.closest('button') && !isSample) getCurrentWindow().startDragging().catch(() => showToast('Use the monitor map to place this widget.')); }, { signal: domEvents.signal });
 let lastTier;
-const meterObserver = new ResizeObserver(() => { const tier = $('#app').clientWidth < 220 * parseFloat(getComputedStyle(document.documentElement).fontSize) / 16; if (tier !== lastTier) { lastTier = tier; if (currentSnapshot) draw(currentSnapshot,currentNoData); } });
+meterObserver = new ResizeObserver(() => { const tier = $('#app').clientWidth < 220 * parseFloat(getComputedStyle(document.documentElement).fontSize) / 16; if (tier !== lastTier) { lastTier = tier; if (currentSnapshot || currentNoData) draw(currentSnapshot,currentNoData); } });
 meterObserver.observe($('#app'));
 fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === '+' || event.key === '=') settings.scale = Math.min(300, settings.scale + 10); else if (event.key === '-') settings.scale = Math.max(50, settings.scale - 10); else if (event.key === '0') settings.scale = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
 if (isSample) draw(currentSample());
@@ -326,12 +229,12 @@ else {
     settings = { ...settings, ...(await invoke('load_settings')) };
     // Older native settings structs discard unknown fields; keep the theme in
     // the webview store until the native schema includes it.
-    try { settings.theme = localStorage.getItem('widgetTheme') || settings.theme; Object.assign(settings, JSON.parse(localStorage.getItem('widgetLook') || '{}')); } catch {}
+
     const overrides = { accent: settings.accent, background: settings.background };
     await activateTheme(settings.theme); Object.assign(settings, overrides); applySettings();
     await subscribe('monitor-scale', event => { const factor = Number(event.payload); if (factor > 0 && factor !== monitorScale) { monitorScale = factor; applySettings(); } });
     monitorScale = await invoke('get_monitor_scale');
-    await loadDesktopSettings();
+    desktopInfo = await invoke('get_desktop_info');
     async function loadProviders() {
       const config = await invoke('get_provider_config');
       const save = async providers => { await invoke('configure_providers', { providers }); };
@@ -340,12 +243,12 @@ else {
         await loadProviders();
         try { await invoke('refresh_now'); } catch (error) { showToast(String(error)); }
       };
-      mountProviders($('#provider-settings'), config, save, saved);
       $('#provider-onboarding').hidden = config.initialized;
       $('#providers').hidden = !config.initialized;
       if (!config.initialized) mountProviders($('#provider-onboarding'), config, save, saved);
     }
     await loadProviders();
+    await subscribe('provider-config-changed', loadProviders);
     await subscribe('snapshot', event => acceptSnapshot(event.payload.snapshot));
     const initial = await invoke('get_snapshot'); acceptSnapshot(initial.snapshot);
     // Events deliver writes immediately; poll only as recovery and age check.
@@ -365,7 +268,11 @@ else {
     };
     document.addEventListener('visibilitychange', updateVisibility, { signal: domEvents.signal });
     updateVisibility();
-    await subscribe('open-settings', () => { $('#settings').hidden = false; loadRuntimeDiagnostics(); });
+    await subscribe('open-settings', openSettings);
+    await subscribe('settings-preview', async event => {
+      const next = event.payload; const overrides = { accent: next.accent, background: next.background };
+      settings = { ...settings, ...next }; await activateTheme(settings.theme); Object.assign(settings, overrides); applySettings();
+    });
     await subscribe('taskbar-settings-changed', event => { settings.taskbar = { ...defaultTaskbar, ...event.payload }; applySettings(); });
     await subscribe('refresh-error', event => showToast(event.payload));
   } catch (error) { draw(sample, true); showToast(`Unable to load quota data: ${error}`); }
@@ -379,7 +286,6 @@ if (new URLSearchParams(location.search).has('sample') && window.__QUOTA_DOCS_FI
   const overrides = { accent: settings.accent, background: settings.background };
   await activateTheme(settings.theme); Object.assign(settings, overrides); applySettings();
   draw(fixture.snapshot);
-  $('#settings').hidden = !fixture.openSettings;
   if (fixture.providerConfig) {
     const config = structuredClone(fixture.providerConfig);
     const save = async ids => {
@@ -387,10 +293,11 @@ if (new URLSearchParams(location.search).has('sample') && window.__QUOTA_DOCS_FI
       for (const [id, provider] of Object.entries(config.providers)) provider.enabled = ids.includes(id);
       window.__QUOTA_DOCS_PROVIDER_SELECTION__ = ids;
     };
-    mountProviders($('#provider-settings'), config, save);
     $('#provider-onboarding').hidden = config.initialized;
     $('#providers').hidden = !config.initialized;
     if (!config.initialized) mountProviders($('#provider-onboarding'), config, save, () => { $('#provider-onboarding').hidden = true; $('#providers').hidden = false; });
   }
   window.__QUOTA_DOCS_READY__ = true;
 }
+
+if (isSample) window.__AI_USAGE_DEMO__ = { async setSnapshot(snapshot, noData = false) { draw(snapshot, noData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setSettings(next) { settings = {...settings,...next}; const overrides={accent:settings.accent,background:settings.background}; await activateTheme(settings.theme); Object.assign(settings,overrides); applySettings(); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, themes, getSettings:()=>structuredClone(settings) };

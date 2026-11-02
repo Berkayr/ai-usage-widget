@@ -773,7 +773,7 @@ impl Strip {
         settings.taskbar = self.model.settings.clone();
         let result = self.app.get_webview_window("main")
             .ok_or_else(|| "Widget window is unavailable".to_string())
-            .and_then(|window| save_settings(window, settings));
+            .and_then(|_| save_settings(self.app.clone(), settings));
         match result {
             Ok(()) => {
                 let _ = self

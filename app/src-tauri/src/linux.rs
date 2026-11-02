@@ -7,6 +7,7 @@ use std::{cell::RefCell, ffi::c_void, fs, sync::atomic::{AtomicBool, Ordering}};
 type Window = *mut gtk::ffi::GtkWindow;
 thread_local! {
     static SHELL: RefCell<Option<Library>> = const { RefCell::new(None) };
+    static LAST_PLACEMENT: RefCell<Option<(String,i32,i32,String)>> = const { RefCell::new(None) };
     static MONITOR_WARNING: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 static SETTINGS_OPEN: AtomicBool = AtomicBool::new(false);
@@ -145,14 +146,16 @@ pub fn resize_layer(window: &tauri::WebviewWindow, width: Option<i32>, height: O
         let Ok(gtk) = target.gtk_window() else { return };
         let (old_width, old_height) = gtk.size_request();
         let display = gtk.display();
-        let settings = super::load_settings();
+        let settings = super::settings_window::current();
         let monitor = selected_monitor(&display, &settings.linux.monitor);
         let max_height = monitor
             .map(|m| m.workarea().height() - 2 * settings.linux.margin.clamp(0,64))
             .unwrap_or(640).max(80);
         let height = height.map(|h| h.ceil().clamp(80.0, max_height as f64) as i32)
             .unwrap_or(old_height).clamp(80, max_height);
-        gtk.set_size_request(width.unwrap_or(old_width), height);
+        let requested_width=width.unwrap_or(old_width);
+        if old_width!=requested_width || old_height!=height { gtk.set_size_request(requested_width, height); }
+        let _=crate::placement::apply(&target,&settings);
     }).map_err(|e| e.to_string())
 }
 pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
@@ -328,3 +331,31 @@ mod tests {
         assert!(write_autostart(std::path::Path::new("/unused"),std::path::Path::new("/opt/bad\nExec=other"),true).is_err());
     }
 }
+
+pub fn placement_monitors() -> Vec<crate::placement::Monitor> {
+    gtk::gdk::Display::default().map(|display| (0..display.n_monitors()).filter_map(|i|display.monitor(i).map(|m| {
+        let area=m.workarea(); crate::placement::Monitor { name:monitor_name(&display,i,&m),x:area.x(),y:area.y(),width:area.width().max(1) as u32,height:area.height().max(1) as u32,primary:display.primary_monitor().as_ref()==Some(&m) || (display.primary_monitor().is_none() && i==0),scale:m.scale_factor() as f64 }
+    })).collect()).unwrap_or_default()
+}
+pub fn place(window: &tauri::WebviewWindow, options: &Options, name: &str, x: i32, y: i32) {
+    let key=(name.to_owned(),x,y,options.layer.clone());
+    if LAST_PLACEMENT.with(|last|last.borrow().as_ref()==Some(&key)) {return;}
+    LAST_PLACEMENT.with(|last|*last.borrow_mut()=Some(key));
+    let Ok(gtk)=window.gtk_window() else {return}; let display=gtk.display();
+    let monitor=selected_monitor(&display,&Some(MonitorSelection::Name(name.into())));
+    // Apply layer and then replace all four anchors/margins. Layer-shell margins
+    // are logical pixels; workarea offsets account for desktop panels.
+    let mut options=options.clone(); options.monitor=Some(MonitorSelection::Name(name.into())); apply(window,&options,"Top left");
+    unsafe { SHELL.with(|slot| { let lib=slot.borrow();let Some(lib)=lib.as_ref() else {return};let ptr=gtk.upcast_ref::<gtk::Window>().to_glib_none().0;
+        let (ox,oy)=monitor.map(|m|{let a=m.workarea();let g=m.geometry();(a.x()-g.x(),a.y()-g.y())}).unwrap_or((0,0));
+        for edge in 0..4 {call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_anchor\0").unwrap()(ptr,edge,(edge==0 || edge==2) as i32);call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_margin\0").unwrap()(ptr,edge,match edge {0=>x+ox,2=>y+oy,_=>0});}
+    }); }
+}
+pub fn watch_monitors(app: tauri::AppHandle) {
+    if let Some(display)=gtk::gdk::Display::default() {
+        let added=app.clone(); display.connect_monitor_added(move |_,_|crate::placement::monitor_changed(added.clone()));
+        display.connect_monitor_removed(move |_,_|crate::placement::monitor_changed(app.clone()));
+    }
+}
+
+pub fn invalidate_placement() { LAST_PLACEMENT.with(|last|*last.borrow_mut()=None); }
