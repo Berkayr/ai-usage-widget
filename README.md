@@ -171,3 +171,13 @@ Bug reports, provider samples with invented data, and desktop compatibility chec
 ## License
 
 AI Usage is licensed under the [MIT License](LICENSE). Bundled font dependencies retain their own upstream licenses; see the app's font resources. Provider names identify compatible tools and do not imply affiliation.
+
+## Shapes
+
+Choose **Portrait**, **Landscape**, or **Square** in **Layout & Position**.
+Every theme fills the same box for the selected shape and size. Landscape
+arranges up to six providers in columns; square shows up to four per page with
+numbered navigation for additional providers. Medium is 680 × 340 for landscape
+and 340 × 340 for square; all five size presets scale proportionally.
+
+![Landscape and square themes with fictional data](docs/screenshots/shapes.png)
