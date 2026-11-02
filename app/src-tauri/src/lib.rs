@@ -103,7 +103,40 @@ fn get_snapshot() -> Value { json!({"snapshot": read_snapshot()}) }
 #[tauri::command]
 fn refresh_now(app: tauri::AppHandle) -> Result<(), String> { refresh()?; emit_snapshot(&app); Ok(()) }
 #[tauri::command]
-fn load_settings() -> Settings { fs::read(settings_path()).ok().and_then(|data| serde_json::from_slice(&data).ok()).unwrap_or_default() }
+fn load_settings() -> Settings { fs::read(settings_path()).ok().map(|data| parse_settings(&data)).unwrap_or_default() }
+
+// Recover persisted fields independently; IPC deserialization remains strict.
+fn parse_settings(data: &[u8]) -> Settings {
+    if let Ok(settings) = serde_json::from_slice::<Settings>(data) { return settings; }
+    fn overlay(current: &mut Value, path: &mut Vec<String>, incoming: &Value) {
+        if let Value::Object(fields) = incoming {
+            for (key, value) in fields {
+                let key = match (path.as_slice(), key.as_str()) {
+                    ([parent], "xRatio") if parent == "placement" => "x_ratio",
+                    ([parent], "yRatio") if parent == "placement" => "y_ratio",
+                    _ => key,
+                };
+                path.push(key.to_owned());
+                overlay(current, path, value);
+                path.pop();
+            }
+            return;
+        }
+        let mut candidate = current.clone();
+        let mut slot = &mut candidate;
+        for key in path.iter() {
+            let Some(next) = slot.as_object_mut().and_then(|object| object.get_mut(key)) else { return; };
+            slot = next;
+        }
+        *slot = incoming.clone();
+        if serde_json::from_value::<Settings>(candidate.clone()).is_ok() { *current = candidate; }
+    }
+    let mut value = serde_json::to_value(Settings::default()).expect("Settings serialize");
+    if let Ok(Value::Object(fields)) = serde_json::from_slice::<Value>(data) {
+        overlay(&mut value, &mut Vec::new(), &Value::Object(fields));
+    }
+    serde_json::from_value(value).unwrap_or_default()
+}
 #[tauri::command]
 fn save_settings(app: tauri::AppHandle, mut settings: Settings) -> Result<(), String> {
     settings.taskbar.color_mode=settings.color_mode.clone();
@@ -253,9 +286,10 @@ mod settings_tests {
     #[cfg(target_os = "linux")]
     fn partial_settings_preserve_explicit_monitor() {
         let settings: Settings = serde_json::from_str(
-            r#"{"linux":{"layer":"top","margin":16,"monitor":"HDMI-A-1"}}"#,
+            r#"{"linux":{"monitor":"HDMI-A-1"},"scale":150}"#,
         ).unwrap();
         assert!(settings.linux.monitor.as_ref().unwrap().matches(1, "HDMI-A-1"));
+        assert_eq!(settings.scale, 150);
         assert_eq!(settings.palette, Settings::default().palette);
         assert_eq!(settings.widget_opacity, 100);
         assert_eq!(settings.background_opacity, 100);
@@ -269,5 +303,33 @@ mod settings_tests {
         assert_eq!(settings.widget_opacity, 75);
         // Invalid explicit values must still be rejected.
         assert!(serde_json::from_str::<Settings>(r#"{"widgetOpacity":"invalid"}"#).is_err());
+    }
+}
+
+#[cfg(test)]
+mod settings_recovery_tests {
+    use super::*;
+    #[test]
+    fn legacy_complete_file_preserves_values_without_theme() {
+        let mut old = serde_json::to_value(Settings::default()).unwrap();
+        for key in ["theme", "colorMode", "dotCount", "accentEdge"] { old.as_object_mut().unwrap().remove(key); }
+        old["scale"] = json!(150); old["position"] = json!("Free");
+        old["placement"]["y_ratio"] = json!(1.0); old["widgetOpacity"] = json!(75);
+        #[cfg(target_os="linux")] { old["linux"]["monitor"] = json!("HDMI-A-1"); }
+        let settings = parse_settings(&serde_json::to_vec(&old).unwrap());
+        assert_eq!(settings.scale,150); assert_eq!(settings.position,"Free");
+        assert_eq!(settings.placement.y_ratio,1.0); assert_eq!(settings.widget_opacity,75);
+        assert_eq!(settings.theme,"system");
+        #[cfg(target_os="linux")] assert!(settings.linux.monitor.unwrap().matches(0,"HDMI-A-1"));
+    }
+    #[test]
+    fn invalid_fields_do_not_discard_valid_siblings() {
+        let settings = parse_settings(br#"{"scale":150,"theme":false,"widgetOpacity":"bad","unknown":42,"placement":{"yRatio":1.0,"x_ratio":"bad"},"linux":{"monitor":"HDMI-A-1","margin":"bad"},"taskbar":{"enabled":true,"dotCount":"bad"}}"#);
+        assert_eq!(settings.scale,150); assert_eq!(settings.theme,"system");
+        assert_eq!(settings.widget_opacity,100); assert_eq!(settings.placement.y_ratio,1.0);
+        assert_eq!(settings.placement.x_ratio,1.0); assert!(settings.taskbar.enabled);
+        assert_eq!(settings.taskbar.dot_count,20);
+        #[cfg(target_os="linux")] { assert!(settings.linux.monitor.unwrap().matches(0,"HDMI-A-1")); assert_eq!(settings.linux.margin,12); }
+        assert_eq!(parse_settings(b"broken").scale,100);
     }
 }

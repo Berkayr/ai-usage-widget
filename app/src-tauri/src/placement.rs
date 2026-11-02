@@ -40,11 +40,15 @@ fn widget_size(window: &tauri::WebviewWindow) -> (u32,u32) {
     #[cfg(target_os="linux")] { use gtk::prelude::*; if let Ok(gtk)=window.gtk_window() { let (w,h)=gtk.size_request(); return (if linux::layered() {w.max(1)} else {gtk.allocated_width().max(1)} as u32,if linux::layered() {h.max(1)} else {gtk.allocated_height().max(1)} as u32); } }
     window.outer_size().map(|s|(s.width,s.height)).unwrap_or((340,640))
 }
-pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),String> {
-    let list=monitors(window);
+pub(crate) fn selected<'a>(list: &'a [Monitor], settings: &Settings) -> Option<&'a Monitor> {
     let mut p=settings.placement.clone();
     #[cfg(target_os="linux")] if p.monitor.is_none() { match &settings.linux.monitor { Some(linux::MonitorSelection::Name(name))=>p.monitor=Some(name.clone()), Some(linux::MonitorSelection::Index(index))=>p.monitor=usize::try_from(*index).ok().and_then(|i|list.get(i)).map(|m|m.name.clone()), _=>() } }
-    let Some(monitor)=select(&list,&p) else { let _=window.hide(); return Ok(()); };
+    select(list,&p)
+}
+pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),String> {
+    let list=monitors(window);
+    let p=&settings.placement;
+    let Some(monitor)=selected(&list,settings) else { let _=window.hide(); return Ok(()); };
     let (width,height)=widget_size(window);
     let clipped=(width.min(monitor.width),height.min(monitor.height));
     if clipped!=(width,height) {
@@ -94,6 +98,21 @@ pub fn watch(app: tauri::AppHandle) {
     use super::*;
     fn monitor(name:&str,primary:bool)->Monitor {Monitor{name:name.into(),x:0,y:0,width:1920,height:1080,primary,scale:1.}}
     #[test] fn ratios_clip_and_roundtrip() { for r in [0.,0.25,0.5,1.] {assert!((ratio(pixel(r,1920,340),1920,340)-r).abs()<0.001);} assert_eq!(pixel(2.,100,20),80);assert_eq!(pixel(-1.,100,20),0);assert_eq!(pixel(f64::NAN,100,20),0);assert_eq!(pixel(0.5,100,200),0);assert_eq!(ratio(99,100,200),0.); }
+    #[test] fn growing_height_keeps_bottom_inside_workarea() {
+        // 1536x960 logical output, 40 px top panel, scale 90%.
+        let panel=40; let area=960-panel;
+        let initial=(640.0_f64*0.9).round() as u32;
+        let grown=(730.0_f64*0.9).round() as u32;
+        let first=pixel(1.0,area,initial);
+        let next=pixel(1.0,area,grown);
+        assert!(next<first);
+        assert_eq!(next+grown as i32,area as i32);
+        assert_eq!(panel as i32+next+grown as i32,960);
+        for height in [initial,grown,area,area+100] {
+            let clipped=height.min(area);
+            assert_eq!(panel as i32+pixel(1.0,area,clipped)+clipped as i32,960);
+        }
+    }
     #[test] fn snapping() {assert_eq!(snap(9,100,"edges"),0);assert_eq!(snap(46,100,"edges"),50);assert_eq!(snap(94,100,"edges"),100);assert_eq!(snap(46,100,"off"),46);assert_eq!(snap(46,100,"grid"),48);assert_eq!(snap(100,99,"grid"),96);}
     #[test] fn missing_monitor_returns_and_falls_back() {let list=vec![monitor("A",true),monitor("B",false)]; let mut p=Placement{monitor:Some("gone".into()),..Default::default()}; assert_eq!(select(&list,&p).unwrap().name,"A");p.disconnected="monitor".into();p.fallback_monitor=Some("B".into());assert_eq!(select(&list,&p).unwrap().name,"B");p.disconnected="hide".into();assert!(select(&list,&p).is_none());p.monitor=Some("B".into());assert_eq!(select(&list,&p).unwrap().name,"B");}
     #[test] fn position_schema_roundtrip() {let p:Placement=serde_json::from_str(r#"{"monitor":"Synthetic","x_ratio":0.25,"y_ratio":0.75}"#).unwrap();assert_eq!(p.x_ratio,0.25);let value=serde_json::to_value(p).unwrap();assert_eq!(value["y_ratio"],0.75);assert!(value.get("xRatio").is_none());let alias:Placement=serde_json::from_str(r#"{"xRatio":0.5}"#).unwrap();assert_eq!(alias.x_ratio,0.5);}

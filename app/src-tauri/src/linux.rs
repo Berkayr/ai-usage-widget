@@ -8,6 +8,7 @@ type Window = *mut gtk::ffi::GtkWindow;
 thread_local! {
     static SHELL: RefCell<Option<Library>> = const { RefCell::new(None) };
     static LAST_PLACEMENT: RefCell<Option<(String,i32,i32,String)>> = const { RefCell::new(None) };
+    static PENDING_RESIZE: RefCell<Option<(Option<i32>, Option<f64>)>> = const { RefCell::new(None) };
     static MONITOR_WARNING: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 static SETTINGS_OPEN: AtomicBool = AtomicBool::new(false);
@@ -141,23 +142,39 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
     let _ = window.show();
 }
 pub fn resize_layer(window: &tauri::WebviewWindow, width: Option<i32>, height: Option<f64>) -> Result<(), String> {
+    if height.is_some_and(|h| !h.is_finite()) { return Err("Invalid widget height".into()); }
     let target = window.clone();
     window.run_on_main_thread(move || {
-        let Ok(gtk) = target.gtk_window() else { return };
-        let (old_width, old_height) = gtk.size_request();
-        let display = gtk.display();
-        let settings = super::settings_window::current();
-        let monitor = selected_monitor(&display, &settings.linux.monitor);
-        let max_height = monitor
-            .map(|m| m.workarea().height() - 2 * settings.linux.margin.clamp(0,64))
-            .unwrap_or(640).max(80);
-        let height = height.map(|h| h.ceil().clamp(80.0, max_height as f64) as i32)
-            .unwrap_or(old_height).clamp(80, max_height);
-        let requested_width=width.unwrap_or(old_width);
-        if old_width!=requested_width || old_height!=height { gtk.set_size_request(requested_width, height); }
-        let _=crate::placement::apply(&target,&settings);
+        let pending = PENDING_RESIZE.with(|slot| {
+            let mut slot = slot.borrow_mut();
+            let pending = slot.is_some();
+            let previous = slot.unwrap_or((None,None));
+            *slot = Some((width.or(previous.0),height.or(previous.1)));
+            pending
+        });
+        if pending { return; }
+        // One short-lived source coalesces width/height updates; no polling timer.
+        gtk::glib::timeout_add_local_once(std::time::Duration::from_millis(40), move || {
+            let Some((width,height)) = PENDING_RESIZE.with(|slot| slot.borrow_mut().take()) else { return; };
+            let Ok(gtk) = target.gtk_window() else { return; };
+            let settings = super::settings_window::current();
+            let list = crate::placement::monitors(&target);
+            let Some(monitor) = crate::placement::selected(&list, &settings) else { return; };
+            let (old_width,old_height) = gtk.size_request();
+            let requested = (
+                width.unwrap_or(old_width).clamp(1,monitor.width as i32),
+                height.map(|h| h.ceil().max(80.0) as i32).unwrap_or(old_height).clamp(1,monitor.height as i32),
+            );
+            if requested != (old_width,old_height) {
+                gtk.set_size_request(requested.0,requested.1);
+                // GTK layer surfaces also need a resize to shrink to requisition.
+                gtk.resize(1,1);
+            }
+            let _ = crate::placement::apply(&target,&settings);
+        });
     }).map_err(|e| e.to_string())
 }
+
 pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
     let corner=if corner=="Free" {"Top right"} else {corner};
     let Ok(gtk) = window.gtk_window() else { return };
@@ -347,6 +364,9 @@ pub fn place(window: &tauri::WebviewWindow, options: &Options, name: &str, x: i3
     // are logical pixels; workarea offsets account for desktop panels.
     let mut options=options.clone(); options.monitor=Some(MonitorSelection::Name(name.into())); apply(window,&options,"Top left");
     unsafe { SHELL.with(|slot| { let lib=slot.borrow();let Some(lib)=lib.as_ref() else {return};let ptr=gtk.upcast_ref::<gtk::Window>().to_glib_none().0;
+        // Coordinates already include workarea offsets. Zone 0 would let the
+        // compositor add the panel exclusion again (e.g. 40 px past the bottom).
+        call::<unsafe extern "C" fn(Window,i32)>(lib,b"gtk_layer_set_exclusive_zone\0").unwrap()(ptr,-1);
         let (ox,oy)=monitor.map(|m|{let a=m.workarea();let g=m.geometry();(a.x()-g.x(),a.y()-g.y())}).unwrap_or((0,0));
         for edge in 0..4 {call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_anchor\0").unwrap()(ptr,edge,(edge==0 || edge==2) as i32);call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_margin\0").unwrap()(ptr,edge,match edge {0=>x+ox,2=>y+oy,_=>0});}
     }); }
