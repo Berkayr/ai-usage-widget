@@ -137,13 +137,17 @@ an odd last card fills the last row. Their cell heights follow the row budget,
 rather than the 200 px height used by single-column cards.
 
 `node docs/tools/theme-identity-check.mjs` checks all nine themes × five presets ×
-1/2/3/5/6 providers × dark/light (450 cases) and writes
+1/2/3/4/5/6 providers × dark/light (540 cases) and writes
 `theme-identity-results.json`. Synthetic DEMO plans and countdowns exercise real
 text widths. It checks card overflow, signature DOM and geometry: Brutalist's
 2.4× display numbers and uppercase labels, two provider columns, concentric
 rings at least 45% of card width with visible center text, paired Frosted Glass
 capsules and LCD columns, and Terminal rules inside the shell without text
 crossings. System bars, Dot Matrix marks, Minimal Pace labels and Compact Strip's
-horizontal arrangement are also asserted. Normal preset widths preserve these
+horizontal arrangement are also asserted. Every card's trailing blank space is
+measured from actual text ranges and meter/ring bounds, rather than stretched
+layout wrappers, and must stay within 25% of the card height (1 px rounding
+tolerance). Space below the last card is checked against the same budget.
+The JSON records the maximum card ratio and the last-card list gap for each case. Normal preset widths preserve these
 layouts at every scale; externally narrowed viewports (below 18 root-font units) use a single column and
 scroll access. Display type uses `--size-font-display` in rem, with no glyph scaling.

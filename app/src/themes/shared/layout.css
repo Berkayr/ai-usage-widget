@@ -16,3 +16,8 @@
 .dot-bar,.segments{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--size-dot-gap);width:max-content;max-width:100%;margin-left:auto;margin-right:auto}
 .dot-bar i,.segments i{flex:0 0 var(--size-dot);width:var(--size-dot);min-width:var(--size-dot)}
 .dot-bar i{height:var(--size-dot);border-radius:50%}
+
+/* Share spare card height between quota blocks, including paired-column themes. */
+.provider-card{display:flex;flex-direction:column}
+.provider-heading{flex:none}
+.windows{flex:1 0 auto;align-content:space-around}

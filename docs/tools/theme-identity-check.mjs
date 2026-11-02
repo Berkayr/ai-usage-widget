@@ -7,7 +7,7 @@ const rows=[];
 try {
   await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
   const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
-  for(const theme of themes) for(const sizePreset of Object.keys(sizePresets)) for(const count of [1,2,3,5,6]) for(const appearance of ['dark','light']) {
+  for(const theme of themes) for(const sizePreset of Object.keys(sizePresets)) for(const count of [1,2,3,4,5,6]) for(const appearance of ['dark','light']) {
     const settings={theme,sizePreset,fineTune:100,fitHeight:true,appearance};
     const scale=sizePresets[sizePreset]/100;
     await b.cdp('Emulation.setDeviceMetricsOverride',{width:Math.round(widgetWidth(settings,count)*scale),height:Math.ceil(widgetHeight(settings,count)*scale)+10,deviceScaleFactor:1,mobile:false});
@@ -23,12 +23,33 @@ try {
       const widget=rect(document.querySelector('.widget'));
       const list=document.querySelector('.provider-list');
       check(cards.length===${count},'Provider count');
+      // Measure painted content, not stretched layout wrappers: text ranges and
+      // actual meters/rings. Padding and borders count towards trailing space.
+      const contentBottom=card=>{
+        const bottoms=[];
+        const walker=document.createTreeWalker(card,NodeFilter.SHOW_TEXT);
+        while(walker.nextNode()) {
+          const node=walker.currentNode;
+          if(!node.textContent.trim())continue;
+          const range=document.createRange();range.selectNodeContents(node);
+          for(const r of range.getClientRects())if(r.width&&r.height)bottoms.push(r.bottom);
+        }
+        for(const el of card.querySelectorAll('.meter,.segments,.dot-bar,.ring-display')) {
+          const r=rect(el);if(r.width&&r.height)bottoms.push(r.bottom);
+        }
+        return Math.max(rect(card).top,...bottoms);
+      };
+      metrics.maxCardBottomSpaceRatio=0;
       for(const card of cards) {
         const cr=rect(card),s=getComputedStyle(card);
         check(card.scrollWidth<=card.clientWidth+2,'Card horizontal overflow');
         check(card.scrollHeight<=card.clientHeight+2,'Card vertical overflow');
         check(cr.left>=widget.left&&cr.right<=widget.right+1&&cr.bottom<=widget.bottom+1,'Card outside shell');
         const windows=card.querySelector('.windows');
+        const bottomSpace=Math.max(0,cr.bottom-contentBottom(card));
+        const ratio=bottomSpace/cr.height;
+        metrics.maxCardBottomSpaceRatio=Math.max(metrics.maxCardBottomSpaceRatio,ratio);
+        check(bottomSpace<=cr.height*.25+1,'Card content bottom space >25%');
         if(theme==='brutalist') {
           const ratio=parseFloat(getComputedStyle(card.querySelector('.window-top b')).fontSize)/parseFloat(s.fontSize);
           metrics.displayRatio=ratio;check(ratio>=2.2,'Brutalist display size');
@@ -56,6 +77,11 @@ try {
         if(theme==='minimal-pace')check(card.querySelectorAll('.pace').length===2,'Pace labels');
         if(theme==='compact-strip')check(getComputedStyle(list).flexDirection==='row','Horizontal strip');
       }
+      const listRect=rect(list);
+      const lastCardBottom=Math.max(...cards.map(card=>rect(card).bottom));
+      const listBottomSpace=Math.max(0,listRect.bottom-lastCardBottom);
+      metrics.listBottomSpaceRatio=listBottomSpace/rect(cards.at(-1)).height;
+      check(listBottomSpace<=rect(cards.at(-1)).height*.25+1,'Space below last card >25%');
       if(theme==='terminal') {
         for(const name of ['header','footer']) {
           const el=document.querySelector('.'+name),r=rect(el),s=getComputedStyle(el);
