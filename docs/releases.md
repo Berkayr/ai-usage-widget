@@ -12,7 +12,7 @@ The build matrix targets Windows x86_64 (`.exe` via NSIS and `.msi` via WiX) and
 
 Before publishing a release, verify installation, host Python/provider CLI discovery, package contents, clean-machine startup, Windows transparency and taskbar behavior, and Linux distribution dependencies. AppImage execution and all native panel configurations still need acceptance. The existing rpm dependency names target Fedora, not every rpm distribution. AUR and winget publication are not part of this pipeline.
 
-The repository must remain private until its owner approves publication. License, final branding and external repository URLs remain maintainer decisions. Replace the local CI/release badges with real hosted status links once repository identity and first successful runs are known.
+The repository must remain private until its owner approves publication. The source is licensed under MIT; public repository URLs and publication remain maintainer decisions. Replace the local CI/release badges with real hosted status links once repository identity and first successful runs are known.
 
 Implementation references: [release-please action](https://github.com/googleapis/release-please-action), [extra version file updaters](https://github.com/googleapis/release-please/blob/main/docs/customizing.md), [Tauri GitHub builds](https://v2.tauri.app/distribute/pipelines/github/).
 

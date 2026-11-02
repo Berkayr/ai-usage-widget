@@ -27,4 +27,4 @@ Use Conventional Commits: `type(scope): imperative description`, without a final
 
 Examples: `fix(linux): preserve corner margin after scaling`, `docs(readme): explain provider authentication`. Use `!` or a `BREAKING CHANGE:` footer for incompatible behavior. Release-please uses these messages to prepare version/changelog pull requests; release publication remains a maintainer action.
 
-The project license is awaiting a maintainer decision. Check the repository's current licensing status before contributing or redistributing code. Do not add proprietary fonts or assets without redistribution rights.
+The project is licensed under the [MIT License](LICENSE). Do not add proprietary fonts or assets without redistribution rights.

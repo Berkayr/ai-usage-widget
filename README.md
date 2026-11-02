@@ -170,4 +170,4 @@ Bug reports, provider samples with invented data, and desktop compatibility chec
 
 ## License
 
-A project license has not been granted yet. A license file will be added after the maintainer's decision. Bundled font dependencies retain their own upstream licenses; see the app's font resources. Provider names identify compatible tools and do not imply affiliation.
+AI Usage is licensed under the [MIT License](LICENSE). Bundled font dependencies retain their own upstream licenses; see the app's font resources. Provider names identify compatible tools and do not imply affiliation.
