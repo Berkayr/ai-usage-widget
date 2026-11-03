@@ -5642,6 +5642,786 @@
     },
     {
       "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05811036789297659,
+        "listBottomSpaceRatio": 0.05016722408026756
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05811036789297659,
+        "listBottomSpaceRatio": 0.05016722408026756
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15655537459283386,
+        "listBottomSpaceRatio": 0.024429967426710098
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15655537459283386,
+        "listBottomSpaceRatio": 0.024429967426710098
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12445295404814004,
+        "listBottomSpaceRatio": 0.03282275711159737
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12445295404814004,
+        "listBottomSpaceRatio": 0.03282275711159737
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1566314076484947,
+        "listBottomSpaceRatio": 0.024410089503661515
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1566314076484947,
+        "listBottomSpaceRatio": 0.024410089503661515
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13747010852903305,
+        "listBottomSpaceRatio": 0.02949291802072475
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13747010852903305,
+        "listBottomSpaceRatio": 0.02949291802072475
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15669327367939398,
+        "listBottomSpaceRatio": 0.02440264361972547
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15669327367939398,
+        "listBottomSpaceRatio": 0.02440264361972547
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05625,
+        "listBottomSpaceRatio": 0.05
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05625,
+        "listBottomSpaceRatio": 0.05
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15548780487804878,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15548780487804878,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12295081967213115,
+        "listBottomSpaceRatio": 0.03278688524590164
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12295081967213115,
+        "listBottomSpaceRatio": 0.03278688524590164
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15548780487804878,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15548780487804878,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13602941176470587,
+        "listBottomSpaceRatio": 0.029411764705882353
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13602941176470587,
+        "listBottomSpaceRatio": 0.029411764705882353
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15548780487804878,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15548780487804878,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05375,
+        "listBottomSpaceRatio": 0.05
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05375,
+        "listBottomSpaceRatio": 0.05
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12131147540983607,
+        "listBottomSpaceRatio": 0.03278688524590164
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12131147540983607,
+        "listBottomSpaceRatio": 0.03278688524590164
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13455882352941176,
+        "listBottomSpaceRatio": 0.029411764705882353
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13455882352941176,
+        "listBottomSpaceRatio": 0.029411764705882353
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05375,
+        "listBottomSpaceRatio": 0.05
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05375,
+        "listBottomSpaceRatio": 0.05
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12131147540983607,
+        "listBottomSpaceRatio": 0.03278688524590164
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12131147540983607,
+        "listBottomSpaceRatio": 0.03278688524590164
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13455882352941176,
+        "listBottomSpaceRatio": 0.029411764705882353
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13455882352941176,
+        "listBottomSpaceRatio": 0.029411764705882353
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05475,
+        "listBottomSpaceRatio": 0.05
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.05475,
+        "listBottomSpaceRatio": 0.05
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1219672131147541,
+        "listBottomSpaceRatio": 0.03278688524590164
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1219672131147541,
+        "listBottomSpaceRatio": 0.03278688524590164
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1351470588235294,
+        "listBottomSpaceRatio": 0.029411764705882353
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1351470588235294,
+        "listBottomSpaceRatio": 0.029411764705882353
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
+        "listBottomSpaceRatio": 0.024390243902439025
+      },
+      "failures": []
+    },
+    {
+      "shape": "portrait",
       "theme": "retro-lcd",
       "sizePreset": "Small",
       "count": 1,
@@ -7988,7 +8768,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05498046875,
+        "maxCardBottomSpaceRatio": 0.05693359375,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.046875
       },
@@ -8002,7 +8782,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05498046875,
+        "maxCardBottomSpaceRatio": 0.05693359375,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.046875
       },
@@ -8100,7 +8880,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1069510739856802,
+        "maxCardBottomSpaceRatio": 0.09695704057279236,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04295942720763723
       },
@@ -8114,7 +8894,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1069510739856802,
+        "maxCardBottomSpaceRatio": 0.09695704057279236,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04295942720763723
       },
@@ -8156,7 +8936,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.057389018691588786,
+        "maxCardBottomSpaceRatio": 0.06103971962616823,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04672897196261682
       },
@@ -8170,7 +8950,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.057389018691588786,
+        "maxCardBottomSpaceRatio": 0.06103971962616823,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04672897196261682
       },
@@ -8268,7 +9048,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1125,
+        "maxCardBottomSpaceRatio": 0.10223214285714285,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04285714285714286
       },
@@ -8282,7 +9062,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1125,
+        "maxCardBottomSpaceRatio": 0.10223214285714285,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04285714285714286
       },
@@ -8324,7 +9104,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05604619565217391,
+        "maxCardBottomSpaceRatio": 0.060025232919254656,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.046583850931677016
       },
@@ -8338,7 +9118,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05604619565217391,
+        "maxCardBottomSpaceRatio": 0.060025232919254656,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.046583850931677016
       },
@@ -8436,7 +9216,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1129750593824228,
+        "maxCardBottomSpaceRatio": 0.10250890736342043,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04275534441805225
       },
@@ -8450,7 +9230,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1129750593824228,
+        "maxCardBottomSpaceRatio": 0.10250890736342043,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04275534441805225
       },
@@ -8492,7 +9272,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05501606308411215,
+        "maxCardBottomSpaceRatio": 0.058666764018691586,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04672897196261682
       },
@@ -8506,7 +9286,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05501606308411215,
+        "maxCardBottomSpaceRatio": 0.058666764018691586,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04672897196261682
       },
@@ -8604,7 +9384,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11238839285714286,
+        "maxCardBottomSpaceRatio": 0.10217633928571429,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04285714285714286
       },
@@ -8618,7 +9398,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11238839285714286,
+        "maxCardBottomSpaceRatio": 0.10217633928571429,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04285714285714286
       },
@@ -8660,7 +9440,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05655317164179104,
+        "maxCardBottomSpaceRatio": 0.06040111940298507,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04664179104477612
       },
@@ -8674,7 +9454,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05655317164179104,
+        "maxCardBottomSpaceRatio": 0.06040111940298507,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.04664179104477612
       },
@@ -8772,7 +9552,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11269614835948645,
+        "maxCardBottomSpaceRatio": 0.10235378031383738,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.042796005706134094
       },
@@ -8786,7 +9566,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11269614835948645,
+        "maxCardBottomSpaceRatio": 0.10235378031383738,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.042796005706134094
       },
@@ -12830,6 +13610,786 @@
     {
       "shape": "landscape",
       "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09765625,
+        "listBottomSpaceRatio": 0.046875
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09765625,
+        "listBottomSpaceRatio": 0.046875
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09765625,
+        "listBottomSpaceRatio": 0.046875
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09765625,
+        "listBottomSpaceRatio": 0.046875
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09765625,
+        "listBottomSpaceRatio": 0.046875
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09765625,
+        "listBottomSpaceRatio": 0.046875
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09929906542056074,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09929906542056074,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09929906542056074,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09929906542056074,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09929906542056074,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09929906542056074,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09743788819875776,
+        "listBottomSpaceRatio": 0.046583850931677016
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09743788819875776,
+        "listBottomSpaceRatio": 0.046583850931677016
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09743788819875776,
+        "listBottomSpaceRatio": 0.046583850931677016
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09743788819875776,
+        "listBottomSpaceRatio": 0.046583850931677016
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09743788819875776,
+        "listBottomSpaceRatio": 0.046583850931677016
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09743788819875776,
+        "listBottomSpaceRatio": 0.046583850931677016
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.0969626168224299,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.0969626168224299,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.0969626168224299,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.0969626168224299,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.0969626168224299,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.0969626168224299,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "landscape",
+      "theme": "reactor",
       "sizePreset": "2X-Large",
       "count": 6,
       "page": 0,
@@ -21910,6 +23470,1046 @@
     {
       "shape": "square",
       "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13515625,
+        "listBottomSpaceRatio": 0.046875
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13515625,
+        "listBottomSpaceRatio": 0.046875
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20763723150357996,
+        "listBottomSpaceRatio": 0.021479713603818614
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20763723150357996,
+        "listBottomSpaceRatio": 0.021479713603818614
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16341463414634147,
+        "listBottomSpaceRatio": 0.04390243902439024
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15508021390374332,
+        "listBottomSpaceRatio": 0.0481283422459893
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1311619718309859,
+        "listBottomSpaceRatio": 0.0528169014084507
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15508021390374332,
+        "listBottomSpaceRatio": 0.0481283422459893
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1311619718309859,
+        "listBottomSpaceRatio": 0.0528169014084507
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15508021390374332,
+        "listBottomSpaceRatio": 0.0481283422459893
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20365535248041775,
+        "listBottomSpaceRatio": 0.02349869451697128
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15508021390374332,
+        "listBottomSpaceRatio": 0.0481283422459893
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20365535248041775,
+        "listBottomSpaceRatio": 0.02349869451697128
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13361565420560748,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13361565420560748,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20714285714285716,
+        "listBottomSpaceRatio": 0.02142857142857143
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20714285714285716,
+        "listBottomSpaceRatio": 0.02142857142857143
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.154,
+        "listBottomSpaceRatio": 0.048
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1294407894736842,
+        "listBottomSpaceRatio": 0.05263157894736842
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.154,
+        "listBottomSpaceRatio": 0.048
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1294407894736842,
+        "listBottomSpaceRatio": 0.05263157894736842
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.154,
+        "listBottomSpaceRatio": 0.048
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.203125,
+        "listBottomSpaceRatio": 0.0234375
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.154,
+        "listBottomSpaceRatio": 0.048
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.203125,
+        "listBottomSpaceRatio": 0.0234375
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13111413043478262,
+        "listBottomSpaceRatio": 0.046583850931677016
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13111413043478262,
+        "listBottomSpaceRatio": 0.046583850931677016
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20665083135391923,
+        "listBottomSpaceRatio": 0.021377672209026127
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20665083135391923,
+        "listBottomSpaceRatio": 0.021377672209026127
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.16140776699029127,
+        "listBottomSpaceRatio": 0.043689320388349516
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1529255319148936,
+        "listBottomSpaceRatio": 0.047872340425531915
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12663898601398602,
+        "listBottomSpaceRatio": 0.05244755244755245
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1529255319148936,
+        "listBottomSpaceRatio": 0.047872340425531915
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12663898601398602,
+        "listBottomSpaceRatio": 0.05244755244755245
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1529255319148936,
+        "listBottomSpaceRatio": 0.047872340425531915
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.2025974025974026,
+        "listBottomSpaceRatio": 0.023376623376623377
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1529255319148936,
+        "listBottomSpaceRatio": 0.047872340425531915
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.2025974025974026,
+        "listBottomSpaceRatio": 0.023376623376623377
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13124269859813084,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13124269859813084,
+        "listBottomSpaceRatio": 0.04672897196261682
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20714285714285716,
+        "listBottomSpaceRatio": 0.02142857142857143
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20714285714285716,
+        "listBottomSpaceRatio": 0.02142857142857143
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1624087591240876,
+        "listBottomSpaceRatio": 0.043795620437956206
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.154,
+        "listBottomSpaceRatio": 0.048
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12676809210526316,
+        "listBottomSpaceRatio": 0.05263157894736842
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.154,
+        "listBottomSpaceRatio": 0.048
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12676809210526316,
+        "listBottomSpaceRatio": 0.05263157894736842
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.154,
+        "listBottomSpaceRatio": 0.048
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.203125,
+        "listBottomSpaceRatio": 0.0234375
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.154,
+        "listBottomSpaceRatio": 0.048
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.203125,
+        "listBottomSpaceRatio": 0.0234375
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13208372201492538,
+        "listBottomSpaceRatio": 0.04664179104477612
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.13208372201492538,
+        "listBottomSpaceRatio": 0.04664179104477612
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12772452731092437,
+        "listBottomSpaceRatio": 0.052521008403361345
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 1,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.12772452731092437,
+        "listBottomSpaceRatio": 0.052521008403361345
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 1,
+      "appearance": "dark",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
+      },
+      "failures": []
+    },
+    {
+      "shape": "square",
+      "theme": "reactor",
       "sizePreset": "2X-Large",
       "count": 6,
       "page": 1,
@@ -31142,6 +33742,1026 @@
     },
     {
       "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {
+        "circleSignature": {
+          "width": 9,
+          "cap": "butt",
+          "pattern": "9 1",
+          "weight": 600
+        }
+      },
+      "failures": []
+    },
+    {
+      "shape": "circle",
       "theme": "retro-lcd",
       "sizePreset": "Small",
       "count": 1,
@@ -37382,6 +41002,606 @@
     },
     {
       "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 1,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 2,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 3,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 4,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 5,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "dark",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "count": 6,
+      "page": 0,
+      "appearance": "light",
+      "metrics": {},
+      "failures": []
+    },
+    {
+      "shape": "pill",
       "theme": "retro-lcd",
       "sizePreset": "Small",
       "count": 1,
@@ -41091,6 +45311,366 @@
     {
       "shape": "circle",
       "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "reactor",
       "sizePreset": "2X-Large",
       "appearance": "light",
       "values": [

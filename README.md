@@ -69,7 +69,7 @@ Scale text and spacing together from 50% to 300%, with presets or Ctrl +/− and
 
 ### Find your signal
 
-Choose a quiet Calm look, colorful Vivid palettes or pure black and white Mono. Nine themes change the layout as well as the colors. Theme cards in Settings switch designs immediately; every theme supports Auto, Light and Dark appearance.
+Choose a quiet Calm look, colorful Vivid palettes or pure black and white Mono. Ten themes change the layout as well as the colors. Theme cards in Settings switch designs immediately; every theme supports Auto, Light and Dark appearance.
 
 ![Pink, Nord, blue glass and acid palette examples](docs/screenshots/palettes.png)
 <sub>Dot Matrix / Sakura Pink, Light · Dot Matrix / Nord · Frosted Glass / Acrylic · Brutalist / Acid. Vivid, fictional data.</sub>
@@ -98,7 +98,7 @@ Prefer the familiar? System uses your desktop font, light/dark appearance and sy
 
 ### Nine designs, one snapshot
 
-![Nine themes in two rows, mixing light and dark appearance](docs/screenshots/themes.png)
+![Ten themes in two rows, mixing light and dark appearance](docs/screenshots/themes.png)
 <sub>Top: System, Dot Matrix / Sakura Pink, Circular Rings, Terminal, Frosted Glass. Bottom: Brutalist, Compact Strip, Retro LCD, Minimal Pace. Alternating Dark / Light, Vivid, fictional data.</sub>
 
 [Individual light and dark captures](docs/screenshots/themes/) · [Alternate gallery](docs/screenshots/themes-light.png) · [All themes in Mono](docs/screenshots/mono.png)
@@ -150,6 +150,12 @@ First launch asks which providers to track; all providers stay disabled until yo
 
 Requests retrieve usage or balances; the collector does not submit prompts or request model completions. It does not scan chat history. Passive panel reads make no network requests; explicit refresh runs the collector. There is no application telemetry or analytics code. Third-party CLIs retain their own networking behavior. Snapshots, observations and pace history stay local and can contain sensitive usage metadata; do not attach raw files to issues. See the [security model](docs/security-model.md) for credential destinations, plaintext key storage, process limits, retention and verification; [provider data boundaries](docs/providers.md) describe adapter support.
 
+### Optional daily quote
+
+Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.
+
+`quotacore quote --mode mixed --json` explicitly opts into a daily fetch. All modes share `quote-cache.json` in the state directory, including a failed-attempt date to avoid retries until tomorrow. Offline results retain their original date. The daily round batches twelve same-date Wikiquote pages and one Wikidata sitelink lookup; it is at most two HTTP requests, with no redirects, cookies or credentials. Born/died modes fall back to the daily pick when no verified anniversary exists. Source and CC BY-SA 4.0 attribution are accessible from every shape. Pill uses a quote button and full-text dialog because its quota strip has no space for a readable quote.
+
 ## FAQ
 
 **Why does this differ from the provider dashboard?** Sources refresh at different times; cached data, different quota windows and API balances are not interchangeable. Check the source and state before comparing.
@@ -188,3 +194,17 @@ and 340 × 340 for square; all five size presets scale proportionally.
 Choose Portrait, Landscape (2:1), Square, Circle Dial, or Pill (4:1) in Settings → Layout & Position. Every theme uses the same dimensions for a given shape and size. Circle shows percentages beside arc endpoints, with automatic spacing for nearby values. Provider colors are shared across shapes: choose custom colors or reset each provider in **Appearance / Theme → Provider colors**. Low contrast and similar colors trigger a warning; Mono keeps patterned rings. Circle and Pill support up to three providers per widget; choose them in **Providers on this widget**. Other providers remain available in the rectangular layouts. Round shapes keep Settings and the right-click menu inside their silhouette and use native input masks so transparent corners pass clicks through to the desktop.
 
 ![Five shapes with fictional usage data](docs/screenshots/shapes.png)
+
+
+Provider layout is configurable in **Layout & Position → Provider layout**.
+Drag rows or use Up / Down, and toggle visibility without disabling collection.
+Choose Auto (highest usage across quota windows), a specific featured provider,
+or None. Top / Bottom places the large cell in portrait and square grids; None
+centers the unpaired half-width cell. Missing layout settings preserve the
+legacy last-cell layout and automatic circle center. Hidden or unselected
+featured providers are not silently replaced.
+
+**Reactor** adds a luminous core, segmented inner ring and cool glow to Circle,
+with matching surfaces in all other shapes. Breathing is off by default and
+respects reduced motion. Calm softens meter hues and tracks; Vivid increases
+saturation and arc weight. Mono retains provider patterns.
