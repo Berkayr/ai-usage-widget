@@ -181,3 +181,10 @@ numbered navigation for additional providers. Medium is 680 × 340 for landscape
 and 340 × 340 for square; all five size presets scale proportionally.
 
 ![Landscape and square themes with fictional data](docs/screenshots/shapes.png)
+
+
+### Shapes
+
+Choose Portrait, Landscape (2:1), Square, Circle Dial, or Pill (4:1) in Settings → Layout & Position. Every theme uses the same dimensions for a given shape and size. Circle and Pill support up to three providers per widget; choose them in **Providers on this widget**. Other providers remain available in the rectangular layouts. Round shapes keep Settings and the right-click menu inside their silhouette and use native input masks so transparent corners pass clicks through to the desktop.
+
+![Five shapes with fictional usage data](docs/screenshots/shapes.png)
