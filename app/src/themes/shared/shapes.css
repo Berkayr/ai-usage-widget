@@ -52,3 +52,94 @@
 :root[data-dense-shape=true][data-theme=circular-rings] .provider-card{padding:.375rem}
 :root[data-dense-shape=true][data-theme=circular-rings] .ring-center strong{font-size:max(var(--shape-min-font),.875rem);line-height:1}
 :root[data-dense-shape=true][data-theme=circular-rings] .ring-center small{line-height:1}
+/* Round silhouettes use the same box in every theme. Text occupies the inner square. */
+:root:is([data-shape=circle],[data-shape=pill]) .widget{padding:0;overflow:hidden;max-height:none;position:relative;box-sizing:border-box;--size-font-small:max(var(--shape-min-font),.6875rem);--size-font-base:max(var(--shape-min-font),.9375rem)}
+:root[data-shape=circle] .widget{width:21.25rem;height:21.25rem;border-radius:50%;clip-path:circle(50%)}
+:root[data-shape=pill] .widget{width:30rem;height:7.5rem;border-radius:3.75rem;clip-path:inset(0 round 3.75rem)}
+:root:is([data-shape=circle],[data-shape=pill]) :is(.footer,.title-block,.shape-pages){display:none}
+:root:is([data-shape=circle],[data-shape=pill]) .header{position:absolute;z-index:3;border:0;padding:0;margin:0;height:auto;width:auto;background:none;top:1.75rem;left:calc(50% - .75rem)}
+:root:is([data-shape=circle],[data-shape=pill]) .gear{width:1.5rem;height:1.5rem;padding:0;font-size:max(var(--shape-min-font),1rem);line-height:1;border:0;background:var(--bgWidget);color:var(--chromeText)}
+:root[data-shape=circle] .provider-list{display:block;width:100%;height:100%;margin:0;overflow:hidden}
+.dial{position:relative;width:100%;height:100%;color:var(--textPrimary)}
+.dial-rings{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke-width:7;pointer-events:none}
+.dial-track{stroke:var(--bgTrackOff)}.dial-value{stroke:var(--severityNormal)}
+.dial-safe{position:absolute;left:21%;right:21%;top:24%;bottom:19%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;text-align:center;min-width:0}
+.dial-safe>*{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;line-height:1.4}
+.dial-legend{font-size:max(var(--shape-min-font),.9375rem);width:100%}.dial-legend>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dial-legend i{display:inline-block;width:.35rem;height:.35rem;border-radius:50%;background:var(--accent);margin-right:.25rem}
+.dial-number{font-size:3rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:0}.dial-name{font-size:max(var(--shape-min-font),.875rem)}.dial-reset{font-size:max(var(--shape-min-font),.6875rem)}
+:root[data-shape=circle][data-theme=brutalist] .dial-number{font-size:3.75rem;font-weight:900}
+:root[data-shape=circle][data-theme=dot-matrix] :is(.dial-track,.dial-value){stroke-linecap:round}
+:root[data-shape=circle][data-theme=retro-lcd] :is(.dial-track,.dial-value){stroke-linecap:butt}
+:root[data-shape=circle][data-theme=terminal] :is(.dial-track,.dial-value){stroke-linecap:butt}
+:root[data-shape=circle][data-theme=frosted-glass] .widget{backdrop-filter:blur(24px)}
+:root[data-shape=pill] .header{top:calc(50% - .75rem);left:auto;right:1rem}
+:root[data-shape=pill] .provider-list{display:flex;flex-direction:row;width:100%;height:100%;gap:.5rem;margin:0;padding:.75rem 3rem .75rem 2.5rem;overflow:hidden}
+:root[data-shape=pill] .provider-card{display:flex;flex:1 1 0;flex-direction:column;min-width:0;min-height:0;height:100%;padding:.25rem .375rem;margin:0;overflow:hidden;border-radius:.375rem}
+:root[data-shape=pill] .provider-heading{min-height:0;margin:0 0 .25rem;display:block}
+:root[data-shape=pill] .provider-heading>div{display:block;min-width:0}:root[data-shape=pill] h2{font-size:max(var(--shape-min-font),.75rem);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root[data-shape=pill] :is(.plan,.balance-row,.pace,.ring-display){display:none}
+:root[data-shape=pill] .windows{display:flex;flex-direction:column;flex:1;gap:.125rem;justify-content:space-around;min-height:0}
+:root[data-shape=pill] .quota-window{padding:0;min-width:0;min-height:0}
+:root[data-shape=pill] .window-top{display:flex;flex-direction:row;gap:.125rem;justify-content:space-between;align-items:baseline;min-height:0;font-size:max(var(--shape-min-font),.625rem)}
+:root[data-shape=pill] .window-top b{font-size:max(var(--shape-min-font),1rem);line-height:1;font-variant-numeric:tabular-nums}
+:root[data-shape=pill] .window-bottom{display:none}
+:root[data-shape=pill] :is(.meter,.segments,.dot-bar){height:.25rem;width:100%;gap:.0625rem;display:flex;flex-wrap:nowrap;margin:.125rem 0}
+:root[data-shape=pill] :is(.segments,.dot-bar) i{flex:1;min-width:0;width:auto;height:100%}
+:root[data-shape=pill] .status-badge{font-size:0;width:.35rem;height:.35rem;padding:0;background:var(--severityWarning);position:absolute;top:.25rem;right:.25rem}
+:root[data-shape=pill] .no-data{min-height:0;padding:0;font-size:max(var(--shape-min-font),.75rem)}
+:root[data-shape=pill] .widget .window-top b{font-size:max(var(--shape-min-font),1rem);line-height:1}
+:root[data-shape=pill] .widget .quota-window:first-child .window-bottom{display:flex;margin:0;font-size:max(var(--shape-min-font),.625rem);line-height:1.1}
+:root[data-shape=pill] .widget .quota-window:first-child .window-bottom .reset{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root[data-shape=pill] .widget .provider-card{flex:1 1 0}
+
+:root[data-shape=pill][data-large-shape=true] .widget .window-bottom{display:flex;margin:0;font-size:max(var(--shape-min-font),.625rem);line-height:1.1}
+.dial-safe .dial-number{line-height:1.4}
+:root[data-shape=pill] .widget .segments>em{top:0;height:100%}
+:root[data-shape=pill] .widget .provider-card{position:relative}
+/* Reserve line boxes for font ascenders/descenders and both large-size reset rows. */
+:root[data-shape=pill] .provider-list{padding-block:.5rem}
+:root[data-shape=pill] .widget .provider-card{padding-block:.125rem}
+:root[data-shape=pill] .widget .provider-heading{margin-bottom:.125rem}
+:root[data-shape=pill] .widget .window-top b{font-size:max(var(--shape-min-font),.875rem);line-height:1.4}
+:root[data-shape=pill] .widget :is(.meter,.segments,.dot-bar){margin-block:.0625rem}
+:root[data-shape=pill] .widget .quota-window .window-bottom{line-height:1.4}
+:root[data-shape=pill] .widget .window-top b{margin:0}
+
+/* Below Small, remove timing and duplicate labels before core percentages. */
+:root[data-shape=circle][data-micro-shape=true] :is(.dial-reset,.dial-name){display:none}
+:root[data-shape=circle][data-micro-shape=true] .dial-number{font-size:max(var(--shape-min-font),1.75rem)}
+:root[data-shape=circle][data-micro-shape=true] .dial-safe{gap:0}
+:root[data-shape=pill][data-micro-shape=true] .widget :is(.quota-window:not(:first-child),.quota-window .window-bottom){display:none}
+:root[data-shape=pill][data-micro-shape=true] .widget .window-top>span{display:none}
+:root[data-shape=pill][data-micro-shape=true] .widget .window-top{justify-content:center}
+
+/* The page itself stays transparent, including browser/iframe previews. */
+:root:is([data-shape=circle],[data-shape=pill]),:root:is([data-shape=circle],[data-shape=pill]) body{background:transparent!important}
+:root[data-shape=circle][data-theme=brutalist] :is(.dial-legend,.dial-name){text-transform:uppercase;font-weight:800}
+:root[data-shape=circle][data-theme=circular-rings] .dial-number{font-size:3.25rem;font-weight:700}
+:root[data-shape=circle][data-theme=retro-lcd] .dial-number{font-family:JetBrainsMono,monospace;font-weight:500;letter-spacing:.04em;text-shadow:2px 2px var(--bgTrackOff)}
+:root[data-shape=circle][data-theme=terminal] .dial-number{font-weight:400}
+:root[data-shape=circle][data-theme=terminal] .dial-name::before{content:'> '}
+:root[data-shape=circle][data-theme=frosted-glass] .dial-safe{border:1px solid var(--border);border-radius:1.5rem;background:var(--bgCard);box-shadow:inset 0 1px 0 #ffffff40,0 8px 24px #0002}
+:root[data-shape=circle][data-theme=minimal-pace] .dial-number{font-weight:300}
+.dial-elapsed{stroke:var(--chromeText);stroke-width:2}
+/* Preserve a physical gap, then drop timing before plan metadata. */
+:root[data-shape=pill] .widget .window-top{gap:max(4px,.3rem);white-space:nowrap}
+:root[data-shape=pill] .widget .window-top>span{flex-shrink:0}
+:root[data-shape=pill] .widget .window-top b{flex-shrink:0}
+:root[data-shape=pill] .widget .quota-window .window-bottom{display:none}
+:root[data-shape=pill][data-large-shape=true] .widget .quota-window .window-bottom{display:flex}
+:root[data-shape=pill]:not([data-micro-shape=true]) .widget .plan{display:inline-block;border:0;padding:0;font-size:max(var(--shape-min-font),.5625rem);line-height:1.2;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root[data-shape=pill] .widget .provider-heading>div{display:flex;align-items:baseline;gap:.25rem;flex-wrap:nowrap}
+:root[data-shape=pill]:not([data-large-shape=true]) .widget .window-top b{font-size:max(var(--shape-min-font),.75rem)}
+:root:is([data-shape=circle],[data-shape=pill]){color-scheme:only light}
+:root[data-shape=pill]:not([data-large-shape=true]) .widget .quota-window .window-bottom{display:none}
+
+/* Provider identity stays independent of severity in combined silhouettes. */
+:root[data-shape=pill] .provider-card::after{content:'';position:absolute;bottom:0;left:.375rem;right:.375rem;border-bottom:2px solid var(--provider-identity);pointer-events:none}
+:root[data-color-mode=mono][data-shape=pill] .provider-card::after{border-color:var(--textPrimary)}
+:root[data-color-mode=mono][data-shape=pill] .provider-card[data-identity="1"]::after{border-bottom-style:dashed}
+:root[data-color-mode=mono][data-shape=pill] .provider-card[data-identity="2"]::after{border-bottom-style:dotted}
+:root[data-color-mode=mono] .dial-legend i{border-radius:0;width:.65rem;height:0;border-bottom:3px solid var(--identity);background:none!important}
+:root[data-color-mode=mono] .dial-legend i[data-identity="1"]{border-bottom-style:dashed}
+:root[data-color-mode=mono] .dial-legend i[data-identity="2"]{border-bottom-style:dotted}

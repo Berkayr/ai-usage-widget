@@ -33,8 +33,18 @@
         "severityNormal": "#1b1b1b",
         "severityWarning": "#855500",
         "severityDanger": "#b91c1c",
-        "accent": "#526b82"
-      }
+        "accent": "#526b82",
+        "providerColors": [
+          "#526b82",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#a7bacb",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     },
     "signal-orange": {
       "name": "Signal Orange",
@@ -60,8 +70,18 @@
         "border": "#d5d4ce",
         "severityNormal": "#1b1b1b",
         "severityWarning": "#855500",
-        "severityDanger": "#b91c1c"
-      }
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#FF3B1D",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#FF3B1D",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     },
     "sakura-pink": {
       "name": "Sakura Pink",
@@ -87,7 +107,12 @@
         "border": "#E8C8D4",
         "severityNormal": "#0D9488",
         "severityWarning": "#D97706",
-        "severityDanger": "#E11D48"
+        "severityDanger": "#E11D48",
+        "providerColors": [
+          "#E11D74",
+          "#0072b2",
+          "#a33278"
+        ]
       },
       "dark": {
         "bgWidget": "#0E0E11",
@@ -100,7 +125,12 @@
         "severityNormal": "#F4F4F6",
         "severityWarning": "#FF9E1B",
         "severityDanger": "#FF2A2A"
-      }
+      },
+      "providerColors": [
+        "#E11D74",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     },
     "nord": {
       "name": "Nord",
@@ -126,8 +156,18 @@
         "border": "#d5d4ce",
         "severityNormal": "#1b1b1b",
         "severityWarning": "#855500",
-        "severityDanger": "#b91c1c"
-      }
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#88C0D0",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#88C0D0",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     },
     "mono-paper": {
       "name": "Mono Paper",
@@ -153,7 +193,12 @@
         "border": "#C8C4BB",
         "severityNormal": "#141413",
         "severityWarning": "#8C5A08",
-        "severityDanger": "#B91C1C"
+        "severityDanger": "#B91C1C",
+        "providerColors": [
+          "#141413",
+          "#0072b2",
+          "#a33278"
+        ]
       },
       "dark": {
         "bgWidget": "#0E0E11",
@@ -166,7 +211,12 @@
         "severityNormal": "#F4F4F6",
         "severityWarning": "#FF9E1B",
         "severityDanger": "#FF2A2A"
-      }
+      },
+      "providerColors": [
+        "#141413",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     },
     "ember": {
       "name": "Ember",
@@ -192,8 +242,18 @@
         "border": "#d5d4ce",
         "severityNormal": "#1b1b1b",
         "severityWarning": "#855500",
-        "severityDanger": "#b91c1c"
-      }
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#ff5a1f",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#ff5a1f",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     }
   }
 }

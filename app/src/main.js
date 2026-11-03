@@ -1,4 +1,6 @@
-import { normalizeSize, widgetWidth, widgetHeight } from './sizing.js';
+import { providerIndex } from './themes/shared/identity.js';
+import { renderRound } from './themes/shared/round.js';
+import { normalizeSize, widgetWidth, widgetHeight, widgetProviders } from './sizing.js';
 import { hiddenStates } from './themes/dot-matrix/render.js';
 import { repairTextContrast } from './text-contrast.js';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -83,11 +85,13 @@ function applySettings() {
   if (!theme) return;
   settings = normalizeSize(settings);
   document.documentElement.dataset.shape = settings.shape;
+  document.documentElement.dataset.largeShape = String(settings.scale >= 150);
   document.documentElement.style.setProperty('--shape-min-font', '9px');
   const selected = theme.palettes[settings.palette] || Object.values(theme.palettes)[0];
   const mode = settings.appearance === 'auto' ? (systemAppearance.matches ? 'light' : 'dark') : settings.appearance;
   const palette = { ...selected, ...(selected[mode] || {}), mode }; 
   for (const [key, value] of Object.entries(palette)) if (typeof value === 'string' && key !== 'name' && key !== 'mode') document.documentElement.style.setProperty(`--${key}`, value);
+  (palette.providerColors || [palette.accent, '#56b4e9', '#cc79a7']).forEach((color,i) => document.documentElement.style.setProperty(`--provider-${i}`,color));
   if (settings.accent) document.documentElement.style.setProperty('--accent', settings.accent);
   if (settings.background) document.documentElement.style.setProperty('--bgWidget', settings.background);
   document.documentElement.dataset.mode = palette.mode;
@@ -123,6 +127,7 @@ function applySettings() {
   settings.dotCount = [10,20,30].includes(Number(settings.dotCount)) ? Number(settings.dotCount) : 20;
   document.documentElement.dataset.dotCount = settings.dotCount;
   const effectiveScale = settings.scale / (settings.matchPhysicalSize ? monitorScale : 1);
+  document.documentElement.dataset.microShape = String(effectiveScale < 65);
   document.documentElement.style.setProperty('--widget-opacity', settings.widgetOpacity / 100);
   document.documentElement.style.setProperty('--background-opacity', settings.backgroundOpacity / 100);
   document.documentElement.style.setProperty('--ui-scale', effectiveScale / 100);
@@ -173,12 +178,19 @@ function draw(snapshot, noData = false) {
     const allProviders = (visible?.providers || []).filter(p => !hiddenStates.has(String(p.state).toUpperCase()));
     const pages = settings.shape === 'square' ? Math.ceil(allProviders.length / 4) : 1;
     shapePage = Math.min(shapePage, Math.max(0, pages - 1));
-    const paged = pages > 1 ? {...visible, providers:allProviders.slice(shapePage*4, shapePage*4+4)} : visible;
+    const round = ['circle','pill'].includes(settings.shape);
+    const selectedProviders = round ? widgetProviders(allProviders, settings.widgetProviders) : allProviders;
+    const paged = round ? {...visible,providers:selectedProviders} : pages > 1 ? {...visible, providers:allProviders.slice(shapePage*4, shapePage*4+4)} : visible;
     const pageNav = $('.shape-pages'); pageNav.hidden = pages <= 1; pageNav.replaceChildren();
     for (let page=0;page<pages && pages>1;page++) { const button=document.createElement('button'); button.textContent=`${page+1}`; button.setAttribute('aria-label', `Provider page ${page+1} of ${pages}`); button.setAttribute('aria-current', String(page===shapePage)); button.onclick=()=>{shapePage=page;draw(currentSnapshot,currentNoData);}; pageNav.append(button); }
-    renderSnapshot($('#providers'), paged, { noData, showExtraWindows: settings.showExtraWindows });
+    (round ? (root,snapshot)=>renderRound(root,snapshot,settings) : renderSnapshot)($('#providers'), paged, { noData, showExtraWindows: settings.showExtraWindows });
+    $('#providers').querySelectorAll('.provider-card').forEach((card,i) => {
+      const index=providerIndex(paged.providers[i],i);
+      card.style.setProperty('--provider-identity',`var(--provider-${index})`);
+      card.dataset.identity=index;
+    });
     $('#updated').textContent = snapshot?.generated_at ? `SYNC ${new Date(snapshot.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'NO DATA YET';
-    const count = $('#providers').querySelectorAll('.provider-card').length;
+    const count = round ? selectedProviders.length : $('#providers').querySelectorAll('.provider-card').length;
     $('#widget').style.setProperty('--provider-count', Math.max(1,count));
     document.documentElement.dataset.denseShape = String(settings.shape !== 'portrait' && (settings.shape === 'square' ? count > 1 : count > 3));
     $('#widget').style.setProperty('--shape-columns', settings.shape === 'square' ? (count > 1 ? 2 : 1) : Math.min(3, Math.max(1,count)));
@@ -236,17 +248,17 @@ function appearanceChanged() { if (settings.appearance === 'auto') applySettings
 systemAppearance.addEventListener('change', appearanceChanged);
 const openSettings = () => isSample ? window.open('/?settings&sample', 'settings', 'width=900,height=680') : invoke('open_settings').catch(error => showToast(String(error)));
 $('#gear').onclick = openSettings;
-$('#widget').addEventListener('contextmenu', event => { event.preventDefault(); $('#context-menu').hidden = false; $('#context-menu').style.left = `${event.clientX}px`; $('#context-menu').style.top = `${event.clientY}px`; }, { signal: domEvents.signal });
+$('#widget').addEventListener('contextmenu', event => { event.preventDefault(); $('#context-menu').hidden = false; const menu=$('#context-menu'),r=$('#widget').getBoundingClientRect();const round=['circle','pill'].includes(settings.shape);menu.style.left=`${round?r.left+r.width/2-menu.offsetWidth/2:Math.min(event.clientX,r.right-menu.offsetWidth)}px`;menu.style.top=`${round?r.top+r.height/2-menu.offsetHeight/2:Math.min(event.clientY,r.bottom-menu.offsetHeight)}px`; }, { signal: domEvents.signal });
 document.addEventListener('click', event => { if (!event.target.closest('#context-menu')) $('#context-menu').hidden = true; }, { signal: domEvents.signal });
 $('#refresh').onclick = async () => { if (isSample) return draw(currentSample()); try { await invoke('refresh_now'); } catch (error) { showToast(String(error)); } };
 $('#menu-settings').onclick = openSettings;
 
 await activateTheme(settings.theme);
-$('.header').addEventListener('pointerdown', event => { if (event.button === 0 && settings.lockPosition === false && !event.target.closest('button') && !isSample) getCurrentWindow().startDragging().catch(() => showToast('Use the monitor map to place this widget.')); }, { signal: domEvents.signal });
+$('#widget').addEventListener('pointerdown', event => { if (event.button === 0 && settings.lockPosition === false && (['circle','pill'].includes(settings.shape) || event.target.closest('.header')) && !event.target.closest('button') && !isSample) getCurrentWindow().startDragging().catch(() => showToast('Use the monitor map to place this widget.')); }, { signal: domEvents.signal });
 let lastTier;
 meterObserver = new ResizeObserver(() => { updateNarrowViewport(); const tier = $('#app').clientWidth < 220 * parseFloat(getComputedStyle(document.documentElement).fontSize) / 16; if (tier !== lastTier) { lastTier = tier; if (currentSnapshot || currentNoData) draw(currentSnapshot,currentNoData); } });
 meterObserver.observe($('#app'));
-fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === '+' || event.key === '=') settings.fineTune = Math.min(150, settings.fineTune + 5); else if (event.key === '-') settings.fineTune = Math.max(50, settings.fineTune - 5); else if (event.key === '0') settings.fineTune = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
+fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === ',') {event.preventDefault();openSettings();return;} if (event.key === '+' || event.key === '=') settings.fineTune = Math.min(150, settings.fineTune + 5); else if (event.key === '-') settings.fineTune = Math.max(50, settings.fineTune - 5); else if (event.key === '0') settings.fineTune = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
 if (isSample) draw(currentSample());
 else {
   try {

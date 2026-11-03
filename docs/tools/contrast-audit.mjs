@@ -7,7 +7,7 @@ const session=await browser();
 try {
   await session.navigate('/?sample','window.__AI_USAGE_DEMO__');
   const total={combinations:0,texts:0,failures:[]};
-  for(const shape of ['portrait','landscape','square']) for(const width of (shape==='portrait'?[200,340,600]:[shape==='landscape'?680:340])) {
+  for(const shape of ['portrait','landscape','square','circle','pill']) for(const width of (shape==='portrait'?[200,340,600]:[shape==='landscape'?680:shape==='pill'?480:340])) {
   await session.cdp('Emulation.setDeviceMetricsOverride',{width,height:1400,deviceScaleFactor:1,mobile:false});
   const result=await session.evaluate(`(async()=>{
     const api=window.__AI_USAGE_DEMO__;

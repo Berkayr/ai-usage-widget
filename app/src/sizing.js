@@ -1,8 +1,7 @@
 // Design dimensions are logical CSS pixels at 100% fine tuning and DPI 1.
 export const sizePresets = {Small:75, Medium:100, Large:150, 'X-Large':200, '2X-Large':250};
-// Reserved geometries are schema values, not selectable shapes in this phase.
-export const shapes = ['portrait', 'landscape', 'square'];
-export const reservedShapes = ['circle', 'pill'];
+export const shapes = ['portrait', 'landscape', 'square', 'circle', 'pill'];
+export const reservedShapes = [];
 export function normalizeShape(shape) { return shapes.includes(shape) ? shape : 'portrait'; }
 export function normalizeSize(value = {}) {
   const aliases = {Normal:'Medium', Huge:'X-Large'};
@@ -19,13 +18,20 @@ export function normalizeSize(value = {}) {
 }
 export function widgetWidth(settings, count = 1) {
   if (settings.shape === 'landscape') return 680;
-  if (settings.shape === 'square') return 340;
+  if (['square','circle'].includes(settings.shape)) return 340;
+  if (settings.shape === 'pill') return 480;
   return settings.theme === 'compact-strip' ? 30 + Math.max(1,count)*310 : 340;
 }
 
 // Shared with the CSS tokens in layout.css: 28 padding + 2 border +
 // 60 header + 26 footer, then one 200px block and 10px gap per provider.
 export function widgetHeight(settings, count = 1) {
-  if (['landscape', 'square'].includes(settings.shape)) return 340;
+  if (['landscape', 'square', 'circle'].includes(settings.shape)) return 340;
+  if (settings.shape === 'pill') return 120;
   return 116 + (settings.theme === 'compact-strip' ? 1 : Math.max(1, count)) * 210;
+}
+
+export function widgetProviders(providers, selection) {
+  if (!Array.isArray(selection)) return providers.slice(0,3);
+  return providers.filter(p=>selection.includes(p.id)).slice(0,3);
 }

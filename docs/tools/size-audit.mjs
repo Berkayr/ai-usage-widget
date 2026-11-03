@@ -2,6 +2,7 @@
 import { writeFile } from 'node:fs/promises';
 import { browser } from './browser-harness.mjs';
 import { shapes, sizePresets, normalizeSize, widgetWidth, widgetHeight } from '../../app/src/sizing.js';
+if(shapes.join(',')!=='portrait,landscape,square,circle,pill')throw Error('Five-shape audit contract');
 const b = await browser();
 try {
   await b.navigate('/?sample', 'window.__AI_USAGE_DEMO__');

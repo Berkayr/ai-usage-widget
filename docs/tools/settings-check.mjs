@@ -20,11 +20,17 @@ try {
     $('#save').click();await new Promise(r=>setTimeout(r,50));assert($('#dirty').textContent==='All changes saved','Save');
     $('[data-theme="terminal"]').click();$('#revert').click();assert($('[data-theme="dot-matrix"]').getAttribute('aria-pressed')==='true','Revert theme');
     $('[data-category=layout]').click();
-    assert(document.querySelectorAll('[data-shape]').length===3,'Three shapes');
+    assert(document.querySelectorAll('[data-shape]').length===5,'Five shapes');
     $('[data-shape=landscape]').click();assert($('[data-size=Medium] small').textContent==='680 × 340 px','Landscape dimensions');assert($('#fit-height').disabled,'Fixed shape fit-height');
     $('#save').click();await new Promise(r=>setTimeout(r,50));
     $('[data-shape=square]').click();assert($('[data-size=Medium] small').textContent==='340 × 340 px','Square dimensions');
     $('#revert').click();assert($('[data-shape=landscape]').getAttribute('aria-pressed')==='true','Revert shape');
+    for(const [shape,dimensions] of [['circle','340 × 340 px'],['pill','480 × 120 px']]) {
+      $('[data-shape='+shape+']').click();assert($('[data-size=Medium] small').textContent===dimensions,'Round dimensions');
+      assert(!$('#widget-provider-choices').hidden,'Round provider picker');
+      const checks=[...document.querySelectorAll('[data-widget-provider]')];assert(checks.filter(c=>c.checked).length<=3,'Selection limit');
+      const first=checks.find(c=>c.checked);if(first){first.click();assert(!document.querySelector('[data-widget-provider="'+first.dataset.widgetProvider+'"]').checked,'Selection toggle');}
+    }
     $('[data-shape=portrait]').click();assert(!$('#fit-height').disabled,'Portrait fit-height');
     const sizes=[...document.querySelectorAll('[data-size]')];
     assert(sizes.map(b=>b.dataset.size).join(',')==='Small,Medium,Large,X-Large,2X-Large','Five size choices');
@@ -60,7 +66,7 @@ try {
     window.__TAURI_EVENT_PLUGIN_INTERNALS__={unregisterListener:(_,id)=>events.delete(id)};
     window.__TAURI_INTERNALS__={metadata:{currentWindow:{label:'settings'},currentWebview:{label:'settings'}},transformCallback:callback=>{const id=++next;callbacks.set(id,callback);return id;},invoke:async(cmd,args={})=>{
       if(cmd==='load_settings')return structuredClone(disk);
-      if(cmd==='get_provider_config')return {initialized:true,providers:{claude:{enabled:true}},disclosures:{claude:'Synthetic provider'},detected:{}};
+      if(cmd==='get_provider_config')return {initialized:true,providers:Object.fromEntries(['claude','codex','gemini','copilot'].map(id=>[id,{enabled:true}])),disclosures:Object.fromEntries(['claude','codex','gemini','copilot'].map(id=>[id,'Synthetic provider'])),detected:{}};
       if(cmd==='get_autostart')return false;
       if(cmd==='get_desktop_info')return {platform:'linux',layerShell:true,monitors:[]};
       if(cmd==='get_placement_monitors')return {layerShell:true,monitors:[{name:'Synthetic display',width:1920,height:1080,primary:true}],widgetWidth:340,widgetHeight:600};
@@ -80,7 +86,12 @@ try {
     console.log(await b.evaluate(`(async()=>{
       const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
       assert(!$('#status').textContent,'Native bridge initialization: '+$('#status').textContent);
-      $('[data-category=layout]').click();const scale=$('#scale');$('[data-shape=square]').click();scale.value=125;scale.dispatchEvent(new Event('input'));scale.value=150;scale.dispatchEvent(new Event('input'));
+      $('[data-category=layout]').click();
+      $('[data-shape=circle]').click();assert(document.querySelectorAll('[data-widget-provider]:checked').length===3,'Default first three');
+      assert($('[data-widget-provider=copilot]').disabled,'Fourth selection must be disabled');
+      $('[data-widget-provider=claude]').click();$('[data-widget-provider=copilot]').click();
+      $('[data-shape=pill]').click();assert($('[data-widget-provider=copilot]').checked&&!$('[data-widget-provider=claude]').checked,'Shared round selection');
+      const scale=$('#scale');$('[data-shape=square]').click();scale.value=125;scale.dispatchEvent(new Event('input'));scale.value=150;scale.dispatchEvent(new Event('input'));
       await new Promise(r=>setTimeout(r,40));assert(native.saves.length===0,'Preview wrote to disk');assert(native.previews.at(-1).scale===150&&native.previews.at(-1).shape==='square','Preview queue lost latest value / shape');
       await native.close();assert(!$('#close-prompt').hidden&&native.hidden===0,'Dirty close not prevented');
       $('#close-cancel').click();assert($('#close-prompt').hidden&&native.hidden===0,'Cancel closed window');

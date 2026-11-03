@@ -45,6 +45,7 @@ for(const id of ['scale','position','fit-height','show-extra-windows'])move(id,'
 sections.layout.append($('.scale-presets'));
 const shapePicker=document.createElement('fieldset');shapePicker.className='shape-picker';shapePicker.innerHTML='<legend>Shape</legend>'+shapes.map(shape=>`<button data-shape="${shape}" aria-pressed="false"><i class="shape-silhouette ${shape}" aria-hidden="true"></i>${shape[0].toUpperCase()+shape.slice(1)}</button>`).join('');sections.layout.prepend(shapePicker);
 shapePicker.querySelectorAll('button').forEach(button=>button.onclick=()=>{draft.shape=button.dataset.shape;update();});
+const widgetChoices=document.createElement('fieldset');widgetChoices.id='widget-provider-choices';sections.layout.insertBefore(widgetChoices,shapePicker.nextSibling);
 move('start-at-login','about');move('autostart-status','about');
 sections.desktop.append($('#linux-settings'));$('#linux-settings').hidden=false;
 sections.taskbar.append($('#taskbar-settings'));
@@ -71,6 +72,11 @@ function previewInk(ink, paper) {
 }
 function renderControls() {
   document.querySelectorAll('[data-shape]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.shape===draft.shape)));
+  widgetChoices.hidden=!['circle','pill'].includes(draft.shape);
+  widgetChoices.replaceChildren();const legend=document.createElement('legend');legend.textContent='Providers on this widget';widgetChoices.append(legend);
+  const note=document.createElement('p');note.className='setting-note';note.textContent='Choose up to 3. By default the first 3 enabled providers are shown.';widgetChoices.append(note);
+  const selected=Array.isArray(draft.widgetProviders)?draft.widgetProviders:providers.slice(0,3);
+  for(const id of providers){const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.dataset.widgetProvider=id;input.checked=selected.includes(id);input.disabled=!input.checked&&selected.length>=3;label.textContent=id;label.append(input);widgetChoices.append(label);input.onchange=()=>{draft.widgetProviders=providers.filter(key=>key===id?input.checked:selected.includes(key)).slice(0,3);update();};}
   $('#fit-height').disabled=draft.shape!=='portrait';
   for(const [id,key]of Object.entries(bindings)) {const el=$(`#${id}`);const value=get(key);if(el.type==='checkbox')el.checked=!!value;else el.value=value??'';const output=$(`#${id.replace('-opacity','')}-out`)||$(`#${id}-out`);if(output)output.value=`${value}${id==='linux-margin'?' px':'%'}`;}
   document.querySelectorAll('[data-size]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.size===draft.sizePreset));b.querySelector('small').textContent=`${Math.round(widgetWidth(draft,Math.max(1,providers.length))*sizePresets[b.dataset.size]/100)} × ${Math.round(widgetHeight(draft,Math.max(1,providers.length))*sizePresets[b.dataset.size]/100)} px`;});

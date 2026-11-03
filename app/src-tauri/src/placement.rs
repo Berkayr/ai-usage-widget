@@ -15,6 +15,13 @@ pub fn snap(value: i32, available: i32, mode: &str) -> i32 {
     if mode == "edges" { for line in [0, available/2, available] { if (value-line).abs() <= 12 { return line; } } }
     value
 }
+// GTK work areas are logical; Windows work areas and outer sizes are physical.
+fn edge_margin(scale: f64) -> u32 { (8. * if scale.is_finite() {scale.max(1.)} else {1.}).ceil() as u32 }
+fn inset_position(r: f64, extent: u32, widget: u32, margin: u32, mode: &str) -> i32 {
+    let available=extent.saturating_sub(widget);
+    let inset=margin.min(available/2) as i32;
+    snap(pixel(r,extent,widget),available as i32,mode).clamp(inset,available as i32-inset)
+}
 fn select<'a>(list: &'a [Monitor], p: &Placement) -> Option<&'a Monitor> {
     if let Some(found) = p.monitor.as_ref().and_then(|name| list.iter().find(|m| &m.name==name)) { return Some(found); }
     if p.monitor.is_some() && p.disconnected=="hide" { return None; }
@@ -50,17 +57,18 @@ pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),St
     let p=&settings.placement;
     let Some(monitor)=selected(&list,settings) else { let _=window.hide(); return Ok(()); };
     let (width,height)=widget_size(window);
-    let clipped=(width.min(monitor.width),height.min(monitor.height));
+    #[cfg(target_os="linux")] let margin=edge_margin(1.);
+    #[cfg(not(target_os="linux"))] let margin=edge_margin(monitor.scale);
+    let clipped=(width.min(monitor.width.saturating_sub(2*margin).max(1)),height.min(monitor.height.saturating_sub(2*margin).max(1)));
     if clipped!=(width,height) {
         #[cfg(target_os="linux")] { use gtk::prelude::*;if let Ok(gtk)=window.gtk_window() {gtk.set_size_request(clipped.0 as i32,clipped.1 as i32);if !linux::layered() {gtk.resize(clipped.0 as i32,clipped.1 as i32);}} }
         #[cfg(not(target_os="linux"))] {let _=window.set_size(tauri::PhysicalSize::new(clipped.0,clipped.1));}
     }
     let (width,height)=clipped;
     let (xr,yr)=if settings.position=="Free" { (p.x_ratio,p.y_ratio) } else { (if settings.position.ends_with("left") {0.} else {1.},if settings.position.starts_with("Top") {0.} else {1.}) };
-    let mut x=snap(pixel(xr,monitor.width,width),monitor.width.saturating_sub(width) as i32,&p.snap);
-    let mut y=snap(pixel(yr,monitor.height,height),monitor.height.saturating_sub(height) as i32,&p.snap);
-    #[cfg(target_os="linux")] if settings.position!="Free" { let margin=settings.linux.margin.clamp(0,64); x=if xr==0. { margin } else { x-margin }; y=if yr==0. { margin } else { y-margin }; }
-    x=x.clamp(0,monitor.width.saturating_sub(width) as i32); y=y.clamp(0,monitor.height.saturating_sub(height) as i32);
+    #[cfg(target_os="linux")] let margin=if settings.position!="Free" {margin.max(settings.linux.margin.clamp(0,64) as u32)} else {margin};
+    let x=inset_position(xr,monitor.width,width,margin,&p.snap);
+    let y=inset_position(yr,monitor.height,height,margin,&p.snap);
     #[cfg(target_os="linux")] {
         if linux::layered() { linux::place(window,&settings.linux,&monitor.name,x,y); if !window.is_visible().unwrap_or(false) { let _=window.show(); } return Ok(()); }
     }
@@ -111,6 +119,25 @@ pub fn watch(app: tauri::AppHandle) {
         for height in [initial,grown,area,area+100] {
             let clipped=height.min(area);
             assert_eq!(panel as i32+pixel(1.0,area,clipped)+clipped as i32,960);
+        }
+    }
+    #[test] fn every_shape_keeps_eight_logical_pixels_at_edges() {
+        for scale in [1.,1.25,1.5,2.] {
+            let margin=edge_margin(scale);
+            for (w,h) in [(340,640),(640,340),(340,340),(480,120)] {
+                for (extent,size) in [(1920,w),(1080,h),(200,w)] {
+                    let size=size.min(extent-2*margin);
+                    for mode in ["off","grid","edges"] {
+                        for r in [0.,0.25,0.5,1.,-1.,2.,f64::NAN] {
+                            let p=inset_position(r,extent,size,margin,mode);
+                            assert!(p>=margin as i32);
+                            assert!(p+size as i32<=extent as i32-margin as i32);
+                        }
+                        assert_eq!(inset_position(0.,extent,size,margin,mode),margin as i32);
+                        assert_eq!(inset_position(1.,extent,size,margin,mode), (extent-size-margin) as i32);
+                    }
+                }
+            }
         }
     }
     #[test] fn snapping() {assert_eq!(snap(9,100,"edges"),0);assert_eq!(snap(46,100,"edges"),50);assert_eq!(snap(94,100,"edges"),100);assert_eq!(snap(46,100,"off"),46);assert_eq!(snap(46,100,"grid"),48);assert_eq!(snap(100,99,"grid"),96);}

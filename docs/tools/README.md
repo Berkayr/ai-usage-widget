@@ -162,3 +162,47 @@ produces `docs/screenshots/shapes.png` from nine themes with fictional data.
 Landscape and square have fixed 680 × 340 / 340 × 340 Medium boxes. Their theme
 identity checks include the 9 CSS px text floor and 25% trailing-space budget.
 Contrast checks cover both shapes in addition to the portrait viewport matrix.
+
+Round-shape checks extend the matrix to all five shapes (900 size cases,
+2880 identity cases). Circle checks every painted text rectangle against the
+circular boundary, plus the inner content area; pill checks text against the
+capsule boundary. Both enforce the 9 CSS px floor, the three-provider cap,
+and text/container overflow checks. For targeted iteration, use
+`AUDIT_SHAPES=circle,pill node docs/tools/theme-identity-check.mjs`.
+The shape preview includes all five geometries for every theme, using fictional
+providers only. Settings checks exercise Circle/Pill dimensions and provider
+selection as well as the existing Save/Revert/close/reopen flow.
+
+`node docs/tools/circle-preview.mjs` produces `circle-sheet.png`: all nine
+circle themes at Medium with three fictional providers, paired dark/light.
+The sheet uses a transparent canvas and asserts all 72 iframe corner pixels
+have zero alpha in the captured PNG. Round documents use a light browser canvas
+scheme to prevent dark iframe canvases painting opaque rectangular corners;
+the widget's resolved theme palette still controls its surface and text.
+
+Circle identity metrics now record stroke width, cap, dot/segment pattern and
+number weight for each theme. Legend keys must match the painted ring color,
+and legend text must be at least body size (15 px at Medium). Minimal Pace
+requires elapsed-time markers. Actual Medium dark circle captures are compared
+pixel by pixel; a mean RGBA channel difference below 3/255 produces a similarity
+warning in `theme-identity-results.json`. Geometry/signature failures remain
+errors. Pill checks compare every visible text range against every other range
+in its card, require a gap of at least 3.5 CSS px between label/value wrappers,
+and enforce reset hiding before plan hiding: Large and above retain reset
+rows, Medium/Small retain only plan metadata, and effective scale below 65% drops
+plans and secondary quota rows. The visible text floor remains 9 CSS px.
+
+Provider identity regression: `node docs/tools/provider-identity-check.mjs` uses
+three fictional providers with identical OK/warning/danger usage in each scene.
+It checks every palette, theme, dark/light appearance and Calm/Vivid/Mono in both
+circle and pill: CIE76 ΔE ≥20 for identity colors, three distinct Mono patterns,
+exact legend/ring color agreement, warning/danger endpoints and symbols, and
+stable identities when selecting/reordering known providers. Results are in
+`provider-identity-results.json`. Identity tones live in each palette's
+`providerColors`; threshold colors remain independent.
+
+`node docs/tools/circle-preview.mjs` refreshes the mixed-threshold circle sheet;
+`CIRCLE_ALL_OK=1 node docs/tools/circle-preview.mjs` adds `circle-sheet-all-ok.png`.
+`node docs/tools/provider-identity-preview.mjs` captures circle and pill side by
+side across all three color modes and identical per-provider status. These
+commands run only the browser frontend with invented quotas, never the native app.

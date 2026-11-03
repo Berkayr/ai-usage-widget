@@ -35,10 +35,22 @@ test('five sizes use proportional boxes, including the independent strip orienta
 
 test('shape migration and fixed boxes are independent of theme and provider count',()=>{
  assert.equal(normalizeSize({}).shape,'portrait');
- for(const shape of ['unknown','circle','pill'])assert.equal(normalizeSize({shape}).shape,'portrait');
+ for(const shape of ['unknown'])assert.equal(normalizeSize({shape}).shape,'portrait');
  for(const theme of ['system','brutalist','circular-rings','compact-strip'])for(const count of [0,1,3,6])for(const shape of ['landscape','square']) {
   const settings=normalizeSize({theme,shape});
   assert.equal(widgetWidth(settings,count),shape==='landscape'?680:340);
   assert.equal(widgetHeight(settings,count),340);
  }
+});
+
+test('round dimensions and per-widget selection',async()=>{
+ const {widgetProviders}=await import('../app/src/sizing.js');
+ for(const count of [0,1,3,6]) for(const theme of ['system','compact-strip','brutalist']) {
+  assert.equal(widgetWidth({shape:'circle',theme},count),340);assert.equal(widgetHeight({shape:'circle',theme},count),340);
+  assert.equal(widgetWidth({shape:'pill',theme},count),480);assert.equal(widgetHeight({shape:'pill',theme},count),120);
+ }
+ const providers=Array.from({length:6},(_,id)=>({id:String(id)}));
+ assert.deepEqual(widgetProviders(providers).map(p=>p.id),['0','1','2']);
+ assert.deepEqual(widgetProviders(providers,['4','5']).map(p=>p.id),['4','5']);
+ assert.deepEqual(widgetProviders(providers,[]),[]);
 });

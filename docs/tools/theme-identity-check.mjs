@@ -3,11 +3,12 @@ import { writeFile } from 'node:fs/promises';
 import { browser } from './browser-harness.mjs';
 import { shapes, sizePresets, widgetHeight, widgetWidth } from '../../app/src/sizing.js';
 const b=await browser();
-const rows=[];
+const rows=[],circleCaptures=[],similarityWarnings=[];
 try {
+  await b.cdp('Emulation.setDefaultBackgroundColorOverride',{color:{r:0,g:0,b:0,a:0}});
   await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
   const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
-  for(const shape of shapes) for(const theme of themes) for(const sizePreset of Object.keys(sizePresets)) for(const count of [1,2,3,4,5,6]) for(const appearance of ['dark','light']) for(const page of (shape==='square'&&count>4?[0,1]:[0])) {
+  for(const shape of shapes.filter(s=>!process.env.AUDIT_SHAPES||process.env.AUDIT_SHAPES.split(',').includes(s))) for(const theme of themes) for(const sizePreset of Object.keys(sizePresets)) for(const count of [1,2,3,4,5,6]) for(const appearance of ['dark','light']) for(const page of (shape==='square'&&count>4?[0,1]:[0])) {
     const settings={shape,theme,sizePreset,fineTune:100,fitHeight:true,appearance};
     const scale=sizePresets[sizePreset]/100;
     await b.cdp('Emulation.setDeviceMetricsOverride',{width:Math.round(widgetWidth(settings,count)*scale),height:Math.ceil(widgetHeight(settings,count)*scale)+10,deviceScaleFactor:1,mobile:false});
@@ -18,6 +19,52 @@ try {
       if (document.querySelectorAll('.shape-pages button').length) {document.querySelectorAll('.shape-pages button')[${page}].click();await new Promise(r=>requestAnimationFrame(r));}
       await document.fonts.ready;
       const shape=${JSON.stringify(shape)},theme=${JSON.stringify(theme)},failures=[],metrics={};
+      if(['circle','pill'].includes(shape)) {
+        const shell=document.querySelector('.widget').getBoundingClientRect(),cx=shell.left+shell.width/2,cy=shell.top+shell.height/2,radius=shell.width/2;
+        const check=(ok,msg)=>{if(!ok)failures.push(msg)};
+        check(document.querySelectorAll(shape==='circle'?'.dial-legend>div':'.provider-card').length===(shape==='circle'&&${count}===1?2:Math.min(3,${count})),'Selected provider count');
+        const walker=document.createTreeWalker(document.querySelector('.widget'),NodeFilter.SHOW_TEXT);
+        while(walker.nextNode()) {
+          const node=walker.currentNode,el=node.parentElement;
+          if(!node.textContent.trim())continue;
+          const range=document.createRange();range.selectNodeContents(node);
+          for(const r of range.getClientRects()) {
+            if(!r.width||!r.height)continue;
+            check(parseFloat(getComputedStyle(el).fontSize)>=9,'Text below 9px');
+            check(r.left>=shell.left-1&&r.right<=shell.right+1&&r.top>=shell.top-1&&r.bottom<=shell.bottom+1,'Text outside shell');
+            if(shape==='circle'&&el.closest('.dial-safe')) {const half=shell.width/(2*Math.SQRT2);check(r.left>=cx-half&&r.right<=cx+half&&r.top>=cy-half&&r.bottom<=cy+half,'Text outside inner square');}
+            if(shape==='circle') for(const x of [r.left,r.right])for(const y of [r.top,r.bottom])check(Math.hypot(x-cx,y-cy)<=radius+1,'Text outside circle');
+            else for(const x of [r.left,r.right])for(const y of [r.top,r.bottom]) {const end=Math.max(shell.left+shell.height/2,Math.min(x,shell.right-shell.height/2));check(Math.hypot(x-end,y-cy)<=shell.height/2+1,'Text outside pill');}
+          }
+        }
+        for(const el of document.querySelectorAll(shape==='circle'?'.dial-safe>*':'.provider-card'))check(el.scrollWidth<=el.clientWidth+2&&el.scrollHeight<=el.clientHeight+2,'Content overflow');
+        if(shape==='circle') {check(document.querySelectorAll('.dial-track').length===(${count}===1?2:Math.min(3,${count})),'Dial tracks');check(document.querySelector('.dial-number').textContent==='100%','Highest usage');}
+        if(shape==='circle') {
+          const value=document.querySelector('.dial-value'),pattern=document.querySelector('.dial-pattern'),number=document.querySelector('.dial-number');
+          const expected={system:[6,'round',null,800],brutalist:[12,'butt',null,900],'circular-rings':[13,'round',null,700],'dot-matrix':[7,'round','.1 3',800],'retro-lcd':[9,'butt','1.3 .7',500],terminal:[4,'butt','1 1',400],'frosted-glass':[8,'round',null,800],'minimal-pace':[2,'butt',null,300],'compact-strip':[5,'square',null,800]}[theme];
+          metrics.circleSignature={width:parseFloat(getComputedStyle(value).strokeWidth),cap:getComputedStyle(value).strokeLinecap,pattern:pattern.getAttribute('stroke-dasharray'),weight:Number(getComputedStyle(number).fontWeight)};
+          check(JSON.stringify(Object.values(metrics.circleSignature))===JSON.stringify(expected),'Circle theme signature');
+          check(parseFloat(getComputedStyle(document.querySelector('.dial-legend')).fontSize)>=parseFloat(getComputedStyle(document.querySelector('.widget')).fontSize),'Legend body size');
+          [...document.querySelectorAll('.dial-value')].forEach((v,i)=>check(getComputedStyle(v).stroke===getComputedStyle(document.querySelectorAll('.dial-legend i')[i]).backgroundColor,'Ring legend color match'));
+          check(getComputedStyle(document.body).backgroundColor==='rgba(0, 0, 0, 0)'&&getComputedStyle(document.documentElement).backgroundColor==='rgba(0, 0, 0, 0)','Transparent circle canvas');
+          if(theme==='minimal-pace')check(document.querySelectorAll('.dial-elapsed').length===document.querySelectorAll('.dial-track').length,'Elapsed markers');
+        } else {
+          const large=document.documentElement.dataset.largeShape==='true';
+          check([...document.querySelectorAll('.window-bottom')].every(el=>large||!el.getClientRects().length),'Pill hides resets before plans');
+          check([...document.querySelectorAll('.plan')].every(el=>el.getClientRects().length>0),'Pill retains plan at preset sizes');
+          // Text ranges catch glyph collisions even if flex wrappers look separated.
+          for(const card of document.querySelectorAll('.provider-card')) {
+            const texts=[],walker=document.createTreeWalker(card,NodeFilter.SHOW_TEXT);
+            while(walker.nextNode()) {if(!walker.currentNode.textContent.trim())continue;const r=document.createRange();r.selectNodeContents(walker.currentNode);for(const box of r.getClientRects())if(box.width&&box.height)texts.push(box);}
+            for(let i=0;i<texts.length;i++)for(let j=i+1;j<texts.length;j++) {
+              const a=texts[i],b=texts[j];check(Math.min(a.right,b.right)-Math.max(a.left,b.left)<=.5||Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)<=.5,'Pill text boxes intersect');
+            }
+            for(const top of card.querySelectorAll('.window-top')) {const label=top.querySelector('span'),value=top.querySelector('b');if(label.getClientRects().length)check(value.getBoundingClientRect().left-label.getBoundingClientRect().right>=3.5,'Pill label/value gap');}
+          }
+        }
+        return {metrics,failures};
+      }
+
       const check=(ok,message)=>{if(!ok)failures.push(message)};
       const rect=el=>el.getBoundingClientRect();
       const cards=[...document.querySelectorAll('.provider-card')];
@@ -122,10 +169,24 @@ try {
       }
       return {metrics,failures};
     })()`);
+    if(shape==='circle'&&sizePreset==='Medium'&&count===3&&appearance==='dark') {
+      const png=await b.cdp('Page.captureScreenshot',{format:'png',clip:{x:0,y:0,width:340,height:340,scale:1}});
+      circleCaptures.push({theme,data:png.data,signature:result.metrics.circleSignature});
+    }
     rows.push({shape,theme,sizePreset,count,page,appearance,...result});
   }
+  // Compare actual rendered pixels as well as structural signatures.
+  for(let i=0;i<circleCaptures.length;i++)for(let j=i+1;j<circleCaptures.length;j++) {
+    const a=circleCaptures[i],c=circleCaptures[j];
+    const difference=await b.evaluate(`(async()=>{
+      const pixels=async data=>{const img=new Image();img.src='data:image/png;base64,'+data;await img.decode();const canvas=document.createElement('canvas');canvas.width=340;canvas.height=340;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);return ctx.getImageData(0,0,340,340).data;};
+      const a=await pixels(${JSON.stringify(a.data)}),b=await pixels(${JSON.stringify(c.data)});let sum=0;for(let k=0;k<a.length;k++)sum+=Math.abs(a[k]-b[k]);return sum/a.length;
+    })()`);
+    if(difference<3)similarityWarnings.push({themes:[a.theme,c.theme],meanChannelDifference:difference});
+  }
+  if(similarityWarnings.length)console.warn('Visually similar circles:',similarityWarnings);
   const failures=rows.filter(r=>r.failures.length);
-  await writeFile('docs/tools/theme-identity-results.json',JSON.stringify({rows,failures},null,2)+'\n');
+  await writeFile('docs/tools/theme-identity-results.json',JSON.stringify({rows,failures,similarityWarnings},null,2)+'\n');
   console.log(`${rows.length} theme/size/provider/appearance combinations; ${failures.length} identity failures`);
   if(failures.length){console.table(failures);process.exitCode=1;}
 } finally {await b.close();}

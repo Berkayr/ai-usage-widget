@@ -32,8 +32,18 @@
         "accent": "#137a37",
         "severityNormal": "#137a37",
         "severityWarning": "#925000",
-        "severityDanger": "#b91c1c"
-      }
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#137a37",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#c8ff00",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     }
   }
 }

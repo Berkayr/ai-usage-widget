@@ -10,6 +10,7 @@ pub fn set_preview(app: &tauri::AppHandle, mut settings: Settings) -> Result<(),
     settings.taskbar.dot_count=settings.dot_count;
     *CURRENT.get_or_init(|| Mutex::new(load_settings())).lock().unwrap_or_else(|e|e.into_inner()) = settings.clone();
     if let Some(window) = app.get_webview_window("main") {
+        shape_region::request(&window);
         let target = window.clone(); let value = settings.clone();
         window.run_on_main_thread(move || { let _ = placement::apply(&target, &value); }).map_err(|e|e.to_string())?;
         window.emit("settings-preview", &settings).map_err(|e| e.to_string())?;

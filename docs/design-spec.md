@@ -252,3 +252,16 @@ Brutalist keeps display-size
 bold numbers, Terminal its dashed frame, and Dot Matrix its round dot tracks.
 Extra quota details remain available in portrait. Visible text in the new
 shapes has a 9 CSS px floor; the floor is absolute, independent of rem scaling.
+
+
+### Round shape contract
+
+All five shapes share the size presets (75%, 100%, 150%, 200%, 250%) and fine tuning. Medium circle is 340 × 340 CSS pixels; Medium pill is 480 × 120. Geometry is independent of theme and provider count. Circle uses a circular mask; pill uses a radius of half its height.
+
+Circle and pill show up to three providers selected per widget in Settings → Layout & Position → Providers on this widget. An absent selection defaults to the first three enabled providers; an empty selection intentionally shows none. Other enabled providers remain visible in settings and in rectangular layouts. Selection does not change collector consent.
+
+A single-provider circle shows session outside and weekly inside. Multiple providers have concentric session tracks and a highest-usage center. Labels, percentages and reset countdown occupy the inner safe square; settings sits inside the top safe zone. Dot Matrix uses dotted tracks, Retro LCD segmented arcs, Terminal dashed radar tracks, Brutalist heavy rings and oversized numerals, Minimal Pace thin tracks, and Frosted Glass a blurred lens. Compact Strip supports the circle as a slim-track dial using its own palette and typography.
+
+Pill shows inline provider cells, primary reset time, dual quota meters, and an internal settings button; header and footer are omitted. Text is at least 9 CSS pixels. Right-click opens the context menu inside either silhouette; Ctrl+, opens Settings. Dragging an unlocked widget works across its surface.
+
+Native input regions match the silhouette: Win32 applies physical-pixel ellipse/capsule regions and transfers region ownership to Windows; GTK applies logical-pixel cairo scanlines to its input region on both X11 and layer-shell Wayland. Resize, DPI and shape changes are coalesced for 40 ms; identical regions are skipped. Rectangular shapes restore the entire input region. Native click-through still requires manual compositor testing.
