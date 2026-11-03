@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { browser } from './browser-harness.mjs';
 const scaleMatrix=JSON.parse(await readFile(new URL('./fixtures/scale-settings.json',import.meta.url),'utf8'));
 const b=await browser();
@@ -196,4 +196,33 @@ try {
       return 'PASS: synthetic IPC ${action}, no disk writes on preview, latest-value queue, dirty close, Cancel, Esc, four reopens with five fixed listeners';
     })()`));
   }
+  console.log(await b.evaluate(`(async()=>{
+    const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
+    await native.reopen();$('[data-category=layout]').click();
+    const set=(id,value)=>{const el=$('#'+id);el.value=value;el.dispatchEvent(new Event('change'));};
+    assert($('#size-mode').value==='fixed','Existing settings must default to fixed');
+    const fixed=native.previews.at(-1)?.scale ?? 150;
+    set('size-mode','screen');set('fit-fraction','0.5');
+    $('#fit-fine-tune').value=82;$('#fit-fine-tune').dispatchEvent(new Event('input'));
+    set('reserved-top','0');set('reserved-bottom','20.4');
+    assert($('.scale-presets').hidden&&!$('#fit-fraction').closest('label').hidden,'Size mode controls');
+    assert($('#size-fit-warning').hidden,'Screen mode shows fixed size warning');
+    assert($('#detected-area').textContent.includes('Detected work area 1920 × 1080'),'Detected area label');
+    $('#save').click();await new Promise(r=>setTimeout(r,60));
+    const saved=native.saves.at(-1);
+    assert(saved.sizeMode==='screen'&&saved.fitFraction===0.5&&saved.fitFineTune===82,'Screen fields not saved');
+    assert(saved.reservedTop===0&&saved.reservedBottom===20,'Zero override lost');
+    assert(saved.scale===fixed,'Screen sizing changed saved fixed scale');
+    await native.reopen();assert($('#size-mode').value==='screen'&&$('#reserved-top').value==='0','Screen reopen');
+    set('size-mode','fixed');set('reserved-top','');$('#revert').click();
+    assert($('#size-mode').value==='screen'&&$('#reserved-top').value==='0','Screen revert');
+    set('reserved-top','');$('#save').click();await new Promise(r=>setTimeout(r,60));
+    assert(native.saves.at(-1).reservedTop===null,'Blank Auto override lost');
+    return 'PASS: screen fractions, independent fine tuning, zero/Auto reservations, fixed scale preserved, save/reopen/revert';
+  })()`));
+  await b.cdp('Emulation.setDeviceMetricsOverride',{width:900,height:680,deviceScaleFactor:1,mobile:false});
+  await b.evaluate("document.querySelector('#size-mode').scrollIntoView({block:'center'})");
+  await mkdir('gorevler/ss-ayar',{recursive:true});
+  const screenPng=await b.cdp('Page.captureScreenshot',{format:'png'});
+  await writeFile('gorevler/ss-ayar/screen-fit-settings.png',Buffer.from(screenPng.data,'base64'));
 }finally{await b.close();}

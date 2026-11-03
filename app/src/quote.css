@@ -64,3 +64,5 @@
 .quote-nav{left:auto;right:0}
 :root[data-shape=landscape] .quote-source{margin:0 3rem 0 0}
 :root[data-shape=circle] .quote-source{min-height:0;line-height:1.4;margin-right:0}
+/* The pill quote icon has no text baseline or inherited theme separator. */
+:root[data-shape=pill] .quote-section{display:flex;align-items:center;border:0}

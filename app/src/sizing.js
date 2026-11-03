@@ -46,5 +46,33 @@ export function monitorFit(settings, count, monitor, platform = 'linux') {
   const maxScale = Math.min(availableWidth / widgetWidth(settings, count), availableHeight / widgetHeight(settings, count)) * 100 / unit;
   const width = widgetWidth(settings, count) * settings.scale / 100 * unit;
   const height = widgetHeight(settings, count) * settings.scale / 100 * unit;
-  return {width, height, maxScale, fits:settings.scale <= maxScale, availableWidth, availableHeight};
+  return {width, height, maxScale, fits:settings.scale <= maxScale, margin, availableWidth, availableHeight};
+}
+
+// Manual reservations replace the detected edge, in logical pixels on every OS.
+export function workAreaMonitor(monitor, settings, platform = 'linux') {
+  const unit = platform === 'windows' ? monitor.scale || 1 : 1;
+  const fullHeight=monitor.height+(monitor.detectedTop || 0)+(monitor.detectedBottom || 0);
+  const top = Math.min(fullHeight-1, settings.reservedTop == null ? monitor.detectedTop || 0 : Math.max(0, Number(settings.reservedTop) || 0) * unit);
+  const bottom = Math.min(fullHeight-top-1, settings.reservedBottom == null ? monitor.detectedBottom || 0 : Math.max(0, Number(settings.reservedBottom) || 0) * unit);
+  const delta = top - (monitor.detectedTop || 0);
+  return {...monitor, y:(monitor.y || 0)+delta, height:Math.max(1,monitor.height-delta-bottom+(monitor.detectedBottom || 0))};
+}
+export function fittedGeometry(settings, count, monitor, platform = 'linux') {
+  const area = workAreaMonitor(monitor, settings, platform);
+  const fit = monitorFit(settings, count, area, platform);
+  const unit = (platform === 'windows' ? monitor.scale || 1 : 1) / (settings.matchPhysicalSize ? monitor.scale || 1 : 1);
+  const wide = ['landscape','pill'].includes(settings.shape);
+  const target = (wide ? fit.availableWidth / widgetWidth(settings,count) : fit.availableHeight / widgetHeight(settings,count)) * 100 / unit;
+  const fraction = [1,.75,.5,1/3].includes(Number(settings.fitFraction)) ? Number(settings.fitFraction) : 1;
+  const scale = settings.sizeMode === 'screen' ? Math.min(fit.maxScale,target*fraction*Math.max(.5,Math.min(1.5,Number(settings.fitFineTune || 100)/100))) : Math.min(settings.scale,fit.maxScale);
+  return {...fit, fits:settings.sizeMode==='screen'||fit.fits, requestedWidth:fit.width, requestedHeight:fit.height, scale, width:widgetWidth(settings,count)*scale/100*unit, height:widgetHeight(settings,count)*scale/100*unit, area};
+}
+
+export function selectedWorkArea(monitors, settings) {
+  const selection=settings.placement?.monitor ?? settings.linux?.monitor;
+  const found=typeof selection==='number'?monitors[selection]:monitors.find(m=>m.name===selection);
+  if (found) return found;
+  if (typeof selection==='string' && settings.placement?.disconnected==='hide') return null;
+  return (settings.placement?.disconnected==='monitor' && monitors.find(m=>m.name===settings.placement?.fallbackMonitor)) || monitors.find(m=>m.primary) || monitors[0];
 }

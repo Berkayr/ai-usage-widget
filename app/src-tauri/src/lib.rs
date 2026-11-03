@@ -12,6 +12,8 @@ mod collector;
 mod runtime;
 mod migration;
 mod placement;
+#[cfg(target_os="linux")]
+mod work_area;
 mod settings_window;
 mod shape_region;
 use std::io::Write;
@@ -21,6 +23,11 @@ use tauri::{Emitter, Manager};
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub(crate) struct Settings {
+    #[serde(rename="sizeMode")] size_mode: String,
+    #[serde(rename="fitFraction")] fit_fraction: f64,
+    #[serde(rename="fitFineTune")] fit_fine_tune: f64,
+    #[serde(rename="reservedTop")] reserved_top: Option<u32>,
+    #[serde(rename="reservedBottom")] reserved_bottom: Option<u32>,
     #[serde(rename="providerOrder")] provider_order: Vec<String>,
     #[serde(rename="hiddenProviders")] hidden_providers: Vec<String>,
     #[serde(rename="featuredProvider")] featured_provider: Option<String>,
@@ -40,7 +47,7 @@ fn deserialize_scale<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Resul
     Ok(normalize_scale(Option::<f64>::deserialize(deserializer)?.unwrap_or_else(default_scale)))
 }
 
-impl Default for Settings { fn default() -> Self { Self { provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
+impl Default for Settings { fn default() -> Self { Self { size_mode: "fixed".into(), fit_fraction: 1., fit_fine_tune: 100., reserved_top: None, reserved_bottom: None, provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
 struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32, style: String, theme: String, color_mode: String, dot_count: u8 }
@@ -190,9 +197,9 @@ fn get_monitor_scale(window: tauri::WebviewWindow) -> Result<f64, String> { wind
 fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<f64>) -> Result<(), String> {
     let scale = normalize_scale(scale) / 100.0;
     #[cfg(target_os = "linux")]
-    if linux::layered() { return linux::resize_layer(&window, Some((width_css_px.unwrap_or(340.0 * scale).clamp(100.0, 10000.0)).round() as i32), None); }
+    if linux::layered() { return linux::resize_layer(&window, Some((width_css_px.unwrap_or(340.0 * scale).clamp(1.0, 10000.0)).round() as i32), None); }
     let factor=window.scale_factor().map_err(|e|e.to_string())?;
-    let old=window.inner_size().map_err(|e|e.to_string())?; let width=(width_css_px.unwrap_or(340.0*scale).clamp(100.0,10000.0)*factor).round() as u32;
+    let old=window.inner_size().map_err(|e|e.to_string())?; let width=(width_css_px.unwrap_or(340.0*scale).clamp(1.0,10000.0)*factor).round() as u32;
     window.set_size(tauri::PhysicalSize::new(width,old.height)).map_err(|e|e.to_string())?;
     let settings=settings_window::current(); placement::apply(&window, &settings)?;
     Ok(())
@@ -200,11 +207,12 @@ fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<
 #[tauri::command]
 fn fit_window_height(window: tauri::WebviewWindow, height_css_px: f64) -> Result<(), String> {
     let settings = settings_window::current();
-    if !settings.fit_height && settings.shape == Shape::Portrait { return Ok(()); }
+    if !settings.fit_height && settings.size_mode != "screen" && settings.shape == Shape::Portrait { return Ok(()); }
     #[cfg(target_os = "linux")]
     if linux::layered() { return linux::resize_layer(&window, None, Some(height_css_px)); }
-    let factor=window.scale_factor().map_err(|e|e.to_string())?; let monitor=current_monitor(&window)?; let area=monitor.work_area();
-    let height=((height_css_px.max(80.0)*factor).round() as u32).min(area.size.height);
+    let factor=window.scale_factor().map_err(|e|e.to_string())?;
+    // Shared placement caps the configured work area, including manual overrides.
+    let height=(height_css_px.max(1.0)*factor).round() as u32;
     let old_position=window.outer_position().unwrap_or(tauri::PhysicalPosition::new(0,0)); let old_size=window.inner_size().map_err(|e|e.to_string())?;
     if (old_size.height as i64 - height as i64).abs() <= 1 { return Ok(()); }
     window.set_size(tauri::PhysicalSize::new(old_size.width,height)).map_err(|e|e.to_string())?;

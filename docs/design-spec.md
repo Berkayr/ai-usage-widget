@@ -317,3 +317,38 @@ source/context fields. `author_description` comes from `descriptions.en` on the
 existing Wikidata entity request. Old caches require no retry: existing
 anniversaries apply immediately; missing work/description remain optional until
 the next scheduled round. Disabled quotes perform no network or cache access.
+
+## Fit to screen
+
+Layout & Position offers Fixed size (the existing presets and fine tuning) and
+Fit to screen. The latter uses Full, 3/4, 1/2 or 1/3 of the selected monitor's
+available primary axis, with independent 50–150% fine tuning. Portrait, square
+and circle use height; landscape and pill use width. The other axis limits the
+result, preserving the shape's aspect ratio. Full fills the primary axis when
+the aspect ratio permits it, after the existing edge margins. Consequently a
+wide pill cannot also fill the monitor's height. Saved fixed size settings and
+the default installation behavior remain unchanged.
+
+All geometry, the monitor map and fit warnings use only rendered providers
+(after visibility, availability, selection and pagination). Windows supplies its
+native work area, in physical pixels. Linux uses logical pixels: a transient
+KWin script queries MaximizeArea over the local session bus, then is unloaded
+and deleted even on timeout. If unavailable, GDK's nontrivial work area is used,
+then Plasma panel position/visibility/thickness configuration, then a 44px KDE
+or 32px GNOME top reservation (other desktops: zero). Layer surfaces use zone -1
+and absolute work-area offsets, avoiding a second compositor reservation.
+
+Reserved top/bottom are optional logical-pixel overrides (blank means Auto;
+zero explicitly removes that reservation). Diagnostics show the automatic area,
+source and edge reservations alongside the effective area. Display geometry,
+DPI and work-area notifications and Plasma configuration events refresh the
+existing placement path; there is no periodic desktop polling or new runtime
+dependency. The one-shot KWin query has bounded D-Bus timeouts and runs off the
+UI thread. A fallback rectangle is available while the query completes.
+
+Settings persist `sizeMode` (`fixed` / `screen`), `fitFraction` (1, 0.75, 0.5,
+1/3), `fitFineTune` (50–150), and nullable integer `reservedTop` /
+`reservedBottom` (logical px). Screen mode preserves `sizePreset`, `fineTune`
+and `scale` for switching back to Fixed size. Physical size matching is inactive
+in Screen mode because the available desktop area determines the size; Ctrl +/-
+and Ctrl 0 adjust/reset the active mode's fine tuning.

@@ -3,7 +3,7 @@ import { hiddenStates } from './themes/dot-matrix/render.js';
 import { layoutControls } from './settings-layout.js';
 import { quotePrivacy } from './quote.js';
 import { providerIds, providerColors, providerColorWarnings } from './themes/shared/identity.js';
-import { normalizeSize, sizePresets, widgetWidth, widgetHeight, shapes, monitorFit, widgetProviders } from './sizing.js';
+import { normalizeSize, sizePresets, widgetWidth, widgetHeight, shapes, fittedGeometry, workAreaMonitor, widgetProviders, selectedWorkArea } from './sizing.js';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -16,7 +16,7 @@ import { rgba, contrast, luminance } from './text-contrast.js';
 const sample = new URLSearchParams(location.search).has('sample') || !window.__TAURI_INTERNALS__;
 const $ = selector => document.querySelector(selector);
 function normalizePlacement(value) {const result={...value,xRatio:value.x_ratio??value.xRatio??1,yRatio:value.y_ratio??value.yRatio??0};delete result.x_ratio;delete result.y_ratio;return result;}
-const defaults = { featuredProvider:'auto', featuredPosition:'bottom', reactorMotion:false, quoteEnabled:false, quoteMode:'qotd', quotePosition:'bottom', quoteNavigation:true, theme:'system', shape:'portrait', appearance:'auto', colorMode:'calm', dotCount:20, matchPhysicalSize:false, accentEdge:'off', palette:'default', accent:null, background:null, widgetOpacity:100, backgroundOpacity:100, scale:100, fitHeight:true, position:'Top right', placementEditing:false, lockPosition:true, showExtraWindows:false, taskbar:{enabled:false,providers:['claude','codex','gemini'],window:'session',showBars:false,style:'transparent',theme:'auto'}, linux:{layer:'bottom',margin:12,monitor:null}, placement:{monitor:null,xRatio:1,yRatio:0,snap:'off',disconnected:'primary',fallbackMonitor:null} };
+const defaults = { sizeMode:"fixed",fitFraction:1,fitFineTune:100,reservedTop:null,reservedBottom:null, featuredProvider:'auto', featuredPosition:'bottom', reactorMotion:false, quoteEnabled:false, quoteMode:'qotd', quotePosition:'bottom', quoteNavigation:true, theme:'system', shape:'portrait', appearance:'auto', colorMode:'calm', dotCount:20, matchPhysicalSize:false, accentEdge:'off', palette:'default', accent:null, background:null, widgetOpacity:100, backgroundOpacity:100, scale:100, fitHeight:true, position:'Top right', placementEditing:false, lockPosition:true, showExtraWindows:false, taskbar:{enabled:false,providers:['claude','codex','gemini'],window:'session',showBars:false,style:'transparent',theme:'auto'}, linux:{layer:'bottom',margin:12,monitor:null}, placement:{monitor:null,xRatio:1,yRatio:0,snap:'off',disconnected:'primary',fallbackMonitor:null} };
 let draft = structuredClone(defaults), saved, providers, savedProviders, autostart=false, savedAutostart=false, closing=false, saving=false, positionBefore=null;
 const abort = new AbortController(), stops = [];
 let disposed=false, previewRunning=false, previewPending=null;
@@ -56,6 +56,8 @@ sections.appearance.append($('.theme-section'),$('.look-section'));
 for(const id of ['appearance','palette','accent','background','widget-opacity','background-opacity'])move(id,'appearance');
 for(const id of ['scale','position','fit-height','show-extra-windows'])move(id,'layout');
 sections.layout.append($('.scale-presets'));
+sections.layout.insertAdjacentHTML('beforeend', `<label>Size mode<select id="size-mode"><option value="fixed">Fixed size</option><option value="screen">Fit to screen</option></select></label><label>Screen fraction<select id="fit-fraction"><option value="1">Full</option><option value="0.75">3/4</option><option value="0.5">1/2</option><option value="${1/3}">1/3</option></select></label><label>Screen fine-tune <output id="fit-fine-tune-out"></output><input id="fit-fine-tune" type="range" min="50" max="150" step="1"></label><label>Reserved top (px)<input id="reserved-top" type="number" min="0" max="1000" placeholder="Auto"></label><label>Reserved bottom (px)<input id="reserved-bottom" type="number" min="0" max="1000" placeholder="Auto"></label><p id="detected-area" class="setting-note"></p>`);
+
 sections.quote.innerHTML += `<p class="setting-note">${quotePrivacy}</p><label class="toggle-setting">Show daily quote<input id="quote-enabled" type="checkbox"></label><label>Position<select id="quote-position"><option value="bottom">Bottom</option><option value="top">Top</option></select></label><label>Mode<select id="quote-mode"><option value="qotd">Quote of the day</option><option value="born">Born on this day</option><option value="died">Died on this day</option><option value="on-this-day">On this day</option><option value="mixed">Mixed</option></select></label><label class="toggle-setting">Show quote navigation<input id="quote-navigation" type="checkbox"></label>`;
 const shapePicker=document.createElement('fieldset');shapePicker.className='shape-picker';shapePicker.innerHTML='<legend>Shape</legend>'+shapes.map(shape=>`<button data-shape="${shape}" aria-pressed="false"><i class="shape-silhouette ${shape}" aria-hidden="true"></i>${shape[0].toUpperCase()+shape.slice(1)}</button>`).join('');sections.layout.prepend(shapePicker);
 shapePicker.querySelectorAll('button').forEach(button=>button.onclick=()=>{draft.shape=button.dataset.shape;update();});
@@ -103,7 +105,11 @@ function renderControls() {
   const note=document.createElement('p');note.className='setting-note';note.textContent='Choose up to 3. By default the first 3 enabled providers are shown.';widgetChoices.append(note);
   const selected=Array.isArray(draft.widgetProviders)?draft.widgetProviders:providers.slice(0,3);
   for(const id of providers){const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.dataset.widgetProvider=id;input.checked=selected.includes(id);input.disabled=!input.checked&&selected.length>=3;label.textContent=id;label.append(input);widgetChoices.append(label);input.onchange=()=>{draft.widgetProviders=providers.filter(key=>key===id?input.checked:selected.includes(key)).slice(0,3);update();};}
-  $('#fit-height').disabled=draft.shape!=='portrait';
+  $('#match-physical-size').disabled=draft.sizeMode==='screen';
+  $('#fit-height').disabled=draft.shape!=='portrait'||draft.sizeMode==='screen';
+  for(const id of ['scale','fit-height']) $(`#${id}`).closest('label').hidden=draft.sizeMode==='screen';
+  $('.scale-presets').hidden=draft.sizeMode==='screen';
+  for(const id of ['fit-fraction','fit-fine-tune']) $(`#${id}`).closest('label').hidden=draft.sizeMode!=='screen';
   for(const [id,key]of Object.entries(bindings)) {const el=$(`#${id}`);const value=get(key);if(el.type==='checkbox')el.checked=!!value;else el.value=value??'';const output=$(`#${id.replace('-opacity','')}-out`)||$(`#${id}-out`);if(output)output.value=`${value}${id==='linux-margin'?' px':'%'}`;}
   document.querySelectorAll('[data-size]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.size===draft.sizePreset));b.querySelector('small').textContent=`${Math.round(widgetWidth(draft,visibleProviderCount())*sizePresets[b.dataset.size]/100)} × ${Math.round(widgetHeight(draft,visibleProviderCount())*sizePresets[b.dataset.size]/100)} px`;});
   const p=themePalette();const paper=draft.background||p.bgWidget;const colors=providerColors(draft,paper);document.querySelectorAll('[data-provider-color]').forEach((el,i)=>el.value=colors[i]);colorWarning.textContent=providerColorWarnings(draft,paper).join('. ');$('#accent').value=draft.accent||p.accent;$('#background').value=draft.background||p.bgWidget;
@@ -113,12 +119,12 @@ function renderControls() {
   document.querySelectorAll('[data-taskbar-provider]').forEach(el=>el.checked=draft.taskbar.providers.includes(el.dataset.taskbarProvider));
   $('#placement-actions').hidden=!positionBefore;$('#place').disabled=!!positionBefore;$('#map-widget').disabled=!positionBefore;renderMap();
 }
-const bindings={'quote-enabled':'quoteEnabled','quote-mode':'quoteMode','quote-position':'quotePosition','quote-navigation':'quoteNavigation','color-mode':'colorMode','dot-count':'dotCount','match-physical-size':'matchPhysicalSize','accent-edge':'accentEdge',appearance:'appearance',accent:'accent',background:'background','widget-opacity':'widgetOpacity','background-opacity':'backgroundOpacity',scale:'fineTune',position:'position','fit-height':'fitHeight','show-extra-windows':'showExtraWindows','taskbar-enabled':'taskbar.enabled','taskbar-style':'taskbar.style','taskbar-theme':'taskbar.theme','taskbar-window':'taskbar.window','taskbar-bars':'taskbar.showBars','linux-layer':'linux.layer','linux-margin':'linux.margin','linux-monitor':'linux.monitor','lock-position':'lockPosition','placement-monitor':'placement.monitor',snap:'placement.snap',disconnected:'placement.disconnected','fallback-monitor':'placement.fallbackMonitor'};
+const bindings={'size-mode':'sizeMode','fit-fraction':'fitFraction','fit-fine-tune':'fitFineTune','reserved-top':'reservedTop','reserved-bottom':'reservedBottom','quote-enabled':'quoteEnabled','quote-mode':'quoteMode','quote-position':'quotePosition','quote-navigation':'quoteNavigation','color-mode':'colorMode','dot-count':'dotCount','match-physical-size':'matchPhysicalSize','accent-edge':'accentEdge',appearance:'appearance',accent:'accent',background:'background','widget-opacity':'widgetOpacity','background-opacity':'backgroundOpacity',scale:'fineTune',position:'position','fit-height':'fitHeight','show-extra-windows':'showExtraWindows','taskbar-enabled':'taskbar.enabled','taskbar-style':'taskbar.style','taskbar-theme':'taskbar.theme','taskbar-window':'taskbar.window','taskbar-bars':'taskbar.showBars','linux-layer':'linux.layer','linux-margin':'linux.margin','linux-monitor':'linux.monitor','lock-position':'lockPosition','placement-monitor':'placement.monitor',snap:'placement.snap',disconnected:'placement.disconnected','fallback-monitor':'placement.fallbackMonitor'};
 const get=path=>path.split('.').reduce((v,k)=>v?.[k],draft);
 function set(path,value) {const keys=path.split('.');const key=keys.pop();let obj=draft;for(const k of keys)obj=obj[k]??={};obj[key]=value;}
-for(const [id,key]of Object.entries(bindings)) {const el=$(`#${id}`);el.addEventListener(el.type==='range'||el.type==='color'?'input':'change',()=>{let value=el.type==='checkbox'?el.checked:el.type==='range'||id==='dot-count'?Number(el.value):el.value;if(id==='placement-monitor'&&value==='')value=null;if(id==='linux-monitor'&&value==='')value=null;set(key,value);update();},{signal:abort.signal});}
+for(const [id,key]of Object.entries(bindings)) {const el=$(`#${id}`);el.addEventListener(el.type==='range'||el.type==='color'?'input':'change',()=>{let value=el.type==='checkbox'?el.checked:el.type==='number'?(el.value===''?null:Math.round(Math.max(0,Math.min(1000,Number(el.value))))):el.type==='range'||['dot-count','fit-fraction'].includes(id)?Number(el.value):el.value;if(id==='placement-monitor'&&value==='')value=null;if(id==='linux-monitor'&&value==='')value=null;set(key,value);update();},{signal:abort.signal});}
 document.querySelectorAll('[data-taskbar-provider]').forEach(el=>el.onchange=()=>{draft.taskbar.providers=[...document.querySelectorAll('[data-taskbar-provider]:checked')].map(el=>el.dataset.taskbarProvider);update();});
-document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{draft.sizePreset=b.dataset.size;update();});
+document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{draft.sizeMode='fixed';draft.sizePreset=b.dataset.size;update();});
 $('#start-at-login').onchange=event=>{autostart=event.target.checked;mark();};
 function renderProviders() {if(!providerConfig)return;const config=structuredClone(providerConfig);for(const [id,p]of Object.entries(config.providers))p.enabled=providers.includes(id);config.initialized=true;mountProviders($('#provider-settings'),config,async()=>{});$('#provider-settings .provider-consent-actions').hidden=true;$('#provider-settings').onchange=()=>{providers=[...$('#provider-settings').querySelectorAll('input')].flatMap((el,i)=>el.checked?[Object.keys(config.providers).filter(id=>id in config.disclosures)[i]]:[]);renderControls();mark();preview().catch(()=>{});};}
 let snapshotProviders=null;
@@ -130,21 +136,26 @@ function visibleProviderCount(){
   const selected=['circle','pill'].includes(draft.shape)?widgetProviders(visible,draft.widgetProviders):visible;
   return Math.max(1,draft.shape==='square'?Math.min(4,selected.length):selected.length);
 }
-function selectedMonitor(){return geometry.monitors.find(m=>m.name===draft.placement.monitor)||geometry.monitors.find(m=>m.primary)||geometry.monitors[0];}
+function selectedMonitor(){return selectedWorkArea(geometry.monitors,draft);}
 function renderMap() {
-  const monitor=selectedMonitor();
+  const detected=selectedMonitor();
+  const monitor=detected && workAreaMonitor(detected,draft,desktopPlatform);
   $('#monitor-map').hidden=!monitor;
   $('#size-fit-warning').hidden=true;
   if(!monitor)return;
-  const fit=monitorFit(draft,visibleProviderCount(),monitor,desktopPlatform);
-  geometry.widgetWidth=Math.min(fit.width,fit.availableWidth);
-  geometry.widgetHeight=Math.min(fit.height,fit.availableHeight);
+  const fit=fittedGeometry(draft,visibleProviderCount(),detected,desktopPlatform);
+  geometry.widgetWidth=fit.width;
+  geometry.widgetHeight=fit.height;
   const warning=$('#size-fit-warning');
-  warning.hidden=fit.fits;
-  warning.textContent=`Selected size doesn't fit this monitor; max size ${Math.floor(fit.maxScale)}% (fine-tune ${Math.floor(fit.maxScale/sizePresets[draft.sizePreset]*100)}% for ${draft.sizePreset}). Requested ${Math.ceil(fit.width)} × ${Math.ceil(fit.height)} px; available ${Math.floor(fit.availableWidth)} × ${Math.floor(fit.availableHeight)} px. Reduce fine-tune or choose a smaller preset.`;
+  warning.hidden=draft.sizeMode==='screen'||fit.fits;
+  $('#detected-area').textContent=`Detected work area ${detected.width} × ${detected.height} · top ${detected.detectedTop || 0}, bottom ${detected.detectedBottom || 0} px (${detected.workAreaSource || 'system'}). Effective ${monitor.width} × ${monitor.height}.`;
+  warning.textContent=`Selected size doesn't fit this monitor; max size ${Math.floor(fit.maxScale)}% (fine-tune ${Math.floor(fit.maxScale/sizePresets[draft.sizePreset]*100)}% for ${draft.sizePreset}). Requested ${Math.ceil(fit.requestedWidth)} × ${Math.ceil(fit.requestedHeight)} px; available ${Math.floor(fit.availableWidth)} × ${Math.floor(fit.availableHeight)} px. Reduce fine-tune or choose a smaller preset.`;
   const map=$('#monitor-map');map.style.aspectRatio=`${monitor.width}/${monitor.height}`;map.style.maxWidth=`${260*monitor.width/monitor.height}px`;
   const width=geometry.widgetWidth/monitor.width,height=geometry.widgetHeight/monitor.height;
-  $('#map-widget').style.cssText=`width:${width*100}%;height:${height*100}%;left:${draft.placement.xRatio*(1-width)*100}%;top:${draft.placement.yRatio*(1-height)*100}%`;
+  const xr=draft.position==='Free'?draft.placement.xRatio:(draft.position.endsWith('left')?0:1);
+  const yr=draft.position==='Free'?draft.placement.yRatio:(draft.position.startsWith('Top')?0:1);
+  const offset=(r,extent,size)=>{const spare=Math.max(0,extent-size),inset=Math.min(fit.margin,spare/2);return Math.max(inset,Math.min(spare-inset,r*spare))/extent*100;};
+  $('#map-widget').style.cssText=`width:${width*100}%;height:${height*100}%;left:${offset(xr,monitor.width,geometry.widgetWidth)}%;top:${offset(yr,monitor.height,geometry.widgetHeight)}%`;
   $('#map-widget').textContent=fit.fits?'Widget':'Size exceeds work area';
   $('#map-widget').title=fit.fits?'Widget fits the work area':warning.textContent;
   $('#map-widget').dataset.overflow=String(!fit.fits);

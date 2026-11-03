@@ -4,9 +4,9 @@ use std::sync::atomic::{AtomicBool, Ordering};
 #[serde(default, rename_all = "camelCase")]
 pub struct Placement { pub monitor: Option<String>, #[serde(rename="x_ratio", alias="xRatio")] pub x_ratio: f64, #[serde(rename="y_ratio", alias="yRatio")] pub y_ratio: f64, pub snap: String, pub disconnected: String, pub fallback_monitor: Option<String> }
 impl Default for Placement { fn default() -> Self { Self { monitor: None, x_ratio: 1., y_ratio: 0., snap: "off".into(), disconnected: "primary".into(), fallback_monitor: None } } }
-#[derive(Clone, Serialize)]
+#[derive(Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Monitor { pub name: String, pub x: i32, pub y: i32, pub width: u32, pub height: u32, pub primary: bool, pub scale: f64 }
+pub struct Monitor { pub name: String, pub x: i32, pub y: i32, pub width: u32, pub height: u32, pub primary: bool, pub scale: f64, pub detected_top: u32, pub detected_bottom: u32, pub work_area_source: String }
 pub fn pixel(ratio: f64, extent: u32, widget: u32) -> i32 { (if ratio.is_finite() { ratio.clamp(0.,1.) } else { 0. } * extent.saturating_sub(widget) as f64).round() as i32 }
 pub fn ratio(pixel: i32, extent: u32, widget: u32) -> f64 { if extent <= widget { 0. } else { (pixel as f64 / (extent-widget) as f64).clamp(0.,1.) } }
 pub fn snap(value: i32, available: i32, mode: &str) -> i32 {
@@ -32,8 +32,23 @@ pub fn monitors(window: &tauri::WebviewWindow) -> Vec<Monitor> {
     #[cfg(target_os="linux")] { let _=window; linux::placement_monitors() }
     #[cfg(not(target_os="linux"))] {
         let primary=window.primary_monitor().ok().flatten();
-        window.available_monitors().unwrap_or_default().iter().map(|m| { let a=m.work_area(); Monitor { name:m.name().cloned().unwrap_or_default(),x:a.position.x,y:a.position.y,width:a.size.width,height:a.size.height,scale:m.scale_factor(),primary:primary.as_ref().map(|p|p.position()==m.position()).unwrap_or(false) } }).collect()
+        window.available_monitors().unwrap_or_default().iter().map(|m| { let a=m.work_area(); Monitor { name:m.name().cloned().unwrap_or_default(),x:a.position.x,y:a.position.y,width:a.size.width,height:a.size.height,scale:m.scale_factor(),detected_top:(a.position.y-m.position().y).max(0) as u32,detected_bottom:(m.position().y+m.size().height as i32-a.position.y-a.size.height as i32).max(0) as u32,work_area_source:"system".into(),primary:primary.as_ref().map(|p|p.position()==m.position()).unwrap_or(false) } }).collect()
     }
+}
+fn apply_reservations(m: &mut Monitor, settings: &Settings) {
+    #[cfg(target_os="linux")] let unit=1.;
+    #[cfg(not(target_os="linux"))] let unit=m.scale;
+    let full_height=m.height+m.detected_top+m.detected_bottom;
+    let top=settings.reserved_top.map(|n|(n.min(1000) as f64*unit).round() as i32).unwrap_or(m.detected_top as i32).min(full_height.saturating_sub(1) as i32);
+    let bottom=settings.reserved_bottom.map(|n|(n.min(1000) as f64*unit).round() as i32).unwrap_or(m.detected_bottom as i32).min(full_height as i32-top-1);
+    let delta=top-m.detected_top as i32;
+    m.y+=delta;
+    m.height=(m.height as i32-delta-bottom+m.detected_bottom as i32).max(1) as u32;
+}
+pub(crate) fn configured_monitors(window: &tauri::WebviewWindow, settings: &Settings) -> Vec<Monitor> {
+    let mut list=monitors(window);
+    for monitor in &mut list {apply_reservations(monitor,settings);}
+    list
 }
 #[tauri::command]
 pub async fn get_placement_monitors(app: tauri::AppHandle) -> Result<Value,String> {
@@ -53,7 +68,7 @@ pub(crate) fn selected<'a>(list: &'a [Monitor], settings: &Settings) -> Option<&
     select(list,&p)
 }
 pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),String> {
-    let list=monitors(window);
+    let list=configured_monitors(window,settings);
     let p=&settings.placement;
     let Some(monitor)=selected(&list,settings) else { let _=window.hide(); return Ok(()); };
     let (width,height)=widget_size(window);
@@ -70,7 +85,7 @@ pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),St
     let x=inset_position(xr,monitor.width,width,margin,&p.snap);
     let y=inset_position(yr,monitor.height,height,margin,&p.snap);
     #[cfg(target_os="linux")] {
-        if linux::layered() { linux::place(window,&settings.linux,&monitor.name,x,y); if !window.is_visible().unwrap_or(false) { let _=window.show(); } return Ok(()); }
+        if linux::layered() { linux::place(window,&settings.linux,&monitor.name,monitor.x+x,monitor.y+y); if !window.is_visible().unwrap_or(false) { let _=window.show(); } return Ok(()); }
     }
     #[cfg(target_os="linux")] { use gtk::prelude::*; if let Ok(gtk)=window.gtk_window() { let desired=(monitor.x+x,monitor.y+y); if gtk.position()!=desired { gtk.move_(desired.0,desired.1); } if !window.is_visible().unwrap_or(false) {let _=window.show();} return Ok(()); } }
     let desired=tauri::PhysicalPosition::new(monitor.x+x,monitor.y+y);
@@ -84,7 +99,7 @@ pub async fn capture_position(app: tauri::AppHandle) -> Result<Placement,String>
     let (tx,rx)=std::sync::mpsc::channel(); let target=window.clone();
     window.run_on_main_thread(move || {
         let result=(|| { #[cfg(not(target_os="linux"))] let position=target.outer_position().map_err(|e|e.to_string())?;
-            #[cfg(target_os="linux")] let position={use gtk::prelude::*;let gtk=target.gtk_window().map_err(|e|e.to_string())?;let (x,y)=gtk.position();tauri::PhysicalPosition::new(x,y)}; let size=widget_size(&target); let list=monitors(&target);
+            #[cfg(target_os="linux")] let position={use gtk::prelude::*;let gtk=target.gtk_window().map_err(|e|e.to_string())?;let (x,y)=gtk.position();tauri::PhysicalPosition::new(x,y)}; let size=widget_size(&target); let list=configured_monitors(&target,&settings_window::current());
             let monitor=list.iter().find(|m|position.x>=m.x && position.x<m.x+m.width as i32 && position.y>=m.y && position.y<m.y+m.height as i32).ok_or("Monitor unavailable")?;
             Ok(Placement {monitor:Some(monitor.name.clone()),x_ratio:ratio(position.x-monitor.x,monitor.width,size.0),y_ratio:ratio(position.y-monitor.y,monitor.height,size.1),..settings_window::current().placement}) })(); let _=tx.send(result);
     }).map_err(|e|e.to_string())?;
@@ -104,7 +119,7 @@ pub fn watch(app: tauri::AppHandle) {
 }
 #[cfg(test)] mod tests {
     use super::*;
-    fn monitor(name:&str,primary:bool)->Monitor {Monitor{name:name.into(),x:0,y:0,width:1920,height:1080,primary,scale:1.}}
+    fn monitor(name:&str,primary:bool)->Monitor {Monitor{name:name.into(),x:0,y:0,width:1920,height:1080,primary,scale:1.,..Default::default()}}
     #[test]
     fn laptop_layer_surface_stays_inside_panel_workarea() {
         // 1536x960 output, 34px top panel, GTK logical units at DPI 1.
@@ -120,6 +135,21 @@ pub fn watch(app: tauri::AppHandle) {
                 assert!(34+y>=46 && 34+y+height as i32<=948);
             }
         }
+    }
+    #[test] fn reservations_replace_detected_edges_and_remain_inside_output() {
+        for top in [None,Some(0),Some(46),Some(1000)] {for bottom in [None,Some(0),Some(10),Some(1000)] {
+            let mut m=monitor("fixture",true);m.y=34;m.height=926;m.detected_top=34;
+            let s=Settings {reserved_top:top,reserved_bottom:bottom,..Default::default()};
+            apply_reservations(&mut m,&s);
+            assert!(m.y>=0 && m.y+m.height as i32<=960);
+            if top==Some(0) && bottom==Some(0) {assert_eq!(m.height,960);}
+        }}
+    }
+    #[test] fn screen_settings_roundtrip_without_changing_legacy_defaults() {
+        let old:Settings=serde_json::from_str("{}").unwrap();assert_eq!(old.size_mode,"fixed");
+        let value=serde_json::json!({"sizeMode":"screen","fitFraction":0.75,"fitFineTune":82.0,"reservedTop":0,"reservedBottom":null});
+        let s:Settings=serde_json::from_value(value.clone()).unwrap();let encoded=serde_json::to_value(s).unwrap();
+        for key in ["sizeMode","fitFraction","fitFineTune","reservedTop","reservedBottom"] {assert_eq!(encoded[key],value[key]);}
     }
     #[test] fn ratios_clip_and_roundtrip() { for r in [0.,0.25,0.5,1.] {assert!((ratio(pixel(r,1920,340),1920,340)-r).abs()<0.001);} assert_eq!(pixel(2.,100,20),80);assert_eq!(pixel(-1.,100,20),0);assert_eq!(pixel(f64::NAN,100,20),0);assert_eq!(pixel(0.5,100,200),0);assert_eq!(ratio(99,100,200),0.); }
     #[test] fn growing_height_keeps_bottom_inside_workarea() {

@@ -158,12 +158,12 @@ pub fn resize_layer(window: &tauri::WebviewWindow, width: Option<i32>, height: O
             let Some((width,height)) = PENDING_RESIZE.with(|slot| slot.borrow_mut().take()) else { return; };
             let Ok(gtk) = target.gtk_window() else { return; };
             let settings = super::settings_window::current();
-            let list = crate::placement::monitors(&target);
+            let list = crate::placement::configured_monitors(&target,&settings);
             let Some(monitor) = crate::placement::selected(&list, &settings) else { return; };
             let (old_width,old_height) = gtk.size_request();
             let requested = (
                 width.unwrap_or(old_width).clamp(1,monitor.width as i32),
-                height.map(|h| h.ceil().max(80.0) as i32).unwrap_or(old_height).clamp(1,monitor.height as i32),
+                height.map(|h| h.ceil().max(1.0) as i32).unwrap_or(old_height).clamp(1,monitor.height as i32),
             );
             if requested != (old_width,old_height) {
                 gtk.set_size_request(requested.0,requested.1);
@@ -351,7 +351,15 @@ mod tests {
 
 pub fn placement_monitors() -> Vec<crate::placement::Monitor> {
     gtk::gdk::Display::default().map(|display| (0..display.n_monitors()).filter_map(|i|display.monitor(i).map(|m| {
-        let area=m.workarea(); crate::placement::Monitor { name:monitor_name(&display,i,&m),x:area.x(),y:area.y(),width:area.width().max(1) as u32,height:area.height().max(1) as u32,primary:display.primary_monitor().as_ref()==Some(&m) || (display.primary_monitor().is_none() && i==0),scale:m.scale_factor() as f64 }
+        let g=m.geometry();let a=m.workarea();let name=monitor_name(&display,i,&m);
+        let (x,y,width,height,source)=if let Some(area)=crate::work_area::cached(&name) {
+            (area.x,area.y,area.width,area.height,"kwin")
+        } else if a!=g { (a.x(),a.y(),a.width().max(1) as u32,a.height().max(1) as u32,"gdk") }
+        else {
+            let (edges,source)=crate::work_area::fallback_edges(i);
+            (g.x()+edges[2],g.y()+edges[0],(g.width()-edges[2]-edges[3]).max(1) as u32,(g.height()-edges[0]-edges[1]).max(1) as u32,source)
+        };
+        crate::placement::Monitor {name,x,y,width,height,primary:display.primary_monitor().as_ref()==Some(&m)||(display.primary_monitor().is_none()&&i==0),scale:m.scale_factor() as f64,detected_top:(y-g.y()).max(0) as u32,detected_bottom:(g.y()+g.height()-y-height as i32).max(0) as u32,work_area_source:source.into() }
     })).collect()).unwrap_or_default()
 }
 pub fn place(window: &tauri::WebviewWindow, options: &Options, name: &str, x: i32, y: i32) {
@@ -367,15 +375,30 @@ pub fn place(window: &tauri::WebviewWindow, options: &Options, name: &str, x: i3
         // Coordinates already include workarea offsets. Zone 0 would let the
         // compositor add the panel exclusion again (e.g. 40 px past the bottom).
         call::<unsafe extern "C" fn(Window,i32)>(lib,b"gtk_layer_set_exclusive_zone\0").unwrap()(ptr,-1);
-        let (ox,oy)=monitor.map(|m|{let a=m.workarea();let g=m.geometry();(a.x()-g.x(),a.y()-g.y())}).unwrap_or((0,0));
+        let (ox,oy)=monitor.map(|m|{let g=m.geometry();(-g.x(),-g.y())}).unwrap_or((0,0));
         for edge in 0..4 {call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_anchor\0").unwrap()(ptr,edge,(edge==0 || edge==2) as i32);call::<unsafe extern "C" fn(Window,u32,i32)>(lib,b"gtk_layer_set_margin\0").unwrap()(ptr,edge,match edge {0=>x+ox,2=>y+oy,_=>0});}
     }); }
 }
-pub fn watch_monitors(app: tauri::AppHandle) {
-    if let Some(display)=gtk::gdk::Display::default() {
-        let added=app.clone(); display.connect_monitor_added(move |_,_|crate::placement::monitor_changed(added.clone()));
-        display.connect_monitor_removed(move |_,_|crate::placement::monitor_changed(app.clone()));
+fn watch_monitor(monitor: &gtk::gdk::Monitor, app: &tauri::AppHandle) {
+    for property in ["geometry","workarea","scale-factor"] {
+        let app=app.clone();monitor.connect_notify_local(Some(property),move |_,_|{crate::work_area::refresh(app.clone());crate::placement::monitor_changed(app.clone());});
     }
 }
+pub fn watch_monitors(app: tauri::AppHandle) {
+    crate::work_area::refresh(app.clone());
+    if let Some(display)=gtk::gdk::Display::default() {
+        for i in 0..display.n_monitors() {if let Some(m)=display.monitor(i) {watch_monitor(&m,&app);}}
+        let added=app.clone(); display.connect_monitor_added(move |_,m|{watch_monitor(m,&added);crate::work_area::refresh(added.clone());crate::placement::monitor_changed(added.clone());});
+        let removed=app.clone();display.connect_monitor_removed(move |_,_|{crate::work_area::refresh(removed.clone());crate::placement::monitor_changed(removed.clone());});
+    }
+    // Reuse desktop events, without a polling timer. Watch the directory because
+    // Plasma atomically replaces its configuration files.
+    use notify::Watcher;
+    let config=std::env::var_os("XDG_CONFIG_HOME").map(std::path::PathBuf::from).unwrap_or_else(||dirs::home_dir().unwrap_or_default().join(".config"));
+    if let Ok(mut watcher)=notify::recommended_watcher(move |event: Result<notify::Event,notify::Error>| {
+        if event.is_ok_and(|e|matches!(e.kind,notify::EventKind::Create(_)|notify::EventKind::Modify(_)|notify::EventKind::Remove(_)) && e.paths.iter().any(|p|matches!(p.file_name().and_then(|n|n.to_str()),Some("plasmashellrc"|"plasma-org.kde.plasma.desktop-appletsrc"|"kwinoutputconfig.json")))) {crate::work_area::refresh(app.clone());crate::placement::monitor_changed(app.clone());}
+    }) {if watcher.watch(&config,notify::RecursiveMode::NonRecursive).is_ok() {DESKTOP_WATCHER.with(|slot|*slot.borrow_mut()=Some(watcher));}}
+}
+thread_local! {static DESKTOP_WATCHER: std::cell::RefCell<Option<notify::RecommendedWatcher>>=const {std::cell::RefCell::new(None)};}
 
 pub fn invalidate_placement() { LAST_PLACEMENT.with(|last|*last.borrow_mut()=None); }

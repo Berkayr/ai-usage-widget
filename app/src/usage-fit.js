@@ -22,6 +22,7 @@ export function fitUsage(root) {
   root.style.removeProperty('padding-bottom');
   for (const card of cards) {
     delete card.dataset.usageCompact;
+    card.style.removeProperty('padding-bottom');
     for (const el of card.querySelectorAll('[data-usage-font]')) {
       el.style.fontSize = el.dataset.usageFont;
       delete el.dataset.usageFont;
@@ -34,6 +35,7 @@ export function fitUsage(root) {
   const padding = parseFloat(getComputedStyle(root).paddingBottom);
   if (debt > 0 && debt <= padding) root.style.paddingBottom = `${padding - debt}px`;
   cards.forEach(compactCard);
+  fitHeader(root.closest('.widget'));
 }
 
 function donateFeaturedSpace(root, cards) {
@@ -55,6 +57,7 @@ function donateFeaturedSpace(root, cards) {
 function compactCard(card) {
   if (!overflows(card)) return;
   card.dataset.usageCompact = 'true';
+  settleCardRounding(card);
   if (!overflows(card)) return;
   const texts = [...card.querySelectorAll('*')].filter(el => [...el.childNodes].some(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()));
   const sizes = texts.map(el => parseFloat(getComputedStyle(el).fontSize));
@@ -62,6 +65,24 @@ function compactCard(card) {
   // Existing small labels keep their authored size; newly reduced text stops at 11px.
   for (let reduction = .5; reduction <= Math.max(...sizes); reduction += .5) {
     texts.forEach((el, i) => {el.style.fontSize = `${Math.max(Math.min(11, sizes[i]), sizes[i] - reduction)}px`;});
+    settleCardRounding(card);
     if (!overflows(card)) break;
   }
+}
+
+// The title is frame chrome, so it must fit even at fractional screen sizes.
+function fitHeader(widget) {
+  const title=widget?.querySelector('.app-title');
+  if (!title || !title.getClientRects().length) return;
+  title.style.removeProperty('font-size');
+  const range=document.createRange();range.selectNodeContents(title);
+  const width=range.getBoundingClientRect().width;
+  const available=title.parentElement.clientWidth;
+  if (width>available && width>0) title.style.fontSize=`${parseFloat(getComputedStyle(title).fontSize)*available/width}px`;
+}
+
+function settleCardRounding(card) {
+  const debt=card.scrollHeight-card.clientHeight;
+  const padding=parseFloat(getComputedStyle(card).paddingBottom);
+  if (debt>0 && debt<=1 && debt<=padding) card.style.paddingBottom=`${padding-debt}px`;
 }

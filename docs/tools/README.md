@@ -290,3 +290,26 @@ are saved to `gorevler/ss-ayar/`; use `AUDIT_OUTPUT` for another output director
 selects its screenshot name. Native quote preview also explicitly enables
 featured auto at the top with three providers and measures usage overflow,
 scrollbar widths and card edges through Medium → Large → Medium.
+
+Fit to screen has a separate synthetic screen matrix:
+
+```sh
+node --test tests/screen-fit.mjs
+node docs/tools/screen-fit-check.mjs
+```
+
+The browser matrix covers seven Windows/KDE/GNOME work areas, including 4K
+at 150% and 200%, four fractions, five shapes, quote on/off, one/two/three
+providers and every theme (8,400 cases). It checks the requested viewport,
+visible usage cards and header text. `AUDIT_DISPLAYS` filters display fixture
+names and `AUDIT_OUTPUT` selects an ignored output directory. The unit matrix
+also covers all five positions, physical size matching and fine-tune limits.
+An optional local KDE diagnostic opens no application window:
+
+```sh
+cd app/src-tauri
+cargo test --offline live_desktop_work_area -- --ignored --nocapture
+```
+
+This diagnostic requires access to the local session bus and GTK display and
+prints real geometry; keep its output outside the repository.

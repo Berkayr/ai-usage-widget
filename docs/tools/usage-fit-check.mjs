@@ -26,7 +26,7 @@ try {
       await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
       const errors=[],list=document.querySelector('#providers'),shell=document.querySelector('#widget').getBoundingClientRect(),lr=list.getBoundingClientRect();
       const visible=el=>getComputedStyle(el).visibility!=='hidden'&&el.getClientRects().length;
-      for(const el of [list,...list.querySelectorAll('.provider-card')]) {
+      for(const el of [document.querySelector('.header'),document.querySelector('.app-title'),list,...list.querySelectorAll('.provider-card')]) {
         if(!visible(el))continue;
         const cs=getComputedStyle(el),r=el.getBoundingClientRect();
         if(el.scrollHeight>el.clientHeight)errors.push(el.className+': vertical overflow '+el.scrollHeight+'/'+el.clientHeight);
@@ -34,7 +34,7 @@ try {
         const scrollbar=el.offsetWidth-el.clientWidth-parseFloat(cs.borderLeftWidth)-parseFloat(cs.borderRightWidth);
         if(scrollbar>0.5)errors.push(el.className+': scrollbar '+scrollbar);
         if(r.top<shell.top-1||r.bottom>shell.bottom+1||r.left<shell.left-1||r.right>shell.right+1)errors.push(el.className+': outside shell');
-        if(el!==list&&(r.top<lr.top-1||r.bottom>lr.bottom-parseFloat(getComputedStyle(list).paddingBottom)+1))errors.push('card edge clipped');
+        if(el.classList.contains('provider-card')&&(r.top<lr.top-1||r.bottom>lr.bottom-parseFloat(getComputedStyle(list).paddingBottom)+1))errors.push('card edge clipped');
       }
       for (const card of list.querySelectorAll('.provider-card')) {
         if (!visible(card)) continue;

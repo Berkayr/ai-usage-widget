@@ -5,7 +5,7 @@ import { loadQuote, renderQuote, sampleQuote } from './quote.js';
 import './quote.css';
 import { providerIndex } from './themes/shared/identity.js';
 import { renderRound } from './themes/shared/round.js';
-import { normalizeSize, widgetWidth, widgetHeight, widgetProviders, monitorFit } from './sizing.js';
+import { normalizeSize, widgetWidth, widgetHeight, widgetProviders, fittedGeometry, selectedWorkArea } from './sizing.js';
 import { hiddenStates } from './themes/dot-matrix/render.js';
 import { repairTextContrast } from './text-contrast.js';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -73,12 +73,13 @@ let monitorScale = 1;
 let placementMonitors = [];
 let layoutScale = 100;
 function updateLayoutScale(count) {
-  const name=settings.placement?.monitor || (typeof settings.linux?.monitor === 'string' ? settings.linux.monitor : null);
-  const monitor=placementMonitors.find(m=>m.name===name) || placementMonitors.find(m=>m.primary) || placementMonitors[0];
-  layoutScale=monitor ? Math.min(settings.scale,monitorFit(settings,count,monitor,desktopInfo?.platform || 'linux').maxScale) : settings.scale;
-  const effective=layoutScale/(settings.matchPhysicalSize ? monitorScale : 1);
+  const monitor=selectedWorkArea(placementMonitors,settings);
+  layoutScale=monitor ? fittedGeometry(settings.sizeMode==='screen'?{...settings,matchPhysicalSize:false}:settings,count,monitor,desktopInfo?.platform || 'linux').scale : settings.scale;
+  const effective=layoutScale/(settings.matchPhysicalSize && settings.sizeMode!=='screen' ? monitorScale : 1);
   document.documentElement.style.setProperty('--ui-scale',effective/100);
   document.documentElement.style.fontSize=`${16*effective/100}px`;
+  document.documentElement.dataset.microShape=String(effective<65);
+  updateNarrowViewport();
 }
 async function refreshWorkArea() {
   const geometry=await invoke('get_placement_monitors');
@@ -114,14 +115,14 @@ function applySettings() {
   settings.dotCount = [10,20,30].includes(Number(settings.dotCount)) ? Number(settings.dotCount) : 20;
   document.documentElement.dataset.dotCount = settings.dotCount;
   updateLayoutScale(Math.max(1,$('#providers').querySelectorAll('.provider-card').length));
-  const effectiveScale = layoutScale / (settings.matchPhysicalSize ? monitorScale : 1);
+  const effectiveScale = layoutScale / (settings.matchPhysicalSize && settings.sizeMode!=='screen' ? monitorScale : 1);
   document.documentElement.dataset.microShape = String(effectiveScale < 65);
   document.documentElement.style.setProperty('--widget-opacity', settings.widgetOpacity / 100);
   document.documentElement.style.setProperty('--background-opacity', settings.backgroundOpacity / 100);
   document.documentElement.style.setProperty('--ui-scale', effectiveScale / 100);
   document.documentElement.style.fontSize = `${16 * effectiveScale / 100}px`;
   updateNarrowViewport();
-  document.documentElement.classList.toggle('fit-height', Boolean(settings.fitHeight && settings.shape === 'portrait')); lastFitHeight = 0;
+  document.documentElement.classList.toggle('fit-height', Boolean((settings.fitHeight || settings.sizeMode === 'screen') && settings.shape === 'portrait')); lastFitHeight = 0;
   settings.taskbar = { ...defaultTaskbar, ...settings.taskbar, colorMode: settings.colorMode, dotCount: settings.dotCount };
   document.documentElement.dataset.translucent = String(settings.widgetOpacity * settings.backgroundOpacity < 7000);
   $('#widget').classList.toggle('placing', !!settings.placementEditing);
@@ -185,7 +186,7 @@ function draw(snapshot, noData = false) {
     $('#widget').style.setProperty('--shape-columns', settings.shape === 'square' ? (count > 1 ? 2 : 1) : Math.min(3, Math.max(1,count)));
     $('#widget').style.setProperty('--shape-rows', settings.shape === 'square' ? (count > 2 ? 2 : 1) : (count > 3 ? 2 : 1));
     updateLayoutScale(count);
-    const width = widgetWidth(settings,count) * layoutScale / 100 / (settings.matchPhysicalSize ? monitorScale : 1);
+    const width = widgetWidth(settings,count) * layoutScale / 100 / (settings.matchPhysicalSize && settings.sizeMode!=='screen' ? monitorScale : 1);
     if (!isSample) invoke('resize_widget', {scale:settings.scale,widthCssPx:width}).catch(error=>showToast(String(error)));
     renderQuote($('#quote'),settings,quoteData,()=>draw(currentSnapshot,currentNoData),repairTextContrast);
     updateQuote();
@@ -204,13 +205,13 @@ let lastFitHeight = 0;
 let fitPending = false;
 async function requestFit() {
   // The contract is independent of theme content; native code caps it to the monitor.
-  if ((!settings.fitHeight && settings.shape === 'portrait') || isSample || fitPending || document.hidden) return;
+  if ((!(settings.fitHeight || settings.sizeMode === 'screen') && settings.shape === 'portrait') || isSample || fitPending || document.hidden) return;
   fitPending = true;
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   fitPending = false;
   if (disposed) return;
   const count = $('#providers').querySelectorAll('.provider-card').length;
-  const height = widgetHeight(settings,count) * layoutScale / 100 / (settings.matchPhysicalSize ? monitorScale : 1);
+  const height = widgetHeight(settings,count) * layoutScale / 100 / (settings.matchPhysicalSize && settings.sizeMode!=='screen' ? monitorScale : 1);
   if (Math.abs(height - lastFitHeight) < 2) return;
   lastFitHeight = height;
   invoke('fit_window_height', { heightCssPx: height }).catch(() => {});
@@ -252,7 +253,7 @@ $('#widget').addEventListener('pointerdown', event => { if (event.button === 0 &
 let lastTier;
 meterObserver = new ResizeObserver(() => { updateNarrowViewport(); const tier = $('#app').clientWidth < 220 * parseFloat(getComputedStyle(document.documentElement).fontSize) / 16; if (tier !== lastTier) { lastTier = tier; if (currentSnapshot || currentNoData) draw(currentSnapshot,currentNoData); } });
 meterObserver.observe($('#app'));
-fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === ',') {event.preventDefault();openSettings();return;} if (event.key === '+' || event.key === '=') settings.fineTune = Math.min(150, settings.fineTune + 5); else if (event.key === '-') settings.fineTune = Math.max(50, settings.fineTune - 5); else if (event.key === '0') settings.fineTune = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
+fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === ',') {event.preventDefault();openSettings();return;} const key=settings.sizeMode==='screen'?'fitFineTune':'fineTune',value=Number(settings[key] ?? 100); if (event.key === '+' || event.key === '=') settings[key] = Math.min(150, value + 5); else if (event.key === '-') settings[key] = Math.max(50, value - 5); else if (event.key === '0') settings[key] = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
 if (isSample) draw(currentSample());
 else {
   try {
@@ -262,7 +263,7 @@ else {
 
     const overrides = { accent: settings.accent, background: settings.background };
     await activateTheme(settings.theme); Object.assign(settings, overrides); applySettings();
-    await subscribe('monitor-scale', event => { const factor = Number(event.payload); if (factor > 0 && factor !== monitorScale) { monitorScale = factor; applySettings(); } });
+    await subscribe('monitor-scale', event => { const factor = Number(event.payload); if (factor > 0 && factor !== monitorScale) { monitorScale = factor; refreshWorkArea().catch(error=>showToast(String(error))); } });
     monitorScale = await invoke('get_monitor_scale');
     desktopInfo = await invoke('get_desktop_info');
     await refreshWorkArea();
@@ -333,4 +334,4 @@ if (new URLSearchParams(location.search).has('sample') && window.__QUOTA_DOCS_FI
   window.__QUOTA_DOCS_READY__ = true;
 }
 
-if (isSample) window.__AI_USAGE_DEMO__ = { async setWorkArea(monitors) { placementMonitors=monitors; applySettings(); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setSnapshot(snapshot, noData = false) { draw(snapshot, noData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setSettings(next) { if ('scale' in next && !('sizePreset' in next) && !('fineTune' in next)) next = normalizeSize(next); settings = {...settings,...next}; const overrides={accent:settings.accent,background:settings.background}; await activateTheme(settings.theme); Object.assign(settings,overrides); applySettings(); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setQuote(data) { quoteData=data; draw(currentSnapshot,currentNoData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, themes, getSettings:()=>structuredClone(settings) };
+if (isSample) window.__AI_USAGE_DEMO__ = { async setWorkArea(monitors,platform='linux') { desktopInfo={...desktopInfo,platform}; placementMonitors=monitors; applySettings(); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setSnapshot(snapshot, noData = false) { draw(snapshot, noData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setSettings(next) { if ('scale' in next && !('sizePreset' in next) && !('fineTune' in next)) next = normalizeSize(next); settings = {...settings,...next}; const overrides={accent:settings.accent,background:settings.background}; await activateTheme(settings.theme); Object.assign(settings,overrides); applySettings(); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setQuote(data) { quoteData=data; draw(currentSnapshot,currentNoData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, themes, getSettings:()=>structuredClone(settings) };
