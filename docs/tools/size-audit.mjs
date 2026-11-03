@@ -22,14 +22,19 @@ try {
       const title=document.querySelector('.app-title'), style=getComputedStyle(title);
       if(title.textContent!=='AI USAGE'||parseFloat(style.letterSpacing)<0||style.transform!=='none'||style.fontStretch!=='100%')throw Error('Title contract: '+${JSON.stringify(theme)});
       if(style.fontFamily!==getComputedStyle(document.querySelector('.widget')).fontFamily)throw Error('Title/body family mismatch');
-      return {width:rect.width,height:rect.height,cards:[...document.querySelectorAll('.provider-card,.no-data')].map(el=>el.getBoundingClientRect().height)};
+      return {width:rect.width,height:rect.height,cards:[...document.querySelectorAll('.provider-card,.no-data')].map(el=>el.getBoundingClientRect().height),rowHeights:[...new Map([...document.querySelectorAll('.provider-card,.no-data')].map(el=>{const r=el.getBoundingClientRect();return [r.top,r.height]})).values()]};
     })()`);
     // Grid themes redistribute the same provider budget over two columns.
     const grid = ['brutalist','circular-rings','reactor'].includes(theme) && count > 0;
     const expectedCard = grid
       ? (count * (quoteEnabled ? 170 : 210) - (theme === 'brutalist' ? 10 : Math.ceil(count/2)*10)) / Math.ceil(count/2) * factor
       : (quoteEnabled ? 160 : 200) * factor;
-    const error = Math.max(Math.abs(width-measured.width),Math.abs(height-measured.height),...(shape==='portrait'?measured.cards.map(h=>Math.abs(h-expectedCard)):[]));
+    // Quote-enabled featured grids may donate height between rows. Validate the
+    // same total row budget; quote-off cards retain the per-card size contract.
+    const cardErrors = quoteEnabled && grid && count === 3
+      ? [Math.abs(measured.rowHeights.reduce((sum,h)=>sum+h,0)-expectedCard*Math.ceil(count/2))]
+      : measured.cards.map(h=>Math.abs(h-expectedCard));
+    const error = Math.max(Math.abs(width-measured.width),Math.abs(height-measured.height),...(shape==='portrait'?cardErrors:[]));
     rows.push({quoteEnabled,shape,theme,sizePreset,providers:count,width:measured.width,height:measured.height,providerHeight:measured.cards[0],expectedWidth:width,expectedHeight:height,error});
   }
   console.table(rows);

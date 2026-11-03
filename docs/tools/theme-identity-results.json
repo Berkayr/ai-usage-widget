@@ -9,7 +9,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -22,7 +22,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -61,7 +61,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -74,7 +74,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -113,7 +113,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -126,7 +126,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2529,7 +2529,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2542,7 +2542,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2555,7 +2555,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2568,7 +2568,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2581,7 +2581,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2594,7 +2594,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2607,7 +2607,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2620,7 +2620,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2633,7 +2633,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2646,7 +2646,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2659,7 +2659,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -2672,7 +2672,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -3309,7 +3309,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -3322,7 +3322,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -3361,7 +3361,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -3374,7 +3374,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -3413,7 +3413,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -3426,7 +3426,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4089,7 +4089,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16895833333333332,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4102,7 +4102,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16895833333333332,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4141,7 +4141,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16895833333333332,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4154,7 +4154,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16895833333333332,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4193,7 +4193,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16895833333333332,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4206,7 +4206,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16895833333333332,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4869,7 +4869,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4882,7 +4882,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4921,7 +4921,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4934,7 +4934,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4973,7 +4973,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -4986,7 +4986,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -6429,7 +6429,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16395833333333334,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -6442,7 +6442,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16395833333333334,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -6481,7 +6481,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16395833333333334,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -6494,7 +6494,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16395833333333334,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -6533,7 +6533,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16395833333333334,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -6546,7 +6546,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.16395833333333334,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -7209,7 +7209,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -7222,7 +7222,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -7261,7 +7261,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -7274,7 +7274,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -7313,7 +7313,7 @@
       "appearance": "dark",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },
@@ -7326,7 +7326,7 @@
       "appearance": "light",
       "metrics": {
         "maxCardBottomSpaceRatio": 0.08375,
-        "listBottomSpaceRatio": 0.04666666666666667
+        "listBottomSpaceRatio": 0.043333333333333335
       },
       "failures": []
     },

@@ -171,3 +171,31 @@
 :root[data-shape=circle][data-theme=compact-strip] .dial-arc-label{border-radius:0;border-width:0 0 2px;background:var(--bgCard)}
 :root[data-shape=circle][data-theme=frosted-glass] .widget{background-color:var(--bgWidget);background-image:radial-gradient(circle at 30% 20%,color-mix(in srgb,var(--accent) 22%,var(--bgWidget)),var(--bgWidget) 70%);box-shadow:inset 0 0 0 1px var(--border)}
 :root[data-shape=circle][data-theme=frosted-glass] .dial-arc-label{background:var(--bgCard);box-shadow:0 2px 8px #0003;border-radius:8px}
+
+/* Spend the featured row's spare space before squeezing the paired quota cards.
+   The intrinsic minimum includes headings, meters and reset line boxes. */
+:root[data-quote=true][data-shape=portrait] .featured-provider:nth-child(n) .windows{flex:0 0 auto;align-content:start}
+:root[data-quote=true][data-shape=portrait][data-theme=brutalist] .featured-provider:nth-child(n) .quota-window{justify-content:flex-start;gap:.375rem}
+
+/* Applied only when measured content exceeds its card; preset geometry stays fixed. */
+:root .provider-card[data-usage-compact=true]{padding-block:.25rem}
+:root .provider-card[data-usage-compact=true] .provider-heading{min-height:0;margin-bottom:.25rem;gap:.125rem}
+:root .provider-card[data-usage-compact=true] .windows{flex:0 0 auto;min-height:0;align-content:start;gap:.25rem}
+:root .provider-card[data-usage-compact=true] .quota-window{min-height:0;justify-content:flex-start;gap:.125rem}
+:root .provider-card[data-usage-compact=true] .window-bottom{margin-top:.125rem;gap:.125rem}
+:root .provider-card[data-usage-compact=true] .ring-display{min-height:0;max-height:100%;height:100%;aspect-ratio:auto;margin-bottom:0}
+:root .provider-card[data-usage-compact=true] .ring-display svg{object-fit:contain}
+/* A quote leaves a shallow landscape row: keep both metrics side by side. */
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true]{padding:.125rem}
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .windows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .window-top{display:flex;flex-direction:row;align-items:baseline;gap:.125rem}
+
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .window-top b{margin-top:0}
+:root:is([data-theme=frosted-glass],[data-theme=retro-lcd])[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .quota-window{padding:.125rem}
+:root .provider-card[data-usage-compact=true] .pace-context{display:none}
+:root[data-shape=portrait][data-theme=brutalist] .provider-card[data-usage-compact=true] .window-top{flex-direction:row;align-items:baseline}
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .window-bottom{line-height:1.1}
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .plan{padding-block:0}
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] :is(.meter,.segments,.dot-bar){height:.25rem;margin-top:.125rem}
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .segments i{height:100%}
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .segments>em{top:0;height:100%}

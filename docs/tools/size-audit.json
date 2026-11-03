@@ -13095,10 +13095,10 @@
       "providers": 3,
       "width": 255,
       "height": 709.5,
-      "providerHeight": 187.25,
+      "providerHeight": 194.25,
       "expectedWidth": 255,
       "expectedHeight": 709.5,
-      "error": 0.25
+      "error": 0.5
     },
     {
       "quoteEnabled": true,
@@ -13147,7 +13147,7 @@
       "providers": 3,
       "width": 340,
       "height": 946,
-      "providerHeight": 250,
+      "providerHeight": 261,
       "expectedWidth": 340,
       "expectedHeight": 946,
       "error": 0
@@ -13199,7 +13199,7 @@
       "providers": 3,
       "width": 425,
       "height": 1182.5,
-      "providerHeight": 312.5,
+      "providerHeight": 324.5,
       "expectedWidth": 425,
       "expectedHeight": 1182.5,
       "error": 0
@@ -13251,7 +13251,7 @@
       "providers": 3,
       "width": 680,
       "height": 1892,
-      "providerHeight": 500,
+      "providerHeight": 521,
       "expectedWidth": 680,
       "expectedHeight": 1892,
       "error": 0
@@ -13303,7 +13303,7 @@
       "providers": 3,
       "width": 850,
       "height": 2365,
-      "providerHeight": 625,
+      "providerHeight": 652,
       "expectedWidth": 850,
       "expectedHeight": 2365,
       "error": 0
@@ -13358,7 +13358,7 @@
       "providerHeight": 183.5,
       "expectedWidth": 255,
       "expectedHeight": 709.5,
-      "error": 0.25
+      "error": 0.5
     },
     {
       "quoteEnabled": true,
@@ -14658,7 +14658,7 @@
       "providerHeight": 183.5,
       "expectedWidth": 255,
       "expectedHeight": 709.5,
-      "error": 0.25
+      "error": 0.5
     },
     {
       "quoteEnabled": true,

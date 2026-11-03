@@ -102,16 +102,23 @@ def inside():
               const api=window.__AI_USAGE_DEMO__;
               await api.setWorkArea([{name:'Synthetic laptop',width:1536,height:926,scale:1,primary:true}]);
               await api.setSettings(SETTINGS);
-              await api.setSnapshot({providers:['claude','codex','gemini'].map(id=>({id,state:'OK',windows:[{kind:'session',used_percent:34},{kind:'weekly',used_percent:62}]}))});
+              await api.setSnapshot({providers:['claude','codex','gemini'].map(id=>({id,plan:'DEMO',state:'OK',windows:[{kind:'session',used_percent:84,resets_at:new Date(Date.now()+9600000).toISOString()},{kind:'weekly',used_percent:62,resets_at:new Date(Date.now()+144000000).toISOString()}]}))});
               await api.setQuote({status:'ok',cards:[{quote:'Fictional words about quiet thought and patient work. '.repeat(4),author:'Example Author',work:'An Invented Work (1933)',reason:'Died on this day, 1957'}]});
               await document.fonts.ready;
               await new Promise(r=>setTimeout(r,250));
+              const list=document.querySelector('#providers');
+              const cards=[...list.querySelectorAll('.provider-card')];
+              const usageFits=[list,...cards].every(el=>el.scrollHeight<=el.clientHeight&&el.scrollWidth<=el.clientWidth);
+              const scrollbars=[list,...cards].map(el=>{const s=getComputedStyle(el);return el.offsetWidth-el.clientWidth-parseFloat(s.borderLeftWidth)-parseFloat(s.borderRightWidth)});
+              const lr=list.getBoundingClientRect();
+              const edgesFit=cards.every(el=>{const r=el.getBoundingClientRect();return r.top>=lr.top-1&&r.bottom<=lr.bottom-parseFloat(getComputedStyle(list).paddingBottom)+1});
               const t=document.querySelector('.quote-text'),r=document.querySelector('#widget').getBoundingClientRect();
-              document.title='MEASURE:'+JSON.stringify({preset:PRESET,fineTune:api.getSettings().fineTune,width:r.width,height:r.height,viewport:[innerWidth,innerHeight],textFits:t.scrollHeight<=t.clientHeight&&t.scrollWidth<=t.clientWidth,font:getComputedStyle(t).fontSize});
+              document.title='MEASURE:'+JSON.stringify({preset:PRESET,fineTune:api.getSettings().fineTune,width:r.width,height:r.height,viewport:[innerWidth,innerHeight],usageFits,scrollbars,edgesFit,featured:document.querySelector('.featured-provider')?.dataset.provider,textFits:t.scrollHeight<=t.clientHeight&&t.scrollWidth<=t.clientWidth,font:getComputedStyle(t).fontSize});
             })().catch(e=>document.title='FAIL:'+e.message)'''
             settings = dict(theme='brutalist', shape='portrait', sizePreset=preset,
                             fineTune=82, quoteEnabled=True, quotePosition='bottom',
-                            fitHeight=True, appearance='dark', linux={'margin': 12})
+                            fitHeight=True, appearance='dark', featuredProvider='auto',
+                            featuredPosition='top', linux={'margin': 12})
             script = script.replace('SETTINGS', json.dumps(settings)).replace('PRESET', json.dumps(preset))
             web.evaluate_javascript(script, -1, None, None, None, None, None)
         except Exception as error:
@@ -128,7 +135,8 @@ def inside():
             metrics['layerShell'] = GtkLayerShell.is_layer_window(window)
             metrics['allocation'] = [window.get_allocated_width(), window.get_allocated_height()]
             assert metrics['layerShell'] and metrics['fineTune'] == 82 and metrics['textFits'], metrics
-            assert metrics['height'] <= metrics['viewport'][1] + 1, metrics
+            assert metrics['usageFits'] and metrics['edgesFit'] and max(metrics['scrollbars']) <= .5, metrics
+            assert metrics['featured'] and metrics['height'] <= metrics['viewport'][1] + 1, metrics
             assert 46 + metrics['allocation'][1] <= 948, metrics
             results.append(metrics)
             def snapshot_done(view, task):

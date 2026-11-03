@@ -273,6 +273,17 @@ Quote is opt-in. In portrait, enabled quotes use a 320px reading block and
 160px provider cards (170px including the gap), instead of 200px quotes and
 200px cards. Quote-off dimensions and layout remain unchanged. With three
 providers the total remains 946px at 100%. Grid themes share this same budget.
+Usage overflow is measured after rendering and on list resize/font readiness.
+In a three-provider portrait grid, the featured row first donates spare height
+to the paired row. Featured quote content stays grouped near the heading.
+Only cards that still overflow compact their internal spacing and then reduce
+text, stopping at 11px (existing smaller labels keep their authored size).
+Dense Minimal Pace cards show the signed percentage-point delta with its
+comparison context in a tooltip. Ring graphics use the remaining cell height.
+This preserves shell dimensions,
+card borders, theme surfaces and cards that already fit. Overflow is never
+fixed by hiding a scrollbar or clipping quota content.
+
 The quote uses normal case and readable body weight; theme signatures remain on
 its label. Attribution is a small, borderless source line near the lower right;
 the source and text open the full quote, work, author description and license.

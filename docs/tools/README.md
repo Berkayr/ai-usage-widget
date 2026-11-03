@@ -271,3 +271,22 @@ WebKit snapshots plus layer/allocation measurements under the ignored task
 output directory, and removes its temporary profile. It verifies native
 rendering and compositor allocation; it does not launch the installed Tauri
 application or exercise its IPC. Rust placement tests cover native inset math.
+
+Usage scrollbars and card edges have a separate exhaustive offline matrix:
+
+```sh
+node docs/tools/usage-fit-check.mjs
+```
+
+It covers all themes, five shapes, five presets, featured none/auto/top/bottom,
+quote off/top/bottom and one/two/three fictional providers (9,000 cases), plus
+the reported Brutalist Medium 82% portrait. `top`/`bottom` mean auto selection
+with explicit placement; `auto` uses default bottom placement. Every visible
+list/card must have `scrollHeight <= clientHeight`, `scrollWidth <= clientWidth`,
+zero scrollbar width, unclipped card edges and nonoverlapping quota blocks. Results and a fictional screenshot
+are saved to `gorevler/ss-ayar/`; use `AUDIT_OUTPUT` for another output directory.
+`AUDIT_THEMES`, `AUDIT_SHAPES`, `AUDIT_SIZES` filter a focused run;
+`AUDIT_REPRO_ONLY=1` captures just the reported geometry and `AUDIT_CAPTURE`
+selects its screenshot name. Native quote preview also explicitly enables
+featured auto at the top with three providers and measures usage overflow,
+scrollbar widths and card edges through Medium → Large → Medium.

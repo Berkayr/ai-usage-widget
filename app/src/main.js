@@ -1,3 +1,4 @@
+import { observeUsageFit } from './usage-fit.js';
 import { applyAppearance } from './appearance.js';
 import { orderedProviders, arrangeCards } from './provider-layout.js';
 import { loadQuote, renderQuote, sampleQuote } from './quote.js';
@@ -47,6 +48,7 @@ async function subscribe(name, handler) {
 }
 let pollTimer;
 function dispose() {
+  usageFit.disconnect();
   disposed = true;
   domEvents.abort();
   unlisteners.splice(0).forEach(stop => stop());
@@ -188,6 +190,7 @@ function draw(snapshot, noData = false) {
     renderQuote($('#quote'),settings,quoteData,()=>draw(currentSnapshot,currentNoData),repairTextContrast);
     updateQuote();
     repairTextContrast($('#widget'));
+    usageFit.refresh();
     requestFit();
     if (!isSample) {
       console.debug('snapshot-rendered', snapshot?.generated_at);
@@ -195,6 +198,7 @@ function draw(snapshot, noData = false) {
     }
   });
 }
+const usageFit = observeUsageFit($('#providers'));
 let fitObserver;
 let lastFitHeight = 0;
 let fitPending = false;

@@ -22,7 +22,7 @@ function meter(window, type) {
 }
 function row(window, type) {
   const pct = pctOf(window), elapsed = pace(window);
-  return `<div class="quota-window"><div class="window-top"><span>${esc(shortWindowLabel(window))}</span><b data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : `${Math.round(pct)}%`}</b></div>${meter(window,type)}<div class="window-bottom"><span class="pace">${type === 'minimal-pace' ? (elapsed !== null && pct !== null ? `${pct - elapsed >= 0 ? '+' : ''}${Math.round(pct - elapsed)} pp vs elapsed` : 'Pace unavailable') : ''}</span><span class="reset">${esc(countdown(window.resets_at))}</span></div></div>`;
+  return `<div class="quota-window"><div class="window-top"><span>${esc(shortWindowLabel(window))}</span><b data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : `${Math.round(pct)}%`}</b></div>${meter(window,type)}<div class="window-bottom"><span class="pace" title="Usage compared with elapsed interval">${type === 'minimal-pace' ? (elapsed !== null && pct !== null ? `${pct - elapsed >= 0 ? '+' : ''}${Math.round(pct - elapsed)} pp<span class="pace-context"> vs elapsed</span>` : 'Pace unavailable') : ''}</span><span class="reset">${esc(countdown(window.resets_at))}</span></div></div>`;
 }
 function rings(windows) {
   const rank = w => w.kind === 'session' ? 0 : w.kind === 'weekly' ? 1 : 2;
