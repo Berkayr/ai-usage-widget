@@ -185,6 +185,6 @@ and 340 × 340 for square; all five size presets scale proportionally.
 
 ### Shapes
 
-Choose Portrait, Landscape (2:1), Square, Circle Dial, or Pill (4:1) in Settings → Layout & Position. Every theme uses the same dimensions for a given shape and size. Circle and Pill support up to three providers per widget; choose them in **Providers on this widget**. Other providers remain available in the rectangular layouts. Round shapes keep Settings and the right-click menu inside their silhouette and use native input masks so transparent corners pass clicks through to the desktop.
+Choose Portrait, Landscape (2:1), Square, Circle Dial, or Pill (4:1) in Settings → Layout & Position. Every theme uses the same dimensions for a given shape and size. Circle shows percentages beside arc endpoints, with automatic spacing for nearby values. Provider colors are shared across shapes: choose custom colors or reset each provider in **Appearance / Theme → Provider colors**. Low contrast and similar colors trigger a warning; Mono keeps patterned rings. Circle and Pill support up to three providers per widget; choose them in **Providers on this widget**. Other providers remain available in the rectangular layouts. Round shapes keep Settings and the right-click menu inside their silhouette and use native input masks so transparent corners pass clicks through to the desktop.
 
 ![Five shapes with fictional usage data](docs/screenshots/shapes.png)
