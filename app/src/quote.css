@@ -1,22 +1,22 @@
 .quote-section[hidden]{display:none!important}
-.quote-section{flex:none;position:relative;min-width:0;height:12.5rem;padding:.625rem 0;border-top:1px solid var(--border);font:inherit;color:var(--textPrimary)}
+.quote-section{flex:none;position:relative;min-width:0;height:20rem;padding:.625rem 0;border-top:1px solid var(--border);font:inherit;color:var(--textPrimary)}
 .quote-content{position:relative;display:flex;flex-direction:column;height:100%;min-width:0;overflow:hidden}
 .quote-label{font-size:var(--size-font-small);color:var(--textSecondary);margin-bottom:.375rem}
-.quote-text{display:block;flex:1;min-height:0;overflow:hidden;overflow-wrap:anywhere;text-align:left;font:inherit;color:inherit;border:0;padding:0;background:transparent;cursor:pointer;width:100%;line-height:1.4}
+.quote-text{display:block;flex:1;min-height:0;overflow:hidden;overflow-wrap:anywhere;text-align:left;font:inherit;font-size:max(11px,1.125rem);font-weight:400;text-transform:none;color:inherit;border:0;padding:0;background:transparent;cursor:pointer;width:100%;line-height:1.4}
 .quote-author,.quote-reason{font-size:var(--size-font-small);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.25rem}
 .quote-source,.quote-toggle,.quote-nav button{font:inherit;font-size:var(--size-font-small);color:var(--textPrimary);background:var(--bgWidget);border:1px solid var(--border);cursor:pointer;padding:.125rem .375rem}
 .quote-label,.quote-author,.quote-reason,.quote-source{flex:none}
-.quote-source{align-self:flex-start;max-width:calc(100% - 3rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.375rem}.quote-nav{position:absolute;bottom:0;right:0;display:flex;gap:.125rem}.quote-nav[hidden],.quote-toggle[hidden]{display:none!important}
-:root[data-quote=true][data-shape=portrait] .widget{height:calc(var(--contract-height) + 12.5rem)}
-:root[data-shape=portrait] .quote-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto;column-gap:.5rem}
+.quote-source{align-self:flex-end;max-width:calc(100% - 3rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.375rem;border:0;background:transparent;padding:0}.quote-nav{position:absolute;bottom:0;left:0;display:flex;gap:.125rem}.quote-nav[hidden],.quote-toggle[hidden]{display:none!important}
+:root[data-quote=true][data-shape=portrait] .widget{height:calc(var(--contract-height) + 20rem)}
+:root[data-shape=portrait] .quote-content{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto auto;column-gap:.5rem}
 :root[data-shape=portrait] .quote-label,:root[data-shape=portrait] .quote-text,:root[data-shape=portrait] .quote-source{grid-column:1/-1}
 :root[data-shape=portrait] .quote-label{margin-bottom:.125rem}
-:root[data-shape=portrait] .quote-source{justify-self:start;margin-top:.25rem}
-:root[data-shape=landscape] .quote-section{height:6.25rem}
+:root[data-shape=portrait] .quote-source{justify-self:end;margin-top:.25rem}
+:root[data-shape=landscape] .quote-section{height:7.5rem}
 :root[data-shape=landscape] .quote-content{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr) auto;column-gap:.5rem}
 :root[data-shape=landscape] .quote-label,:root[data-shape=landscape] .quote-text{grid-column:1/-1}
 :root[data-shape=landscape] .quote-label{margin-bottom:.25rem}
-:root[data-shape=landscape] .quote-source{max-width:100%;margin:0 3rem 0 0}
+:root[data-shape=landscape] .quote-source{max-width:100%;margin:0 0 0 3rem}
 :root[data-shape=landscape] .quote-author,:root[data-shape=landscape] .quote-reason{display:inline;margin-right:.5rem}
 :root[data-shape=square] .quote-section{height:1.75rem;padding:0;border:0}
 :root[data-shape=square] .quote-content{display:none}
@@ -34,7 +34,7 @@
 :root[data-shape=pill] .quote-section{position:absolute;left:.75rem;top:calc(50% - .75rem);height:1.5rem;padding:0;border:0}
 .quote-dialog{max-width:min(90vw,42rem);max-height:85vh;overflow:auto;border:1px solid var(--border);border-radius:.75rem;background:var(--bgWidget);color:var(--textPrimary);font:inherit;padding:1.5rem}
 .quote-dialog p{white-space:pre-wrap;overflow-wrap:anywhere}.quote-dialog a{color:inherit}.quote-dialog button{display:block;margin-top:1rem;font:inherit}.quote-dialog::backdrop{background:#0008}
-:root[data-theme=brutalist] .quote-section{border-top:3px solid currentColor;font-weight:900;text-transform:uppercase}
+:root[data-theme=brutalist] .quote-section{border-top:3px solid currentColor;font-weight:400}
 :root[data-theme=terminal] .quote-text{font-weight:400}:root[data-theme=terminal] .quote-label{color:var(--accent)}
 :root[data-theme=retro-lcd] .quote-content{border:1px inset var(--border);padding:.25rem;background:var(--bgCard)}
 :root[data-theme=dot-matrix] .quote-section{border-top-style:dotted;letter-spacing:.03em}
@@ -50,3 +50,17 @@
 
 :root[data-theme=reactor] .quote-content{background:radial-gradient(ellipse at left,color-mix(in srgb,var(--accent) 12%,var(--bgWidget)),var(--bgWidget) 75%);box-shadow:inset 1px 0 var(--accent),inset 0 0 18px color-mix(in srgb,var(--accent) 8%,transparent);padding:.375rem}
 :root[data-theme=reactor] .quote-label{color:var(--accent);letter-spacing:.1em;text-transform:uppercase}
+
+/* Only opt-in portrait usage cards donate space to the reading area. */
+:root[data-quote=true][data-shape=portrait] .widget{--size-card:10rem}
+:root[data-quote=true][data-shape=portrait] .windows{align-content:center;gap:.375rem}
+:root[data-quote=true][data-shape=portrait][data-theme=brutalist] .featured-provider:nth-child(n) .quota-window{justify-content:center;gap:.375rem}
+:root[data-theme=brutalist] .quote-label{font-weight:900;text-transform:uppercase}
+:root[data-shape=portrait][data-quote-position=top] .quote-section{order:-1;border-top:0;border-bottom:1px solid var(--border);margin-top:var(--size-header)}
+:root[data-shape=portrait][data-quote-position=top] .header{position:absolute;top:var(--size-pad);left:var(--size-pad);right:var(--size-pad)}
+:root[data-shape=landscape][data-quote-position=top] .quote-section{order:-1;border-top:0;border-bottom:1px solid var(--border);margin-top:var(--size-header)}
+:root[data-shape=landscape][data-quote-position=top] .header{position:absolute;top:var(--size-pad);left:var(--size-pad);right:var(--size-pad)}
+.quote-source{min-height:1.5rem;line-height:1.5rem;margin-right:3rem}
+.quote-nav{left:auto;right:0}
+:root[data-shape=landscape] .quote-source{margin:0 3rem 0 0}
+:root[data-shape=circle] .quote-source{min-height:0;line-height:1.4;margin-right:0}

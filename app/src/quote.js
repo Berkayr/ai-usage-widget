@@ -45,6 +45,7 @@ function observeQuote(content, text, shape) {
 export function renderQuote(root, settings, data, redraw, repairContrast = () => {}) {
   fitObserver?.disconnect();
   root.replaceChildren();root.hidden=settings.quoteEnabled!==true;
+  document.documentElement.dataset.quotePosition=settings.quotePosition === 'top' ? 'top' : 'bottom';
   document.documentElement.dataset.quote=String(settings.quoteEnabled===true);
   document.documentElement.dataset.quotePage=String(page&&settings.quoteEnabled===true);
   if(root.hidden)return;
@@ -54,13 +55,13 @@ export function renderQuote(root, settings, data, redraw, repairContrast = () =>
   const content=document.createElement('div');content.className='quote-content';root.append(content);
   const label=document.createElement('div');label.className='quote-label';label.textContent=({'reactor':'CORE / DAILY QUOTE','terminal':'> quote','retro-lcd':'[ DAILY QUOTE ]','dot-matrix':'•• DAILY QUOTE','brutalist':'DAILY QUOTE','minimal-pace':'Daily reflection','compact-strip':'QUOTE /','circular-rings':'◉ Daily quote','frosted-glass':'Daily inspiration'})[settings.theme]||'Quote of the day';content.append(label);
   const text=document.createElement('button');text.className='quote-text';text.textContent=card?.quote|| (data?.status==='offline'?'Quotes unavailable · offline':'Loading quote…');content.append(text);
-  const author=document.createElement('div');author.className='quote-author';author.textContent=card?.author||'Wikiquote';content.append(author);
+  const author=document.createElement('div');author.className='quote-author';author.textContent=[card?.author||'Wikiquote',card?.work].filter(Boolean).join(' · ');author.title=author.textContent;content.append(author);
   const reason=document.createElement('div');reason.className='quote-reason';reason.textContent=(data?.status==='offline'?'Offline · ':'')+(card?.reason||'');content.append(reason);
   const attribution=document.createElement('button');attribution.className='quote-source';attribution.textContent='Wikiquote · CC BY-SA';attribution.setAttribute('aria-label','Read full quote, source and CC BY-SA 4.0 license');content.append(attribution);
   const full=()=>{
     const dialog=document.createElement('dialog');dialog.className='quote-dialog';
     const body=document.createElement('p');body.textContent=card?.quote||text.textContent;
-    const by=document.createElement('p');by.textContent=[card?.author,card?.reason].filter(Boolean).join(' · ');
+    const by=document.createElement('p');by.textContent=[card?.author,card?.work,card?.author_description,card?.reason].filter(Boolean).join(' · ');
     const source=document.createElement('a');source.textContent='Wikiquote · CC BY-SA 4.0';
     // A remote value never becomes an arbitrary link or executable URL.
     if(/^https:\/\/en\.wikiquote\.org\/wiki\//.test(card?.source_url||'')){source.href=card.source_url;source.target='_blank';source.rel='noopener noreferrer';}

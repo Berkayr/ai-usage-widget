@@ -59,6 +59,7 @@ pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),St
     let (width,height)=widget_size(window);
     #[cfg(target_os="linux")] let margin=edge_margin(1.);
     #[cfg(not(target_os="linux"))] let margin=edge_margin(monitor.scale);
+    #[cfg(target_os="linux")] let margin=if settings.position!="Free" {margin.max(settings.linux.margin.clamp(0,64) as u32)} else {margin};
     let clipped=(width.min(monitor.width.saturating_sub(2*margin).max(1)),height.min(monitor.height.saturating_sub(2*margin).max(1)));
     if clipped!=(width,height) {
         #[cfg(target_os="linux")] { use gtk::prelude::*;if let Ok(gtk)=window.gtk_window() {gtk.set_size_request(clipped.0 as i32,clipped.1 as i32);if !linux::layered() {gtk.resize(clipped.0 as i32,clipped.1 as i32);}} }
@@ -66,7 +67,6 @@ pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),St
     }
     let (width,height)=clipped;
     let (xr,yr)=if settings.position=="Free" { (p.x_ratio,p.y_ratio) } else { (if settings.position.ends_with("left") {0.} else {1.},if settings.position.starts_with("Top") {0.} else {1.}) };
-    #[cfg(target_os="linux")] let margin=if settings.position!="Free" {margin.max(settings.linux.margin.clamp(0,64) as u32)} else {margin};
     let x=inset_position(xr,monitor.width,width,margin,&p.snap);
     let y=inset_position(yr,monitor.height,height,margin,&p.snap);
     #[cfg(target_os="linux")] {
@@ -105,6 +105,22 @@ pub fn watch(app: tauri::AppHandle) {
 #[cfg(test)] mod tests {
     use super::*;
     fn monitor(name:&str,primary:bool)->Monitor {Monitor{name:name.into(),x:0,y:0,width:1920,height:1080,primary,scale:1.}}
+    #[test]
+    fn laptop_layer_surface_stays_inside_panel_workarea() {
+        // 1536x960 output, 34px top panel, GTK logical units at DPI 1.
+        let (work_width,work_height,margin)=(1536u32,926u32,12u32);
+        for scale in [0.615_f64,0.82,1.025,1.64,2.05] {
+            let effective=scale.min((work_height-2*margin) as f64/946.);
+            let width=(340.*effective).round() as u32;
+            let height=(946.*effective).ceil() as u32;
+            for ratio in [0.,0.5,1.] {
+                let x=inset_position(ratio,work_width,width,margin,"off");
+                let y=inset_position(ratio,work_height,height,margin,"off");
+                assert!(x>=margin as i32 && x+width as i32<=1524);
+                assert!(34+y>=46 && 34+y+height as i32<=948);
+            }
+        }
+    }
     #[test] fn ratios_clip_and_roundtrip() { for r in [0.,0.25,0.5,1.] {assert!((ratio(pixel(r,1920,340),1920,340)-r).abs()<0.001);} assert_eq!(pixel(2.,100,20),80);assert_eq!(pixel(-1.,100,20),0);assert_eq!(pixel(f64::NAN,100,20),0);assert_eq!(pixel(0.5,100,200),0);assert_eq!(ratio(99,100,200),0.); }
     #[test] fn growing_height_keeps_bottom_inside_workarea() {
         // 1536x960 logical output, 40 px top panel, scale 90%.

@@ -224,7 +224,7 @@ frontend currently normalizes them to portrait and does not expose them.
 
 All dimensions are logical CSS pixels before DPI scaling. Multiply both axes by
 `sizePresets[sizePreset] / 100 * fineTune / 100`. Small, Medium, Large, X-Large,
-and 2X-Large use 0.75, 1, 1.5, 2, and 2.5 respectively. Physical-size matching
+and 2X-Large use 0.75, 1, 1.25, 2, and 2.5 respectively. Physical-size matching
 also divides by monitor scale. Portrait retains its previous sizing, including
 the Compact Strip exception. Landscape is 680 × 340 and square is 340 × 340 at
 Medium, independent of provider count and theme. Native monitor bounds may cap
@@ -256,7 +256,7 @@ shapes has a 9 CSS px floor; the floor is absolute, independent of rem scaling.
 
 ### Round shape contract
 
-All five shapes share the size presets (75%, 100%, 150%, 200%, 250%) and fine tuning. Medium circle is 340 × 340 CSS pixels; Medium pill is 480 × 120. Geometry is independent of theme and provider count. Circle uses a circular mask; pill uses a radius of half its height.
+All five shapes share the size presets (75%, 100%, 125%, 200%, 250%) and fine tuning. Medium circle is 340 × 340 CSS pixels; Medium pill is 480 × 120. Geometry is independent of theme and provider count. Circle uses a circular mask; pill uses a radius of half its height.
 
 Circle and pill show up to three providers selected per widget in Settings → Layout & Position → Providers on this widget. An absent selection defaults to the first three enabled providers; an empty selection intentionally shows none. Other enabled providers remain visible in settings and in rectangular layouts. Selection does not change collector consent.
 
@@ -265,3 +265,36 @@ A single-provider circle shows session outside and weekly inside. Multiple provi
 Pill shows inline provider cells, primary reset time, dual quota meters, and an internal settings button; header and footer are omitted. Text is at least 9 CSS pixels. Right-click opens the context menu inside either silhouette; Ctrl+, opens Settings. Dragging an unlocked widget works across its surface.
 
 Native input regions match the silhouette: Win32 applies physical-pixel ellipse/capsule regions and transfers region ownership to Windows; GTK applies logical-pixel cairo scanlines to its input region on both X11 and layer-shell Wayland. Resize, DPI and shape changes are coalesced for 40 ms; identical regions are skipped. Rectangular shapes restore the entire input region. Native click-through still requires manual compositor testing.
+
+
+### Daily quote reading and work-area fit
+
+Quote is opt-in. In portrait, enabled quotes use a 320px reading block and
+160px provider cards (170px including the gap), instead of 200px quotes and
+200px cards. Quote-off dimensions and layout remain unchanged. With three
+providers the total remains 946px at 100%. Grid themes share this same budget.
+The quote uses normal case and readable body weight; theme signatures remain on
+its label. Attribution is a small, borderless source line near the lower right;
+the source and text open the full quote, work, author description and license.
+Quote text still shrinks to 11px (9px for circle), then truncates at a word
+boundary with an explicit ellipsis. Work appears next to the author, with a
+full tooltip; author description is available in the dialog.
+
+`quotePosition` is `bottom` by default, including persisted settings that omit
+it; `top` places the reading block before providers in portrait and landscape.
+Circle and square keep their quote page; pill keeps its quote dialog.
+Preset changes preserve `fineTune`. Large is 125% to reduce the jump from Medium.
+The monitor preview reports requested dimensions and the largest effective
+percentage that fits its work area after margins. Oversize selections retain
+the saved preset and fine tuning while the actual display scale is capped to
+that maximum; native placement keeps the surface within the work area. No
+settings are rewritten by the cap. The cap is recomputed after provider,
+monitor, quote, shape and settings changes. Linux uses logical GTK work-area
+units including panel offsets; Windows uses physical work-area units and DPI.
+
+QOTD prefers a verified death/birth anniversary for its reason, then the dated
+Wikiquote selection. `work` comes from the author's `in …` suffix, then the
+source/context fields. `author_description` comes from `descriptions.en` on the
+existing Wikidata entity request. Old caches require no retry: existing
+anniversaries apply immediately; missing work/description remain optional until
+the next scheduled round. Disabled quotes perform no network or cache access.

@@ -320,7 +320,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -333,7 +333,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -346,7 +346,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -359,7 +359,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -372,7 +372,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -385,7 +385,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -398,7 +398,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -411,7 +411,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -424,7 +424,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -437,7 +437,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -450,7 +450,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -463,7 +463,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -1124,7 +1124,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1003125,
+        "maxCardBottomSpaceRatio": 0.0999375,
         "displayRatio": 2.64,
         "listBottomSpaceRatio": 0.05
       },
@@ -1138,7 +1138,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1003125,
+        "maxCardBottomSpaceRatio": 0.0999375,
         "displayRatio": 2.64,
         "listBottomSpaceRatio": 0.05
       },
@@ -1152,7 +1152,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11590447154471545,
+        "maxCardBottomSpaceRatio": 0.11573170731707318,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.024390243902439025
       },
@@ -1166,7 +1166,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11590447154471545,
+        "maxCardBottomSpaceRatio": 0.11573170731707318,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.024390243902439025
       },
@@ -1180,7 +1180,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.15342741935483872,
+        "maxCardBottomSpaceRatio": 0.15318548387096775,
         "displayRatio": 2.64,
         "listBottomSpaceRatio": 0.03225806451612903
       },
@@ -1194,7 +1194,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.15342741935483872,
+        "maxCardBottomSpaceRatio": 0.15318548387096775,
         "displayRatio": 2.64,
         "listBottomSpaceRatio": 0.03225806451612903
       },
@@ -1208,7 +1208,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11752008032128514,
+        "maxCardBottomSpaceRatio": 0.11734939759036145,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.024096385542168676
       },
@@ -1222,7 +1222,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11752008032128514,
+        "maxCardBottomSpaceRatio": 0.11734939759036145,
         "displayRatio": 2.4,
         "listBottomSpaceRatio": 0.024096385542168676
       },
@@ -1236,9 +1236,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1636418269230769,
+        "maxCardBottomSpaceRatio": 0.16344559025023436,
         "displayRatio": 2.64,
-        "listBottomSpaceRatio": 0.028846153846153848
+        "listBottomSpaceRatio": 0.028845460445662365
       },
       "failures": []
     },
@@ -1250,9 +1250,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1636418269230769,
+        "maxCardBottomSpaceRatio": 0.16344559025023436,
         "displayRatio": 2.64,
-        "listBottomSpaceRatio": 0.028846153846153848
+        "listBottomSpaceRatio": 0.028845460445662365
       },
       "failures": []
     },
@@ -1264,9 +1264,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11805,
+        "maxCardBottomSpaceRatio": 0.11790117901179012,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.024
+        "listBottomSpaceRatio": 0.024030240302403024
       },
       "failures": []
     },
@@ -1278,9 +1278,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11805,
+        "maxCardBottomSpaceRatio": 0.11790117901179012,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.024
+        "listBottomSpaceRatio": 0.024030240302403024
       },
       "failures": []
     },
@@ -1988,9 +1988,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.043333333333333335,
-        "ringRatio": 0.47854077253218885,
-        "maxRingTextRadiusRatio": 0.7586610349769184,
+        "maxCardBottomSpaceRatio": 0.044,
+        "ringRatio": 0.47809278350515466,
+        "maxRingTextRadiusRatio": 0.7642877485942879,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2003,9 +2003,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.043333333333333335,
-        "ringRatio": 0.47854077253218885,
-        "maxRingTextRadiusRatio": 0.7586610349769184,
+        "maxCardBottomSpaceRatio": 0.044,
+        "ringRatio": 0.47809278350515466,
+        "maxRingTextRadiusRatio": 0.7642877485942879,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2018,9 +2018,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.019105691056910568,
-        "ringRatio": 0.9113082039911308,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.01975609756097561,
+        "ringRatio": 0.9094540612516645,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -2033,9 +2033,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.019105691056910568,
-        "ringRatio": 0.9113082039911308,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.01975609756097561,
+        "ringRatio": 0.9094540612516645,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -2048,9 +2048,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2005464480874317,
-        "ringRatio": 0.47854077253218885,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.20098360655737704,
+        "ringRatio": 0.47809278350515466,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.03278688524590164
       },
       "failures": []
@@ -2063,9 +2063,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2005464480874317,
-        "ringRatio": 0.47854077253218885,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.20098360655737704,
+        "ringRatio": 0.47809278350515466,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.03278688524590164
       },
       "failures": []
@@ -2078,9 +2078,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.019105691056910568,
-        "ringRatio": 0.9113082039911308,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.01975609756097561,
+        "ringRatio": 0.9094540612516645,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -2093,9 +2093,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.019105691056910568,
-        "ringRatio": 0.9113082039911308,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.01975609756097561,
+        "ringRatio": 0.9094540612516645,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -2108,9 +2108,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.23137254901960785,
-        "ringRatio": 0.47854077253218885,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.23176470588235293,
+        "ringRatio": 0.47809278350515466,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.029411764705882353
       },
       "failures": []
@@ -2123,9 +2123,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.23137254901960785,
-        "ringRatio": 0.47854077253218885,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.23176470588235293,
+        "ringRatio": 0.47809278350515466,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.029411764705882353
       },
       "failures": []
@@ -2138,9 +2138,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.019105691056910568,
-        "ringRatio": 0.9113082039911308,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.01975609756097561,
+        "ringRatio": 0.9094540612516645,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -2153,9 +2153,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.019105691056910568,
-        "ringRatio": 0.9113082039911308,
-        "maxRingTextRadiusRatio": 0.8232672058386997,
+        "maxCardBottomSpaceRatio": 0.01975609756097561,
+        "ringRatio": 0.9094540612516645,
+        "maxRingTextRadiusRatio": 0.8303096770965764,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -2840,7 +2840,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2853,7 +2853,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2866,7 +2866,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2879,7 +2879,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2892,7 +2892,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2905,7 +2905,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2918,7 +2918,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2931,7 +2931,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2944,7 +2944,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2957,7 +2957,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2970,7 +2970,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -2983,7 +2983,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3620,7 +3620,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3633,7 +3633,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3646,7 +3646,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3659,7 +3659,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3672,7 +3672,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3685,7 +3685,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3698,7 +3698,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3711,7 +3711,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3724,7 +3724,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3737,7 +3737,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3750,7 +3750,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -3763,7 +3763,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4400,7 +4400,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4413,7 +4413,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4426,7 +4426,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4439,7 +4439,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4452,7 +4452,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4465,7 +4465,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4478,7 +4478,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4491,7 +4491,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4504,7 +4504,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4517,7 +4517,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4530,7 +4530,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -4543,7 +4543,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.165625,
+        "maxCardBottomSpaceRatio": 0.16625,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5180,7 +5180,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5193,7 +5193,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5206,7 +5206,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5219,7 +5219,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5232,7 +5232,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5245,7 +5245,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5258,7 +5258,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5271,7 +5271,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5284,7 +5284,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5297,7 +5297,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5310,7 +5310,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5323,7 +5323,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5960,7 +5960,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05375,
+        "maxCardBottomSpaceRatio": 0.05475,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5973,7 +5973,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05375,
+        "maxCardBottomSpaceRatio": 0.05475,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -5986,7 +5986,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -5999,7 +5999,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -6012,7 +6012,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12131147540983607,
+        "maxCardBottomSpaceRatio": 0.1219672131147541,
         "listBottomSpaceRatio": 0.03278688524590164
       },
       "failures": []
@@ -6025,7 +6025,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12131147540983607,
+        "maxCardBottomSpaceRatio": 0.1219672131147541,
         "listBottomSpaceRatio": 0.03278688524590164
       },
       "failures": []
@@ -6038,7 +6038,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -6051,7 +6051,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -6064,7 +6064,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13455882352941176,
+        "maxCardBottomSpaceRatio": 0.1351470588235294,
         "listBottomSpaceRatio": 0.029411764705882353
       },
       "failures": []
@@ -6077,7 +6077,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13455882352941176,
+        "maxCardBottomSpaceRatio": 0.1351470588235294,
         "listBottomSpaceRatio": 0.029411764705882353
       },
       "failures": []
@@ -6090,7 +6090,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -6103,7 +6103,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.15426829268292683,
+        "maxCardBottomSpaceRatio": 0.1547560975609756,
         "listBottomSpaceRatio": 0.024390243902439025
       },
       "failures": []
@@ -6740,7 +6740,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6753,7 +6753,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6766,7 +6766,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6779,7 +6779,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6792,7 +6792,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6805,7 +6805,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6818,7 +6818,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6831,7 +6831,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6844,7 +6844,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6857,7 +6857,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6870,7 +6870,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -6883,7 +6883,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.160625,
+        "maxCardBottomSpaceRatio": 0.16125,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7520,7 +7520,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7533,7 +7533,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7546,7 +7546,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7559,7 +7559,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7572,7 +7572,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7585,7 +7585,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7598,7 +7598,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7611,7 +7611,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7624,7 +7624,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7637,7 +7637,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7650,7 +7650,7 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -7663,7 +7663,7 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.07875,
+        "maxCardBottomSpaceRatio": 0.07975,
         "listBottomSpaceRatio": 0.05
       },
       "failures": []
@@ -8300,8 +8300,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -8313,8 +8313,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -8326,8 +8326,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -8339,8 +8339,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -8352,8 +8352,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -8365,8 +8365,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -8378,8 +8378,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -8391,8 +8391,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -8404,8 +8404,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -8417,8 +8417,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -8430,8 +8430,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -8443,8 +8443,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -9104,9 +9104,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.060025232919254656,
+        "maxCardBottomSpaceRatio": 0.059468283582089554,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -9118,9 +9118,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.060025232919254656,
+        "maxCardBottomSpaceRatio": 0.059468283582089554,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -9132,9 +9132,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.060025232919254656,
+        "maxCardBottomSpaceRatio": 0.059468283582089554,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -9146,9 +9146,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.060025232919254656,
+        "maxCardBottomSpaceRatio": 0.059468283582089554,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -9160,9 +9160,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.060025232919254656,
+        "maxCardBottomSpaceRatio": 0.059468283582089554,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -9174,9 +9174,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.060025232919254656,
+        "maxCardBottomSpaceRatio": 0.059468283582089554,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -9188,9 +9188,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -9202,9 +9202,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -9216,9 +9216,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -9230,9 +9230,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -9244,9 +9244,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -9258,9 +9258,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -9968,10 +9968,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.040372670807453416,
-        "ringRatio": 0.9733606557377049,
-        "maxRingTextRadiusRatio": 0.6660685464561134,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.041044776119402986,
+        "ringRatio": 0.972939729397294,
+        "maxRingTextRadiusRatio": 0.6719212197357366,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -9983,10 +9983,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.040372670807453416,
-        "ringRatio": 0.9733606557377049,
-        "maxRingTextRadiusRatio": 0.6660685464561134,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.041044776119402986,
+        "ringRatio": 0.972939729397294,
+        "maxRingTextRadiusRatio": 0.6719212197357366,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -9998,10 +9998,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.040372670807453416,
-        "ringRatio": 0.9458896982310093,
-        "maxRingTextRadiusRatio": 0.6660685464561134,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.041044776119402986,
+        "ringRatio": 0.9450343535290443,
+        "maxRingTextRadiusRatio": 0.6719212197357366,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10013,10 +10013,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.040372670807453416,
-        "ringRatio": 0.9458896982310093,
-        "maxRingTextRadiusRatio": 0.6660685464561134,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.041044776119402986,
+        "ringRatio": 0.9450343535290443,
+        "maxRingTextRadiusRatio": 0.6719212197357366,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10028,10 +10028,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.040372670807453416,
-        "ringRatio": 0.9175502923397086,
-        "maxRingTextRadiusRatio": 0.6661506120113799,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.041044776119402986,
+        "ringRatio": 0.9162403331350387,
+        "maxRingTextRadiusRatio": 0.6719212197357366,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10043,10 +10043,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.040372670807453416,
-        "ringRatio": 0.9175502923397086,
-        "maxRingTextRadiusRatio": 0.6661506120113799,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.041044776119402986,
+        "ringRatio": 0.9162403331350387,
+        "maxRingTextRadiusRatio": 0.6719212197357366,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10058,10 +10058,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.938523605974737,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.9372693726937269,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10073,10 +10073,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.938523605974737,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.9372693726937269,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10088,10 +10088,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.938523605974737,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.9372693726937269,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10103,10 +10103,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.938523605974737,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.9372693726937269,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10118,10 +10118,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.9385265584477956,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.9372693726937269,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10133,10 +10133,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.9385265584477956,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.9372693726937269,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10820,8 +10820,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10833,8 +10833,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10846,8 +10846,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10859,8 +10859,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10872,8 +10872,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10885,8 +10885,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -10898,8 +10898,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10911,8 +10911,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10924,8 +10924,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10937,8 +10937,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10950,8 +10950,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -10963,8 +10963,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -11600,8 +11600,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -11613,8 +11613,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -11626,8 +11626,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -11639,8 +11639,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -11652,8 +11652,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -11665,8 +11665,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -11678,8 +11678,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -11691,8 +11691,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -11704,8 +11704,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -11717,8 +11717,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -11730,8 +11730,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -11743,8 +11743,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -12380,8 +12380,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1156347049689441,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11701259328358209,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -12393,8 +12393,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1156347049689441,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11701259328358209,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -12406,8 +12406,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1156347049689441,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11701259328358209,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -12419,8 +12419,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1156347049689441,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11701259328358209,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -12432,8 +12432,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1156347049689441,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11701259328358209,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -12445,8 +12445,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1156347049689441,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11701259328358209,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -12458,8 +12458,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -12471,8 +12471,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -12484,8 +12484,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -12497,8 +12497,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -12510,8 +12510,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -12523,8 +12523,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -13160,8 +13160,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13173,8 +13173,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13186,8 +13186,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13199,8 +13199,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13212,8 +13212,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13225,8 +13225,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13238,8 +13238,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -13251,8 +13251,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -13264,8 +13264,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -13277,8 +13277,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -13290,8 +13290,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -13303,8 +13303,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -13940,8 +13940,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13953,8 +13953,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13966,8 +13966,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13979,8 +13979,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -13992,8 +13992,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -14005,8 +14005,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -14018,8 +14018,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14031,8 +14031,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14044,8 +14044,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14057,8 +14057,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14070,8 +14070,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14083,8 +14083,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14720,8 +14720,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11408190993788819,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11543843283582089,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -14733,8 +14733,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11408190993788819,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11543843283582089,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -14746,8 +14746,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11408190993788819,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11543843283582089,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -14759,8 +14759,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11408190993788819,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11543843283582089,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -14772,8 +14772,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11408190993788819,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11543843283582089,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -14785,8 +14785,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11408190993788819,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11543843283582089,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -14798,8 +14798,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14811,8 +14811,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14824,8 +14824,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14837,8 +14837,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14850,8 +14850,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -14863,8 +14863,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -15500,8 +15500,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -15513,8 +15513,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -15526,8 +15526,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -15539,8 +15539,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -15552,8 +15552,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -15565,8 +15565,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.09743788819875776,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.09818097014925373,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -15578,8 +15578,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -15591,8 +15591,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -15604,8 +15604,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -15617,8 +15617,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -15630,8 +15630,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -15643,8 +15643,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -16384,8 +16384,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -16397,8 +16397,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -16410,8 +16410,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -16423,8 +16423,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -16436,8 +16436,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -16449,8 +16449,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -16462,8 +16462,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -16475,8 +16475,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -16488,8 +16488,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -16501,8 +16501,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -16514,8 +16514,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -16527,8 +16527,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -16540,8 +16540,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -16553,8 +16553,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -16566,8 +16566,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -16579,8 +16579,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -17456,9 +17456,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11286878881987578,
+        "maxCardBottomSpaceRatio": 0.11188199626865672,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -17470,9 +17470,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11286878881987578,
+        "maxCardBottomSpaceRatio": 0.11188199626865672,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -17484,9 +17484,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.17625445368171022,
+        "maxCardBottomSpaceRatio": 0.1754636233951498,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -17498,9 +17498,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.17625445368171022,
+        "maxCardBottomSpaceRatio": 0.1754636233951498,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -17512,9 +17512,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -17526,9 +17526,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -17540,9 +17540,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -17554,9 +17554,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10250890736342043,
+        "maxCardBottomSpaceRatio": 0.10092724679029957,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.04275534441805225
+        "listBottomSpaceRatio": 0.042796005706134094
       },
       "failures": []
     },
@@ -17568,9 +17568,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.08871753246753247,
+        "maxCardBottomSpaceRatio": 0.08697347893915756,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046753246753246755
+        "listBottomSpaceRatio": 0.046801872074883
       },
       "failures": []
     },
@@ -17582,9 +17582,9 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10609702797202797,
+        "maxCardBottomSpaceRatio": 0.10497636554621849,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -17596,9 +17596,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.08871753246753247,
+        "maxCardBottomSpaceRatio": 0.08697347893915756,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046753246753246755
+        "listBottomSpaceRatio": 0.046801872074883
       },
       "failures": []
     },
@@ -17610,9 +17610,9 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10609702797202797,
+        "maxCardBottomSpaceRatio": 0.10497636554621849,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -17624,9 +17624,9 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.08871753246753247,
+        "maxCardBottomSpaceRatio": 0.08697347893915756,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046753246753246755
+        "listBottomSpaceRatio": 0.046801872074883
       },
       "failures": []
     },
@@ -17638,9 +17638,9 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16935876623376622,
+        "maxCardBottomSpaceRatio": 0.1684867394695788,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -17652,9 +17652,9 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.08871753246753247,
+        "maxCardBottomSpaceRatio": 0.08697347893915756,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.046753246753246755
+        "listBottomSpaceRatio": 0.046801872074883
       },
       "failures": []
     },
@@ -17666,9 +17666,9 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16935876623376622,
+        "maxCardBottomSpaceRatio": 0.1684867394695788,
         "displayRatio": 2.4,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -18608,10 +18608,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.040372670807453416,
-        "ringRatio": 0.4721030042918455,
-        "maxRingTextRadiusRatio": 0.7690064127266036,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.041044776119402986,
+        "ringRatio": 0.47164948453608246,
+        "maxRingTextRadiusRatio": 0.7747288380559586,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -18623,10 +18623,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.040372670807453416,
-        "ringRatio": 0.4721030042918455,
-        "maxRingTextRadiusRatio": 0.7690064127266036,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.041044776119402986,
+        "ringRatio": 0.47164948453608246,
+        "maxRingTextRadiusRatio": 0.7747288380559586,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -18638,10 +18638,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.023752969121140142,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.5344445699403575,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.024251069900142655,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.5381500936580532,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -18653,10 +18653,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.023752969121140142,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.5344445699403575,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.024251069900142655,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.5381500936580532,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -18668,10 +18668,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.4793388429752066,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.47890818858560796,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -18683,10 +18683,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.4793388429752066,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.47890818858560796,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -18698,10 +18698,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -18713,10 +18713,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.04854368932038835,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.807233985847415,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.04956268221574344,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.813980162583206,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -18728,10 +18728,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05319148936170213,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.9225531266827599,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.054313099041533544,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.9308194203702691,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -18743,10 +18743,10 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.045454545454545456,
-        "ringRatio": 0.4721030042918455,
-        "maxRingTextRadiusRatio": 0.7760615174305174,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.046218487394957986,
+        "ringRatio": 0.47164948453608246,
+        "maxRingTextRadiusRatio": 0.7832893777029857,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -18758,10 +18758,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05319148936170213,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.9225531266827599,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.054313099041533544,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.9308194203702691,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -18773,10 +18773,10 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.045454545454545456,
-        "ringRatio": 0.4721030042918455,
-        "maxRingTextRadiusRatio": 0.7760615174305174,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.046218487394957986,
+        "ringRatio": 0.47164948453608246,
+        "maxRingTextRadiusRatio": 0.7832893777029857,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -18788,10 +18788,10 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05319148936170213,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.9225531266827599,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.054313099041533544,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.9308194203702691,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -18803,10 +18803,10 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.025974025974025976,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.5344445699403575,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.0265210608424337,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.5381500936580532,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -18818,10 +18818,10 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.05319148936170213,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.9225531266827599,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.054313099041533544,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.9308194203702691,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -18833,10 +18833,10 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.025974025974025976,
-        "ringRatio": 0.9157894736842105,
-        "maxRingTextRadiusRatio": 0.5344445699403575,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.0265210608424337,
+        "ringRatio": 0.9140328697850821,
+        "maxRingTextRadiusRatio": 0.5381500936580532,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -19744,8 +19744,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -19757,8 +19757,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -19770,8 +19770,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -19783,8 +19783,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -19796,8 +19796,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -19809,8 +19809,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -19822,8 +19822,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -19835,8 +19835,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -19848,8 +19848,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -19861,8 +19861,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -19874,8 +19874,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -19887,8 +19887,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -19900,8 +19900,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -19913,8 +19913,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -19926,8 +19926,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -19939,8 +19939,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -20784,8 +20784,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -20797,8 +20797,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -20810,8 +20810,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -20823,8 +20823,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -20836,8 +20836,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -20849,8 +20849,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -20862,8 +20862,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -20875,8 +20875,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -20888,8 +20888,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -20901,8 +20901,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -20914,8 +20914,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -20927,8 +20927,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -20940,8 +20940,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -20953,8 +20953,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -20966,8 +20966,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -20979,8 +20979,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -21824,8 +21824,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1156347049689441,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11701259328358209,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -21837,8 +21837,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1156347049689441,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11701259328358209,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -21850,8 +21850,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1977063539192399,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.1981098430813124,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -21863,8 +21863,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1977063539192399,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.1981098430813124,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -21876,8 +21876,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -21889,8 +21889,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -21902,8 +21902,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -21915,8 +21915,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.14312803398058252,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14395043731778426,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -21928,8 +21928,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13289561170212766,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.13378594249201278,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -21941,8 +21941,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10921110139860139,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.11075367647058823,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -21954,8 +21954,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13289561170212766,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.13378594249201278,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -21967,8 +21967,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10921110139860139,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.11075367647058823,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -21980,8 +21980,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13289561170212766,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.13378594249201278,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -21993,8 +21993,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.19281655844155843,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.19325273010920438,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -22006,8 +22006,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13289561170212766,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.13378594249201278,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -22019,8 +22019,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.19281655844155843,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.19325273010920438,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -22864,8 +22864,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11597437888198758,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11695429104477612,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -22877,8 +22877,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11597437888198758,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11695429104477612,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -22890,8 +22890,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -22903,8 +22903,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -22916,8 +22916,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -22929,8 +22929,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -22942,8 +22942,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -22955,8 +22955,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -22968,8 +22968,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -22981,8 +22981,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10959353146853147,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.11068802521008403,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -22994,8 +22994,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -23007,8 +23007,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10959353146853147,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.11068802521008403,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -23020,8 +23020,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -23033,8 +23033,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -23046,8 +23046,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -23059,8 +23059,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -23904,8 +23904,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -23917,8 +23917,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -23930,8 +23930,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -23943,8 +23943,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -23956,8 +23956,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -23969,8 +23969,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -23982,8 +23982,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -23995,8 +23995,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -24008,8 +24008,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -24021,8 +24021,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -24034,8 +24034,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -24047,8 +24047,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -24060,8 +24060,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -24073,8 +24073,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -24086,8 +24086,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -24099,8 +24099,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -24944,8 +24944,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11408190993788819,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11543843283582089,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -24957,8 +24957,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.11408190993788819,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.11543843283582089,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -24970,8 +24970,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1959248812351544,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.19632667617689015,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -24983,8 +24983,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1959248812351544,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.19632667617689015,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -24996,8 +24996,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -25009,8 +25009,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -25022,8 +25022,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -25035,8 +25035,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1394872572815534,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.14030612244897958,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -25048,8 +25048,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12890625,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.1297923322683706,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -25061,8 +25061,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10746284965034965,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.10898109243697479,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -25074,8 +25074,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12890625,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.1297923322683706,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -25087,8 +25087,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.10746284965034965,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.10898109243697479,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -25100,8 +25100,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12890625,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.1297923322683706,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -25113,8 +25113,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1908685064935065,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.19130265210608424,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -25126,8 +25126,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12890625,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.1297923322683706,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -25139,8 +25139,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1908685064935065,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.19130265210608424,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -25984,8 +25984,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -25997,8 +25997,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.13111413043478262,
-        "listBottomSpaceRatio": 0.046583850931677016
+        "maxCardBottomSpaceRatio": 0.13211287313432835,
+        "listBottomSpaceRatio": 0.04664179104477612
       },
       "failures": []
     },
@@ -26010,8 +26010,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -26023,8 +26023,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.20665083135391923,
-        "listBottomSpaceRatio": 0.021377672209026127
+        "maxCardBottomSpaceRatio": 0.20684736091298145,
+        "listBottomSpaceRatio": 0.021398002853067047
       },
       "failures": []
     },
@@ -26036,8 +26036,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -26049,8 +26049,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -26062,8 +26062,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -26075,8 +26075,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.16140776699029127,
-        "listBottomSpaceRatio": 0.043689320388349516
+        "maxCardBottomSpaceRatio": 0.1618075801749271,
+        "listBottomSpaceRatio": 0.043731778425655975
       },
       "failures": []
     },
@@ -26088,8 +26088,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -26101,8 +26101,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -26114,8 +26114,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -26127,8 +26127,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.12663898601398602,
-        "listBottomSpaceRatio": 0.05244755244755245
+        "maxCardBottomSpaceRatio": 0.12775735294117646,
+        "listBottomSpaceRatio": 0.052521008403361345
       },
       "failures": []
     },
@@ -26140,8 +26140,8 @@
       "page": 0,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -26153,8 +26153,8 @@
       "page": 1,
       "appearance": "dark",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },
@@ -26166,8 +26166,8 @@
       "page": 0,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.1529255319148936,
-        "listBottomSpaceRatio": 0.047872340425531915
+        "maxCardBottomSpaceRatio": 0.15335463258785942,
+        "listBottomSpaceRatio": 0.04792332268370607
       },
       "failures": []
     },
@@ -26179,8 +26179,8 @@
       "page": 1,
       "appearance": "light",
       "metrics": {
-        "maxCardBottomSpaceRatio": 0.2025974025974026,
-        "listBottomSpaceRatio": 0.023376623376623377
+        "maxCardBottomSpaceRatio": 0.20280811232449297,
+        "listBottomSpaceRatio": 0.0234009360374415
       },
       "failures": []
     },

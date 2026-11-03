@@ -56,11 +56,23 @@ test('round dimensions and per-widget selection',async()=>{
 });
 
 
-test('quote off preserves dimensions; portrait adds exactly 200px',()=>{
+test('quote off preserves dimensions; portrait redistributes the provider budget',()=>{
  for(const shape of ['portrait','landscape','square','circle','pill']) for(const theme of ['system','compact-strip','brutalist']) for(const count of [0,1,3,6]) {
   const base={shape,theme};
   assert.equal(widgetWidth({...base,quoteEnabled:false},count),widgetWidth(base,count));
   assert.equal(widgetHeight({...base,quoteEnabled:false},count),widgetHeight(base,count));
-  assert.equal(widgetHeight({...base,quoteEnabled:true},count),widgetHeight(base,count)+(shape==='portrait'?200:0));
+  assert.equal(widgetHeight({...base,quoteEnabled:true},count),widgetHeight(base,count)+(shape==='portrait'?320-40*(theme==='compact-strip'?1:Math.max(1,count)):0));
+ }
+});
+
+test('monitor fit handles panels, DPI and oversize without changing saved fine-tune',async()=>{
+ const {monitorFit}=await import('../app/src/sizing.js');
+ const monitor={width:1536,height:926,scale:1};
+ for(const shape of ['portrait','landscape','square','circle','pill'])for(const sizePreset of Object.keys(sizePresets)) {
+  const value=normalizeSize({shape,sizePreset,fineTune:82,quoteEnabled:true,position:'Top right',linux:{margin:12}});
+  const fit=monitorFit(value,3,monitor);
+  const actual=Math.min(value.scale,fit.maxScale)/value.scale;
+  assert.ok(fit.width*actual<=1512+.001 && fit.height*actual<=902+.001);
+  assert.equal(value.fineTune,82);
  }
 });

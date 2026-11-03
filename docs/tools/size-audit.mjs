@@ -27,8 +27,8 @@ try {
     // Grid themes redistribute the same provider budget over two columns.
     const grid = ['brutalist','circular-rings','reactor'].includes(theme) && count > 0;
     const expectedCard = grid
-      ? (count * 210 - (theme === 'brutalist' ? 10 : Math.ceil(count/2)*10)) / Math.ceil(count/2) * factor
-      : 200 * factor;
+      ? (count * (quoteEnabled ? 170 : 210) - (theme === 'brutalist' ? 10 : Math.ceil(count/2)*10)) / Math.ceil(count/2) * factor
+      : (quoteEnabled ? 160 : 200) * factor;
     const error = Math.max(Math.abs(width-measured.width),Math.abs(height-measured.height),...(shape==='portrait'?measured.cards.map(h=>Math.abs(h-expectedCard)):[]));
     rows.push({quoteEnabled,shape,theme,sizePreset,providers:count,width:measured.width,height:measured.height,providerHeight:measured.cards[0],expectedWidth:width,expectedHeight:height,error});
   }

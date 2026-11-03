@@ -2,13 +2,14 @@
 // CHROME_BIN may point to Chromium/Edge. Set CHROME_NO_SANDBOX=1 only in an
 // already isolated environment whose user namespace sandbox is unavailable.
 import { auditSettings } from './settings-contrast-audit.mjs';
+import { sizePresets } from '../../app/src/sizing.js';
 import { browser } from './browser-harness.mjs';
 const session=await browser();
 try {
   await session.navigate('/?sample','window.__AI_USAGE_DEMO__');
   const total={combinations:0,texts:0,arcLabels:0,failures:[]};
-  for(const shape of ['portrait','landscape','square','circle','pill']) for(const width of (shape==='portrait'?[200,340,600]:[shape==='landscape'?680:shape==='pill'?480:340])) {
-  await session.cdp('Emulation.setDeviceMetricsOverride',{width,height:1400,deviceScaleFactor:1,mobile:false});
+  for(const sizePreset of Object.keys(sizePresets)) for(const shape of ['portrait','landscape','square','circle','pill']) for(const width of (shape==='portrait'?[200,340,600]:[shape==='landscape'?680:shape==='pill'?480:340])) {
+  await session.cdp('Emulation.setDeviceMetricsOverride',{width:Math.round(width*sizePresets[sizePreset]/100),height:Math.ceil(1400*sizePresets[sizePreset]/100),deviceScaleFactor:1,mobile:false});
   const result=await session.evaluate(`(async()=>{
     const api=window.__AI_USAGE_DEMO__;
     const canvas=document.createElement('canvas');canvas.width=canvas.height=1;const ctx=canvas.getContext('2d',{willReadFrequently:true});
@@ -17,7 +18,7 @@ try {
     const contrast=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
     const failures=[];let combinations=0,texts=0,arcLabels=0;
     for(const theme of api.themes)for(const palette of Object.keys(theme.palettes))for(const appearance of ['light','dark'])for(const colorMode of ['calm','vivid','mono']) {
-      await api.setSettings({quoteEnabled:true,shape:${JSON.stringify(shape)},theme:theme.id,palette,appearance,colorMode,widgetOpacity:100,backgroundOpacity:100,accent:null,background:null});combinations++;
+      await api.setSettings({sizePreset:${JSON.stringify(sizePreset)},fineTune:100,quoteEnabled:true,shape:${JSON.stringify(shape)},theme:theme.id,palette,appearance,colorMode,widgetOpacity:100,backgroundOpacity:100,accent:null,background:null});combinations++;
       const toggle=document.querySelector('#quote .quote-toggle');
       if(['circle','square'].includes(${JSON.stringify(shape)})&&document.documentElement.dataset.quotePage!=='true'){toggle.click();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}
       if(${JSON.stringify(shape)}==='pill')toggle.click();
@@ -37,7 +38,7 @@ try {
     }
     return {combinations,texts,arcLabels,failures};
   })()`);
-  total.arcLabels+=result.arcLabels;total.combinations+=result.combinations;total.texts+=result.texts;total.failures.push(...result.failures.map(f=>({shape,width,...f})));
+  total.arcLabels+=result.arcLabels;total.combinations+=result.combinations;total.texts+=result.texts;total.failures.push(...result.failures.map(f=>({shape,width,sizePreset,...f})));
   }
   if(!total.arcLabels)total.failures.push({message:'Circle endpoint labels were not audited'});
   const settings=await auditSettings(session);

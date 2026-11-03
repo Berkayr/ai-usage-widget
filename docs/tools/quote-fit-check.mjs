@@ -13,7 +13,7 @@ try {
   await b.cdp('Network.setBlockedURLs', {urls:['https://*','http://en.wikiquote.org/*']});
   await b.navigate('/?sample', 'window.__AI_USAGE_DEMO__');
   const themes = await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
-  for (const theme of themes) for (const shape of shapes) for (const sizePreset of Object.keys(sizePresets)) {
+  for (const theme of themes.filter(t=>!process.env.AUDIT_THEMES || process.env.AUDIT_THEMES.split(',').includes(t))) for (const shape of shapes) for (const sizePreset of Object.keys(sizePresets)) {
     const settings = {theme,shape,sizePreset,fineTune:100,quoteEnabled:true,quoteNavigation:true,fitHeight:true};
     const scale = sizePresets[sizePreset] / 100;
     await b.cdp('Emulation.setDeviceMetricsOverride', {width:Math.round(widgetWidth(settings,3)*scale),height:Math.ceil(widgetHeight(settings,3)*scale)+10,deviceScaleFactor:1,mobile:false});
@@ -27,7 +27,7 @@ try {
       for (const appearance of ['dark','light']) for (const length of [40,200,600,2000]) {
         await api.setSettings({appearance});
         const quote = 'Fictional words about quiet thought and patient work. '.repeat(40).slice(0,length);
-        const card = {quote,author:'Example Author',reason:'A fictional daily selection',source_url:'https://en.wikiquote.org/wiki/Example'};
+        const card = {quote,author:'Example Author',work:'An Invented Book (1933)',author_description:'Fictional essayist',reason:'A fictional daily selection',source_url:'https://en.wikiquote.org/wiki/Example'};
         await api.setQuote({status:'ok',cards:[card,{...card,quote:'Another fictional quote.'}]});
         await document.fonts.ready; await frame();
         if (['square','circle'].includes(${JSON.stringify(shape)}) && document.documentElement.dataset.quotePage !== 'true') {
@@ -92,7 +92,7 @@ try {
   await b.evaluate(`(async()=>{
     const api=window.__AI_USAGE_DEMO__;
     await api.setSettings({theme:'brutalist',shape:'portrait',sizePreset:'Medium',fineTune:82,appearance:'dark'});
-    await api.setQuote({status:'ok',cards:[{quote:'Fictional words about quiet thought and patient work. '.repeat(4),author:'Example Author',reason:'A fictional daily selection'}]});
+    await api.setQuote({status:'ok',cards:[{quote:'Fictional words about quiet thought and patient work. '.repeat(4),author:'Example Author',work:'An Invented Book (1933)',author_description:'Fictional essayist',reason:'A fictional daily selection'}]});
     await document.fonts.ready;
     await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
     const t=document.querySelector('.quote-text'), c=document.querySelector('.quote-content');

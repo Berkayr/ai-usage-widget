@@ -12,10 +12,12 @@ try {
     assert(!$('#quote-enabled').checked,'Quote off by default');
     assert($('#category-quote').textContent.includes('Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.'),'Quote disclosure');
     $('#quote-enabled').click();
+    assert($('#quote-position').value==='bottom','Default quote position');
+    $('#quote-position').value='top';$('#quote-position').dispatchEvent(new Event('change'));
     $('#quote-mode').value='mixed';$('#quote-mode').dispatchEvent(new Event('change'));
     $('#quote-navigation').click();
     $('#save').click();await new Promise(r=>setTimeout(r,50));
-    $('#quote-enabled').click();$('#revert').click();assert($('#quote-enabled').checked&&$('#quote-mode').value==='mixed'&&!$('#quote-navigation').checked,'Quote save/revert');
+    $('#quote-enabled').click();$('#revert').click();assert($('#quote-enabled').checked&&$('#quote-mode').value==='mixed'&&$('#quote-position').value==='top'&&!$('#quote-navigation').checked,'Quote save/revert');
     $('[data-category=appearance]').click();
     $('[data-theme="dot-matrix"]').click();
     assert($('#palette-grid .palette-option i'),'Palette colors');
@@ -70,7 +72,10 @@ try {
     $('[data-shape=portrait]').click();assert(!$('#fit-height').disabled,'Portrait fit-height');
     const sizes=[...document.querySelectorAll('[data-size]')];
     assert(sizes.map(b=>b.dataset.size).join(',')==='Small,Medium,Large,X-Large,2X-Large','Five size choices');
-    for(const button of sizes){button.click();assert(button.getAttribute('aria-pressed')==='true'&&$('#scale').value==='100','Preset selection / reset');}
+    for(const button of sizes){button.click();assert(button.getAttribute('aria-pressed')==='true'&&$('#scale').value==='100','Preset selection');}
+    $('#scale').value=82;$('#scale').dispatchEvent(new Event('input'));
+    $('[data-size=Large]').click();$('[data-size=Medium]').click();assert($('#scale').value==='82','Preset roundtrip preserves fine-tune');
+    $('[data-size="2X-Large"]').click();assert(!$('#size-fit-warning').hidden&&$('#map-widget').dataset.overflow==='true','Oversize monitor warning / preview');
     $('#scale').value=90;$('#scale').dispatchEvent(new Event('input'));
     $('[data-theme="terminal"]').click();
     assert($('#scale').value==='90'&&$('[data-size="2X-Large"]').getAttribute('aria-pressed')==='true','Theme changed size');

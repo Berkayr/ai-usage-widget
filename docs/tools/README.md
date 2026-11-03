@@ -226,3 +226,48 @@ Top / Bottom, hiding, ordering, drag and keyboard controls, and Save / Revert.
 saturation for every theme. `circle-sheet.png` includes all ten themes, with
 Calm / Vivid / Mono rows and dark / light columns. Reactor motion defaults off;
 `theme-identity-check.mjs` checks opt-in and reduced-motion behavior.
+
+Daily quote readability checks (offline fictional data, no native settings):
+
+```sh
+npm --prefix app run build
+node docs/tools/quote-fit-check.mjs
+node docs/tools/quote-position-check.mjs
+node docs/tools/settings-check.mjs
+node docs/tools/size-audit.mjs
+node docs/tools/theme-identity-check.mjs
+node docs/tools/contrast-audit.mjs
+node docs/tools/quote-readability-preview.mjs after
+```
+
+`quote-fit-check` covers ten themes, five shapes, every size, both appearances
+and four quote lengths, including work and description metadata. Use
+`AUDIT_THEMES=frosted-glass` for a focused run. `quote-position-check` covers
+both quote positions at 82% fine tuning on a synthetic 1536×960 Linux output
+with a 34px top panel and 12px inset. It uses the same work-area fit calculation
+as the application. Native placement's unit test exercises the corresponding
+GTK logical coordinates. These tests do not capture or validate a live KWin
+layer surface. Run native desktop acceptance separately with isolated settings
+and a current-day fictional quote cache; never use a real account for fixtures.
+`quote-readability-preview` saves the current Medium/Large/Medium reproduction
+and numeric measurements to the ignored task output directory. Its `before`
+mode is for capturing the pre-change renderer before rebuilding the new code.
+The contrast audit includes all five size presets as well as palettes, shapes,
+appearance, color modes, narrowed portrait widths and settings surfaces.
+
+For a native WebKitGTK check on an isolated virtual KWin output:
+
+```sh
+python3 docs/tools/native-quote-preview.py
+```
+
+This optional development tool needs preinstalled KWin, PyGObject, GTK3,
+GtkLayerShell and WebKit2 4.1. It adds no application dependency. A temporary
+HOME/config/runtime and private D-Bus session isolate the existing desktop.
+A 34px exclusive panel and real layer-shell webview exercise the built
+production renderer through Medium → Large → Medium at fine-tune 82, with
+synthetic providers/quote only. The run is bounded to 45 seconds, saves native
+WebKit snapshots plus layer/allocation measurements under the ignored task
+output directory, and removes its temporary profile. It verifies native
+rendering and compositor allocation; it does not launch the installed Tauri
+application or exercise its IPC. Rust placement tests cover native inset math.
