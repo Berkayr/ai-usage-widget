@@ -6,7 +6,44 @@ export async function loadQuote(settings, invoke) {
   return invoke('get_quote');
 }
 let index=0, page=false;
+let fitObserver;
+
+function fitQuote(text, fullText, shape) {
+  if (!text.isConnected || !text.clientWidth || !text.clientHeight) return;
+  text.style.removeProperty('font-size');
+  text.textContent = fullText;
+  const originalSize = parseFloat(getComputedStyle(text).fontSize);
+  const minimumSize = Math.min(originalSize, shape === 'circle' ? 9 : 11);
+  const fits = () => text.scrollHeight <= text.clientHeight && text.scrollWidth <= text.clientWidth;
+  // Restore the original size on every pass, including after a resize/font load.
+  let size = originalSize;
+  while (!fits() && size > minimumSize) {
+    size = Math.max(minimumSize, size - .5);
+    text.style.fontSize = `${size}px`;
+  }
+  if (fits()) return;
+  const words = fullText.match(/\S+\s*/gu) || [];
+  let low = 0, high = words.length;
+  while (low < high) {
+    const middle = Math.ceil((low + high) / 2);
+    text.textContent = words.slice(0, middle).join('').trimEnd() + '…';
+    if (fits()) low = middle;
+    else high = middle - 1;
+  }
+  text.textContent = words.slice(0, low).join('').trimEnd() + '…';
+}
+
+function observeQuote(content, text, shape) {
+  const fullText = text.textContent;
+  const fit = () => fitQuote(text, fullText, shape);
+  fitObserver = new ResizeObserver(fit);
+  fitObserver.observe(content);
+  requestAnimationFrame(fit);
+  document.fonts.ready.then(fit);
+}
+
 export function renderQuote(root, settings, data, redraw, repairContrast = () => {}) {
+  fitObserver?.disconnect();
   root.replaceChildren();root.hidden=settings.quoteEnabled!==true;
   document.documentElement.dataset.quote=String(settings.quoteEnabled===true);
   document.documentElement.dataset.quotePage=String(page&&settings.quoteEnabled===true);
@@ -38,4 +75,5 @@ export function renderQuote(root, settings, data, redraw, repairContrast = () =>
   for(const delta of [-1,1]){const b=document.createElement('button');b.textContent=delta<0?'‹':'›';b.setAttribute('aria-label',delta<0?'Previous quote':'Next quote');b.onclick=()=>{index=(index+delta+cards.length)%cards.length;redraw();};nav.append(b);}
   content.append(nav);
   if(settings.shape==='pill') {root.replaceChildren();const b=document.createElement('button');b.className='quote-toggle';b.textContent='“';b.title=card?.quote||'Daily quote';b.setAttribute('aria-label','Read daily quote and attribution');b.onclick=full;root.append(b);}
+  else observeQuote(content, text, settings.shape);
 }
