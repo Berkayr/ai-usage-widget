@@ -106,12 +106,15 @@ def daily_card(raw, title, today):
     if not text:
         return None
     link = re.search(r'\[\[([^]|]+)', author_raw)
-    author_page = link[1].split('#')[0].replace('_', ' ').strip() if link else clean(author_raw)
+    author_page = link[1].split('#')[0].replace('_', ' ').strip() if link else clean(re.split(r'\s+in\s+', author_raw, maxsplit=1, flags=re.I)[0])
+    author_parts = re.split(r'\s+in\s+', author_raw, maxsplit=1, flags=re.I)
+    work = clean(author_parts[1]) if len(author_parts) > 1 else clean(
+        param(raw, 'source') or param(raw, 'context'))
     context = clean(' '.join(param(raw, key) for key in ('source', 'comment', 'context')))
     month, day = MONTHS[today.month - 1], str(today.day)
     pattern = rf'\b(?:{month}\s+{day}|{day}\s+{month})\b,?\s+(\d{{4}})\b'
     match = re.search(pattern, context, re.I)
-    return dict(quote=text, author=clean(author_raw) or 'Unknown',
+    return dict(quote=text, author=clean(author_parts[0]) or 'Unknown', work=work, author_description='',
                 author_page=author_page, reason=f"Wikiquote's pick for {title.split('/')[-1]}",
                 source_url='https://en.wikiquote.org/wiki/' + quote(title.replace(' ', '_'), safe=''),
                 license='CC BY-SA 4.0', kind='qotd', said_year=match[1] if match else None)
@@ -124,7 +127,7 @@ def author_entities(cards, deadline):
         try:
             # One large author must not discard the rest of the daily pool.
             data = round_request('www.wikidata.org', dict(action='wbgetentities',
-                sites='enwikiquote', titles=title, props='claims|sitelinks', format='json'), deadline)
+                sites='enwikiquote', titles=title, props='claims|sitelinks|descriptions', languages='en', format='json'), deadline)
             if 'error' in data:
                 lookups[title] = 'failed: Wikidata API error'
                 continue
@@ -180,6 +183,7 @@ def fetch(today):
     for card in cards:
         title = card.pop('author_page')
         entity = by_title.get(title, {})
+        card['author_description'] = clean(entity.get('descriptions', {}).get('en', {}).get('value', ''))
         card['anniversary_lookup'] = lookups.get(title, 'no author identity')
         if card['anniversary_lookup'].startswith('failed:'):
             card['diagnostic'] = 'Anniversary lookup failed (see anniversary_lookup)'
@@ -252,7 +256,9 @@ def lookup_status(cards):
 def select(cards, mode):
     lookup_failed = lookup_status(cards).startswith('failed:')
     if mode == 'qotd':
-        return cards[:1]
+        return [{**c, 'reason': c.get('anniversaries', {}).get('died') or
+                 c.get('anniversaries', {}).get('born') or c.get('reason', '')}
+                for c in cards[:1]]
     if mode in ('born', 'died'):
         return unique_cards(matching_cards(cards, mode) or
                             fallback(cards[:1], ('Anniversary lookup failed; falling back to QOTD' if lookup_failed else

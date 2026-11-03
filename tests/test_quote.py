@@ -27,6 +27,37 @@ class QuoteTests(unittest.TestCase):
     def test_disabled_never_calls_network_or_cache(self):
         with patch('urllib.request.OpenerDirector.open', side_effect=AssertionError('Network')), patch.object(quote, 'request', side_effect=AssertionError('Request')), patch.object(quote, 'data_path', side_effect=AssertionError('Cache')):
             self.assertEqual(quote.daily_quote()['status'], 'disabled')
+    def test_qotd_anniversary_work_description_share_existing_requests(self):
+        def response(host, params, **kwargs):
+            if host == 'en.wikiquote.org':
+                return {'parse': {'wikitext': "{{QOTD|quote=An invented thought.|author=[[Example Author]]\nin\n''An Invented Book (1933)''}}"}}
+            self.assertIn('descriptions', params['props'])
+            data = self.response(host, params)
+            entity = data['entities']['Q1']
+            entity['claims']['P570'] = entity['claims'].pop('P569')
+            entity['claims']['P570'][0]['mainsnak']['datavalue']['value']['time'] = '+1957-11-03T00:00:00Z'
+            entity['descriptions'] = {'en': {'value': 'Fictional essayist'}}
+            return data
+        with patch.object(quote, 'request', side_effect=response) as http:
+            card = quote.daily_quote(enabled=True, today=TODAY)['cards'][0]
+            self.assertEqual(http.call_count, quote.MAX_PAGES + 1)
+        self.assertEqual(card['reason'], 'Died on this day, 1957')
+        self.assertEqual(card['author'], 'Example Author')
+        self.assertEqual(card['work'], 'An Invented Book (1933)')
+        self.assertEqual(card['author_description'], 'Fictional essayist')
+        with patch.object(quote, 'request', side_effect=AssertionError('Network')):
+            self.assertEqual(quote.daily_quote(enabled=True, today=TODAY)['cards'][0], card)
+
+    def test_legacy_qotd_cache_reuses_known_anniversary(self):
+        card = {'quote':'Invented', 'author':'Example', 'reason':'Daily pick',
+                'source_url':'https://en.wikiquote.org/wiki/Example', 'license':'CC BY-SA 4.0',
+                'anniversaries':{'died':'Died on this day, 1957'}}
+        quote.atomic_json(quote.data_path('quote-cache.json'),
+                          {'attempt_date':TODAY.isoformat(), 'cards':[card]})
+        with patch.object(quote, 'request', side_effect=AssertionError('Network')):
+            self.assertEqual(quote.daily_quote(enabled=True, today=TODAY)['cards'][0]['reason'],
+                             'Died on this day, 1957')
+
     def test_daily_pool_modes_and_cleaning(self):
         with patch.object(quote, 'request', side_effect=self.response) as http:
             result = quote.daily_quote(enabled=True, today=TODAY)
