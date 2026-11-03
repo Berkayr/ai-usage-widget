@@ -194,6 +194,9 @@ def main(argv: list[str] | None = None) -> int:
     bar_parser.add_argument("--format", choices=("plain", "waybar", "polybar", "i3blocks", "json"), default="plain")
     bar_parser.add_argument("--providers", help="comma-separated IDs; defaults to all OK/STALE providers")
     bar_parser.add_argument("--window", choices=("session", "weekly", "both"), default="session")
+    quote_parser = sub.add_parser("quote", help="explicitly request daily Wikiquote cards")
+    quote_parser.add_argument("--mode", choices=("qotd", "born", "died", "on-this-day", "mixed"), default="qotd")
+    quote_parser.add_argument("--json", action="store_true")
     sub.add_parser("snapshot")
     write_parser = sub.add_parser("write")
     write_parser.add_argument("--print", dest="print_snapshot", action="store_true",
@@ -224,7 +227,11 @@ def main(argv: list[str] | None = None) -> int:
     pace_parser.add_argument("--no-log", action="store_true", help="skip history appends; still update pace state")
     pace_parser.add_argument("--purge", action="store_true", help="delete pace history and state without collecting")
     args = parser.parse_args(argv)
-    if args.command == "bar":
+    if args.command == "quote":
+        from .quote import daily_quote
+        result = daily_quote(enabled=True, mode=args.mode)
+        print(json.dumps(result) if args.json else "\n\n".join(c["quote"] + " — " + c["author"] + "\n" + c["reason"] + "\n" + c["source_url"] + " · " + c["license"] for c in result["cards"]) or result["status"])
+    elif args.command == "bar":
         from .bar import render
         providers = None if args.providers is None else list(dict.fromkeys(x.strip() for x in args.providers.split(",") if x.strip()))
         if providers is not None and (not providers or any(x not in PROVIDERS for x in providers)):
