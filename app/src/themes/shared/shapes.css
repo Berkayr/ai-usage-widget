@@ -93,7 +93,6 @@
 :root[data-shape=pill] .widget .provider-card{flex:1 1 0}
 
 :root[data-shape=pill][data-large-shape=true] .widget .window-bottom{display:flex;margin:0;font-size:max(var(--shape-min-font),.625rem);line-height:1.1}
-.dial-safe .dial-number{line-height:1.4}
 :root[data-shape=pill] .widget .segments>em{top:0;height:100%}
 :root[data-shape=pill] .widget .provider-card{position:relative}
 /* Reserve line boxes for font ascenders/descenders and both large-size reset rows. */
@@ -143,3 +142,13 @@
 :root[data-color-mode=mono] .dial-legend i{border-radius:0;width:.65rem;height:0;border-bottom:3px solid var(--identity);background:none!important}
 :root[data-color-mode=mono] .dial-legend i[data-identity="1"]{border-bottom-style:dashed}
 :root[data-color-mode=mono] .dial-legend i[data-identity="2"]{border-bottom-style:dotted}
+
+/* A narrow identity edge applies to every card without replacing theme styling. */
+:root .widget .provider-card{box-shadow:inset 2px 0 var(--provider-identity)}
+:root[data-color-mode=mono] .widget .provider-card{box-shadow:inset 2px 0 var(--textPrimary)}
+.dial-safe{left:29%;right:29%;top:34%;bottom:34%;gap:0;background:none!important;border:0!important;box-shadow:none!important}
+.dial-safe .dial-number{font-size:2.25rem!important;line-height:1.4}
+.dial-safe .dial-name{font-size:max(var(--shape-min-font),.75rem)}
+.dial-arc-label{position:absolute;width:44px;height:20px;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font:600 11px/1 system-ui,sans-serif;color:var(--identity);background:var(--bgWidget);border:1px solid var(--identity);border-radius:10px;white-space:nowrap}
+:root[data-micro-shape=true] .dial-arc-label{display:none}
+.dial-arc-label{font-size:max(var(--shape-min-font),.6875rem)}

@@ -22,7 +22,7 @@ try {
       if(['circle','pill'].includes(shape)) {
         const shell=document.querySelector('.widget').getBoundingClientRect(),cx=shell.left+shell.width/2,cy=shell.top+shell.height/2,radius=shell.width/2;
         const check=(ok,msg)=>{if(!ok)failures.push(msg)};
-        check(document.querySelectorAll(shape==='circle'?'.dial-legend>div':'.provider-card').length===(shape==='circle'&&${count}===1?2:Math.min(3,${count})),'Selected provider count');
+        check(document.querySelectorAll(shape==='circle'?'.dial-arc-label':'.provider-card').length===(shape==='circle'&&${count}===1?2:Math.min(3,${count})),'Selected provider count');
         const walker=document.createTreeWalker(document.querySelector('.widget'),NodeFilter.SHOW_TEXT);
         while(walker.nextNode()) {
           const node=walker.currentNode,el=node.parentElement;
@@ -44,8 +44,11 @@ try {
           const expected={system:[6,'round',null,800],brutalist:[12,'butt',null,900],'circular-rings':[13,'round',null,700],'dot-matrix':[7,'round','.1 3',800],'retro-lcd':[9,'butt','1.3 .7',500],terminal:[4,'butt','1 1',400],'frosted-glass':[8,'round',null,800],'minimal-pace':[2,'butt',null,300],'compact-strip':[5,'square',null,800]}[theme];
           metrics.circleSignature={width:parseFloat(getComputedStyle(value).strokeWidth),cap:getComputedStyle(value).strokeLinecap,pattern:pattern.getAttribute('stroke-dasharray'),weight:Number(getComputedStyle(number).fontWeight)};
           check(JSON.stringify(Object.values(metrics.circleSignature))===JSON.stringify(expected),'Circle theme signature');
-          check(parseFloat(getComputedStyle(document.querySelector('.dial-legend')).fontSize)>=parseFloat(getComputedStyle(document.querySelector('.widget')).fontSize),'Legend body size');
-          [...document.querySelectorAll('.dial-value')].forEach((v,i)=>check(getComputedStyle(v).stroke===getComputedStyle(document.querySelectorAll('.dial-legend i')[i]).backgroundColor,'Ring legend color match'));
+          check(!document.querySelector('.dial-legend'),'Center list removed');
+          const textBoxes=[];
+          const walker=document.createTreeWalker(document.querySelector('.widget'),NodeFilter.SHOW_TEXT);
+          while(walker.nextNode()){const n=walker.currentNode;if(!n.textContent.trim())continue;const range=document.createRange();range.selectNodeContents(n);for(const r of range.getClientRects())if(r.width&&r.height)textBoxes.push(r);}
+          for(let i=0;i<textBoxes.length;i++)for(let j=i+1;j<textBoxes.length;j++){const a=textBoxes[i],b=textBoxes[j];check(Math.min(a.right,b.right)-Math.max(a.left,b.left)<=.5||Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)<=.5,'Circle text boxes intersect');}
           check(getComputedStyle(document.body).backgroundColor==='rgba(0, 0, 0, 0)'&&getComputedStyle(document.documentElement).backgroundColor==='rgba(0, 0, 0, 0)','Transparent circle canvas');
           if(theme==='minimal-pace')check(document.querySelectorAll('.dial-elapsed').length===document.querySelectorAll('.dial-track').length,'Elapsed markers');
         } else {
@@ -174,6 +177,24 @@ try {
       circleCaptures.push({theme,data:png.data,signature:result.metrics.circleSignature});
     }
     rows.push({shape,theme,sizePreset,count,page,appearance,...result});
+  }
+  // Endpoint labels must remain collision-free at nearby and boundary usages.
+  for(const theme of themes)for(const sizePreset of Object.keys(sizePresets))for(const appearance of ['dark','light'])for(const values of [[30,31,32],[0,0,0],[99,100,100]]) {
+    const result=await b.evaluate(`(async()=>{
+      const api=window.__AI_USAGE_DEMO__;await api.setSettings({shape:'circle',theme:${JSON.stringify(theme)},sizePreset:${JSON.stringify(sizePreset)},fineTune:100,appearance:${JSON.stringify(appearance)}});
+      await api.setSnapshot({providers:['claude','codex','gemini'].map((id,i)=>({id,state:'OK',windows:[{kind:'session',used_percent:${JSON.stringify(values)}[i]}]}))});await document.fonts.ready;
+      const labels=[...document.querySelectorAll('.dial-arc-label')],failures=[];
+      if(labels.length!==3)failures.push('Missing endpoint labels');
+      const boxes=labels.map(el=>el.getBoundingClientRect()),shell=document.querySelector('.widget').getBoundingClientRect(),cx=shell.left+shell.width/2,cy=shell.top+shell.height/2;
+      const center=document.querySelector('.dial-safe').getBoundingClientRect();
+      for(let i=0;i<boxes.length;i++){
+        const a=boxes[i];
+        for(const x of [a.left,a.right])for(const y of [a.top,a.bottom])if(Math.hypot(x-cx,y-cy)>shell.width/2+1)failures.push('Badge outside circle');
+        for(const b of [...boxes.slice(i+1),center])if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>.5&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>.5)failures.push('Endpoint label collision');
+      }
+      return {failures};
+    })()`);
+    rows.push({shape:'circle',theme,sizePreset,appearance,values,...result});
   }
   // Compare actual rendered pixels as well as structural signatures.
   for(let i=0;i<circleCaptures.length;i++)for(let j=i+1;j<circleCaptures.length;j++) {

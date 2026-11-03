@@ -196,10 +196,14 @@ Provider identity regression: `node docs/tools/provider-identity-check.mjs` uses
 three fictional providers with identical OK/warning/danger usage in each scene.
 It checks every palette, theme, dark/light appearance and Calm/Vivid/Mono in both
 circle and pill: CIE76 ΔE ≥20 for identity colors, three distinct Mono patterns,
-exact legend/ring color agreement, warning/danger endpoints and symbols, and
+endpoint labels, warning/danger endpoint markers, and
 stable identities when selecting/reordering known providers. Results are in
-`provider-identity-results.json`. Identity tones live in each palette's
-`providerColors`; threshold colors remain independent.
+`provider-identity-results.json`. Brand-inspired default identities are shared in `app/src/themes/shared/identity.js`.
+All seven defaults are checked for contrast and ΔE on every palette surface.
+Settings stores optional per-provider `providerColors` overrides and warns about
+low contrast or similar choices; threshold colors remain independent.
+The circle uses collision-avoiding endpoint badges instead of a central list.
+Theme checks include badge bounds and nearby 30/31/32%, 0%, and 99/100% cases.
 
 `node docs/tools/circle-preview.mjs` refreshes the mixed-threshold circle sheet;
 `CIRCLE_ALL_OK=1 node docs/tools/circle-preview.mjs` adds `circle-sheet-all-ok.png`.

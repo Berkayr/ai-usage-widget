@@ -1,4 +1,4 @@
-import { providerIndex } from './themes/shared/identity.js';
+import { providerIndex, providerColors } from './themes/shared/identity.js';
 import { renderRound } from './themes/shared/round.js';
 import { normalizeSize, widgetWidth, widgetHeight, widgetProviders } from './sizing.js';
 import { hiddenStates } from './themes/dot-matrix/render.js';
@@ -91,7 +91,7 @@ function applySettings() {
   const mode = settings.appearance === 'auto' ? (systemAppearance.matches ? 'light' : 'dark') : settings.appearance;
   const palette = { ...selected, ...(selected[mode] || {}), mode }; 
   for (const [key, value] of Object.entries(palette)) if (typeof value === 'string' && key !== 'name' && key !== 'mode') document.documentElement.style.setProperty(`--${key}`, value);
-  (palette.providerColors || [palette.accent, '#56b4e9', '#cc79a7']).forEach((color,i) => document.documentElement.style.setProperty(`--provider-${i}`,color));
+  providerColors(settings, settings.background || palette.bgWidget).forEach((color,i) => document.documentElement.style.setProperty(`--provider-${i}`,color));
   if (settings.accent) document.documentElement.style.setProperty('--accent', settings.accent);
   if (settings.background) document.documentElement.style.setProperty('--bgWidget', settings.background);
   document.documentElement.dataset.mode = palette.mode;

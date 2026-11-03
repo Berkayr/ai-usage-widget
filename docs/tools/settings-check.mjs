@@ -15,6 +15,17 @@ try {
     const palette=$('#palette-grid .palette-option:last-child');palette.click();
     assert(paletteGridSelected(),'Palette selection');
     function paletteGridSelected(){return !!$('#palette-grid [aria-pressed=true]');}
+    assert(document.querySelectorAll('[data-provider-color]').length===7,'Seven provider color pickers');
+    const color=()=>document.querySelector('[data-provider-color="claude"]');
+    color().value='#ffffff';color().dispatchEvent(new Event('input'));
+    assert($('#dirty').textContent==='Unsaved changes','Dirty provider color');
+    const codex=document.querySelector('[data-provider-color="codex"]');codex.value='#ffffff';codex.dispatchEvent(new Event('input'));
+    assert($('#provider-color-warning').textContent.includes('too similar'),'Similar colors warning');
+    $('#appearance').value='light';$('#appearance').dispatchEvent(new Event('change'));assert($('#provider-color-warning').textContent.includes('low background contrast'),'Low contrast warning');
+    $('#appearance').value='auto';$('#appearance').dispatchEvent(new Event('change')); 
+    $('#save').click();await new Promise(r=>setTimeout(r,50));
+    color().value='#123456';color().dispatchEvent(new Event('input'));$('#revert').click();assert(color().value==='#ffffff','Revert saved provider color');
+    color().nextElementSibling.click();assert(color().value!=='#ffffff','Reset provider color');
     const a=$('#accent');a.value='#123456';a.dispatchEvent(new Event('input'));
     a.nextElementSibling.click();assert(a.value!=='#123456','Reset palette');
     $('#save').click();await new Promise(r=>setTimeout(r,50));assert($('#dirty').textContent==='All changes saved','Save');

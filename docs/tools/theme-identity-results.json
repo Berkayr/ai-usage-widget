@@ -38579,6 +38579,3246 @@
       "appearance": "light",
       "metrics": {},
       "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "system",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "brutalist",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "circular-rings",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "compact-strip",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "dot-matrix",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "frosted-glass",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "minimal-pace",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "retro-lcd",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Small",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Medium",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "appearance": "dark",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        30,
+        31,
+        32
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        0,
+        0,
+        0
+      ],
+      "failures": []
+    },
+    {
+      "shape": "circle",
+      "theme": "terminal",
+      "sizePreset": "2X-Large",
+      "appearance": "light",
+      "values": [
+        99,
+        100,
+        100
+      ],
+      "failures": []
     }
   ],
   "failures": [],

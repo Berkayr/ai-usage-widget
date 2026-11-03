@@ -24,7 +24,7 @@ try {
   for(const el of document.querySelectorAll('.widget *')){if(![...el.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())||!el.getClientRects().length)continue;const r=el.getBoundingClientRect();if(r.width&&r.height)assert(parseFloat(getComputedStyle(el).fontSize)>=9,'Fine-tune text floor');}
   await api.setSettings({shape:'circle',sizePreset:'Medium',fineTune:100,widgetProviders:['demo-3','demo-5']});
   await api.setSnapshot({providers:Array.from({length:6},(_,i)=>({id:'demo-'+i,label:'Provider '+(i+1),state:'OK',windows:[{kind:'session',used_percent:34},{kind:'weekly',used_percent:62}]}))});
-  assert(document.querySelectorAll('.dial-track').length===2,'Pinned circle providers');assert(document.querySelector('.dial-legend').textContent.includes('Provider 4')&&!document.querySelector('.dial-legend').textContent.includes('Provider 1'),'Pinned identities');
+  assert(document.querySelectorAll('.dial-track').length===2,'Pinned circle providers');assert(document.querySelector('.dial-arc-label').title==='Provider 4','Pinned identities');
   await api.setSettings({shape:'pill'});assert(document.querySelectorAll('.provider-card').length===2,'Pill keeps selection');
   await api.setSettings({widgetProviders:[]});assert(document.querySelector('.no-data'),'Empty pill selection');
   await api.setSettings({shape:'circle'});assert(document.querySelector('.dial-name').textContent==='NO ACTIVE PROVIDERS','Empty circle selection');

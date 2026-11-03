@@ -1,3 +1,4 @@
+import { providerIds, providerColors, providerColorWarnings } from './themes/shared/identity.js';
 import { normalizeSize, sizePresets, widgetWidth, widgetHeight, shapes } from './sizing.js';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
@@ -59,6 +60,16 @@ function category(id) {for(const [key,section]of Object.entries(sections))sectio
 document.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>category(b.dataset.category));category('providers');
 const themeSymbols={system:'━━━━','dot-matrix':'••••••','circular-rings':'◉ ◎',terminal:'[▓▓░░]','frosted-glass':'▰ ▰',brutalist:'84%','compact-strip':'━ ━ ━','retro-lcd':'▮▮▮▯▯','minimal-pace':'──┊──'};
 for(const theme of themes) {const button=document.createElement('button');button.dataset.theme=theme.id;button.innerHTML='<span class="theme-preview" aria-hidden="true"></span><span></span>';button.firstChild.textContent=themeSymbols[theme.id];button.lastChild.textContent=theme.name;button.onclick=()=>{draft.theme=theme.id;draft.palette=Object.keys(theme.palettes)[0];draft.accent=null;draft.background=null;update();};$('#theme-picker').append(button);}
+const colorControls=document.createElement('fieldset');colorControls.id='provider-colors';
+colorControls.innerHTML='<legend>Provider colors</legend><p class="setting-note">Colors identify providers in every shape. Mono uses patterns.</p>';
+for(const id of providerIds){
+ const label=document.createElement('label');label.textContent=id;
+ const input=document.createElement('input');input.type='color';input.dataset.providerColor=id;input.setAttribute('aria-label',id+' color');
+ input.oninput=()=>{draft.providerColors={...draft.providerColors,[id]:input.value};update();};
+ const reset=document.createElement('button');reset.textContent='Reset to default';reset.onclick=()=>{delete (draft.providerColors||{})[id];update();};
+ label.append(input,reset);colorControls.append(label);
+}
+const colorWarning=document.createElement('p');colorWarning.id='provider-color-warning';colorWarning.className='setting-note';colorWarning.setAttribute('role','status');colorControls.append(colorWarning);sections.appearance.append(colorControls);
 const mode=matchMedia('(prefers-color-scheme:light)');
 function themePalette(t=themes.find(t=>t.id===draft.theme)||themes[0],key=draft.palette) {const p=t.palettes[key]||Object.values(t.palettes)[0];const appearance=draft.appearance==='auto'?(mode.matches?'light':'dark'):draft.appearance;return {...p,...p[appearance]};}
 // Palette samples retain their hue while keeping their glyphs readable.
@@ -80,7 +91,7 @@ function renderControls() {
   $('#fit-height').disabled=draft.shape!=='portrait';
   for(const [id,key]of Object.entries(bindings)) {const el=$(`#${id}`);const value=get(key);if(el.type==='checkbox')el.checked=!!value;else el.value=value??'';const output=$(`#${id.replace('-opacity','')}-out`)||$(`#${id}-out`);if(output)output.value=`${value}${id==='linux-margin'?' px':'%'}`;}
   document.querySelectorAll('[data-size]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.size===draft.sizePreset));b.querySelector('small').textContent=`${Math.round(widgetWidth(draft,Math.max(1,providers.length))*sizePresets[b.dataset.size]/100)} × ${Math.round(widgetHeight(draft,Math.max(1,providers.length))*sizePresets[b.dataset.size]/100)} px`;});
-  const p=themePalette();$('#accent').value=draft.accent||p.accent;$('#background').value=draft.background||p.bgWidget;
+  const p=themePalette();const paper=draft.background||p.bgWidget;const colors=providerColors(draft,paper);document.querySelectorAll('[data-provider-color]').forEach((el,i)=>el.value=colors[i]);colorWarning.textContent=providerColorWarnings(draft,paper).join('. ');$('#accent').value=draft.accent||p.accent;$('#background').value=draft.background||p.bgWidget;
   document.querySelectorAll('[data-theme]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.theme===draft.theme));const colors=themePalette(themes.find(t=>t.id===b.dataset.theme));b.querySelector('.theme-preview').style.cssText=`background:${colors.bgWidget};color:${previewInk(colors.accent,colors.bgWidget)};border-color:${colors.border}`;});
   paletteGrid.replaceChildren();const t=themes.find(t=>t.id===draft.theme)||themes[0];
   for(const [key,value]of Object.entries(t.palettes)) {const button=document.createElement('button');button.className='palette-option';button.setAttribute('aria-pressed',String(key===draft.palette));const name=document.createElement('span');name.textContent=value.name;button.append(name);const colors=themePalette(t,key);for(const color of ['accent','bgWidget','bgCard','textPrimary','severityWarning']) {const swatch=document.createElement('i');swatch.style.background=colors[color];swatch.title=`${color}: ${colors[color]}`;button.append(swatch);}button.onclick=()=>{draft.palette=key;draft.accent=null;draft.background=null;update();};paletteGrid.append(button);}
