@@ -174,6 +174,12 @@ class HistoricalQuoteTests(unittest.TestCase):
         raw = '{{QOTD\n| quote = November 3, 1812\n| author = Writer\n}}'
         self.assertIsNone(quote.daily_card(raw, title, TODAY)['said_year'])
 
+    def test_qotd_author_and_work_trim_wikiquote_separators(self):
+        raw = "{{QOTD|quote=An invented thought.|author=  ~ [[Robert A. Heinlein]] ~  in  ~ ''Job: A Comedy of Justice'' ~}}"
+        card = quote.daily_card(raw, 'Wikiquote:Quote of the day/November 3, 2026', TODAY)
+        self.assertEqual(card['author'], 'Robert A. Heinlein')
+        self.assertEqual(card['work'], 'Job: A Comedy of Justice')
+
     def test_reich_and_markup_cleanup(self):
         self.assertEqual(quote.clean('The character structure of modern [[man]] , who reproduces…'),
                          'The character structure of modern man, who reproduces…')

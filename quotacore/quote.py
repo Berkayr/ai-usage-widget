@@ -72,6 +72,12 @@ def clean(value):
     value = ' '.join(value.split())
     return re.sub(r'\s+([,.;:!?%])', r'\1', value)[:6000]
 
+
+def clean_field(value):
+    """Clean a Wikiquote author/work field and its surrounding separators."""
+    value = clean(value)
+    return re.sub(r'\s+', ' ', value.strip(' ~—–')).strip()
+
 def param(raw, name):
     raw = re.sub(r'<!--.*?-->', '', raw, flags=re.S).strip()
     start = raw.find('{{')
@@ -108,13 +114,13 @@ def daily_card(raw, title, today):
     link = re.search(r'\[\[([^]|]+)', author_raw)
     author_page = link[1].split('#')[0].replace('_', ' ').strip() if link else clean(re.split(r'\s+in\s+', author_raw, maxsplit=1, flags=re.I)[0])
     author_parts = re.split(r'\s+in\s+', author_raw, maxsplit=1, flags=re.I)
-    work = clean(author_parts[1]) if len(author_parts) > 1 else clean(
+    work = clean_field(author_parts[1]) if len(author_parts) > 1 else clean_field(
         param(raw, 'source') or param(raw, 'context'))
     context = clean(' '.join(param(raw, key) for key in ('source', 'comment', 'context')))
     month, day = MONTHS[today.month - 1], str(today.day)
     pattern = rf'\b(?:{month}\s+{day}|{day}\s+{month})\b,?\s+(\d{{4}})\b'
     match = re.search(pattern, context, re.I)
-    return dict(quote=text, author=clean(author_parts[0]) or 'Unknown', work=work, author_description='',
+    return dict(quote=text, author=clean_field(author_parts[0]) or 'Unknown', work=work, author_description='',
                 author_page=author_page, reason=f"Wikiquote's pick for {title.split('/')[-1]}",
                 source_url='https://en.wikiquote.org/wiki/' + quote(title.replace(' ', '_'), safe=''),
                 license='CC BY-SA 4.0', kind='qotd', said_year=match[1] if match else None)
