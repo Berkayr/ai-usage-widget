@@ -1,3 +1,4 @@
+import {auditColorModes} from './color-mode-check.mjs';
 import * as identity from '../../app/src/themes/shared/identity.js';
 // Production DOM, fictional quotas. CIE76 ΔE in D65 Lab; no provider credentials.
 import {readFile,readdir,writeFile} from 'node:fs/promises';
@@ -61,6 +62,7 @@ try {
    }
  }
  if(identity.providerColorWarnings({providerColors:{claude:'#ffffff',codex:'#ffffff'}},'#ffffff').length<2)result.failures.push({message:'User warnings'});
+ const modes=await auditColorModes(b);result.colorModes=modes.results;result.failures.push(...modes.failures.map(row=>({message:'Calm/Vivid pixel saturation',...row})));
  await writeFile('docs/tools/provider-identity-results.json',JSON.stringify(result,null,2)+'\n');
  console.log(JSON.stringify(result));if(result.failures.length)process.exitCode=1;
 }finally{await b.close();}

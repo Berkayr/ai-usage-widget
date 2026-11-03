@@ -15,12 +15,12 @@
 .window-top b {font-size:var(--size-font-base)}
 .window-bottom {margin-top:.125rem}
 /* A single/odd last provider uses the full row, with the same large ring at left. */
-.provider-card:last-child:nth-child(odd) {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr);column-gap:0}
-.provider-card:last-child:nth-child(odd) .provider-heading {grid-column:1/-1}
-.provider-card:last-child:nth-child(odd) .windows {align-self:center;padding-left:.5rem}
-.provider-card:last-child:nth-child(odd) :is(.balance-row,.empty-window) {grid-column:1/-1}
+.provider-card.featured-provider:nth-child(n) {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr);column-gap:0}
+.provider-card.featured-provider:nth-child(n) .provider-heading {grid-column:1/-1}
+.provider-card.featured-provider:nth-child(n) .windows {align-self:center;padding-left:.5rem}
+.provider-card.featured-provider:nth-child(n) :is(.balance-row,.empty-window) {grid-column:1/-1}
 .reset,.pace,.plan,.status-badge,.sync-line {font-family:JetBrainsMono,monospace}
-.provider-card:last-child:nth-child(odd) .ring-display {margin:0}
+.provider-card.featured-provider:nth-child(n) .ring-display {margin:0}
 .provider-heading {min-height:1.75rem}
-:root[data-narrow-viewport=true] .provider-card:last-child:nth-child(odd) {display:block}
-:root[data-narrow-viewport=true] .provider-card:last-child:nth-child(odd) .windows {padding-left:0}
+:root[data-narrow-viewport=true] .provider-card.featured-provider:nth-child(n) {display:block}
+:root[data-narrow-viewport=true] .provider-card.featured-provider:nth-child(n) .windows {padding-left:0}

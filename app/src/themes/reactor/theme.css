@@ -1,0 +1,16 @@
+@import '../shared/layout.css';
+@import '../shared/grid.css';
+.widget{font-family:JetBrainsMono,monospace;background-color:var(--bgWidget);background-image:radial-gradient(ellipse at center,color-mix(in srgb,var(--accent) 12%,var(--bgWidget)),var(--bgWidget) 70%);box-shadow:inset 0 0 0 1px var(--border)}
+.provider-card{border:1px solid var(--border);border-radius:12px;background:var(--bgCard)}
+.header{border-bottom:1px solid var(--accent)}
+.segments{display:flex;gap:3px;height:8px}.segments i{flex:1;background:var(--bgTrackOff);border-radius:1px}.segments i.on{background:var(--accent);box-shadow:0 0 5px var(--accent)}
+.window-top b{font-weight:600}.dial-rings{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--accent) 65%,transparent))}
+.dial-safe .dial-number{font-weight:600;text-shadow:0 0 12px var(--accent)}
+.dial-name{text-transform:uppercase;letter-spacing:.08em}.dial-arc-label{border-radius:2px}
+.reactor-core{position:absolute;inset:30%;border:1px solid var(--accent);border-radius:50%;box-shadow:0 0 12px color-mix(in srgb,var(--accent) 35%,transparent),inset 0 0 18px color-mix(in srgb,var(--accent) 25%,transparent);pointer-events:none}
+.reactor-core::before{content:'';position:absolute;inset:-12%;border-radius:50%;border:2px dashed var(--accent);opacity:.4}
+:root[data-reactor-motion=true] .reactor-core{animation:reactor-breathe 5s ease-in-out infinite}
+@keyframes reactor-breathe{50%{opacity:.45}}
+@media(prefers-reduced-motion:reduce){.reactor-core{animation:none!important}}
+
+.dial-track{stroke:var(--accent);opacity:.2}

@@ -1,0 +1,49 @@
+{
+  "id": "reactor",
+  "name": "Reactor",
+  "sizeTiers": {
+    "xs": 219,
+    "s": 319,
+    "m": 519,
+    "l": 960
+  },
+  "palettes": {
+    "default": {
+      "name": "Ice core",
+      "bgWidget": "#07151f",
+      "bgCard": "#0d2330",
+      "bgTrackOff": "#23434f",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b5b5ae",
+      "textMuted": "#99a5b8",
+      "border": "#467f91",
+      "accent": "#a4edff",
+      "severityNormal": "#a4edff",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#e7f4f8",
+        "bgCard": "#f7fcff",
+        "bgTrackOff": "#cbd5e1",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#32657a",
+        "accent": "#075b78",
+        "severityNormal": "#075b78",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#137a37",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#c8ff00",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    }
+  }
+}

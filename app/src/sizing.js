@@ -28,7 +28,7 @@ export function widgetWidth(settings, count = 1) {
 export function widgetHeight(settings, count = 1) {
   if (['landscape', 'square', 'circle'].includes(settings.shape)) return 340;
   if (settings.shape === 'pill') return 120;
-  return 116 + (settings.theme === 'compact-strip' ? 1 : Math.max(1, count)) * 210;
+  return (settings.quoteEnabled === true ? 200 : 0) + 116 + (settings.theme === 'compact-strip' ? 1 : Math.max(1, count)) * 210;
 }
 
 export function widgetProviders(providers, selection) {
