@@ -17,9 +17,12 @@ try {
     const contrast=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
     const failures=[];let combinations=0,texts=0,arcLabels=0;
     for(const theme of api.themes)for(const palette of Object.keys(theme.palettes))for(const appearance of ['light','dark'])for(const colorMode of ['calm','vivid','mono']) {
-      await api.setSettings({shape:${JSON.stringify(shape)},theme:theme.id,palette,appearance,colorMode,widgetOpacity:100,backgroundOpacity:100,accent:null,background:null});combinations++;
+      await api.setSettings({quoteEnabled:true,shape:${JSON.stringify(shape)},theme:theme.id,palette,appearance,colorMode,widgetOpacity:100,backgroundOpacity:100,accent:null,background:null});combinations++;
+      const toggle=document.querySelector('#quote .quote-toggle');
+      if(['circle','square'].includes(${JSON.stringify(shape)})&&document.documentElement.dataset.quotePage!=='true'){toggle.click();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}
+      if(${JSON.stringify(shape)}==='pill')toggle.click();
       await document.fonts.ready;
-      for(const el of document.querySelectorAll('#widget *')) {
+      for(const el of document.querySelectorAll('#widget *, .quote-dialog *')) {
         if(![...el.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())||!el.getClientRects().length||getComputedStyle(el).visibility==='hidden')continue;
         const rect=el.getBoundingClientRect();if(!rect.width||!rect.height)continue;
         const layers=[];let opacity=1;
@@ -30,6 +33,7 @@ try {
         const value=contrast(painted,bg),size=parseFloat(s.fontSize),large=size>=24||(size>=18&&Number(s.fontWeight)>=700),threshold=large?3:4.5;texts++;
         if(value<threshold)failures.push({shape:${JSON.stringify(shape)},theme:theme.id,palette,appearance,colorMode,text:el.textContent.trim().slice(0,70),selector:el.className||el.tagName,foreground:s.color,background:bg.map(Math.round).join(','),ratio:Number(value.toFixed(3)),threshold});
       }
+      document.querySelector('.quote-dialog')?.close();
     }
     return {combinations,texts,arcLabels,failures};
   })()`);

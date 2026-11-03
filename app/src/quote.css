@@ -1,0 +1,45 @@
+.quote-section[hidden]{display:none!important}
+.quote-section{flex:none;position:relative;min-width:0;height:12.5rem;padding:.625rem 0;border-top:1px solid var(--border);font:inherit;color:var(--textPrimary)}
+.quote-content{position:relative;height:100%;min-width:0;overflow:hidden}
+.quote-label{font-size:var(--size-font-small);color:var(--textSecondary);margin-bottom:.375rem}
+.quote-text{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-align:left;font:inherit;color:inherit;border:0;padding:0;background:transparent;cursor:pointer;width:100%;line-height:1.4;max-height:4.2em}
+.quote-author,.quote-reason{font-size:var(--size-font-small);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.25rem}
+.quote-source,.quote-toggle,.quote-nav button{font:inherit;font-size:var(--size-font-small);color:var(--textPrimary);background:var(--bgWidget);border:1px solid var(--border);cursor:pointer;padding:.125rem .375rem}
+.quote-source{margin-top:.375rem}.quote-nav{position:absolute;bottom:0;right:0}.quote-nav[hidden],.quote-toggle[hidden]{display:none!important}
+:root[data-quote=true][data-shape=portrait] .widget{height:calc(var(--contract-height) + 12.5rem)}
+:root[data-shape=landscape] .quote-section{height:6.25rem}
+:root[data-shape=landscape] .quote-text{-webkit-line-clamp:1;max-height:1.4em}
+:root[data-shape=landscape] .quote-author,:root[data-shape=landscape] .quote-reason{display:inline;margin-right:.5rem}
+:root[data-shape=landscape] .quote-source{float:right;margin:0}
+:root[data-shape=square] .quote-section{height:1.75rem;padding:0;border:0}
+:root[data-shape=square] .quote-content{display:none}
+:root[data-shape=square][data-quote-page=true] .provider-list{visibility:hidden}
+:root[data-shape=square][data-quote-page=true] .quote-section{position:absolute;inset:4.75rem .875rem 2.5rem;height:auto;background:var(--bgWidget)}
+:root[data-shape=square][data-quote-page=true] .quote-content{display:block;padding-top:1.5rem}
+:root[data-shape=circle] .quote-section{position:absolute;inset:24% 23% 19%;height:auto;border:0;padding:0;text-align:center;pointer-events:none}
+:root[data-shape=circle] .quote-toggle{position:absolute;bottom:0;left:50%;transform:translateX(-50%);pointer-events:auto;z-index:4}
+:root[data-shape=circle] .quote-content{display:none}
+:root[data-shape=circle][data-quote-page=true] .dial-safe{visibility:hidden}
+:root[data-shape=circle][data-quote-page=true] .quote-content{display:block;pointer-events:auto;padding-bottom:1.5rem}
+:root[data-shape=circle] .quote-label,:root[data-shape=circle] .quote-reason{display:none}
+:root[data-shape=circle] .quote-text{text-align:center;font-size:max(9px,.75rem);-webkit-line-clamp:3}
+:root[data-shape=circle] .quote-source{font-size:max(9px,.5625rem);padding:0}
+:root[data-shape=pill] .quote-section{position:absolute;left:.75rem;top:calc(50% - .75rem);height:1.5rem;padding:0;border:0}
+.quote-dialog{max-width:min(90vw,42rem);max-height:85vh;overflow:auto;border:1px solid var(--border);border-radius:.75rem;background:var(--bgWidget);color:var(--textPrimary);font:inherit;padding:1.5rem}
+.quote-dialog p{white-space:pre-wrap;overflow-wrap:anywhere}.quote-dialog a{color:inherit}.quote-dialog button{display:block;margin-top:1rem;font:inherit}.quote-dialog::backdrop{background:#0008}
+:root[data-theme=brutalist] .quote-section{border-top:3px solid currentColor;font-weight:900;text-transform:uppercase}
+:root[data-theme=terminal] .quote-text{font-weight:400}:root[data-theme=terminal] .quote-label{color:var(--accent)}
+:root[data-theme=retro-lcd] .quote-content{border:1px inset var(--border);padding:.25rem;background:var(--bgCard)}
+:root[data-theme=dot-matrix] .quote-section{border-top-style:dotted;letter-spacing:.03em}
+:root[data-theme=frosted-glass] .quote-content{border-radius:.625rem;background:var(--bgCard);padding:.375rem}
+:root[data-theme=minimal-pace] .quote-text{font-weight:300}
+:root[data-theme=circular-rings] .quote-section{border-top-color:var(--accent)}
+:root[data-theme=compact-strip] .quote-label{letter-spacing:.12em}
+
+:root[data-shape=circle] .quote-nav{display:none}
+:root[data-shape=circle] .quote-content{background:transparent;border:0;border-radius:0;padding-left:0;padding-right:0}
+
+.quote-dialog button{color:var(--textPrimary);background:var(--bgWidget);border:1px solid var(--border);padding:.375rem .625rem}
+
+:root[data-theme=reactor] .quote-content{background:radial-gradient(ellipse at left,color-mix(in srgb,var(--accent) 12%,var(--bgWidget)),var(--bgWidget) 75%);box-shadow:inset 1px 0 var(--accent),inset 0 0 18px color-mix(in srgb,var(--accent) 8%,transparent);padding:.375rem}
+:root[data-theme=reactor] .quote-label{color:var(--accent);letter-spacing:.1em;text-transform:uppercase}

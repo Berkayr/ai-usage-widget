@@ -1,4 +1,8 @@
-import { providerIndex, providerColors } from './themes/shared/identity.js';
+import { applyAppearance } from './appearance.js';
+import { orderedProviders, arrangeCards } from './provider-layout.js';
+import { loadQuote, renderQuote, sampleQuote } from './quote.js';
+import './quote.css';
+import { providerIndex } from './themes/shared/identity.js';
 import { renderRound } from './themes/shared/round.js';
 import { normalizeSize, widgetWidth, widgetHeight, widgetProviders } from './sizing.js';
 import { hiddenStates } from './themes/dot-matrix/render.js';
@@ -8,6 +12,18 @@ import { mountProviders } from './themes/shared/providers.js';
 import './themes/shared/chrome.css';
 import { themes, loadTheme } from './themes/registry.js';
 import sample from './sample-snapshot.json';
+let quoteData = null;
+let quoteKey = null;
+let quoteBusy = false;
+async function updateQuote() {
+  if (settings.quoteEnabled !== true) { quoteData = null; quoteKey = null; return; }
+  const key = new Date().toLocaleDateString() + settings.quoteMode;
+  if (quoteKey === key || quoteBusy) return;
+  quoteBusy = true;
+  try { quoteData = isSample ? sampleQuote : await loadQuote(settings, invoke); quoteKey = key; }
+  catch { quoteData = {status:"offline",cards:[]}; }
+  finally { quoteBusy = false; draw(currentSnapshot,currentNoData); }
+}
 let theme;
 let renderSnapshot;
 let themeRequest = 0;
@@ -17,7 +33,7 @@ document.head.append(themeStyle);
 // Wayland does not expose layer-bottom occlusion. Avoid continuous animation
 // even if the compositor keeps the document's visibility state as visible.
 const motionStyle = document.createElement('style');
-motionStyle.textContent = '*::before,*::after,*{animation:none!important} @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}';
+motionStyle.textContent = ':root:not([data-reactor-motion=true]) *::before,:root:not([data-reactor-motion=true]) *::after,:root:not([data-reactor-motion=true]) *{animation:none!important} @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}';
 document.head.append(motionStyle);
 import { invoke } from '@tauri-apps/api/core';
 import { listen, emitTo } from '@tauri-apps/api/event';
@@ -45,7 +61,7 @@ window.addEventListener('pagehide', dispose, { once: true, signal: domEvents.sig
 const isSample = new URLSearchParams(location.search).has('sample') || !('__TAURI_INTERNALS__' in window);
 const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'], window: 'session', showBars: false, offsetX: 0, style: 'transparent', theme: 'auto' };
 const systemAppearance = matchMedia('(prefers-color-scheme: light)');
-let settings = { theme: 'system', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'default', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
+let settings = { quoteEnabled:false, quoteMode:'qotd', quoteNavigation:true, theme: 'system', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'default', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
 try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
 let shapePage = 0;
 let currentSnapshot = null;
@@ -58,24 +74,13 @@ document.querySelector('#app').innerHTML = `
     <header class="header"><div class="title-block"><div class="app-title">AI USAGE</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
     <section id="provider-onboarding" hidden></section><div class="provider-list" id="providers"></div>
     <nav class="shape-pages" aria-label="Provider pages" hidden></nav>
+    <section class="quote-section" id="quote" hidden aria-label="Daily quote"></section>
     <footer class="footer"><span>AI USAGE</span><span>SYSTEM</span></footer>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
     <div class="toast" id="toast" hidden></div>
   </main>`;
 
 const $ = selector => document.querySelector(selector);
-// Palette files use opaque hex colors. Correct text against its actual surface.
-const rgb = hex => hex.replace('#', '').match(/../g).slice(0, 3).map(n => parseInt(n, 16));
-function mix(a, b, weight) { return '#' + rgb(a).map((v, i) => Math.round(v * weight + rgb(b)[i] * (1 - weight)).toString(16).padStart(2, '0')).join(''); }
-function luminance(hex) { return rgb(hex).map(v => { v /= 255; return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }).reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0); }
-function readable(color, background) {
-  const bg = luminance(background), target = bg > .179 ? '#000000' : '#ffffff';
-  for (let i = 0; i <= 100; i++) {
-    const candidate = mix(color, target, 1 - i / 100), value = luminance(candidate);
-    if ((Math.max(value, bg) + .05) / (Math.min(value, bg) + .05) >= 5) return candidate;
-  }
-  return target;
-}
 function updateNarrowViewport() {
   // Container font-relative queries can retain a previous scale during resize.
   const unit = parseFloat(getComputedStyle(document.documentElement).fontSize);
@@ -85,45 +90,10 @@ function applySettings() {
   if (!theme) return;
   settings = normalizeSize(settings);
   document.documentElement.dataset.shape = settings.shape;
+  document.documentElement.dataset.reactorMotion = String(settings.reactorMotion === true && !document.hidden);
   document.documentElement.dataset.largeShape = String(settings.scale >= 150);
   document.documentElement.style.setProperty('--shape-min-font', '9px');
-  const selected = theme.palettes[settings.palette] || Object.values(theme.palettes)[0];
-  const mode = settings.appearance === 'auto' ? (systemAppearance.matches ? 'light' : 'dark') : settings.appearance;
-  const palette = { ...selected, ...(selected[mode] || {}), mode }; 
-  for (const [key, value] of Object.entries(palette)) if (typeof value === 'string' && key !== 'name' && key !== 'mode') document.documentElement.style.setProperty(`--${key}`, value);
-  providerColors(settings, settings.background || palette.bgWidget).forEach((color,i) => document.documentElement.style.setProperty(`--provider-${i}`,color));
-  if (settings.accent) document.documentElement.style.setProperty('--accent', settings.accent);
-  if (settings.background) document.documentElement.style.setProperty('--bgWidget', settings.background);
-  document.documentElement.dataset.mode = palette.mode;
-  // Native system accent when supported; no platform bridge or font embedding.
-  document.documentElement.style.setProperty('--systemAccent', settings.accent || (CSS.supports('color', 'AccentColor') && CSS.supports('color', 'AccentColorText') ? 'AccentColor' : palette.accent));
-  document.documentElement.style.setProperty('--systemAccentText', CSS.supports('color', 'AccentColorText') ? 'AccentColorText' : palette.textPrimary);
-  settings.colorMode = ['calm', 'vivid', 'mono'].includes(settings.colorMode) ? settings.colorMode : 'calm';
-  settings.accentEdge = ['off', 'auto', 'left', 'right'].includes(settings.accentEdge) ? settings.accentEdge : 'off';
-  document.documentElement.dataset.colorMode = settings.colorMode;
-  document.documentElement.dataset.accentEdge = settings.accentEdge === 'auto'
-    ? (settings.position.endsWith('left') ? 'left' : settings.position.endsWith('right') ? 'right' : 'off') : settings.accentEdge;
-  const card = palette.bgCard, background = settings.background || palette.bgWidget;
-  const neutral = mode === 'light' ? '#292d32' : '#e0e3e7';
-  const foreground = settings.colorMode === 'calm' ? mix(palette.textPrimary, neutral, .25) : palette.textPrimary;
-  const primary = readable(foreground, card);
-  const calmText = color => settings.colorMode === 'calm' ? mix(color, neutral, .25) : color;
-  for (const [key, value] of Object.entries({
-    textPrimary: primary,
-    textSecondary: readable(calmText(palette.textSecondary), card),
-    textMuted: readable(calmText(palette.textMuted), card),
-    chromeText: readable(foreground, background),
-    chromeSecondary: readable(calmText(palette.textMuted), background),
-  })) document.documentElement.style.setProperty(`--${key}`, value);
-  if (settings.colorMode === 'calm') {
-    document.documentElement.style.setProperty('--severityNormal', primary);
-    document.documentElement.style.setProperty('--severityWarning', readable(mode === 'light' ? '#805c29' : '#c6ab7d', card));
-    document.documentElement.style.setProperty('--severityDanger', readable(mode === 'light' ? '#99494b' : '#d29898', card));
-  }
-  if (settings.colorMode === 'mono') {
-    const ink = mode === 'light' ? '#000000' : '#ffffff', paper = mode === 'light' ? '#ffffff' : '#000000';
-    for (const [key,value] of Object.entries({bgWidget:paper,bgCard:paper,bgTrackOff:mode === 'light' ? '#dddddd' : '#333333',textPrimary:ink,textSecondary:mode === 'light' ? '#333333' : '#cccccc',textMuted:mode === 'light' ? '#555555' : '#aaaaaa',chromeText:ink,chromeSecondary:mode === 'light' ? '#555555' : '#aaaaaa',border:mode === 'light' ? '#888888' : '#777777',accent:ink,severityNormal:ink,severityWarning:ink,severityDanger:ink})) document.documentElement.style.setProperty(`--${key}`,value);
-  }
+  applyAppearance(settings, theme, systemAppearance.matches);
   settings.dotCount = [10,20,30].includes(Number(settings.dotCount)) ? Number(settings.dotCount) : 20;
   document.documentElement.dataset.dotCount = settings.dotCount;
   const effectiveScale = settings.scale / (settings.matchPhysicalSize ? monitorScale : 1);
@@ -175,12 +145,12 @@ function draw(snapshot, noData = false) {
     const filtered = settings.providerPreview && snapshot ? {...snapshot,providers:(snapshot.providers||[]).filter(p=>settings.providerPreview.includes(p.id))}:snapshot;
     const visible = snapshotOld(snapshot) ? { ...snapshot, providers: (snapshot.providers || []).map(p => ({ ...p, stale: true, state: ['OK', 'STALE'].includes(p.state) ? 'STALE' : p.state })) } : filtered;
     if (settings.providerPreview && visible?.providers) visible.providers=visible.providers.filter(p=>settings.providerPreview.includes(p.id));
-    const allProviders = (visible?.providers || []).filter(p => !hiddenStates.has(String(p.state).toUpperCase()));
+    const allProviders = orderedProviders((visible?.providers || []).filter(p => !hiddenStates.has(String(p.state).toUpperCase())), settings);
     const pages = settings.shape === 'square' ? Math.ceil(allProviders.length / 4) : 1;
     shapePage = Math.min(shapePage, Math.max(0, pages - 1));
     const round = ['circle','pill'].includes(settings.shape);
     const selectedProviders = round ? widgetProviders(allProviders, settings.widgetProviders) : allProviders;
-    const paged = round ? {...visible,providers:selectedProviders} : pages > 1 ? {...visible, providers:allProviders.slice(shapePage*4, shapePage*4+4)} : visible;
+    const paged = round ? {...visible,providers:selectedProviders} : pages > 1 ? {...visible, providers:allProviders.slice(shapePage*4, shapePage*4+4)} : {...visible,providers:allProviders};
     const pageNav = $('.shape-pages'); pageNav.hidden = pages <= 1; pageNav.replaceChildren();
     for (let page=0;page<pages && pages>1;page++) { const button=document.createElement('button'); button.textContent=`${page+1}`; button.setAttribute('aria-label', `Provider page ${page+1} of ${pages}`); button.setAttribute('aria-current', String(page===shapePage)); button.onclick=()=>{shapePage=page;draw(currentSnapshot,currentNoData);}; pageNav.append(button); }
     (round ? (root,snapshot)=>renderRound(root,snapshot,settings) : renderSnapshot)($('#providers'), paged, { noData, showExtraWindows: settings.showExtraWindows });
@@ -189,6 +159,7 @@ function draw(snapshot, noData = false) {
       card.style.setProperty('--provider-identity',`var(--provider-${index})`);
       card.dataset.identity=index;
     });
+    arrangeCards($('#providers'), paged.providers || [], settings);
     $('#updated').textContent = snapshot?.generated_at ? `SYNC ${new Date(snapshot.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'NO DATA YET';
     const count = round ? selectedProviders.length : $('#providers').querySelectorAll('.provider-card').length;
     $('#widget').style.setProperty('--provider-count', Math.max(1,count));
@@ -197,6 +168,8 @@ function draw(snapshot, noData = false) {
     $('#widget').style.setProperty('--shape-rows', settings.shape === 'square' ? (count > 2 ? 2 : 1) : (count > 3 ? 2 : 1));
     const width = widgetWidth(settings,count) * settings.scale / 100 / (settings.matchPhysicalSize ? monitorScale : 1);
     if (!isSample) invoke('resize_widget', {scale:Math.round(settings.scale),widthCssPx:width}).catch(()=>{});
+    renderQuote($('#quote'),settings,quoteData,()=>draw(currentSnapshot,currentNoData),repairTextContrast);
+    updateQuote();
     repairTextContrast($('#widget'));
     requestFit();
     if (!isSample) {
@@ -292,14 +265,15 @@ else {
       try { acceptSnapshot((await invoke('get_snapshot')).snapshot); } catch {}
     };
     const updateVisibility = () => {
+      document.documentElement.dataset.reactorMotion = String(settings.reactorMotion === true && !document.hidden);
       clearInterval(pollTimer);
       if (document.hidden) {
         cancelAnimationFrame(drawFrame); drawFrame = 0;
         clearTimeout(toastTimer); $('#toast').hidden = true;
       } else {
         draw(currentSnapshot, currentNoData);
-        recoverSnapshot();
-        pollTimer = setInterval(recoverSnapshot, 300000);
+        recoverSnapshot(); updateQuote();
+        pollTimer = setInterval(()=>{recoverSnapshot();updateQuote();}, 300000);
       }
     };
     document.addEventListener('visibilitychange', updateVisibility, { signal: domEvents.signal });
@@ -336,4 +310,4 @@ if (new URLSearchParams(location.search).has('sample') && window.__QUOTA_DOCS_FI
   window.__QUOTA_DOCS_READY__ = true;
 }
 
-if (isSample) window.__AI_USAGE_DEMO__ = { async setSnapshot(snapshot, noData = false) { draw(snapshot, noData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setSettings(next) { if ('scale' in next && !('sizePreset' in next) && !('fineTune' in next)) next = normalizeSize(next); settings = {...settings,...next}; const overrides={accent:settings.accent,background:settings.background}; await activateTheme(settings.theme); Object.assign(settings,overrides); applySettings(); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, themes, getSettings:()=>structuredClone(settings) };
+if (isSample) window.__AI_USAGE_DEMO__ = { async setSnapshot(snapshot, noData = false) { draw(snapshot, noData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setSettings(next) { if ('scale' in next && !('sizePreset' in next) && !('fineTune' in next)) next = normalizeSize(next); settings = {...settings,...next}; const overrides={accent:settings.accent,background:settings.background}; await activateTheme(settings.theme); Object.assign(settings,overrides); applySettings(); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, async setQuote(data) { quoteData=data; draw(currentSnapshot,currentNoData); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }, themes, getSettings:()=>structuredClone(settings) };

@@ -20,9 +20,9 @@ Theme captures include `themes.png`, `themes-light.png`, and `themes/<id>-dark.p
 
 Marketing scenes use Vivid for palette variety; System and check scenes use Calm unless stated otherwise. The accent edge stays off. `checks/vivid.png` compares Calm and Vivid. Readability checks require labels ≥11 CSS px and primary numbers ≥15 CSS px at 100% (scaled proportionally at 150%), with secondary text contrast ≥4.5:1. Contrast is calculated from computed text colors and composited background-color layers against the least favorable black/white desktop polarity; background images and compositor effects require visual review. `checks/` remains ignored.
 
-`SCENE=checks/providers- node docs/tools/screenshots.mjs` captures first-run provider consent in all nine themes in dark/light modes and checks default-off choices, wrapped disclosures and explicit Start behavior. These controls use synthetic detection only.
+`SCENE=checks/providers- node docs/tools/screenshots.mjs` captures first-run provider consent in all ten themes in dark/light modes and checks default-off choices, wrapped disclosures and explicit Start behavior. These controls use synthetic detection only.
 
-Mono adds `mono.png` (all nine themes), `checks/mono-light.png`,
+Mono adds `mono.png` (all ten themes), `checks/mono-light.png`,
 `checks/mono-thresholds.png` (0/49/50/79/80/100/unknown), and
 `checks/dots-{200,340,520,700}.png`. Mono uses a neutral gallery background.
 Width checks assert visible per-window mark counts (10 in XS, otherwise 20)
@@ -128,7 +128,7 @@ captures are `settings-preview-light.png` and `settings-preview-dark.png`.
 
 ## Fixed shell, theme identity
 
-`node docs/tools/size-audit.mjs` measures all nine themes × three shapes × five presets ×
+`node docs/tools/size-audit.mjs` measures all ten themes × three shapes × five presets ×
 0/1/3/6 providers (540 cases, ±2 CSS px) and writes `size-audit.json` and
 `size-sheet.png`. The outer size stays 340 × (116 + 210 × provider count) at
 Medium. Compact Strip retains its separate horizontal size contract.
@@ -136,7 +136,7 @@ Brutalist and Circular Rings share the provider budget across two columns;
 an odd last card fills the last row. Their cell heights follow the row budget,
 rather than the 200 px height used by single-column cards.
 
-`node docs/tools/theme-identity-check.mjs` checks all nine themes × three shapes × five presets ×
+`node docs/tools/theme-identity-check.mjs` checks all ten themes × three shapes × five presets ×
 1/2/3/4/5/6 providers × dark/light, including both square pages for five/six
 providers (1800 cases), and writes
 `theme-identity-results.json`. Synthetic DEMO plans and countdowns exercise real
@@ -173,7 +173,7 @@ The shape preview includes all five geometries for every theme, using fictional
 providers only. Settings checks exercise Circle/Pill dimensions and provider
 selection as well as the existing Save/Revert/close/reopen flow.
 
-`node docs/tools/circle-preview.mjs` produces `circle-sheet.png`: all nine
+`node docs/tools/circle-preview.mjs` produces `circle-sheet.png`: all ten
 circle themes at Medium with three fictional providers, paired dark/light.
 The sheet uses a transparent canvas and asserts all 72 iframe corner pixels
 have zero alpha in the captured PNG. Round documents use a light browser canvas
@@ -210,3 +210,19 @@ Theme checks include badge bounds and nearby 30/31/32%, 0%, and 99/100% cases.
 `node docs/tools/provider-identity-preview.mjs` captures circle and pill side by
 side across all three color modes and identical per-provider status. These
 commands run only the browser frontend with invented quotas, never the native app.
+
+
+`node docs/tools/quote-check.mjs` checks optional daily quotes across all ten
+themes, five shapes, dark/light appearance and three sizes, with long fictional
+text and an unsafe source URL. It generates `quote-sheet.png` (50 views). The
+size audit includes quotes off/on; identity checks include the quote sweep;
+contrast checks include quote pages and the pill full-text dialog. All fixtures
+are synthetic and the browser cannot contact Wikiquote.
+
+
+Provider layout checks also cover explicit / Auto / None featured selection,
+Top / Bottom, hiding, ordering, drag and keyboard controls, and Save / Revert.
+`provider-identity-check.mjs` samples PNG arc pixels to compare Calm and Vivid
+saturation for every theme. `circle-sheet.png` includes all ten themes, with
+Calm / Vivid / Mono rows and dark / light columns. Reactor motion defaults off;
+`theme-identity-check.mjs` checks opt-in and reduced-motion behavior.

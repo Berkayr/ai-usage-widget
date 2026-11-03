@@ -237,3 +237,9 @@ up-to-date dependency vulnerability scan.
 - [Renderers](../app/src/themes/shared/safety.js) escape text and allowlist state classes in every theme.
 - [Windows strip](../app/src-tauri/src/taskbar.rs) observes Explorer location events only when enabled; no keylogging or injection.
 - [Release builds](../.github/workflows/build.yml) pin external actions and request provenance; signing and AV reputation remain unverified.
+
+### Optional daily quote
+
+Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.
+
+`quotacore quote --mode mixed --json` explicitly opts into a daily fetch. All modes share `quote-cache.json` in the state directory, including a failed-attempt date to avoid retries until tomorrow. Offline results retain their original date. The daily round batches twelve same-date Wikiquote pages and one Wikidata sitelink lookup; it is at most two HTTP requests, with no redirects, cookies or credentials. Born/died modes fall back to the daily pick when no verified anniversary exists. Source and CC BY-SA 4.0 attribution are accessible from every shape. Pill uses a quote button and full-text dialog because its quota strip has no space for a readable quote.

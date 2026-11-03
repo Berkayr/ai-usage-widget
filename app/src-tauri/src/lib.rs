@@ -20,13 +20,18 @@ use tauri::{Emitter, Manager};
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub(crate) struct Settings { #[serde(default, rename="providerColors")] provider_colors: std::collections::BTreeMap<String,String>, #[serde(default, rename="widgetProviders")] widget_providers: Option<Vec<String>>, #[serde(default, rename="providerPreview")] provider_preview: Option<Vec<String>>, #[serde(default, rename="placementEditing")] placement_editing: bool, theme: String, #[serde(default)] shape: Shape, #[serde(rename="colorMode")] color_mode: String, #[serde(rename="dotCount")] dot_count: u8, #[serde(default, rename="matchPhysicalSize")] match_physical_size: bool, #[serde(rename="accentEdge")] accent_edge: String, #[serde(default="default_fit_height", rename="lockPosition")] lock_position: bool, #[serde(default)] placement: placement::Placement, #[cfg(target_os = "linux")] #[serde(default)] linux: linux::Options, #[serde(default="default_auto")] appearance: String, palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale")] scale: u16, #[serde(default, rename="sizePreset")] size_preset: Option<String>, #[serde(default, rename="fineTune")] fine_tune: Option<f64>, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default)] taskbar: TaskbarSettings }
+pub(crate) struct Settings {
+    #[serde(rename="providerOrder")] provider_order: Vec<String>,
+    #[serde(rename="hiddenProviders")] hidden_providers: Vec<String>,
+    #[serde(rename="featuredProvider")] featured_provider: Option<String>,
+    #[serde(rename="featuredPosition")] featured_position: Option<String>,
+    #[serde(rename="reactorMotion")] reactor_motion: bool, #[serde(rename="quoteEnabled")] quote_enabled: bool, #[serde(rename="quoteMode")] quote_mode: String, #[serde(rename="quoteNavigation")] quote_navigation: bool, #[serde(default, rename="providerColors")] provider_colors: std::collections::BTreeMap<String,String>, #[serde(default, rename="widgetProviders")] widget_providers: Option<Vec<String>>, #[serde(default, rename="providerPreview")] provider_preview: Option<Vec<String>>, #[serde(default, rename="placementEditing")] placement_editing: bool, theme: String, #[serde(default)] shape: Shape, #[serde(rename="colorMode")] color_mode: String, #[serde(rename="dotCount")] dot_count: u8, #[serde(default, rename="matchPhysicalSize")] match_physical_size: bool, #[serde(rename="accentEdge")] accent_edge: String, #[serde(default="default_fit_height", rename="lockPosition")] lock_position: bool, #[serde(default)] placement: placement::Placement, #[cfg(target_os = "linux")] #[serde(default)] linux: linux::Options, #[serde(default="default_auto")] appearance: String, palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale")] scale: u16, #[serde(default, rename="sizePreset")] size_preset: Option<String>, #[serde(default, rename="fineTune")] fine_tune: Option<f64>, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default)] taskbar: TaskbarSettings }
 #[derive(Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all="lowercase")]
 pub(crate) enum Shape { #[default] Portrait, Landscape, Square, Circle, Pill }
 fn default_auto() -> String { "auto".into() }
 fn default_fit_height() -> bool { true } fn default_scale() -> u16 { 100 } fn default_position() -> String { "Top right".into() }
-impl Default for Settings { fn default() -> Self { Self { provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
+impl Default for Settings { fn default() -> Self { Self { provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
 struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32, style: String, theme: String, color_mode: String, dot_count: u8 }
@@ -54,6 +59,17 @@ fn collector(operation: &str, extra: &[String]) -> Result<Value, String> {
 #[tauri::command]
 fn get_runtime_diagnostics() -> Result<Value, String> { collector("doctor", &[]) }
 
+fn quote_if_enabled(settings: Settings, collect: impl FnOnce(&str, &[String]) -> Result<Value, String>) -> Result<Value, String> {
+    if !settings.quote_enabled { return Ok(json!({"status":"disabled","cards":[]})); }
+    let mode = settings.quote_mode;
+    if !["qotd","born","died","on-this-day","mixed"].contains(&mode.as_str()) { return Err("Unknown quote mode".into()); }
+    collect("quote", &["--json".into(),"--mode".into(),mode])
+}
+#[tauri::command]
+async fn get_quote() -> Result<Value, String> {
+    let settings = settings_window::current();
+    tauri::async_runtime::spawn_blocking(move || quote_if_enabled(settings, collector)).await.map_err(|_| "Quote worker unavailable".to_string())?
+}
 fn refresh() -> Result<(), String> { collector("write", &[]).map(|_| ()) }
 #[tauri::command]
 fn get_provider_config() -> Result<Value, String> { collector("provider-config", &[]) }
@@ -106,8 +122,11 @@ fn snapshot_rendered(generated_at: String) {
 fn get_snapshot() -> Value { json!({"snapshot": read_snapshot()}) }
 #[tauri::command]
 fn refresh_now(app: tauri::AppHandle) -> Result<(), String> { refresh()?; emit_snapshot(&app); Ok(()) }
+fn initial_settings() -> Settings {
+    Settings { featured_provider: Some("auto".into()), ..Settings::default() }
+}
 #[tauri::command]
-fn load_settings() -> Settings { fs::read(settings_path()).ok().map(|data| parse_settings(&data)).unwrap_or_default() }
+fn load_settings() -> Settings { fs::read(settings_path()).ok().map(|data| parse_settings(&data)).unwrap_or_else(initial_settings) }
 
 // Recover persisted fields independently; IPC deserialization remains strict.
 fn parse_settings(data: &[u8]) -> Settings {
@@ -280,12 +299,33 @@ async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> 
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint,settings_window::open_settings,settings_window::finish_settings,settings_window::preview_settings,placement::get_placement_monitors,placement::capture_position]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if webview.label()=="main" && payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); settings_window::initialize(); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=settings_window::current(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } shape_region::request(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }) { shape_region::request(&close_window); } if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } placement::watch(app.handle().clone()); #[cfg(debug_assertions)] settings_window::start_soak(app.handle().clone()); #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_quote,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint,settings_window::open_settings,settings_window::finish_settings,settings_window::preview_settings,placement::get_placement_monitors,placement::capture_position]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if webview.label()=="main" && payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); settings_window::initialize(); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=settings_window::current(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } shape_region::request(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }) { shape_region::request(&close_window); } if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } placement::watch(app.handle().clone()); #[cfg(debug_assertions)] settings_window::start_soak(app.handle().clone()); #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
 }
 
 #[cfg(test)]
 mod settings_tests {
     use super::*;
+    #[test]
+    fn quote_disabled_never_starts_collector() {
+        let result = quote_if_enabled(Settings::default(), |_, _| panic!("Disabled quote started collector/network"));
+        assert_eq!(result.unwrap()["status"], "disabled");
+    }
+    #[test]
+    fn provider_layout_migration_and_round_trip() {
+        assert_eq!(initial_settings().featured_provider.as_deref(), Some("auto"));
+        let legacy = parse_settings(b"{}");
+        assert!(legacy.featured_provider.is_none());
+        assert!(legacy.provider_order.is_empty());
+        assert!(!legacy.reactor_motion);
+        let value = br#"{"providerOrder":["gemini","claude"],"hiddenProviders":["codex"],"featuredProvider":"claude","featuredPosition":"top","reactorMotion":true}"#;
+        let settings = parse_settings(value);
+        let restored = parse_settings(&serde_json::to_vec(&settings).unwrap());
+        assert_eq!(restored.provider_order, vec!["gemini", "claude"]);
+        assert_eq!(restored.hidden_providers, vec!["codex"]);
+        assert_eq!(restored.featured_provider.as_deref(), Some("claude"));
+        assert_eq!(restored.featured_position.as_deref(), Some("top"));
+        assert!(restored.reactor_motion);
+    }
     #[test]
     fn provider_colors_migrate_and_round_trip() {
         assert!(parse_settings(b"{}").provider_colors.is_empty());

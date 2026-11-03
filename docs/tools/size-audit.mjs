@@ -8,8 +8,8 @@ try {
   await b.navigate('/?sample', 'window.__AI_USAGE_DEMO__');
   const themes = await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
   const rows = [];
-  for (const shape of shapes) for (const theme of themes) for (const sizePreset of Object.keys(sizePresets)) for (const count of [0,1,3,6]) {
-    const settings = normalizeSize({shape,theme,sizePreset,fineTune:100});
+  for (const quoteEnabled of [false,true]) for (const shape of shapes) for (const theme of themes) for (const sizePreset of Object.keys(sizePresets)) for (const count of [0,1,3,6]) {
+    const settings = normalizeSize({shape,theme,sizePreset,fineTune:100,quoteEnabled});
     const factor = settings.scale / 100;
     const width = widgetWidth(settings,count)*factor, height = widgetHeight(settings,count)*factor;
     await b.cdp('Emulation.setDeviceMetricsOverride',{width:Math.round(width),height:Math.ceil(height)+100,deviceScaleFactor:1,mobile:false});
@@ -25,12 +25,12 @@ try {
       return {width:rect.width,height:rect.height,cards:[...document.querySelectorAll('.provider-card,.no-data')].map(el=>el.getBoundingClientRect().height)};
     })()`);
     // Grid themes redistribute the same provider budget over two columns.
-    const grid = ['brutalist','circular-rings'].includes(theme) && count > 0;
+    const grid = ['brutalist','circular-rings','reactor'].includes(theme) && count > 0;
     const expectedCard = grid
       ? (count * 210 - (theme === 'brutalist' ? 10 : Math.ceil(count/2)*10)) / Math.ceil(count/2) * factor
       : 200 * factor;
     const error = Math.max(Math.abs(width-measured.width),Math.abs(height-measured.height),...(shape==='portrait'?measured.cards.map(h=>Math.abs(h-expectedCard)):[]));
-    rows.push({shape,theme,sizePreset,providers:count,width:measured.width,height:measured.height,providerHeight:measured.cards[0],expectedWidth:width,expectedHeight:height,error});
+    rows.push({quoteEnabled,shape,theme,sizePreset,providers:count,width:measured.width,height:measured.height,providerHeight:measured.cards[0],expectedWidth:width,expectedHeight:height,error});
   }
   console.table(rows);
   const failures=rows.filter(r=>r.error>2);

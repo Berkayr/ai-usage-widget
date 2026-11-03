@@ -7,7 +7,15 @@ try {
   const check=await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)};
     assert(!$('#status').textContent,'Initialization: '+$('#status').textContent);
-    assert(document.querySelectorAll('[data-category]').length===6,'Categories');
+    assert(document.querySelectorAll('[data-category]').length===7,'Categories');
+    $('[data-category=quote]').click();
+    assert(!$('#quote-enabled').checked,'Quote off by default');
+    assert($('#category-quote').textContent.includes('Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.'),'Quote disclosure');
+    $('#quote-enabled').click();
+    $('#quote-mode').value='mixed';$('#quote-mode').dispatchEvent(new Event('change'));
+    $('#quote-navigation').click();
+    $('#save').click();await new Promise(r=>setTimeout(r,50));
+    $('#quote-enabled').click();$('#revert').click();assert($('#quote-enabled').checked&&$('#quote-mode').value==='mixed'&&!$('#quote-navigation').checked,'Quote save/revert');
     $('[data-category=appearance]').click();
     $('[data-theme="dot-matrix"]').click();
     assert($('#palette-grid .palette-option i'),'Palette colors');
@@ -32,6 +40,23 @@ try {
     $('[data-theme="terminal"]').click();$('#revert').click();assert($('[data-theme="dot-matrix"]').getAttribute('aria-pressed')==='true','Revert theme');
     $('[data-category=layout]').click();
     assert(document.querySelectorAll('[data-shape]').length===5,'Five shapes');
+    const order=()=>[...document.querySelectorAll('[data-layout-provider]')].map(el=>el.dataset.layoutProvider);
+    const original=order();
+    document.querySelector('[data-layout-provider] button:last-child').click();
+    assert(order()[1]===original[0],'Keyboard provider reorder');
+    const first=document.querySelector('[data-layout-provider]'),last=document.querySelector('[data-layout-provider]:last-child');
+    const transfer=new DataTransfer();first.dispatchEvent(new DragEvent('dragstart',{dataTransfer:transfer}));last.dispatchEvent(new DragEvent('drop',{dataTransfer:transfer,cancelable:true}));
+    assert(order().at(-1)===first.dataset.layoutProvider,'Drag provider reorder');
+    document.querySelector('[data-layout-provider] input').click();
+    $('#featured-provider').value=original[0];$('#featured-provider').dispatchEvent(new Event('change'));
+    $('#featured-position').value='top';$('#featured-position').dispatchEvent(new Event('change'));
+    $('#reactor-motion').click();
+    $('#save').click();await new Promise(r=>setTimeout(r,50));
+    const savedOrder=order().join(',');
+    $('#featured-provider').value='none';$('#featured-provider').dispatchEvent(new Event('change'));
+    document.querySelector('[data-layout-provider] button:last-child').click();$('#revert').click();
+    assert(order().join(',')===savedOrder&&$('#featured-provider').value===original[0]&&$('#featured-position').value==='top'&&$('#reactor-motion').checked,'Layout save/revert');
+
     $('[data-shape=landscape]').click();assert($('[data-size=Medium] small').textContent==='680 × 340 px','Landscape dimensions');assert($('#fit-height').disabled,'Fixed shape fit-height');
     $('#save').click();await new Promise(r=>setTimeout(r,50));
     $('[data-shape=square]').click();assert($('[data-size=Medium] small').textContent==='340 × 340 px','Square dimensions');

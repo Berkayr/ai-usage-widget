@@ -1,3 +1,5 @@
+import { auditLayoutVariants } from './layout-variants.mjs';
+import { auditQuotes } from './quote-check.mjs';
 // Measure signature layouts on the production renderer; all inputs are fictional.
 import { writeFile } from 'node:fs/promises';
 import { browser } from './browser-harness.mjs';
@@ -41,7 +43,7 @@ try {
         if(shape==='circle') {check(document.querySelectorAll('.dial-track').length===(${count}===1?2:Math.min(3,${count})),'Dial tracks');check(document.querySelector('.dial-number').textContent==='100%','Highest usage');}
         if(shape==='circle') {
           const value=document.querySelector('.dial-value'),pattern=document.querySelector('.dial-pattern'),number=document.querySelector('.dial-number');
-          const expected={system:[6,'round',null,800],brutalist:[12,'butt',null,900],'circular-rings':[13,'round',null,700],'dot-matrix':[7,'round','.1 3',800],'retro-lcd':[9,'butt','1.3 .7',500],terminal:[4,'butt','1 1',400],'frosted-glass':[8,'round',null,800],'minimal-pace':[2,'butt',null,300],'compact-strip':[5,'square',null,800]}[theme];
+          const expected={reactor:[9,'butt','9 1',600],system:[6,'round',null,800],brutalist:[12,'butt',null,900],'circular-rings':[13,'round',null,700],'dot-matrix':[7,'round','.1 3',800],'retro-lcd':[9,'butt','1.3 .7',500],terminal:[4,'butt','1 1',400],'frosted-glass':[8,'round',null,800],'minimal-pace':[2,'butt',null,300],'compact-strip':[5,'square',null,800]}[theme];
           metrics.circleSignature={width:parseFloat(getComputedStyle(value).strokeWidth),cap:getComputedStyle(value).strokeLinecap,pattern:pattern.getAttribute('stroke-dasharray'),weight:Number(getComputedStyle(number).fontWeight)};
           check(JSON.stringify(Object.values(metrics.circleSignature))===JSON.stringify(expected),'Circle theme signature');
           check(!document.querySelector('.dial-legend'),'Center list removed');
@@ -210,4 +212,9 @@ try {
   await writeFile('docs/tools/theme-identity-results.json',JSON.stringify({rows,failures,similarityWarnings},null,2)+'\n');
   console.log(`${rows.length} theme/size/provider/appearance combinations; ${failures.length} identity failures`);
   if(failures.length){console.table(failures);process.exitCode=1;}
-} finally {await b.close();}
+  const layoutFailures=await auditLayoutVariants(b);console.log('Layout variants:',layoutFailures);if(layoutFailures.length)process.exitCode=1;
+  await b.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+  await b.evaluate(`(async()=>{await window.__AI_USAGE_DEMO__.setSettings({theme:'reactor',shape:'circle',reactorMotion:true});if(getComputedStyle(document.querySelector('.reactor-core')).animationName!=='none')throw Error('Reduced motion');await window.__AI_USAGE_DEMO__.setSettings({reactorMotion:false});})()`);
+  await b.cdp('Emulation.setEmulatedMedia',{features:[]});
+  await auditQuotes(b);
+} finally { await b.close(); }

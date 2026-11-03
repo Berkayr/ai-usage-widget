@@ -54,3 +54,13 @@ test('round dimensions and per-widget selection',async()=>{
  assert.deepEqual(widgetProviders(providers,['4','5']).map(p=>p.id),['4','5']);
  assert.deepEqual(widgetProviders(providers,[]),[]);
 });
+
+
+test('quote off preserves dimensions; portrait adds exactly 200px',()=>{
+ for(const shape of ['portrait','landscape','square','circle','pill']) for(const theme of ['system','compact-strip','brutalist']) for(const count of [0,1,3,6]) {
+  const base={shape,theme};
+  assert.equal(widgetWidth({...base,quoteEnabled:false},count),widgetWidth(base,count));
+  assert.equal(widgetHeight({...base,quoteEnabled:false},count),widgetHeight(base,count));
+  assert.equal(widgetHeight({...base,quoteEnabled:true},count),widgetHeight(base,count)+(shape==='portrait'?200:0));
+ }
+});
