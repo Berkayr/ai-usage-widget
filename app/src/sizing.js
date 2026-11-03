@@ -14,7 +14,7 @@ export function normalizeSize(value = {}) {
   }
   if (!Number.isFinite(fineTune)) fineTune = 100;
   fineTune = Math.max(50, Math.min(150, fineTune));
-  return {...value, shape:normalizeShape(value.shape), sizePreset, fineTune, scale:sizePresets[sizePreset]*fineTune/100};
+  return {...value, shape:normalizeShape(value.shape), sizePreset, fineTune, scale:Math.max(10, Math.min(300, sizePresets[sizePreset]*fineTune/100))};
 }
 export function widgetWidth(settings, count = 1) {
   if (settings.shape === 'landscape') return 680;

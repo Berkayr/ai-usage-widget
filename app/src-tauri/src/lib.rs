@@ -25,14 +25,22 @@ pub(crate) struct Settings {
     #[serde(rename="hiddenProviders")] hidden_providers: Vec<String>,
     #[serde(rename="featuredProvider")] featured_provider: Option<String>,
     #[serde(rename="featuredPosition")] featured_position: Option<String>,
-    #[serde(rename="reactorMotion")] reactor_motion: bool, #[serde(rename="quoteEnabled")] quote_enabled: bool, #[serde(rename="quoteMode")] quote_mode: String, #[serde(default="default_quote_position", rename="quotePosition")] quote_position: String, #[serde(rename="quoteNavigation")] quote_navigation: bool, #[serde(default, rename="providerColors")] provider_colors: std::collections::BTreeMap<String,String>, #[serde(default, rename="widgetProviders")] widget_providers: Option<Vec<String>>, #[serde(default, rename="providerPreview")] provider_preview: Option<Vec<String>>, #[serde(default, rename="placementEditing")] placement_editing: bool, theme: String, #[serde(default)] shape: Shape, #[serde(rename="colorMode")] color_mode: String, #[serde(rename="dotCount")] dot_count: u8, #[serde(default, rename="matchPhysicalSize")] match_physical_size: bool, #[serde(rename="accentEdge")] accent_edge: String, #[serde(default="default_fit_height", rename="lockPosition")] lock_position: bool, #[serde(default)] placement: placement::Placement, #[cfg(target_os = "linux")] #[serde(default)] linux: linux::Options, #[serde(default="default_auto")] appearance: String, palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale")] scale: u16, #[serde(default, rename="sizePreset")] size_preset: Option<String>, #[serde(default, rename="fineTune")] fine_tune: Option<f64>, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default)] taskbar: TaskbarSettings }
+    #[serde(rename="reactorMotion")] reactor_motion: bool, #[serde(rename="quoteEnabled")] quote_enabled: bool, #[serde(rename="quoteMode")] quote_mode: String, #[serde(default="default_quote_position", rename="quotePosition")] quote_position: String, #[serde(rename="quoteNavigation")] quote_navigation: bool, #[serde(default, rename="providerColors")] provider_colors: std::collections::BTreeMap<String,String>, #[serde(default, rename="widgetProviders")] widget_providers: Option<Vec<String>>, #[serde(default, rename="providerPreview")] provider_preview: Option<Vec<String>>, #[serde(default, rename="placementEditing")] placement_editing: bool, theme: String, #[serde(default)] shape: Shape, #[serde(rename="colorMode")] color_mode: String, #[serde(rename="dotCount")] dot_count: u8, #[serde(default, rename="matchPhysicalSize")] match_physical_size: bool, #[serde(rename="accentEdge")] accent_edge: String, #[serde(default="default_fit_height", rename="lockPosition")] lock_position: bool, #[serde(default)] placement: placement::Placement, #[cfg(target_os = "linux")] #[serde(default)] linux: linux::Options, #[serde(default="default_auto")] appearance: String, palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale", deserialize_with="deserialize_scale")] scale: f64, #[serde(default, rename="sizePreset")] size_preset: Option<String>, #[serde(default, rename="fineTune")] fine_tune: Option<f64>, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default)] taskbar: TaskbarSettings }
 #[derive(Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all="lowercase")]
 pub(crate) enum Shape { #[default] Portrait, Landscape, Square, Circle, Pill }
 fn default_auto() -> String { "auto".into() }
-fn default_fit_height() -> bool { true } fn default_scale() -> u16 { 100 } fn default_position() -> String { "Top right".into() }
+fn default_fit_height() -> bool { true } fn default_scale() -> f64 { 100.0 } fn default_position() -> String { "Top right".into() }
 fn default_quote_position() -> String { "bottom".into() }
-impl Default for Settings { fn default() -> Self { Self { provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
+fn normalize_scale(scale: f64) -> f64 {
+    if scale.is_finite() { scale.clamp(10.0, 300.0) } else { default_scale() }
+}
+fn deserialize_scale<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<f64, D::Error> {
+    // JSON encodes non-finite JavaScript numbers as null.
+    Ok(normalize_scale(Option::<f64>::deserialize(deserializer)?.unwrap_or_else(default_scale)))
+}
+
+impl Default for Settings { fn default() -> Self { Self { provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
 struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32, style: String, theme: String, color_mode: String, dot_count: u8 }
@@ -179,10 +187,11 @@ fn current_monitor(window: &tauri::WebviewWindow) -> Result<tauri::Monitor, Stri
 #[tauri::command]
 fn get_monitor_scale(window: tauri::WebviewWindow) -> Result<f64, String> { window.scale_factor().map_err(|e|e.to_string()) }
 #[tauri::command]
-fn resize_widget(window: tauri::WebviewWindow, scale: u16, width_css_px: Option<f64>) -> Result<(), String> {
+fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<f64>) -> Result<(), String> {
+    let scale = normalize_scale(scale) / 100.0;
     #[cfg(target_os = "linux")]
-    if linux::layered() { return linux::resize_layer(&window, Some((width_css_px.unwrap_or(340.0 * scale.clamp(10,300) as f64 / 100.0).clamp(100.0, 10000.0)).round() as i32), None); }
-    let scale=scale.clamp(10,300) as f64/100.0; let factor=window.scale_factor().map_err(|e|e.to_string())?;
+    if linux::layered() { return linux::resize_layer(&window, Some((width_css_px.unwrap_or(340.0 * scale).clamp(100.0, 10000.0)).round() as i32), None); }
+    let factor=window.scale_factor().map_err(|e|e.to_string())?;
     let old=window.inner_size().map_err(|e|e.to_string())?; let width=(width_css_px.unwrap_or(340.0*scale).clamp(100.0,10000.0)*factor).round() as u32;
     window.set_size(tauri::PhysicalSize::new(width,old.height)).map_err(|e|e.to_string())?;
     let settings=settings_window::current(); placement::apply(&window, &settings)?;
@@ -361,7 +370,7 @@ mod settings_tests {
             r#"{"linux":{"monitor":"HDMI-A-1"},"scale":150}"#,
         ).unwrap();
         assert!(settings.linux.monitor.as_ref().unwrap().matches(1, "HDMI-A-1"));
-        assert_eq!(settings.scale, 150);
+        assert_eq!(settings.scale, 150.0);
         assert_eq!(settings.palette, Settings::default().palette);
         assert_eq!(settings.widget_opacity, 100);
         assert_eq!(settings.background_opacity, 100);
@@ -382,6 +391,46 @@ mod settings_tests {
 mod settings_recovery_tests {
     use super::*;
     #[test]
+    fn fractional_scale_round_trip_and_recovery() {
+        for scale in [102.5, 61.5, 82.0] {
+            let value = json!({"scale":scale});
+            let settings: Settings = serde_json::from_value(value.clone()).unwrap();
+            assert_eq!(settings.scale, scale);
+            let data = serde_json::to_vec(&settings).unwrap();
+            assert_eq!(parse_settings(&data).scale, scale);
+            let mut damaged = value;
+            damaged["theme"] = json!(false);
+            assert_eq!(parse_settings(&serde_json::to_vec(&damaged).unwrap()).scale, scale);
+        }
+        assert_eq!(serde_json::from_str::<Settings>(r#"{"scale":82}"#).unwrap().scale, 82.0);
+    }
+
+    #[test]
+    fn scale_limits_and_non_finite_values() {
+        for (input, expected) in [(0.0,10.0), (375.0,300.0), (f64::NAN,100.0), (f64::INFINITY,100.0), (f64::NEG_INFINITY,100.0)] {
+            assert_eq!(normalize_scale(input), expected);
+        }
+        for (value, expected) in [(json!(0),10.0), (json!(375),300.0), (Value::Null,100.0)] {
+            let settings: Settings = serde_json::from_value(json!({"scale":value})).unwrap();
+            assert_eq!(settings.scale, expected);
+        }
+        assert!(serde_json::from_str::<Settings>(r#"{"scale":"invalid"}"#).is_err());
+    }
+
+    #[test]
+    fn frontend_scale_matrix_deserializes_without_loss() {
+        let rows: Vec<Value> = serde_json::from_str(include_str!("../../../docs/tools/fixtures/scale-settings.json")).unwrap();
+        assert_eq!(rows.len(), 30);
+        for row in rows {
+            let settings: Settings = serde_json::from_value(row.clone()).unwrap();
+            assert_eq!(settings.scale, row["scale"].as_f64().unwrap());
+            assert_eq!(settings.fine_tune, row["fineTune"].as_f64());
+            assert_eq!(settings.size_preset.as_deref(), row["sizePreset"].as_str());
+            assert_eq!(parse_settings(&serde_json::to_vec(&settings).unwrap()).scale, settings.scale);
+        }
+    }
+
+    #[test]
     fn legacy_complete_file_preserves_values_without_theme() {
         let mut old = serde_json::to_value(Settings::default()).unwrap();
         for key in ["theme", "colorMode", "dotCount", "accentEdge"] { old.as_object_mut().unwrap().remove(key); }
@@ -389,7 +438,7 @@ mod settings_recovery_tests {
         old["placement"]["y_ratio"] = json!(1.0); old["widgetOpacity"] = json!(75);
         #[cfg(target_os="linux")] { old["linux"]["monitor"] = json!("HDMI-A-1"); }
         let settings = parse_settings(&serde_json::to_vec(&old).unwrap());
-        assert_eq!(settings.scale,150); assert_eq!(settings.position,"Free");
+        assert_eq!(settings.scale,150.0); assert_eq!(settings.position,"Free");
         assert_eq!(settings.placement.y_ratio,1.0); assert_eq!(settings.widget_opacity,75);
         assert_eq!(settings.theme,"system");
         #[cfg(target_os="linux")] assert!(settings.linux.monitor.unwrap().matches(0,"HDMI-A-1"));
@@ -397,11 +446,11 @@ mod settings_recovery_tests {
     #[test]
     fn invalid_fields_do_not_discard_valid_siblings() {
         let settings = parse_settings(br#"{"scale":150,"theme":false,"widgetOpacity":"bad","unknown":42,"placement":{"yRatio":1.0,"x_ratio":"bad"},"linux":{"monitor":"HDMI-A-1","margin":"bad"},"taskbar":{"enabled":true,"dotCount":"bad"}}"#);
-        assert_eq!(settings.scale,150); assert_eq!(settings.theme,"system");
+        assert_eq!(settings.scale,150.0); assert_eq!(settings.theme,"system");
         assert_eq!(settings.widget_opacity,100); assert_eq!(settings.placement.y_ratio,1.0);
         assert_eq!(settings.placement.x_ratio,1.0); assert!(settings.taskbar.enabled);
         assert_eq!(settings.taskbar.dot_count,20);
         #[cfg(target_os="linux")] { assert!(settings.linux.monitor.unwrap().matches(0,"HDMI-A-1")); assert_eq!(settings.linux.margin,12); }
-        assert_eq!(parse_settings(b"broken").scale,100);
+        assert_eq!(parse_settings(b"broken").scale,100.0);
     }
 }

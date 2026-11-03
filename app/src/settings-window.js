@@ -1,7 +1,9 @@
+import { orderedProviders } from './provider-layout.js';
+import { hiddenStates } from './themes/dot-matrix/render.js';
 import { layoutControls } from './settings-layout.js';
 import { quotePrivacy } from './quote.js';
 import { providerIds, providerColors, providerColorWarnings } from './themes/shared/identity.js';
-import { normalizeSize, sizePresets, widgetWidth, widgetHeight, shapes, monitorFit } from './sizing.js';
+import { normalizeSize, sizePresets, widgetWidth, widgetHeight, shapes, monitorFit, widgetProviders } from './sizing.js';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -18,7 +20,15 @@ const defaults = { featuredProvider:'auto', featuredPosition:'bottom', reactorMo
 let draft = structuredClone(defaults), saved, providers, savedProviders, autostart=false, savedAutostart=false, closing=false, saving=false, positionBefore=null;
 const abort = new AbortController(), stops = [];
 let disposed=false, previewRunning=false, previewPending=null;
-function error(message) { $('#status').textContent=String(message); }
+function errorText(value) { return value instanceof Error ? value.message : typeof value === 'object' ? JSON.stringify(value) : String(value); }
+function error(message) { $('#status').textContent=errorText(message); }
+async function settingsInvoke(command, args) {
+  try { return await invoke(command, args); }
+  catch (cause) {
+    const failure=new Error(`Settings command ${command} failed: ${errorText(cause)}`);
+    error(failure);throw failure;
+  }
+}
 let previewWork = Promise.resolve();
 function preview() {
   // One worker drains the latest value; closing/reverting waits for the drain.
@@ -26,7 +36,7 @@ function preview() {
   if (previewRunning) return previewWork;
   previewRunning=true;
   previewWork=(async()=> {
-    try { while(previewPending && !disposed) { const value=previewPending; previewPending=null; if(!sample) await invoke('preview_settings',{settings:value}); } }
+    try { while(previewPending && !disposed) { const value=previewPending; previewPending=null; if(!sample) await settingsInvoke('preview_settings',{settings:value}); } }
     catch(e) { error(e); throw e; } finally { previewRunning=false; }
   })();
   return previewWork;
@@ -111,9 +121,15 @@ document.querySelectorAll('[data-taskbar-provider]').forEach(el=>el.onchange=()=
 document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{draft.sizePreset=b.dataset.size;update();});
 $('#start-at-login').onchange=event=>{autostart=event.target.checked;mark();};
 function renderProviders() {if(!providerConfig)return;const config=structuredClone(providerConfig);for(const [id,p]of Object.entries(config.providers))p.enabled=providers.includes(id);config.initialized=true;mountProviders($('#provider-settings'),config,async()=>{});$('#provider-settings .provider-consent-actions').hidden=true;$('#provider-settings').onchange=()=>{providers=[...$('#provider-settings').querySelectorAll('input')].flatMap((el,i)=>el.checked?[Object.keys(config.providers).filter(id=>id in config.disclosures)[i]]:[]);renderControls();mark();preview().catch(()=>{});};}
+let snapshotProviders=null;
 let providerConfig;let autostartAvailable=true;let desktopPlatform='linux';
 let geometry={monitors:[{name:'Demo display',width:1920,height:1080,primary:true,scale:1}],widgetWidth:340,widgetHeight:600};
-function visibleProviderCount(){return Math.max(1,(providers || []).filter(id=>!(draft.hiddenProviders || []).includes(id)).length);}
+function visibleProviderCount(){
+  const available=snapshotProviders ?? (providers || []).map(id=>({id}));
+  const visible=orderedProviders(available.filter(p=>(providers || []).includes(p.id)&&!hiddenStates.has(String(p.state).toUpperCase())),draft);
+  const selected=['circle','pill'].includes(draft.shape)?widgetProviders(visible,draft.widgetProviders):visible;
+  return Math.max(1,draft.shape==='square'?Math.min(4,selected.length):selected.length);
+}
 function selectedMonitor(){return geometry.monitors.find(m=>m.name===draft.placement.monitor)||geometry.monitors.find(m=>m.primary)||geometry.monitors[0];}
 function renderMap() {
   const monitor=selectedMonitor();
@@ -136,7 +152,7 @@ function renderMap() {
 function beginPlacement(){if(!positionBefore){positionBefore=structuredClone({placement:draft.placement,position:draft.position,lockPosition:draft.lockPosition});if(draft.position!=='Free'){draft.placement.xRatio=draft.position.endsWith('left')?0:1;draft.placement.yRatio=draft.position.startsWith('Top')?0:1;}draft.placementEditing=true;draft.lockPosition=false;mapMoved=false;}if(!draft.placement.monitor)draft.placement.monitor=selectedMonitor()?.name??null;}
 $('#place').onclick=()=>{beginPlacement();update();};
 function cancelPlacement(){if(positionBefore)Object.assign(draft,structuredClone(positionBefore));positionBefore=null;draft.placementEditing=false;mapMoved=false;update();}
-async function savePosition(){if(!sample && !mapMoved && !geometry.layerShell){try{draft.placement=normalizePlacement(await invoke('capture_position'));}catch(e){error(e);return;}}draft.position='Free';draft.lockPosition=true;draft.placementEditing=false;positionBefore=null;mapMoved=false;update();await save();}
+async function savePosition(){if(!sample && !mapMoved && !geometry.layerShell){try{draft.placement=normalizePlacement(await settingsInvoke('capture_position'));}catch(e){error(e);return;}}draft.position='Free';draft.lockPosition=true;draft.placementEditing=false;positionBefore=null;mapMoved=false;update();await save();}
 $('#save-position').onclick=savePosition;$('#cancel-position').onclick=cancelPlacement;
 let drag=null,mapMoved=false;
 $('#map-widget').addEventListener('pointerdown',event=>{if(!positionBefore)return;event.preventDefault();const rect=event.currentTarget.getBoundingClientRect();drag={x:event.clientX-rect.left,y:event.clientY-rect.top};event.currentTarget.setPointerCapture(event.pointerId);},{signal:abort.signal});
@@ -144,7 +160,7 @@ function snap(value,available){value=Math.max(0,Math.min(available,value));if(dr
 $('#map-widget').addEventListener('pointermove',event=>{if(!drag)return;const rect=$('#monitor-map').getBoundingClientRect(),monitor=selectedMonitor();const aw=Math.max(0,monitor.width-geometry.widgetWidth),ah=Math.max(0,monitor.height-geometry.widgetHeight);draft.position='Free';draft.placement.xRatio=aw?snap((event.clientX-rect.left-drag.x)/rect.width*monitor.width,aw)/aw:0;draft.placement.yRatio=ah?snap((event.clientY-rect.top-drag.y)/rect.height*monitor.height,ah)/ah:0;mapMoved=true;mark();renderMap();preview().catch(()=>{});},{signal:abort.signal});
 for(const type of ['pointerup','pointercancel','lostpointercapture'])$('#map-widget').addEventListener(type,()=>drag=null,{signal:abort.signal});
 $('#map-widget').onkeydown=event=>{if(!positionBefore||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;event.preventDefault();const m=selectedMonitor();const key=['ArrowLeft','ArrowRight'].includes(event.key)?'xRatio':'yRatio';const available=key==='xRatio'?m.width-geometry.widgetWidth:m.height-geometry.widgetHeight;const delta=['ArrowLeft','ArrowUp'].includes(event.key)?-8:8;draft.position='Free';draft.placement[key]=Math.max(0,Math.min(1,draft.placement[key]+delta/Math.max(1,available)));mapMoved=true;update();};
-async function refreshMonitors(){if(!sample)geometry=await invoke('get_placement_monitors');for(const id of ['placement-monitor','fallback-monitor','linux-monitor']){const el=$(`#${id}`),value=get(bindings[id]);el.replaceChildren(new Option('Primary / Auto',''));for(const m of geometry.monitors)el.add(new Option(m.name,m.name));if(value&&!geometry.monitors.some(m=>m.name===value))el.add(new Option(`${value} (disconnected)`,value));el.value=value??'';}renderMap();}
+async function refreshMonitors(){if(!sample)geometry=await settingsInvoke('get_placement_monitors');for(const id of ['placement-monitor','fallback-monitor','linux-monitor']){const el=$(`#${id}`),value=get(bindings[id]);el.replaceChildren(new Option('Primary / Auto',''));for(const m of geometry.monitors)el.add(new Option(m.name,m.name));if(value&&!geometry.monitors.some(m=>m.name===value))el.add(new Option(`${value} (disconnected)`,value));el.value=value??'';}renderMap();}
 async function save(){
   if(saving)return false;
   if(positionBefore){error('Save or cancel placement first.');return false;}
@@ -153,9 +169,9 @@ async function save(){
   try {
     await preview();
     if(!sample){
-      if(JSON.stringify(chosen)!==JSON.stringify(savedProviders)){await invoke('configure_providers',{providers:chosen});savedProviders=structuredClone(chosen);invoke('refresh_now').catch(error);}
-      if(login!==savedAutostart){await invoke('set_autostart',{enabled:login});savedAutostart=login;}
-      await invoke('save_settings',{settings:value});
+      if(JSON.stringify(chosen)!==JSON.stringify(savedProviders)){await settingsInvoke('configure_providers',{providers:chosen});savedProviders=structuredClone(chosen);settingsInvoke('refresh_now').catch(error);}
+      if(login!==savedAutostart){await settingsInvoke('set_autostart',{enabled:login});savedAutostart=login;}
+      await settingsInvoke('save_settings',{settings:value});
     }
     saved=value;savedProviders=chosen;savedAutostart=login;
     await preview();$('#close-prompt').hidden=true;error('');mark();return true;
@@ -167,11 +183,11 @@ $('#save').onclick=save;$('#revert').onclick=()=>{draft=structuredClone(saved);p
 async function close(){
   if(closing)return;
   closing=true;
-  try {await previewWork;if(!sample)await invoke('finish_settings');else window.close();}
+  try {await previewWork;if(!sample)await settingsInvoke('finish_settings');else window.close();}
   catch(e){error(e);}
   finally{closing=false;}
 }
-$('#close-save').onclick=async()=>{if(await save())await close();};$('#close-discard').onclick=async()=>{draft=structuredClone(saved);providers=structuredClone(savedProviders);await preview();await close();};$('#close-cancel').onclick=()=>$('#close-prompt').hidden=true;
+$('#close-save').onclick=async()=>{if(await save())await close();};$('#close-discard').onclick=async()=>{try{draft=structuredClone(saved);providers=structuredClone(savedProviders);await preview();await close();}catch(e){error(e);}};$('#close-cancel').onclick=()=>$('#close-prompt').hidden=true;
 window.addEventListener('keydown',event=>{if(event.ctrlKey&&event.key.toLowerCase()==='s'){event.preventDefault();save();}if(event.key==='Escape')$('#close-prompt').hidden=true;},{signal:abort.signal});
 mode.addEventListener('change',renderControls,{signal:abort.signal});
 window.addEventListener('pagehide',()=>{disposed=true;abort.abort();stops.splice(0).forEach(stop=>stop());},{once:true});
@@ -180,13 +196,14 @@ async function loadSession(){
   panel.inert=true;$('#save').disabled=true;$('#revert').disabled=true;$('#close-prompt').hidden=true;
   positionBefore=null;mapMoved=false;drag=null;previewPending=null;error('');
   await previewWork;
-  draft={...defaults,...(sample?{}:await invoke('load_settings'))};draft.providerPreview=null;draft.placement=normalizePlacement(draft.placement||{});for(const key of ['taskbar','linux','placement'])draft[key]={...defaults[key],...draft[key]};if(!themes.some(t=>t.id===draft.theme))draft.theme='system';const manifest=themes.find(t=>t.id===draft.theme);if(!manifest.palettes[draft.palette])draft.palette=Object.keys(manifest.palettes)[0];
+  draft={...defaults,...(sample?{}:await settingsInvoke('load_settings'))};draft.providerPreview=null;draft.placement=normalizePlacement(draft.placement||{});for(const key of ['taskbar','linux','placement'])draft[key]={...defaults[key],...draft[key]};if(!themes.some(t=>t.id===draft.theme))draft.theme='system';const manifest=themes.find(t=>t.id===draft.theme);if(!manifest.palettes[draft.palette])draft.palette=Object.keys(manifest.palettes)[0];
   draft=normalizeSize(draft);
   saved=structuredClone(draft);
   if(!sample){
-    try {providerConfig=await invoke('get_provider_config');} catch(e){providerConfig={initialized:true,providers:{},disclosures:{},detected:{}};error(`Provider settings unavailable: ${e}`);}
-    try {autostart=await invoke('get_autostart');} catch(e){autostartAvailable=false;$('#autostart-status').hidden=false;$('#autostart-status').textContent=String(e);}
-    try {const desktop=await invoke('get_desktop_info');desktopPlatform=desktop.platform;$('#desktop-layer').hidden=!desktop.layerShell;$('#desktop-layer-unavailable').hidden=desktop.layerShell;sections.desktop.querySelector('#linux-settings').hidden=desktop.platform!=='linux';sections.taskbar.querySelector('#taskbar-settings').hidden=desktop.platform!=='windows';}catch(e){error(e);}
+    snapshotProviders=(await settingsInvoke('get_snapshot')).snapshot?.providers ?? [];
+    try {providerConfig=await settingsInvoke('get_provider_config');} catch(e){providerConfig={initialized:true,providers:{},disclosures:{},detected:{}};error(`Provider settings unavailable: ${e}`);}
+    try {autostart=await settingsInvoke('get_autostart');} catch(e){autostartAvailable=false;$('#autostart-status').hidden=false;$('#autostart-status').textContent=String(e);}
+    try {const desktop=await settingsInvoke('get_desktop_info');desktopPlatform=desktop.platform;$('#desktop-layer').hidden=!desktop.layerShell;$('#desktop-layer-unavailable').hidden=desktop.layerShell;sections.desktop.querySelector('#linux-settings').hidden=desktop.platform!=='linux';sections.taskbar.querySelector('#taskbar-settings').hidden=desktop.platform!=='windows';}catch(e){error(e);}
   }
   else providerConfig={initialized:true,providers:{claude:{enabled:true},codex:{enabled:true},gemini:{enabled:false}},disclosures:{claude:'Read local quota metadata.',codex:'Read local quota metadata.',gemini:'Read local quota metadata.'},detected:{}};
   providers=Object.entries(providerConfig.providers).filter(([,p])=>p.enabled&&providerConfig.initialized).map(([id])=>id);savedProviders=structuredClone(providers);savedAutostart=autostart;$('#start-at-login').checked=autostart;$('#start-at-login').disabled=!autostartAvailable;
@@ -194,6 +211,6 @@ async function loadSession(){
 }
 try {
   await loadSession();
-  if(!sample){await subscription(getCurrentWindow().onCloseRequested(event=>{event.preventDefault();if(closing||panel.inert)return;if(changed()){$('#close-prompt').hidden=false;$('#close-save').focus();}else close();}));await subscription(listen('settings-reopened',()=>loadSession().catch(error)));await subscription(listen('monitors-changed',()=>refreshMonitors().catch(error)));await subscription(listen('placement-action',event=>event.payload==='save'?savePosition():cancelPlacement()));invoke('get_runtime_diagnostics').then(value=>{$('#runtime-diagnostics').textContent=`Python ${value.paths.python_version} (${value.paths.runtime_source})`;}).catch(error);}
+  if(!sample){await subscription(getCurrentWindow().onCloseRequested(event=>{event.preventDefault();if(closing||panel.inert)return;if(changed()){$('#close-prompt').hidden=false;$('#close-save').focus();}else close();}));await subscription(listen('snapshot',event=>{snapshotProviders=event.payload.snapshot?.providers ?? [];renderControls();}));await subscription(listen('settings-reopened',()=>loadSession().catch(error)));await subscription(listen('monitors-changed',()=>refreshMonitors().catch(error)));await subscription(listen('placement-action',event=>event.payload==='save'?savePosition():cancelPlacement()));settingsInvoke('get_runtime_diagnostics').then(value=>{$('#runtime-diagnostics').textContent=`Python ${value.paths.python_version} (${value.paths.runtime_source})`;}).catch(error);}
 }catch(e){error(e);}
 window.__SETTINGS_READY__=true;

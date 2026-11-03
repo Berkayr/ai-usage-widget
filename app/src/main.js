@@ -186,7 +186,7 @@ function draw(snapshot, noData = false) {
     $('#widget').style.setProperty('--shape-rows', settings.shape === 'square' ? (count > 2 ? 2 : 1) : (count > 3 ? 2 : 1));
     updateLayoutScale(count);
     const width = widgetWidth(settings,count) * layoutScale / 100 / (settings.matchPhysicalSize ? monitorScale : 1);
-    if (!isSample) invoke('resize_widget', {scale:Math.round(settings.scale),widthCssPx:width}).catch(()=>{});
+    if (!isSample) invoke('resize_widget', {scale:settings.scale,widthCssPx:width}).catch(error=>showToast(String(error)));
     renderQuote($('#quote'),settings,quoteData,()=>draw(currentSnapshot,currentNoData),repairTextContrast);
     updateQuote();
     repairTextContrast($('#widget'));

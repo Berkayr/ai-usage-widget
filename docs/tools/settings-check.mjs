@@ -1,5 +1,6 @@
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { browser } from './browser-harness.mjs';
+const scaleMatrix=JSON.parse(await readFile(new URL('./fixtures/scale-settings.json',import.meta.url),'utf8'));
 const b=await browser();
 try {
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:900,height:680,deviceScaleFactor:1,mobile:false});
@@ -102,10 +103,12 @@ try {
   // This cannot touch native settings, providers, files or OS autostart.
   await b.cdp('Page.addScriptToEvaluateOnNewDocument',{source:`(()=>{
     const callbacks=new Map(),events=new Map();let next=0,disk={theme:'system',palette:'default'};
-    const state=window.__FAKE_NATIVE__={previews:[],saves:[],hidden:0,close:async()=>{for(const [id,event]of events)if(event==='tauri://close-requested')await callbacks.get(id)({event,id,payload:{}});}};
+    const state=window.__FAKE_NATIVE__={previews:[],saves:[],hidden:0,fail:null,close:async()=>{for(const [id,event]of events)if(event==='tauri://close-requested')await callbacks.get(id)({event,id,payload:{}});}};
     window.confirm=()=>{throw Error('Browser confirm is forbidden')};
     window.__TAURI_EVENT_PLUGIN_INTERNALS__={unregisterListener:(_,id)=>events.delete(id)};
     window.__TAURI_INTERNALS__={metadata:{currentWindow:{label:'settings'},currentWebview:{label:'settings'}},transformCallback:callback=>{const id=++next;callbacks.set(id,callback);return id;},invoke:async(cmd,args={})=>{
+      if(state.fail===cmd)throw Error('Synthetic serialization failure: '+cmd);
+      if(cmd==='get_snapshot')return {snapshot:{providers:['claude','codex','gemini','copilot'].map(id=>({id,state:id==='copilot'?'NO_SUBSCRIPTION':'OK'}))}};
       if(cmd==='load_settings')return structuredClone(disk);
       if(cmd==='get_provider_config')return {initialized:true,providers:Object.fromEntries(['claude','codex','gemini','copilot'].map(id=>[id,{enabled:true}])),disclosures:Object.fromEntries(['claude','codex','gemini','copilot'].map(id=>[id,'Synthetic provider'])),detected:{}};
       if(cmd==='get_autostart')return false;
@@ -122,6 +125,45 @@ try {
       throw Error('Unexpected synthetic IPC: '+cmd);
     }};
   })()`});
+  await b.navigate('/?settings','window.__SETTINGS_READY__');
+  console.log(await b.evaluate(`(async()=>{
+    const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
+    $('[data-category=layout]').click();
+    assert($('[data-size=Medium] small').textContent==='340 × 746 px','Fit must exclude unavailable fourth provider');
+    for(const row of ${JSON.stringify(scaleMatrix)}) {
+      $('#scale').value=row.fineTune;$('#scale').dispatchEvent(new Event('input'));
+      $('[data-size="'+row.sizePreset+'"]').click();
+      await new Promise(r=>setTimeout(r,25));
+      const value=native.previews.at(-1);
+      for(const key of ['scale','fineTune','sizePreset','shape'])assert(value[key]===row[key],'Rust fixture mismatch: '+key+' '+JSON.stringify(row));
+    }
+    for(const [preset,expected] of [['Large',102.5],['Small',61.5]]) {
+      $('#scale').value=82;$('#scale').dispatchEvent(new Event('input'));$('[data-size='+preset+']').click();
+      $('#save').click();await new Promise(r=>setTimeout(r,50));
+      assert(native.saves.at(-1).scale===expected,'Fractional save lost precision');
+      await native.reopen();await new Promise(r=>setTimeout(r,30));
+      $('[data-size=Medium]').click();$('#revert').click();await new Promise(r=>setTimeout(r,30));
+      assert(native.previews.at(-1).scale===expected,'Fractional reopen/revert lost precision');
+    }
+    $('[data-size=Medium]').click();
+    for(const command of ['preview_settings','save_settings','finish_settings']) {
+      native.fail=command;$('#status').textContent='';
+      if(command==='preview_settings'){
+        $('[data-size=Large]').click();await new Promise(r=>setTimeout(r,30));
+      }else if(command==='save_settings'){
+        $('#save').click();await new Promise(r=>setTimeout(r,50));
+        assert($('#dirty').textContent==='Unsaved changes','Failed save marked clean');
+      }else{
+        $('#revert').click();await new Promise(r=>setTimeout(r,30));await native.close();await new Promise(r=>setTimeout(r,30));
+        assert(native.hidden===0,'Failed finish hid settings');
+      }
+      assert($('#status').textContent.includes('Synthetic serialization failure: '+command),'Missing readable IPC error: '+command);
+      native.fail=null;
+    }
+    return 'PASS: 30 preset/fine-tune drafts match Rust fixtures, fractional save/reopen/revert, three IPC errors visible, fit excludes unavailable provider';
+  })()`));
+  const errorPng=await b.cdp('Page.captureScreenshot',{format:'png'});
+  await writeFile('docs/tools/settings-error-preview.png',Buffer.from(errorPng.data,'base64'));
   for(const action of ['discard','save']) {
     await b.navigate('/?settings','window.__SETTINGS_READY__');
     console.log(await b.evaluate(`(async()=>{
@@ -142,7 +184,7 @@ try {
       } else {
         window.dispatchEvent(new KeyboardEvent('keydown',{key:'s',ctrlKey:true}));await new Promise(r=>setTimeout(r,50));assert(native.saves.length===1&&native.saves[0].scale===150&&native.saves[0].shape==='square','Ctrl+S failed');assert($('#dirty').textContent==='All changes saved','Saved state');await native.close();await new Promise(r=>setTimeout(r,40));assert(native.hidden===1,'Clean close blocked');
       }
-      const count=native.listenerCount();assert(count===4,'Unexpected initial listener count');
+      const count=native.listenerCount();assert(count===5,'Unexpected initial listener count');
       for(let cycle=0;cycle<4;cycle++){
         await native.reopen();await new Promise(r=>setTimeout(r,50));
         assert($('#dirty').textContent==='All changes saved'&&$('#close-prompt').hidden,'Reopened session not reset');
@@ -151,7 +193,7 @@ try {
         assert(native.listenerCount()===count,'Listeners grew on reopen');
       }
       assert(native.hidden===5,'Reused window failed to hide');
-      return 'PASS: synthetic IPC ${action}, no disk writes on preview, latest-value queue, dirty close, Cancel, Esc, four reopens with four fixed listeners';
+      return 'PASS: synthetic IPC ${action}, no disk writes on preview, latest-value queue, dirty close, Cancel, Esc, four reopens with five fixed listeners';
     })()`));
   }
 }finally{await b.close();}

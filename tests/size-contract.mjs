@@ -76,3 +76,14 @@ test('monitor fit handles panels, DPI and oversize without changing saved fine-t
   assert.equal(value.fineTune,82);
  }
 });
+
+
+test('frontend scale matrix matches the fixture deserialized by Rust',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const fixture=JSON.parse(await readFile(new URL('../docs/tools/fixtures/scale-settings.json',import.meta.url),'utf8'));
+ const expected=Object.keys(sizePresets).flatMap(sizePreset=>[50,79,82,83,97,150].map(fineTune=>normalizeSize({sizePreset,fineTune})));
+ assert.deepEqual(fixture,expected);
+ assert.equal(normalizeSize({sizePreset:'Large',fineTune:82}).scale,102.5);
+ assert.equal(normalizeSize({sizePreset:'Small',fineTune:82}).scale,61.5);
+ assert.equal(normalizeSize({sizePreset:'2X-Large',fineTune:150}).scale,300);
+});

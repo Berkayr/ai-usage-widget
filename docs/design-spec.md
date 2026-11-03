@@ -22,11 +22,19 @@ XS breakpoints scale with these same design units.
 
 Size owns geometry; a theme owns fonts, colors, borders and meter style.
 Five presets multiply all logical dimensions uniformly: Small 75%, Medium 100%,
-Large 150%, X-Large 200%, 2X-Large 250%. Base widths are 255, 340, 510, 680,
+Large 125%, X-Large 200%, 2X-Large 250%. Base widths are 255, 340, 425, 680,
 and 850 CSS pixels. Fine-tune is a multiplier (50–150%, default 100%);
 the wider range preserves legacy 50–300% scales without changing their size.
 Legacy Normal maps to Medium, Huge to X-Large. Other old scales choose the nearest
 preset plus an exact multiplier: 90 becomes Medium × 90%.
+
+Effective scale is a floating-point percentage, bounded to 10–300% at the IPC
+boundary. Preset × fine-tune is capped at 300%; non-finite scale falls back to
+100%. Large × 82% is 102.5% and Small × 82% is 61.5%. Settings files and preview,
+save and resize commands preserve these fractions; only final native pixel
+dimensions are rounded. Settings IPC failures appear in the status line.
+Monitor-fit estimates use snapshot provider states, enabled/hidden filters and
+the same round-widget selection as the widget, excluding unavailable providers.
 
 At Medium, with n = max(1, visible provider count), vertical widgets request
 **width = 340, height = 116 + 210 × n**. The 116px chrome consists of 28px outer
