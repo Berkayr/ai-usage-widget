@@ -137,6 +137,10 @@ PlasmoidItem {
         }
     }
     fullRepresentation: ColumnLayout {
+        Layout.minimumWidth: Kirigami.Units.gridUnit * 22
+        Layout.minimumHeight: Kirigami.Units.gridUnit * 27
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 22
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 27
         implicitWidth: Kirigami.Units.gridUnit * 22
         implicitHeight: Kirigami.Units.gridUnit * 27
         spacing: 10
@@ -198,7 +202,7 @@ PlasmoidItem {
         }
         RowLayout {
             Layout.fillWidth: true; Layout.margins: 12
-            Controls.Label { text: root.age(); opacity: 0.65; Layout.fillWidth: true }
+            Controls.Label { text: root.age(); opacity: 0.65; Layout.fillWidth: true; elide: Text.ElideRight }
             Controls.Button { text: root.refreshing ? "Refreshing…" : "Refresh"; enabled: !root.refreshing; onClicked: root.refresh() }
         }
     }
