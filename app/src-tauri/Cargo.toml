@@ -30,7 +30,7 @@ windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_UI_Wind
 gtk = "0.18"
 # Already used by Tauri/Wry; matching the existing lockfile version.
 webkit2gtk = { version = "=2.0.2", features = ["v2_40"] }
-libloading = "0.7"
+libloading = "0.9"
 
 [profile.release]
 opt-level = "z"
