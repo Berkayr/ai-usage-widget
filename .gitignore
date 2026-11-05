@@ -42,3 +42,18 @@ docs/screenshots/checks/
 # Verified build-time Windows runtime; never commit downloaded binaries
 app/src-tauri/python/
 target-release/
+
+# Reproducible local audit outputs; keep source tools and fixtures
+/docs/tools/circle-sheet-all-ok.png
+/docs/tools/circle-sheet.png
+/docs/tools/featured-sheet.png
+/docs/tools/provider-identity-results.json
+/docs/tools/provider-identity-sheet.png
+/docs/tools/quote-sheet.png
+/docs/tools/settings-error-preview.png
+/docs/tools/settings-preview-dark.png
+/docs/tools/settings-preview-light.png
+/docs/tools/size-audit.json
+/docs/tools/size-sheet.png
+/docs/tools/theme-identity-results.json
+/docs/tools/widget-layout-preview.png
