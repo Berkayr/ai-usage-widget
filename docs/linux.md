@@ -4,7 +4,7 @@ The widget uses Tauri with GTK3/WebKitGTK. Python 3.10+ and the relevant provide
 
 | Desktop | Placement | Panel option | Evidence |
 | --- | --- | --- | --- |
-| KDE Plasma 6 Wayland | GTK3 layer-shell corners; ordinary window fallback without library | [Plasmoid](../integrations/kde-plasmoid/README.md) | Isolated fallback startup checked; native layer-shell and real panel community-tested wanted. |
+| KDE Plasma 6 Wayland | GTK3 layer-shell corners; ordinary window fallback without library | [Plasmoid](../integrations/kde-plasmoid/README.md) | Tested: native layer-shell widget and a 16-minute memory run. Plasmoid checked in plasmoidviewer, not yet on a real panel. |
 | KDE Plasma 6 X11 | Physical work area + scaled margins; utility/sticky hints | Plasmoid | Community-tested wanted. |
 | GNOME 45–49 Wayland | Ordinary Mutter window; optional XWayland | [GNOME extension](../integrations/gnome-extension/README.md) | Community-tested wanted on every Shell version. |
 | GNOME X11 | X11 coordinates + utility hints | GNOME extension | Community-tested wanted. |

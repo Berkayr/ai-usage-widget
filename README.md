@@ -137,8 +137,10 @@ Stable marks recorded live-source checks; beta adapters still need live-account 
 | Environment | Status |
 | --- | --- |
 | Windows 10/11 | Native widget and strip implemented; live desktop community-tested wanted |
-| KDE Plasma 6 Wayland | Fallback startup checked; native layer-shell and panel community-tested wanted |
+| KDE Plasma 6 Wayland | Tested: native layer-shell widget, 16-minute memory run, panel widget in plasmoidviewer |
 | KDE X11, GNOME Wayland/X11 | Community-tested wanted |
+| Ubuntu 24.04 | `.deb` and AppImage install and launch checked in CI under Xvfb; desktop use community-tested wanted |
+| Fedora | `.rpm` install checked in a CI container; launch and desktop use community-tested wanted |
 | Hyprland / Sway | Layer-shell and Waybar implemented; community-tested wanted |
 | Xfce, Cinnamon, MATE, i3 and other X11 desktops | Positioning/panel paths available; community-tested wanted |
 
