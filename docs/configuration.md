@@ -14,10 +14,10 @@ Theme defaults to System when no choice is stored; an existing explicit theme is
 | `appearance` | `auto` | `auto`, `light`, `dark`; auto follows OS color preference live. |
 | `colorMode` | `calm` | Neutral or system-accent usage below 50%, soft amber from 50%, muted red from 80%; `vivid` restores theme colors. |
 | `accentEdge` | `off` | `off`, `auto`, `left`, `right`; Auto follows the selected corner, with no edge in Free placement. |
-| `palette` | Theme dependent | System: `default` (Desktop). Dot Matrix: `slate` (neutral default), `signal-orange`, `sakura-pink`, `nord`, `mono-paper`. Existing palette choices remain available. |
+| `palette` | Theme dependent | Twelve built-in choices per theme, including theme-specific defaults. Dot Matrix includes `slate`, `ember`, `sakura-pink`, `nord` and `mono-paper`; custom palettes are shared across themes. |
 | `userPalettes` | absent | Up to 50 custom palettes, available on every theme; format below. |
 | `accent`, `background` | `null` | Optional CSS color overrides; choosing a palette clears these overrides. |
-| `widgetOpacity` | `100` | Opacity of the entire widget, including text; UI range 20–100. |
+| `widgetOpacity` | `100` | Surface opacity; text remains opaque. UI range 20–100. |
 | `backgroundOpacity` | `100` | Background opacity, 0–100; this does not enable compositor blur. |
 | `scale` | `100` | Derived text and layout scale, 10–300%; presets 85/100/120/150/200 multiplied by fine-tune. Ctrl +/− changes the active fine-tune by 5; Ctrl+0 resets that fine-tune to 100. Work-area and coverage limits apply. |
 | `sizeMode`, `sizePreset`, `fineTune` | `fixed`, `Medium`, `100` | Fixed preset and independent 50–150% fine-tuning, under Size & Shape. |
@@ -46,7 +46,7 @@ Theme defaults to System when no choice is stored; an existing explicit theme is
 
 Linux `layer` is `top` or `bottom`; margin is 0–64 logical pixels in the UI; monitor is null for Auto, a monitor connector/name, or a legacy zero-based GDK index. Layer-shell requires a corner. Windows `window` is `session`, `weekly` or `both`; `style` is `transparent` or `chip`; `theme` is `auto`, `light` or `dark`. Start at login uses the OS autostart registration, not a field in this file.
 
-XS/S/M/L are descriptive responsive layouts, not selectable settings. Current CSS uses ≤219 px for XS and 220–320 px for S at 100% scale; larger widths use detailed cards, with more space at 520 px or 700 px height. Two cards can sit side by side at 640 px, three at 960 px. The theme metadata's nominal tier widths are not runtime breakpoint selectors.
+XS/S/M/L are descriptive responsive layouts, not selectable settings. Current CSS uses ≤219 px for XS and 220–320 px for S at 100% scale; larger widths use detailed cards, with more space at 520 px or 700 px height. Portrait provider grids follow the theme and featured-provider settings; Landscape and Square use shape-specific columns. The theme metadata's nominal tier widths are not runtime breakpoint selectors.
 
 ## Collector configuration
 

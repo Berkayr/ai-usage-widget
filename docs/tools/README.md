@@ -6,19 +6,19 @@ From the repository root:
 node docs/tools/screenshots.mjs
 ```
 
-Requires installed app dependencies (`app/node_modules`), Node with built-in `fetch` and `WebSocket` (Node 22+ recommended), and `google-chrome-stable` on PATH. Override the executable using `CHROME_BIN`. No browser automation dependency is installed. The command builds the app, serves only documentation scenes/assets and the built frontend on an ephemeral loopback port, and drives headless Chrome through the DevTools Protocol.
+Requires installed app dependencies (`app/node_modules`), Node with built-in `fetch` and `WebSocket` (Node 22.2+ required for built-in WebSocket and PNG CRC support), and `google-chrome-stable` on PATH. Override the executable using `CHROME_BIN`. No browser automation dependency is installed. The command builds the app, serves only documentation scenes/assets and the built frontend on an ephemeral loopback port, and drives headless Chrome through the DevTools Protocol.
 
 Every run uses a fresh temporary browser profile; locale, timezone and clock are fixed. The process never starts Tauri, quotacore, provider CLIs, or a real desktop session. The only quota input is [fixtures/quotas.json](fixtures/quotas.json), a wholly fictional dataset with `DEMO` plan labels. The fixture hook in `app/src/main.js` is gated on explicit `?sample`; it cannot override native production data without that query flag. Sample mode does not save native settings. Do not pass personal data into fixtures.
 
-Output is `docs/screenshots/*.png`. All scenes use 2× device scale except the social card, which is exactly 1280×640 for GitHub upload. SVG logos remain vector assets. Change a fixture, palette or frame size in the script and rerun; launch it from any working directory. Generated screenshots are intentional versioned documentation assets, not runtime output.
+Output is `docs/screenshots/*.png`. Scenes use 2× device scale; the large theme, Mono and size sheets use 1× to limit download size. The social card is exactly 1280×640 for GitHub upload. PNG pixel streams are recompressed losslessly at level 9. SVG logos remain vector assets. Change a fixture, palette or frame size in the script and rerun; launch it from any working directory. Generated screenshots are intentional versioned documentation assets, not runtime output.
 
 Hero, size, palette, scale, state and settings scenes embed the **built application UI**. Taskbar, KDE Breeze and Waybar scenes are HTML illustrations, not native desktop captures. `NO_SUBSCRIPTION` is hidden by the actual renderer; the states image shows stale, authentication and rate-limit states in Terminal and Retro LCD. Settings screenshots show the top of a scrollable panel. The current layout contract is documented in [the design specification](../design-spec.md).
 
 Chrome's sandbox stays enabled by default. Restricted development environments can explicitly opt out with `SCREENSHOT_NO_SANDBOX=1`; only use that override with these trusted local fixtures. It needs loopback socket access. In an environment that denies sockets, rerun with the appropriate local execution permission. It does not need internet access once dependencies are present. Browser profile and servers are cleaned up on completion. Inspect every PNG after changing UI or fixtures; native desktop acceptance and design review remain separate.
 
-Theme captures include `themes.png`, `themes-light.png`, and `themes/<id>-dark.png` / `-light.png`. Hero and social preview pair the logo with Dot Matrix / Ember on a dark surface. System light/dark stays in `system.png`. Theme galleries mix dark and light designs in two rows; size and scale scenes use a different theme for each frame. `checks/<id>-dark.png` / `-light.png` put the 340/200 px × 100/150% scale combinations side by side (72 cases total). Additional state scenes exercise stale/auth/rate-limit and extra/unknown windows. `checks/results.json` records provider counts, horizontal overflow, minimum visible text/number sizes, secondary text contrast and the one-active-theme-style invariant. The same browser then exercises every theme selector, appearance, 50/300% scale and the extra-window toggle, Color mode and all 12 Accent edge/position combinations. Fit frames are measured after font loading.
+Theme captures include `themes.png`, `themes-light.png`, and `themes/<id>-dark.png` / `-light.png`. Hero captures pair the logo with Dot Matrix / Ember in the corresponding appearance; social preview uses Dark. System light/dark stays in `system.png`. Theme galleries mix dark and light designs in three rows, followed by the horizontal strip; size and scale scenes use a different theme for each frame. `checks/<id>-dark.png` / `-light.png` put the 340/200 px × 100/150% scale combinations side by side (80 cases total). Additional state scenes exercise stale/auth/rate-limit and extra/unknown windows. `checks/results.json` records provider counts, horizontal overflow, minimum visible text/number sizes, secondary text contrast and the one-active-theme-style invariant. The same browser then exercises every theme selector, appearance, 50/300% scale and the extra-window toggle, Color mode and all 12 Accent edge/position combinations. Fit frames are measured after font loading.
 
-Marketing scenes use Vivid for palette variety; System and check scenes use Calm unless stated otherwise. The accent edge stays off. `checks/vivid.png` compares Calm and Vivid. Readability checks require labels ≥11 CSS px and primary numbers ≥15 CSS px at 100% (scaled proportionally at 150%), with secondary text contrast ≥4.5:1. Contrast is calculated from computed text colors and composited background-color layers against the least favorable black/white desktop polarity; background images and compositor effects require visual review. `checks/` remains ignored.
+Marketing scenes use Vivid for palette variety; System and check scenes use Calm unless stated otherwise. The accent edge stays off. `checks/vivid.png` compares Calm and Vivid. Readability checks require quota window labels ≥13 CSS px, secondary chrome ≥11 CSS px and primary numbers ≥15 CSS px at 100% (scaled proportionally at 150%). Constrained viewports and compacted cards with extra windows retain the production fitter’s 11 px floor. Secondary text contrast ≥4.5:1. Contrast is calculated from computed text colors and composited background-color layers against the least favorable black/white desktop polarity; background images and compositor effects require visual review. `checks/` remains ignored.
 
 `SCENE=checks/providers- node docs/tools/screenshots.mjs` captures first-run provider consent in all ten themes in dark/light modes and checks default-off choices, wrapped disclosures and explicit Start behavior. These controls use synthetic detection only.
 
@@ -128,17 +128,15 @@ captures are `settings-preview-light.png` and `settings-preview-dark.png`.
 
 ## Fixed shell, theme identity
 
-`node docs/tools/size-audit.mjs` measures all ten themes × three shapes × five presets ×
-0/1/3/6 providers (540 cases, ±2 CSS px) and writes `size-audit.json` and
-`size-sheet.png`. The outer size stays 340 × (116 + 210 × provider count) at
-Medium. Compact Strip retains its separate horizontal size contract.
-Brutalist and Circular Rings share the provider budget across two columns;
-an odd last card fills the last row. Their cell heights follow the row budget,
-rather than the 200 px height used by single-column cards.
+`node docs/tools/size-audit.mjs` measures all ten themes × five shapes × five presets ×
+0/1/3/6 providers × quote off/on (2,000 cases), writing `size-audit.json` and
+`size-sheet.png`. Portrait ends at intrinsic content within its fit ceiling;
+other shapes keep their fixed dimensions. Compact Strip retains its horizontal
+width contract and scrolling in externally narrowed viewports.
 
-`node docs/tools/theme-identity-check.mjs` checks all ten themes × three shapes × five presets ×
+`node docs/tools/theme-identity-check.mjs` checks all ten themes × five shapes × five presets ×
 1/2/3/4/5/6 providers × dark/light, including both square pages for five/six
-providers (1800 cases), and writes
+providers (3,500 cases including endpoint boundary scenarios), and writes
 `theme-identity-results.json`. Synthetic DEMO plans and countdowns exercise real
 text widths. It checks card overflow, signature DOM and geometry: Brutalist's
 2.4× display numbers and uppercase labels, two provider columns, concentric
@@ -148,17 +146,19 @@ crossings. System bars, Dot Matrix marks, Minimal Pace labels and Compact Strip'
 horizontal arrangement are also asserted. Every card's trailing blank space is
 measured from actual text ranges and meter/ring bounds, rather than stretched
 layout wrappers, and must stay within 25% of the card height (1 px rounding
-tolerance). Space below the last card is checked against the same budget.
+tolerance) outside Square. Square instead verifies equal full-width rows and
+vertically centered quota text/meters; its decorative rings are hidden. Pill
+uses its space for both windows and hides plan badges. Space below the last card is checked against the same budget.
 Ring text rectangles (including three-digit percentages) must fit inside the
-innermost track, accounting for stroke width and letterboxing. Odd square cards
-must fill the last row with adjacent primary/secondary metrics; both pages are
+innermost track, accounting for stroke width and letterboxing. Square rows
+keep adjacent primary/secondary metrics; both pages are
 checked explicitly. The JSON records the maximum ring text radius ratio, card
 ratio, and last-card list gap for each case. Normal preset widths preserve these
 layouts at every scale; externally narrowed viewports (below 18 root-font units) use a single column and
 scroll access. Display type uses `--size-font-display` in rem, with no glyph scaling.
 
 `node docs/tools/shape-preview.mjs` checks square pagination and transitions and
-produces `docs/screenshots/shapes.png` from ten themes with fictional data.
+produces the ignored `docs/tools/shape-sheet.png` audit sheet from ten themes with fictional data. Published `shapes.png` and `shapes-light.png` come only from `screenshots.mjs`.
 Landscape and square have fixed 680 × 340 / 340 × 340 Medium boxes. Their theme
 identity checks include the 9 CSS px text floor and 25% trailing-space budget.
 Contrast checks cover both shapes in addition to the portrait viewport matrix.
@@ -398,3 +398,15 @@ None selections, Top/Bottom, quotes off/on, and two through four visible provide
 in all five shapes (Circle and Pill cap their widget selection at three).
 It also reproduces the Codex-first stored order / Claude-first draft / Gemini
 Auto hero distinction. Screenshots use fictional data under ignored `gorevler/`.
+
+## Gallery and documentation checks
+
+`node --test tests/documentation.mjs` checks local Markdown links, HTML image/link paths and heading anchors in README, CONTRIBUTING, docs and integration guides, plus regression cases for the gallery-space algorithm and lossless PNG compression. External URLs are not fetched.
+
+Every published gallery (themes, sizes, scale, palettes, states, system, Mono and both shapes scenes) must have no empty axis-aligned rectangle exceeding 12% of the final canvas. The audit uses rendered iframe bounds and actual heading/caption text ranges, treating each widget as a content box; it does not classify pixels inside widgets or transparent dial corners. Checks run after fonts and intrinsic heights settle. Standard session/weekly labels also have a reading-size assertion, and every Dot Matrix mark is checked for equal width/height within 2%.
+
+`GALLERY_ONLY=1 node docs/tools/screenshots.mjs` regenerates the published images without the supplemental check captures. The default command runs both. Hero dark/light use the actual corresponding Ember appearance; palette examples include a fictional user-created Studio palette. Settings captures navigate to Appearance / Theme and reveal the palette controls.
+
+Portrait size audits now treat `widgetHeight` as a ceiling and check exact width; fixed-height shapes retain the ±2 px equality check. `portrait-gap-check.mjs` independently checks intrinsic content spacing, clipping and overlaps.
+
+Circle endpoint collision checks compare actual center text ranges, rather than the larger `.dial-safe` layout wrapper. Square featured ordering is checked independently of the Portrait-only featured card class.

@@ -20,4 +20,4 @@ Status describes validation evidence, not an upstream compatibility guarantee. G
 
 Claude status-line input is reduced to quota observations; the application does not scan conversation history. Hook input can contain other fields, so do not publish raw hook payloads or provider responses. Snapshot files can contain plan labels, quota values, timestamps and error summaries: treat them as private even when they contain no token.
 
-See [configuration](configuration.md) for storage locations and provider enablement, and [privacy](../README.md#privacy) for the collection boundary.
+See [configuration](configuration.md) for storage locations and provider enablement, and [privacy](../README.md#privacy--security) for the collection boundary.
