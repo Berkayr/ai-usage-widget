@@ -200,14 +200,21 @@ Choose Portrait, Landscape (2:1), Square, Circle Dial, or Pill (4:1) in Settings
 ![Five shapes with fictional usage data](docs/screenshots/shapes.png)
 
 
-Provider layout is configurable in **Layout & Position → Provider layout**.
+Provider layout is configurable in **Providers → Provider layout**.
 Drag rows or use Up / Down, and toggle visibility without disabling collection.
-Choose Auto (highest usage across quota windows), a specific featured provider,
-or None. Top / Bottom places the large cell in portrait; None
+Choose First in list (the new-install default), Highest usage (across quota
+windows), a specific featured provider, or None. First in list follows the first
+visible provider after ordering and filtering. Settings explains the current
+selection and when reordering cannot change it. Changes preview immediately;
+Save keeps them. Top / Bottom places the large cell in Portrait with an odd
+provider count (with or without quotes); even counts use equal cards. None
 centers its unpaired half-width cell. Square keeps equal full-width rows and uses
 featured selection only for order. Missing layout settings preserve the
 legacy last-cell layout and automatic circle center. Hidden or unselected
-featured providers are not silently replaced.
+featured providers are not silently replaced. Landscape and Pill use list order
+and ignore featured selection and position; Circle uses the selection for its
+center and ignores position. Circle and Pill apply their widget selection before
+choosing the first provider. Square applies featured ordering within each page.
 
 **Reactor** adds a luminous core, segmented inner ring and cool glow to Circle,
 with matching surfaces in all other shapes. Breathing is off by default and

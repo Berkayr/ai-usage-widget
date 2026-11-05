@@ -9,6 +9,7 @@ export function orderedProviders(providers, settings) {
 export function featuredProvider(providers, settings, legacyLast = false) {
   const choice = settings.featuredProvider;
   if (choice === 'none') return null;
+  if (choice === 'first') return providers[0] || null;
   if (!choice && legacyLast) return providers.at(-1);
   if (choice && choice !== 'auto') return providers.find(p => p.id === choice) || null;
   const usage = p => Math.max(-1, ...(p.windows || []).map(w => pctOf(w) ?? -1));

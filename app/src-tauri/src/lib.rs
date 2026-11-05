@@ -146,7 +146,7 @@ fn get_snapshot() -> Value { json!({"snapshot": read_snapshot()}) }
 #[tauri::command]
 fn refresh_now(app: tauri::AppHandle) -> Result<(), String> { refresh()?; emit_snapshot(&app); Ok(()) }
 fn initial_settings() -> Settings {
-    Settings { featured_provider: Some("auto".into()), ..Settings::default() }
+    Settings { featured_provider: Some("first".into()), ..Settings::default() }
 }
 #[tauri::command]
 fn load_settings() -> Settings { fs::read(settings_path()).ok().map(|data| parse_settings(&data)).unwrap_or_else(initial_settings) }
@@ -378,7 +378,14 @@ mod settings_tests {
     }
     #[test]
     fn provider_layout_migration_and_round_trip() {
-        assert_eq!(initial_settings().featured_provider.as_deref(), Some("auto"));
+        assert_eq!(initial_settings().featured_provider.as_deref(), Some("first"));
+        for choice in ["first", "auto", "none", "unknown"] {
+            let data = serde_json::to_vec(&json!({"featuredProvider":choice})).unwrap();
+            let restored = parse_settings(&data);
+            assert_eq!(restored.featured_provider.as_deref(), Some(choice));
+            let saved = serde_json::to_vec(&restored).unwrap();
+            assert_eq!(parse_settings(&saved).featured_provider.as_deref(), Some(choice));
+        }
         let legacy = parse_settings(b"{}");
         assert!(legacy.featured_provider.is_none());
         assert!(legacy.provider_order.is_empty());

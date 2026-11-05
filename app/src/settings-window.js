@@ -4,6 +4,7 @@ import {invoke} from '@tauri-apps/api/core';
 import {listen} from '@tauri-apps/api/event';
 import {getCurrentWindow} from '@tauri-apps/api/window';
 
+import sampleSnapshot from './sample-snapshot.json';
 import {orderedProviders} from './provider-layout.js';
 import {quotePrivacy} from './quote.js';
 import {differingKeys, equalSettings} from './settings-compare.js';
@@ -52,7 +53,7 @@ export const defaults = {
   fitFineTune : 100,
   reservedTop : null,
   reservedBottom : null,
-  featuredProvider : 'auto',
+  featuredProvider : 'first',
   featuredPosition : 'bottom',
   reactorMotion : false,
   quoteEnabled : false,
@@ -503,7 +504,8 @@ function previewInk(ink, paper) {
   return ink;
 }
 const renderLayout = layoutControls(sections.providers, () => draft,
-                                    () => providers || [], update);
+                                    () => providers || [], update,
+                                    () => snapshotProviders || []);
 const paletteTools = paletteEditor(() => draft, () => themes.find(t => t.id === draft.theme), update);
 sectionBlock(sections.appearance, 'Palette', [ paletteGrid, paletteTools.element ]);
 sectionBlock(sections.appearance, 'Mode',
@@ -767,7 +769,7 @@ function renderProviders() {
     preview().catch(() => {});
   };
 }
-let snapshotProviders = null;
+let snapshotProviders = sample ? sampleSnapshot.providers : null;
 let providerConfig;
 let autostartAvailable = true;
 let desktopPlatform = sample && new URLSearchParams(location.search).get('platform') === 'windows' ? 'windows' : 'linux';
