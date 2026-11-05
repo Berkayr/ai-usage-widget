@@ -103,9 +103,9 @@ On Windows, from the repository root:
 ./scripts/fetch-python.ps1
 cd app
 npm ci
-npm run tauri -- build --locked --bundles nsis,msi --config src-tauri/tauri.with-python.conf.json
+npm run tauri -- build --bundles nsis,msi --config src-tauri/tauri.with-python.conf.json -- --locked
 # Or build slim (does not include python/ even if it exists locally):
-npm run tauri -- build --locked --bundles nsis,msi
+npm run tauri -- build --bundles nsis,msi -- --locked
 ```
 
 On Linux, `scripts/fetch-python.sh` prepares the identical Windows runtime for
@@ -170,6 +170,6 @@ supported. Run `node tests/linux-bundle.mjs` to check this cleanup independently
 
 ```sh
 cd app
-NO_STRIP=true npm run tauri -- build --locked --bundles appimage
+NO_STRIP=true npm run tauri -- build --bundles appimage -- --locked
 # Expected: ai-usage_0.1.0_amd64.AppImage (version/architecture vary)
 ```
