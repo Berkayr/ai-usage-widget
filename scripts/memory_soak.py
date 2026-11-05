@@ -22,7 +22,13 @@ parser.add_argument('--binary', type=Path, default=Path('app/src-tauri/target/de
 parser.add_argument('--monitor', help='Use an unused Linux display, e.g. eDP-1; connector/model+geometry name or legacy index')
 parser.add_argument('--output', type=Path, help='Optional synthetic measurements and logs directory')
 parser.add_argument('--settings-cycles', type=int, choices=range(1, 5), default=0, help='Debug binary only: open/close settings and coalesce 20 monitor events per cycle')
+parser.add_argument('--long', action='store_true', help='Observe 960 seconds, more than two 300-second collector cycles')
+parser.add_argument('--watcher-unavailable', action='store_true', help='Debug build: disable native watcher; requires --long')
 args = parser.parse_args()
+if args.watcher_unavailable and not args.long:
+    parser.error('--watcher-unavailable requires --long')
+duration = 960 if args.long else 120
+
 binary = args.binary.resolve(strict=True)
 libc = ctypes.CDLL(None, use_errno=True)
 libc.inotify_init1.argtypes = [ctypes.c_int]
@@ -50,7 +56,7 @@ with tempfile.TemporaryDirectory(prefix='ai-usage-soak-') as temporary:
             p['state'] = 'OK'
             p['stale'] = False
             for window in p.get('windows', []):
-                window['used_percent'] = sequence * 11
+                window['used_percent'] = sequence * 11 % 100
         pending = state / 'pending.json'
         pending.write_text(json.dumps(fixture))
         os.replace(pending, state / 'snapshot.json')
@@ -62,11 +68,14 @@ with tempfile.TemporaryDirectory(prefix='ai-usage-soak-') as temporary:
     env = dict({key: value for key, value in os.environ.items() if not key.startswith("QUOTACORE_")}, HOME=str(home), XDG_CONFIG_HOME=str(config), XDG_DATA_HOME=str(root / 'data'),
                XDG_CACHE_HOME=str(root / 'cache'), XDG_STATE_HOME=str(root / 'xdg-state'),
                QUOTACORE_HOME=str(state), AI_USAGE_SNAPSHOT_TRACE='1', PATH='/usr/bin:/bin')
+    env.pop('AI_USAGE_SOAK_NO_WATCHER', None)
+    if args.watcher_unavailable:
+        env['AI_USAGE_SOAK_NO_WATCHER'] = '1'
     if args.settings_cycles:
         env['AI_USAGE_SETTINGS_SOAK_CYCLES'] = str(args.settings_cycles)
     # Scope properties are mandatory. Do not fall back to a direct launch on failure.
     command = ['systemd-run', '--user', '--scope', f'--unit={unit}', '-p', 'MemoryMax=1500M',
-               '-p', 'MemorySwapMax=0', 'timeout', '--signal=TERM', '--kill-after=3s', '125s', str(binary)]
+               '-p', 'MemorySwapMax=0', 'timeout', '--signal=TERM', '--kill-after=3s', f'{duration + 5}s', str(binary)]
     log_path = root / 'app.log'
     samples, changes, latencies = [], {}, {}
     opens = 0
@@ -76,7 +85,7 @@ with tempfile.TemporaryDirectory(prefix='ai-usage-soak-') as temporary:
             started = time.monotonic()
             cgroup = None
             next_sample = 0
-            while time.monotonic() - started < 120:
+            while time.monotonic() - started < duration:
                 elapsed = time.monotonic() - started
                 if process.poll() is not None:
                     raise RuntimeError(f'Application/scope exited early: {process.returncode}\n{log_path.read_text()}')
@@ -105,7 +114,7 @@ with tempfile.TemporaryDirectory(prefix='ai-usage-soak-') as temporary:
                                     'webkit_webprocess_count': sum('WebKitWeb' in row['name'] for row in rows)})
                     print(f'{elapsed:6.1f}s {memory / 1048576:8.2f} MiB', flush=True)
                     next_sample += 10
-                for second in (40, 60, 80):
+                for second in ((40, 340, 640) if args.long else (40, 60, 80)):
                     if elapsed >= second and second not in changes:
                         changes[second] = (replace_snapshot(second // 20), time.monotonic())
                 trace = log_path.read_text()
@@ -130,6 +139,7 @@ with tempfile.TemporaryDirectory(prefix='ai-usage-soak-') as temporary:
                       'settings_reused': trace.count('settings-soak-reused'),
                       'settings_opened': trace.count('settings-soak-open '),
                       'settings_closed': trace.count('settings-soak-close '),
+                      'duration_seconds': duration, 'watcher_unavailable': args.watcher_unavailable,
                       'monitor_bursts': args.settings_cycles,
                       'monitor_applied': trace.count('monitor-soak-applied')}
             print(json.dumps(result, indent=2), flush=True)
@@ -143,9 +153,11 @@ with tempfile.TemporaryDirectory(prefix='ai-usage-soak-') as temporary:
                 assert result['settings_opened'] == args.settings_cycles, 'Settings open cycle missing (requires debug binary)'
                 assert result['settings_closed'] == args.settings_cycles, 'Settings close cycle missing'
                 assert result['monitor_applied'] == args.settings_cycles, 'Monitor event debounce did not coalesce each burst'
+            if args.watcher_unavailable:
+                assert 'snapshot-watcher-disabled' in trace, 'Watcher failure hook missing (requires debug build)'
             check_memory(samples, metrics)
-            assert 3 <= opens <= 35, f'Unexpected snapshot read volume: {opens}'
-            assert len(latencies) == 3 and max(latencies.values()) <= 2, 'UI render missing or >2s'
+            assert 3 <= opens <= (100 if args.long else 35), f'Unexpected snapshot read volume: {opens}'
+            assert len(latencies) == 3 and max(latencies.values()) <= (310 if args.watcher_unavailable else 2), 'UI render missing or exceeds recovery deadline'
             print('PASS: memory, snapshot reads, all three native UI acknowledgements', flush=True)
     finally:
         subprocess.run(['systemctl', '--user', 'stop', unit], capture_output=True)

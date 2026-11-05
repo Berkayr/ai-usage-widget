@@ -25,9 +25,17 @@ The watcher accepts Create, Modify(Data), and destination Rename events for the
 exact snapshot path. Modify(Any) is also necessary because notify maps Windows
 FILE_ACTION_MODIFIED to that type. Explicit Access and Metadata are ignored.
 A bounded one-item channel and 400 ms coalescing window prevent event storms;
-a generated_at + content hash suppresses duplicate emissions. Native 30-second
-and frontend 60-second reads provide recovery if filesystem events are missed.
+a generated_at + content hash suppresses duplicate emissions. Native 300-second
+and frontend 300-second reads provide recovery if filesystem events are missed.
 The collector also emits immediately after completion. Frontend duplicate
 snapshots do not render; an age transition past ten minutes marks cards stale.
 `AI_USAGE_SNAPSHOT_TRACE=1` enables synthetic soak emit/render/monitor diagnostics;
 normal launches do not log snapshot timestamps or monitor geometry.
+
+`--long` observes 960 seconds (965-second hard timeout), covering more than two
+300-second collector intervals after startup. `--watcher-unavailable` requires
+`--long` and a debug build: it disables native watcher creation using the debug-only
+`AI_USAGE_SOAK_NO_WATCHER` hook. Replacements at 40/340/640 seconds exercise
+recovery; their native UI acknowledgements must arrive within 310 seconds.
+Frontend recovery reads continue normally. The short 120-second mode remains
+the default for CI. These scenarios require a native desktop session.
