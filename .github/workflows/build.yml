@@ -144,6 +144,9 @@ jobs:
         with:
           pattern: installers-linux-x86_64
           path: release-artifacts
+      - name: Generate installer checksums
+        working-directory: release-artifacts/installers-linux-x86_64
+        run: sha256sum *.deb *.rpm *.AppImage > SHA256SUMS.txt
       - name: Install and launch deb, then AppImage
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -164,4 +167,4 @@ jobs:
       - name: Install rpm in Fedora container
         run: |
           RPM=$(find release-artifacts -name '*.rpm' -print -quit)
-          docker run --rm -v "$PWD:/work" -w /work fedora:latest sh -c 'dnf install -y sudo && /work/scripts/install.sh --from-dir /work/release-artifacts/installers-linux-x86_64'
+          docker run --rm -v "$PWD:/work" -w /work fedora:latest sh -c 'dnf install -y sudo findutils gawk && /work/scripts/install.sh --from-dir /work/release-artifacts/installers-linux-x86_64'
