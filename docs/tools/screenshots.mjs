@@ -165,8 +165,14 @@ try {
  const base=`http://127.0.0.1:${server.address().port}`;
  chrome=spawn(process.env.CHROME_BIN||'google-chrome-stable',['--headless=new',...(process.env.SCREENSHOT_NO_SANDBOX === '1' ? ['--no-sandbox'] : []),'--disable-dev-shm-usage','--disable-gpu','--no-first-run','--no-default-browser-check','--disable-background-networking','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
  const port = await new Promise((resolve,reject)=>{let log='';const timer=setTimeout(()=>reject(Error('Chrome startup timed out')),20000);chrome.once('error',error=>{clearTimeout(timer);reject(error)});chrome.stderr.on('data',chunk=>{log+=chunk;const m=log.match(/DevTools listening on ws:\/\/127\.0\.0\.1:(\d+)/);if(m){clearTimeout(timer);resolve(Number(m[1]));}});});
- const targets=await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
- ws=new WebSocket(targets.find(t=>t.type==='page').webSocketDebuggerUrl);await once(ws,'open');
+ let target;
+ for(let attempt=0;attempt<150;attempt++){
+  const targets=await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
+  target=targets.find(t=>t.type==='page'&&t.webSocketDebuggerUrl);if(target)break;
+  await new Promise(r=>setTimeout(r,100));
+ }
+ if(!target)throw Error('Browser page target timeout');
+ ws=new WebSocket(target.webSocketDebuggerUrl);await once(ws,'open');
  const errors=[];
  const checks=[];
  const typography=[];

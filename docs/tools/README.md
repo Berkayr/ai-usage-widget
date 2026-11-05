@@ -43,7 +43,7 @@ in the results; actual WebView2/WebKitGTK desktop rendering needs platform check
 Typography checks use a single “8” probe in every visible numeric style, with
 computed font properties copied from the real number element. DOM rectangle
 height/width ratios are measured at 200/340/520/700 CSS px × 75/100/150% for all
-nine themes. `checks/typography.json` records each measurement; the capture fails
+ten themes. `checks/typography.json` records each measurement; the capture fails
 if the ratio range exceeds 3%. `SCENE=checks/typography` runs just this matrix.
 This measures the glyph layout box, not the image pixel ink bounding box.
 
@@ -158,7 +158,7 @@ layouts at every scale; externally narrowed viewports (below 18 root-font units)
 scroll access. Display type uses `--size-font-display` in rem, with no glyph scaling.
 
 `node docs/tools/shape-preview.mjs` checks square pagination and transitions and
-produces `docs/screenshots/shapes.png` from nine themes with fictional data.
+produces `docs/screenshots/shapes.png` from ten themes with fictional data.
 Landscape and square have fixed 680 × 340 / 340 × 340 Medium boxes. Their theme
 identity checks include the 9 CSS px text floor and 25% trailing-space budget.
 Contrast checks cover both shapes in addition to the portrait viewport matrix.
@@ -313,3 +313,21 @@ cargo test --offline live_desktop_work_area -- --ignored --nocapture
 
 This diagnostic requires access to the local session bus and GTK display and
 prints real geometry; keep its output outside the repository.
+
+Shape usability acceptance (headless, synthetic data only):
+
+```sh
+CHROME_BIN=/opt/brave-origin-bin/brave node docs/tools/shape-final-check.mjs
+CHROME_BIN=/opt/brave-origin-bin/brave node docs/tools/onboarding-shape-check.mjs
+CHROME_BIN=/opt/brave-origin-bin/brave node docs/tools/shape-final-sheets.mjs
+python3 docs/tools/shape-final-sheets.py
+```
+
+The shape matrix covers 10 themes × 5 shapes × 3 presets × quote on/off ×
+1/2/3 providers (900 cases), including the 11 CSS px text floor, clipped content,
+Square/Pill values and bars, equal Square rows, Pill percentage sizes and hidden
+plan chips, and Circle separators. Geometry and effective mode are additionally
+covered by `tests/screen-fit.mjs`. `AUDIT_THEMES`, `AUDIT_SHAPES` and `AUDIT_OUTPUT`
+allow focused reruns. Captures use 21/33, 8/13 and 30/18; the review sheets and
+results go to `gorevler/ss-sekil-final/`. The optional sheet assembly uses the
+already installed Pillow and preserves screenshot resolution.

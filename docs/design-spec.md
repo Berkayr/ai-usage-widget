@@ -21,12 +21,12 @@ XS breakpoints scale with these same design units.
 ## Widget size contract
 
 Size owns geometry; a theme owns fonts, colors, borders and meter style.
-Five presets multiply all logical dimensions uniformly: Small 75%, Medium 100%,
-Large 125%, X-Large 200%, 2X-Large 250%. Base widths are 255, 340, 425, 680,
-and 850 CSS pixels. Fine-tune is a multiplier (50–150%, default 100%);
+Five presets multiply all logical dimensions uniformly: Small 85%, Medium 100%,
+Large 120%, X-Large 150%, 2X-Large 200%. Portrait base widths are 289, 340, 408, 510,
+and 680 CSS pixels. Small removes secondary chrome and keeps text at least 11 CSS pixels. Fine-tune is a multiplier (50–150%, default 100%);
 the wider range preserves legacy 50–300% scales without changing their size.
 Legacy Normal maps to Medium, Huge to X-Large. Other old scales choose the nearest
-preset plus an exact multiplier: 90 becomes Medium × 90%.
+preset plus an exact multiplier: 90 becomes Small × (90 / 85 × 100)%.
 
 Effective scale is a floating-point percentage, bounded to 10–300% at the IPC
 boundary. Preset × fine-tune is capped at 300%; non-finite scale falls back to
@@ -54,7 +54,7 @@ fonts, rows, padding, gaps and meters; no theme defines separate size metrics.
 Fit height caps the box at the viewport/monitor work area; the provider list
 scrolls when capped, keeping header and footer reachable. Disabling fit height
 keeps the user's window height, while retaining the same card metrics.
-`size-audit.mjs` checks all nine themes × five sizes × 0/1/3/6 providers against
+`size-audit.mjs` checks all ten themes × five sizes × 0/1/3/6 providers against
 these formulas with at most 2 CSS pixels of rounding tolerance, including error
 cards, title font matching and type stretch. It writes `size-audit.json` and
 `size-sheet.png`, with an enlarged header for every theme. These are synthetic
@@ -78,7 +78,7 @@ hollow; System uses a warning hatch on its continuous bar. From 80%, percentage 
 other status badges have monochrome outlines. Unknown marks stay distinct.
 No pulse animation is used, including with reduced motion enabled.
 
-See [the nine-theme Mono gallery](screenshots/mono.png). All data in documentation
+See [the ten-theme Mono gallery](screenshots/mono.png). All data in documentation
 captures is fictional. `node docs/tools/screenshots.mjs` captures the gallery and
 `checks/dots-{200,340,520,700}.png`; checks and numeric results are ignored by Git.
 Each visible row is measured in the browser, with counts recorded per theme.
@@ -226,13 +226,12 @@ authentication and rate-limit states as well as usage percentages and resets.
 ## Shapes
 
 `shape` is independent of theme and size. The selectable values are `portrait`
-(default for missing or unsupported settings), `landscape`, and `square`.
-`circle` and `pill` are reserved native schema values for a future phase; the
-frontend currently normalizes them to portrait and does not expose them.
+(default for missing or unsupported settings), `landscape`, `square`, `circle`
+and `pill`.
 
 All dimensions are logical CSS pixels before DPI scaling. Multiply both axes by
 `sizePresets[sizePreset] / 100 * fineTune / 100`. Small, Medium, Large, X-Large,
-and 2X-Large use 0.75, 1, 1.25, 2, and 2.5 respectively. Physical-size matching
+and 2X-Large use 0.85, 1, 1.2, 1.5, and 2 respectively. Physical-size matching
 also divides by monitor scale. Portrait retains its previous sizing, including
 the Compact Strip exception. Landscape is 680 × 340 and square is 340 × 340 at
 Medium, independent of provider count and theme. Native monitor bounds may cap
@@ -241,13 +240,11 @@ Only portrait uses optional fit-to-content height; the other shapes always
 request their fixed height, even when the saved fit-height option is disabled.
 
 Landscape uses one to three equal columns, then two rows of three for four to
-six providers. Square uses one hero cell or a two-column grid for two to four
-providers. Five or six providers use explicit numbered pages (four providers on
-the first page, the remainder on the next). Paging never changes window size,
-never changes provider configuration, and does not use a background timer.
-The current page is clamped when provider availability changes. An odd final
-card fills both columns on every square page, with the two quota metrics side
-by side. Circular Rings puts its primary ring beside the secondary quota row.
+six providers. Square uses equal full-width rows for up to four providers per
+page, with name and session reset above two side by side quota meters. Five or
+six providers use numbered pages. Paging never changes window size or provider
+configuration and has no background timer. Featured selection only changes the
+order of Square rows. Every row keeps both session and Weekly percentages and bars.
 
 Dense cells first remove sync, plan, and footer metadata, abbreviate stale
 status to a warning dot, then remove reset details. Dense linear themes show
@@ -259,18 +256,23 @@ must fit inside the innermost track after subtracting half its stroke width.
 Brutalist keeps display-size
 bold numbers, Terminal its dashed frame, and Dot Matrix its round dot tracks.
 Extra quota details remain available in portrait. Visible text in the new
-shapes has a 9 CSS px floor; the floor is absolute, independent of rem scaling.
+shapes at Small and 100% fine tuning has an 11 CSS px floor; secondary chrome
+is removed before reducing usage data. Smaller fine-tune values and screen
+fractions retain the existing compact layout.
 
 
 ### Round shape contract
 
-All five shapes share the size presets (75%, 100%, 125%, 200%, 250%) and fine tuning. Medium circle is 340 × 340 CSS pixels; Medium pill is 480 × 120. Geometry is independent of theme and provider count. Circle uses a circular mask; pill uses a radius of half its height.
+All five shapes share the size presets (85%, 100%, 120%, 150%, 200%) and fine tuning. Medium circle is 340 × 340 CSS pixels; Medium pill is 480 × 120. Geometry is independent of theme and provider count. Circle uses a circular mask; pill uses a radius of half its height.
 
 Circle and pill show up to three providers selected per widget in Settings → Layout & Position → Providers on this widget. An absent selection defaults to the first three enabled providers; an empty selection intentionally shows none. Other enabled providers remain visible in settings and in rectangular layouts. Selection does not change collector consent.
 
 A single-provider circle shows session outside and weekly inside. Multiple providers have concentric session tracks and a highest-usage center. Labels, percentages and reset countdown occupy the inner safe square; settings sits inside the top safe zone. Dot Matrix uses dotted tracks, Retro LCD segmented arcs, Terminal dashed radar tracks, Brutalist heavy rings and oversized numerals, Minimal Pace thin tracks, and Frosted Glass a blurred lens. Compact Strip supports the circle as a slim-track dial using its own palette and typography.
 
-Pill shows inline provider cells, primary reset time, dual quota meters, and an internal settings button; header and footer are omitted. Text is at least 9 CSS pixels. Right-click opens the context menu inside either silhouette; Ctrl+, opens Settings. Dragging an unlocked widget works across its surface.
+Pill shows frameless provider columns with colored identity marks, dual quota
+meters and stacked settings/quote controls. Session reset appears from Large.
+Percentages are at least 15 CSS pixels at Medium and 13 at Small; other text
+stays at least 11 CSS pixels at Small with 100% fine tuning. Right-click opens the context menu inside either silhouette; Ctrl+, opens Settings. Dragging an unlocked widget works across its surface.
 
 Native input regions match the silhouette: Win32 applies physical-pixel ellipse/capsule regions and transfers region ownership to Windows; GTK applies logical-pixel cairo scanlines to its input region on both X11 and layer-shell Wayland. Resize, DPI and shape changes are coalesced for 40 ms; identical regions are skipped. Rectangular shapes restore the entire input region. Native click-through still requires manual compositor testing.
 
@@ -283,7 +285,7 @@ Quote is opt-in. In portrait, enabled quotes use a 320px reading block and
 providers the total remains 946px at 100%. Grid themes share this same budget.
 Usage overflow is measured after rendering and on list resize/font readiness.
 In a three-provider portrait grid, the featured row first donates spare height
-to the paired row. Featured quote content stays grouped near the heading.
+to the paired row. Featured quote content shares spare height between its quota windows.
 Only cards that still overflow compact their internal spacing and then reduce
 text, stopping at 11px (existing smaller labels keep their authored size).
 Dense Minimal Pace cards show the signed percentage-point delta with its
@@ -302,7 +304,7 @@ full tooltip; author description is available in the dialog.
 `quotePosition` is `bottom` by default, including persisted settings that omit
 it; `top` places the reading block before providers in portrait and landscape.
 Circle and square keep their quote page; pill keeps its quote dialog.
-Preset changes preserve `fineTune`. Large is 125% to reduce the jump from Medium.
+Preset changes preserve `fineTune`. Large is 120%; X-Large is 150% and 2X-Large is 200%.
 The monitor preview reports requested dimensions and the largest effective
 percentage that fits its work area after margins. Oversize selections retain
 the saved preset and fine tuning while the actual display scale is capped to
@@ -321,13 +323,12 @@ the next scheduled round. Disabled quotes perform no network or cache access.
 ## Fit to screen
 
 Layout & Position offers Fixed size (the existing presets and fine tuning) and
-Fit to screen. The latter uses Full, 3/4, 1/2 or 1/3 of the selected monitor's
-available primary axis, with independent 50–150% fine tuning. Portrait, square
-and circle use height; landscape and pill use width. The other axis limits the
-result, preserving the shape's aspect ratio. Full fills the primary axis when
-the aspect ratio permits it, after the existing edge margins. Consequently a
-wide pill cannot also fill the monitor's height. Saved fixed size settings and
-the default installation behavior remain unchanged.
+Fit to screen. It applies only to Portrait, excluding Compact Strip; other
+combinations use their fixed preset while retaining the stored screen mode.
+Full, 3/4, 1/2 and 1/3 target the available height with independent 50–150% fine
+tuning. Width cannot exceed 30% of the available work area. The coverage and
+height limits remain safety nets, preserving aspect ratio. Fit is disabled in
+Settings with “Portrait only” when unavailable, and returns on switching back.
 
 All geometry, the monitor map and fit warnings use only rendered providers
 (after visibility, availability, selection and pagination). Windows supplies its
@@ -352,3 +353,16 @@ Settings persist `sizeMode` (`fixed` / `screen`), `fitFraction` (1, 0.75, 0.5,
 and `scale` for switching back to Fixed size. Physical size matching is inactive
 in Screen mode because the available desktop area determines the size; Ctrl +/-
 and Ctrl 0 adjust/reset the active mode's fine tuning.
+
+### Shape usability
+
+Fit screen is effective only for Portrait, excluding Compact Strip. Changing shape
+preserves the stored mode and restores Fit on return. Portrait Fit width is capped
+at 30% of the available work area; the existing coverage cap still applies.
+Oversize presets are disabled in Settings with their actual fitted dimensions.
+Square uses equal full-width provider rows, with two side by side quota meters
+and a reset time in the heading from Medium. Featured selection only changes order.
+Pill uses identity-colored names, 5h and W values and slim bars without card boxes
+or plan chips; session reset time appears from Large. Circle includes featured
+Weekly usage and removes card separators and elapsed markers.
+Expired reset times read “Awaiting refresh”. Onboarding uses a plain portrait shell.

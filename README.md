@@ -59,7 +59,7 @@ Open Vite's displayed URL with `?sample` to see fictional data. For a native sou
 
 Keep a compact row beside your editor or expand into detailed cards. Each theme uses the same local data.
 
-![Four different themes at XS, S, M and L window sizes](docs/screenshots/sizes.png)
+![Five presets at 85, 100, 120, 150 and 200 percent](docs/screenshots/sizes.png)
 <sub>XS: Terminal / Phosphor · S: Retro LCD / Liquid Crystal, Light · M: Frosted Glass / Acrylic · L: Brutalist / Acid. Vivid, fictional data.</sub>
 
 Scale text and spacing together from 50% to 300%, with presets or Ctrl +/− and Ctrl+0. Numbers keep their proportions at every size.
@@ -87,16 +87,16 @@ Change palette, opacity, scale and placement in one panel. Calm uses neutral usa
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/settings-light.png">
-  <img src="docs/screenshots/settings-dark.png" alt="AI Usage widget and display settings in two theme variants" width="980">
+  <img src="docs/screenshots/settings-dark.png" alt="Size and shape settings in light and dark appearance" width="980">
 </picture>
-<sub>Dark: Circular Rings / Ocean · Light: Frosted Glass / Acrylic. Vivid, fictional data.</sub>
+<sub>Size & Shape settings · Light and Dark · fictional data.</sub>
 
 Prefer the familiar? System uses your desktop font, light/dark appearance and system accent where supported. It is the default theme.
 
 ![System theme adapts to light and dark desktop appearance](docs/screenshots/system.png)
 <sub>System / Desktop · Light and Dark · Calm · fictional data.</sub>
 
-### Nine designs, one snapshot
+### Ten designs, one snapshot
 
 ![Ten themes in two rows, mixing light and dark appearance](docs/screenshots/themes.png)
 <sub>Top: System, Dot Matrix / Sakura Pink, Circular Rings, Terminal, Frosted Glass. Bottom: Brutalist, Compact Strip, Retro LCD, Minimal Pace. Alternating Dark / Light, Vivid, fictional data.</sub>
@@ -199,8 +199,9 @@ Choose Portrait, Landscape (2:1), Square, Circle Dial, or Pill (4:1) in Settings
 Provider layout is configurable in **Layout & Position → Provider layout**.
 Drag rows or use Up / Down, and toggle visibility without disabling collection.
 Choose Auto (highest usage across quota windows), a specific featured provider,
-or None. Top / Bottom places the large cell in portrait and square grids; None
-centers the unpaired half-width cell. Missing layout settings preserve the
+or None. Top / Bottom places the large cell in portrait; None
+centers its unpaired half-width cell. Square keeps equal full-width rows and uses
+featured selection only for order. Missing layout settings preserve the
 legacy last-cell layout and automatic circle center. Hidden or unselected
 featured providers are not silently replaced.
 
@@ -208,3 +209,9 @@ featured providers are not silently replaced.
 with matching surfaces in all other shapes. Breathing is off by default and
 respects reduced motion. Calm softens meter hues and tracks; Vivid increases
 saturation and arc weight. Mono retains provider patterns.
+
+Sizes: Small 85%, Medium 100%, Large 120%, X-Large 150%, 2X-Large 200%,
+with separate fine tuning. Small keeps text at least 11 CSS pixels and removes
+secondary chrome. Fit screen applies to Portrait (except Compact Strip), with a
+30% work-area width cap; changing shape preserves the saved Fit choice.
+Square and Pill keep both 5-hour and Weekly meters for every visible provider.
