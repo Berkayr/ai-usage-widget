@@ -150,6 +150,10 @@ benchmark are described in [performance notes](../docs/performance.md).
 
 ## Linux AppImage identity and staging
 
+### Linux installer script
+
+After a release is published, x86-64 users can run the one-line installer shown in the root README. It downloads only the matching release package and `SHA256SUMS.txt`, checks that the package has a checksum entry, then verifies it before installation. Debian/Ubuntu and Fedora use their native package managers (with `sudo`); other distributions get an AppImage in `~/.local/bin` and an application-menu entry. Use `scripts/install.sh --uninstall` to remove the AppImage files; package installs are removed with `apt remove ai-usage` or `dnf remove ai-usage`. `--from-dir DIR` exercises the same package selection, checksum and installation path with local release assets.
+
 The platform override `app/src-tauri/tauri.linux.conf.json` uses `ai-usage` as
 Tauri's Linux product name. Tauri names the AppImage root icon and desktop entry
 after that value, while `Icon` uses the main binary name; keeping both equal
