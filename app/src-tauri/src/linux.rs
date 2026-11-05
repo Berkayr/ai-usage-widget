@@ -117,7 +117,7 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
                 let supported = call::<unsafe extern "C" fn() -> i32>(&lib,b"gtk_layer_is_supported\0");
                 let init = call::<unsafe extern "C" fn(Window)>(&lib,b"gtk_layer_init_for_window\0");
                 // Validate every symbol before opting in; old libraries fall back cleanly.
-                let complete = [b"gtk_layer_set_layer\0".as_slice(),b"gtk_layer_set_anchor\0",b"gtk_layer_set_margin\0",b"gtk_layer_set_exclusive_zone\0",b"gtk_layer_set_keyboard_mode\0",b"gtk_layer_set_monitor\0"].iter().all(|name| lib.get::<*mut c_void>(name).is_ok());
+                let complete = [b"gtk_layer_set_layer\0".as_slice(),b"gtk_layer_set_anchor\0",b"gtk_layer_set_margin\0",b"gtk_layer_set_exclusive_zone\0",b"gtk_layer_set_keyboard_mode\0",b"gtk_layer_set_monitor\0"].iter().all(|name| lib.get::<*mut c_void>(*name).is_ok());
                 if complete && supported.map(|f|f()!=0).unwrap_or(false) && init.is_some() {
                     // A layer surface has no xdg ConfigureNotify to complete GTK's
                     // normal resize handshake. Give GTK a requisition before map,
