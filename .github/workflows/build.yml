@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        required: true
+        required: false
         type: string
         description: Reviewed release tag to build
 permissions:
@@ -92,7 +92,8 @@ jobs:
           if-no-files-found: error
           retention-days: 7
   attach:
-    needs: bundle
+    if: github.event_name == 'push' || inputs.tag != ''
+    needs: [bundle, install-smoke]
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -119,6 +120,7 @@ jobs:
             const fs = require('fs');
             const {owner, repo} = context.repo;
             const tag = process.env.RELEASE_TAG;
+            if (!tag) core.setFailed('A release tag is required to attach artifacts');
             let release;
             try {
               release = (await github.rest.repos.getReleaseByTag({owner, repo, tag})).data;
@@ -132,3 +134,33 @@ jobs:
               if (existing) await github.rest.repos.deleteReleaseAsset({owner, repo, asset_id: existing.id});
               await github.rest.repos.uploadReleaseAsset({owner, repo, release_id: release.id, name, data: fs.readFileSync(`release-artifacts/${name}`)});
             }
+  install-smoke:
+    needs: bundle
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: installers-linux-x86_64
+          path: release-artifacts
+      - name: Install and launch deb, then AppImage
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          DEB=$(find release-artifacts -name '*.deb' -print -quit)
+          APPIMAGE=$(find release-artifacts -name '*.AppImage' -print -quit)
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          scripts/install.sh --from-dir "$(dirname "$DEB")"
+          xvfb-run sh -c 'timeout 20 ai-usage; test $? -eq 124'
+          scripts/install.sh --uninstall
+          APPDIR=$(mktemp -d)
+          cp "$APPIMAGE" "$APPDIR/"
+          (cd "$APPDIR" && sha256sum "$(basename "$APPIMAGE")" > SHA256SUMS.txt)
+          scripts/install.sh --from-dir "$APPDIR"
+          APPIMAGE_EXTRACT_AND_RUN=1 xvfb-run sh -c 'timeout 20 "$HOME/.local/bin/ai-usage.AppImage"; test $? -eq 124'
+          scripts/install.sh --uninstall
+      - name: Install rpm in Fedora container
+        run: |
+          RPM=$(find release-artifacts -name '*.rpm' -print -quit)
+          docker run --rm -v "$PWD:/work" -w /work fedora:latest sh -c 'dnf install -y sudo && /work/scripts/install.sh --from-dir /work/release-artifacts/installers-linux-x86_64'

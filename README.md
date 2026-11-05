@@ -26,13 +26,13 @@ Pre-release: installers are coming with v0.1. Gallery values are fictional; prov
 
 ## Install
 
-| Platform | Preferred download | Availability |
-| --- | --- | --- |
-| Windows 10/11 | `.exe` setup or `.msi` from GitHub Releases | Coming with v0.1 |
-| Linux | AppImage, Debian/Ubuntu `.deb`, Fedora `.rpm` | Coming with v0.1 |
-| Arch Linux | AUR package | Coming with v0.1; recipe drafts only |
+Installers are coming with v0.1; no release is available yet.
 
-No winget or AUR installation command is published yet. Linux needs host Python 3.10+, provider CLIs and the appropriate GTK/WebKit runtime; AppImage also has host dependencies. Windows **with Python** installers include a verified private Python runtime; no separate Python installation is needed. If Python 3.10+ is already installed, choose **slim** to skip the bundled runtime and use your existing interpreter. Provider tools are still installed separately. See [packaging](packaging/README.md) before building or testing a package.
+- **Linux:** `curl -fsSL https://raw.githubusercontent.com/Berkayr/ai-usage-widget/main/scripts/install.sh | sh` or download the `.deb` / `.rpm` / AppImage from GitHub Releases.
+- **Windows 10/11:** Download `windows-x86_64-with-python-AI Usage_*_x64-setup.exe` from GitHub Releases, then choose **Next, Next, Finish**; no Python installation is needed. Windows may show SmartScreen because the installer is not signed yet: choose **More info**, then **Run anyway**.
+- **Arch Linux:** AUR package availability is also coming with v0.1; recipe drafts only.
+
+Linux needs host Python 3.10+, provider CLIs and the appropriate GTK/WebKit runtime; AppImage also has host dependencies. Windows slim installers are for users who already have Python 3.10+. Provider tools are installed separately. See [packaging](packaging/README.md) before building or testing a package.
 
 ## Quick start
 
