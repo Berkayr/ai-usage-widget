@@ -44,6 +44,413 @@
         "#56b4e9",
         "#cc79a7"
       ]
+    },
+    "amber-cursor": {
+      "name": "Amber Cursor",
+      "bgWidget": "#130f0a",
+      "bgCard": "#201a10",
+      "bgTrackOff": "#4a4236",
+      "textPrimary": "#f6f5f4",
+      "textSecondary": "#d2ccc1",
+      "textMuted": "#b5aea1",
+      "border": "#645640",
+      "accent": "#f1c77e",
+      "severityNormal": "#f1c77e",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f6f3ee",
+        "bgCard": "#fcfcfa",
+        "bgTrackOff": "#d4cec4",
+        "textPrimary": "#171512",
+        "textSecondary": "#4a4236",
+        "textMuted": "#645c4f",
+        "border": "#c7bca8",
+        "accent": "#855a0f",
+        "severityNormal": "#855a0f",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#855a0f",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#f1c77e",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "ice-cursor": {
+      "name": "Ice Cursor",
+      "bgWidget": "#0a1013",
+      "bgCard": "#101c20",
+      "bgTrackOff": "#36454a",
+      "textPrimary": "#f4f5f6",
+      "textSecondary": "#c1ced2",
+      "textMuted": "#a1b0b5",
+      "border": "#405b64",
+      "accent": "#7ed4f1",
+      "severityNormal": "#7ed4f1",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#eef4f6",
+        "bgCard": "#fafcfc",
+        "bgTrackOff": "#c4d0d4",
+        "textPrimary": "#121617",
+        "textSecondary": "#36454a",
+        "textMuted": "#4f5f64",
+        "border": "#a8bfc7",
+        "accent": "#0f6885",
+        "severityNormal": "#0f6885",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#0f6885",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#7ed4f1",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "violet-prompt": {
+      "name": "Violet Prompt",
+      "bgWidget": "#0e0a13",
+      "bgCard": "#191020",
+      "bgTrackOff": "#40364a",
+      "textPrimary": "#f5f4f6",
+      "textSecondary": "#cac1d2",
+      "textMuted": "#aca1b5",
+      "border": "#534064",
+      "accent": "#bb7ef1",
+      "severityNormal": "#bb7ef1",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3eef6",
+        "bgCard": "#fbfafc",
+        "bgTrackOff": "#cdc4d4",
+        "textPrimary": "#151217",
+        "textSecondary": "#40364a",
+        "textMuted": "#5a4f64",
+        "border": "#b9a8c7",
+        "accent": "#4e0f85",
+        "severityNormal": "#4e0f85",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#4e0f85",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#bb7ef1",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "lime-prompt": {
+      "name": "Lime Prompt",
+      "bgWidget": "#0f130a",
+      "bgCard": "#1a2010",
+      "bgTrackOff": "#414a36",
+      "textPrimary": "#f5f6f4",
+      "textSecondary": "#cbd2c1",
+      "textMuted": "#adb5a1",
+      "border": "#556440",
+      "accent": "#c1f17e",
+      "severityNormal": "#c1f17e",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f6ee",
+        "bgCard": "#fbfcfa",
+        "bgTrackOff": "#cdd4c4",
+        "textPrimary": "#151712",
+        "textSecondary": "#414a36",
+        "textMuted": "#5b644f",
+        "border": "#bac7a8",
+        "accent": "#54850f",
+        "severityNormal": "#54850f",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#54850f",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#c1f17e",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "rose-prompt": {
+      "name": "Rose Prompt",
+      "bgWidget": "#130a0d",
+      "bgCard": "#201017",
+      "bgTrackOff": "#4a363e",
+      "textPrimary": "#f6f4f5",
+      "textSecondary": "#d2c1c8",
+      "textMuted": "#b5a1a9",
+      "border": "#64404f",
+      "accent": "#f17eae",
+      "severityNormal": "#f17eae",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f6eef2",
+        "bgCard": "#fcfafb",
+        "bgTrackOff": "#d4c4cb",
+        "textPrimary": "#171214",
+        "textSecondary": "#4a363e",
+        "textMuted": "#644f57",
+        "border": "#c7a8b5",
+        "accent": "#850f40",
+        "severityNormal": "#850f40",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#850f40",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#f17eae",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "copper-prompt": {
+      "name": "Copper Prompt",
+      "bgWidget": "#130d0a",
+      "bgCard": "#201610",
+      "bgTrackOff": "#4a3d36",
+      "textPrimary": "#f6f4f4",
+      "textSecondary": "#d2c7c1",
+      "textMuted": "#b5a8a1",
+      "border": "#644d40",
+      "accent": "#f1a87e",
+      "severityNormal": "#f1a87e",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f6f1ee",
+        "bgCard": "#fcfbfa",
+        "bgTrackOff": "#d4cac4",
+        "textPrimary": "#171412",
+        "textSecondary": "#4a3d36",
+        "textMuted": "#64564f",
+        "border": "#c7b3a8",
+        "accent": "#853a0f",
+        "severityNormal": "#853a0f",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#853a0f",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#f1a87e",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "blue-prompt": {
+      "name": "Blue Prompt",
+      "bgWidget": "#0a0d13",
+      "bgCard": "#101620",
+      "bgTrackOff": "#363d4a",
+      "textPrimary": "#f4f4f6",
+      "textSecondary": "#c1c7d2",
+      "textMuted": "#a1a8b5",
+      "border": "#404d64",
+      "accent": "#7ea8f1",
+      "severityNormal": "#7ea8f1",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#eef1f6",
+        "bgCard": "#fafbfc",
+        "bgTrackOff": "#c4cad4",
+        "textPrimary": "#121417",
+        "textSecondary": "#363d4a",
+        "textMuted": "#4f5664",
+        "border": "#a8b3c7",
+        "accent": "#0f3a85",
+        "severityNormal": "#0f3a85",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#0f3a85",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#7ea8f1",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "cyan-prompt": {
+      "name": "Cyan Prompt",
+      "bgWidget": "#0a1312",
+      "bgCard": "#10201f",
+      "bgTrackOff": "#364a49",
+      "textPrimary": "#f4f6f6",
+      "textSecondary": "#c1d2d1",
+      "textMuted": "#a1b5b4",
+      "border": "#406462",
+      "accent": "#7ef1ed",
+      "severityNormal": "#7ef1ed",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#eef6f6",
+        "bgCard": "#fafcfc",
+        "bgTrackOff": "#c4d4d4",
+        "textPrimary": "#121717",
+        "textSecondary": "#364a49",
+        "textMuted": "#4f6463",
+        "border": "#a8c7c6",
+        "accent": "#0f8581",
+        "severityNormal": "#0f8581",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#0f8581",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#7ef1ed",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "white-phosphor": {
+      "name": "White Phosphor",
+      "bgWidget": "#0a0e13",
+      "bgCard": "#101820",
+      "bgTrackOff": "#36404a",
+      "textPrimary": "#f4f5f6",
+      "textSecondary": "#c1c9d2",
+      "textMuted": "#a1abb5",
+      "border": "#405264",
+      "accent": "#7eb8f1",
+      "severityNormal": "#7eb8f1",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#eef2f6",
+        "bgCard": "#fafbfc",
+        "bgTrackOff": "#c4ccd4",
+        "textPrimary": "#121417",
+        "textSecondary": "#36404a",
+        "textMuted": "#4f5964",
+        "border": "#a8b8c7",
+        "accent": "#0f4a85",
+        "severityNormal": "#0f4a85",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#0f4a85",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#7eb8f1",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "gold-cursor": {
+      "name": "Gold Cursor",
+      "bgWidget": "#13110a",
+      "bgCard": "#201d10",
+      "bgTrackOff": "#4a4736",
+      "textPrimary": "#f6f6f4",
+      "textSecondary": "#d2cfc1",
+      "textMuted": "#b5b2a1",
+      "border": "#645e40",
+      "accent": "#f1de7e",
+      "severityNormal": "#f1de7e",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f6f5ee",
+        "bgCard": "#fcfcfa",
+        "bgTrackOff": "#d4d1c4",
+        "textPrimary": "#171612",
+        "textSecondary": "#4a4736",
+        "textMuted": "#64604f",
+        "border": "#c7c2a8",
+        "accent": "#85710f",
+        "severityNormal": "#85710f",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#85710f",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#f1de7e",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "red-cursor": {
+      "name": "Red Cursor",
+      "bgWidget": "#130a0a",
+      "bgCard": "#201210",
+      "bgTrackOff": "#4a3736",
+      "textPrimary": "#f6f4f4",
+      "textSecondary": "#d2c2c1",
+      "textMuted": "#b5a2a1",
+      "border": "#644340",
+      "accent": "#f1887e",
+      "severityNormal": "#f1887e",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f6efee",
+        "bgCard": "#fcfafa",
+        "bgTrackOff": "#d4c5c4",
+        "textPrimary": "#171212",
+        "textSecondary": "#4a3736",
+        "textMuted": "#64504f",
+        "border": "#c7aba8",
+        "accent": "#85190f",
+        "severityNormal": "#85190f",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#85190f",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#f1887e",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     }
   }
 }

@@ -331,3 +331,55 @@ covered by `tests/screen-fit.mjs`. `AUDIT_THEMES`, `AUDIT_SHAPES` and `AUDIT_OUT
 allow focused reruns. Captures use 21/33, 8/13 and 30/18; the review sheets and
 results go to `gorevler/ss-sekil-final/`. The optional sheet assembly uses the
 already installed Pillow and preserves screenshot resolution.
+
+### Portrait spacing
+
+`node docs/tools/portrait-gap-check.mjs` measures all ten themes, one to three
+providers, featured on/off, quote on/off, all five presets and all four screen
+fractions at synthetic 1536 × 960 (125% KDE scale) and 1920 × 1080 work areas.
+Build first. The existing isolated headless harness is used; nothing reads or
+writes native settings. `AUDIT_OUTPUT` selects the JSON output directory.
+`AUDIT_BASELINE=1` records failures without returning a failing exit code.
+`AUDIT_THEMES`, `AUDIT_COUNTS`, and `AUDIT_CHOICES` optionally narrow a debug run.
+
+Text Range line rectangles and meter/graphic rectangles are projected onto the
+vertical axis and merged. Each card and the whole surface record the longest
+unoccupied run; each card also records the total unoccupied vertical share.
+Card limits are max(2.5rem, 12% of card height), with a 1px rounding tolerance.
+The check also rejects card text collisions, text outside cards, container
+scroll overflow, and usage/quote content outside the surface. This measures
+layout boxes, not raster ink density. Compact Strip keeps its independent
+horizontal fixed mode and is still covered by the portrait matrix.
+
+`node docs/tools/portrait-preview.mjs` captures synthetic Small and Full Fit
+scenes for all ten themes, cropped to the measured surface. `shape-final-check.mjs` also
+writes `geometry.json` for exact comparison of the four non-portrait shapes.
+Screen Fit permits Portrait to end at its content; all other shapes still have
+to fill their fixed boxes. Native WebKitGTK/WebView2 acceptance remains separate.
+
+`node docs/tools/portrait-resize-check.mjs` emulates fitting the native viewport
+to one provider, adds three providers without first growing the viewport, then
+returns to one. It checks both quote states and verifies that Fit spends spare
+height on number sizes within the existing display tier. It uses no native IPC.
+
+Palette acceptance (headless, fictional data only):
+
+```sh
+node --test tests/user-palettes.mjs
+node docs/tools/palette-check.mjs
+SKIP_AUDIT_SCREENSHOTS=1 node docs/tools/settings-check.mjs
+node docs/tools/contrast-audit.mjs
+node docs/tools/theme-identity-check.mjs
+```
+
+The contrast audit enumerates every built-in palette in both appearances and all
+three color modes. Theme identity includes all palettes across five shapes,
+comparing structure within each appearance/mode. The palette UI check covers
+editing, duplicate/delete, transfer, warnings, fallback, and all-theme rendering;
+the settings check also verifies user palettes through synthetic IPC and honest
+Save/Revert. `PALETTE_CAPTURE=/tmp/palette-editor.png` optionally captures the
+editor outside the repository. `SKIP_AUDIT_SCREENSHOTS=1` suppresses screenshot
+file writes in the settings acceptance tool.
+
+Use `AUDIT_THEMES=dot-matrix AUDIT_PALETTES=slate` for a focused contrast recheck;
+omit both filters for the complete built-in matrix.

@@ -69,6 +69,8 @@ Scale text and spacing together from 50% to 300%, with presets or Ctrl +/− and
 
 ### Find your signal
 
+Every theme includes 12 palettes; create your own Dark/Light colors and import or export them in Settings.
+
 Choose a quiet Calm look, colorful Vivid palettes or pure black and white Mono. Ten themes change the layout as well as the colors. Theme cards in Settings switch designs immediately; every theme supports Auto, Light and Dark appearance.
 
 ![Pink, Nord, blue glass and acid palette examples](docs/screenshots/palettes.png)

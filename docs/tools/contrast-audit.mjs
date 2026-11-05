@@ -17,7 +17,7 @@ try {
     const lum=c=>c.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
     const contrast=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
     const failures=[];let combinations=0,texts=0,arcLabels=0;
-    for(const theme of api.themes)for(const palette of Object.keys(theme.palettes))for(const appearance of ['light','dark'])for(const colorMode of ['calm','vivid','mono']) {
+    for(const theme of api.themes.filter(t=>!${JSON.stringify(process.env.AUDIT_THEMES?.split(',') || null)} || ${JSON.stringify(process.env.AUDIT_THEMES?.split(',') || null)}.includes(t.id)))for(const palette of Object.keys(theme.palettes).filter(p=>!${JSON.stringify(process.env.AUDIT_PALETTES?.split(',') || null)} || ${JSON.stringify(process.env.AUDIT_PALETTES?.split(',') || null)}.includes(p)))for(const appearance of ['light','dark'])for(const colorMode of ['calm','vivid','mono']) {
       await api.setSettings({sizePreset:${JSON.stringify(sizePreset)},fineTune:100,quoteEnabled:true,shape:${JSON.stringify(shape)},theme:theme.id,palette,appearance,colorMode,widgetOpacity:100,backgroundOpacity:100,accent:null,background:null});combinations++;
       const toggle=document.querySelector('#quote .quote-toggle');
       if(['circle','square'].includes(${JSON.stringify(shape)})&&document.documentElement.dataset.quotePage!=='true'){toggle.click();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}
@@ -38,6 +38,7 @@ try {
     }
     return {combinations,texts,arcLabels,failures};
   })()`);
+  console.log(`${shape}/${sizePreset}/${width}: ${result.combinations} combinations, ${result.failures.length} contrast failures`);
   total.arcLabels+=result.arcLabels;total.combinations+=result.combinations;total.texts+=result.texts;total.failures.push(...result.failures.map(f=>({shape,width,sizePreset,...f})));
   }
   if(!total.arcLabels)total.failures.push({message:'Circle endpoint labels were not audited'});

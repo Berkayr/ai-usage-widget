@@ -1,3 +1,4 @@
+import {auditPaletteIdentity} from './palette-identity-check.mjs';
 import { auditLayoutVariants } from './layout-variants.mjs';
 import { auditQuotes } from './quote-check.mjs';
 // Measure signature layouts on the production renderer; all inputs are fictional.
@@ -9,6 +10,7 @@ const rows=[],circleCaptures=[],similarityWarnings=[];
 try {
   await b.cdp('Emulation.setDefaultBackgroundColorOverride',{color:{r:0,g:0,b:0,a:0}});
   await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
+  const palettes = await auditPaletteIdentity(b); if(palettes.failures.length) { console.table(palettes.failures); process.exitCode=1; }
   const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
   for(const shape of shapes.filter(s=>!process.env.AUDIT_SHAPES||process.env.AUDIT_SHAPES.split(',').includes(s))) for(const theme of themes) for(const sizePreset of Object.keys(sizePresets)) for(const count of [1,2,3,4,5,6]) for(const appearance of ['dark','light']) for(const page of (shape==='square'&&count>4?[0,1]:[0])) {
     const settings={shape,theme,sizePreset,fineTune:100,fitHeight:true,appearance};

@@ -1,3 +1,4 @@
+import { selectedPalette, appearancePalette } from './user-palettes.js';
 import { providerColors } from './themes/shared/identity.js';
 const rgb = hex => hex.replace('#', '').match(/../g).slice(0, 3).map(n => parseInt(n, 16));
 function mix(a, b, weight) { return '#' + rgb(a).map((v, i) => Math.round(v * weight + rgb(b)[i] * (1 - weight)).toString(16).padStart(2, '0')).join(''); }
@@ -13,16 +14,16 @@ function readable(color, background) {
 function properties(values) {
   for (const [key,value] of Object.entries(values)) document.documentElement.style.setProperty(`--${key}`,value);
 }
-function basePalette(settings, palette) {
+function basePalette(settings, palette, background = palette.bgWidget) {
   const values = Object.fromEntries(Object.entries(palette).filter(([key,value]) => typeof value === 'string' && !['name','mode'].includes(key)));
   properties(values);
-  providerColors(settings, settings.background || palette.bgWidget).forEach((color,i) => properties({[`provider-${i}`]:color}));
+  providerColors(settings, settings.background || background).forEach((color,i) => properties({[`provider-${i}`]:color}));
   if (settings.accent) properties({accent:settings.accent});
   if (settings.background) properties({bgWidget:settings.background});
   document.documentElement.dataset.mode = palette.mode;
   // Native system accent when supported; no platform bridge or font embedding.
   const native = CSS.supports('color','AccentColor') && CSS.supports('color','AccentColorText');
-  properties({systemAccent:settings.accent || (native ? 'AccentColor' : palette.accent),systemAccentText:CSS.supports('color','AccentColorText')?'AccentColorText':palette.textPrimary});
+  properties({systemAccent:settings.accent || (native && !(settings.theme === 'system' && settings.palette !== 'default') ? 'AccentColor' : palette.accent),systemAccentText:CSS.supports('color','AccentColorText')?'AccentColorText':palette.textPrimary});
 }
 function textPalette(settings, palette) {
   const card = palette.bgCard, background = settings.background || palette.bgWidget;
@@ -45,9 +46,10 @@ function colorMode(settings) {
   document.documentElement.dataset.accentEdge = settings.accentEdge === 'auto' ? automatic : settings.accentEdge;
 }
 export function applyAppearance(settings, theme, systemLight) {
-  const selected = theme.palettes[settings.palette] || Object.values(theme.palettes)[0];
+  const selected = selectedPalette(theme, settings);
   const mode = settings.appearance === 'auto' ? (systemLight ? 'light' : 'dark') : settings.appearance;
-  const palette = {...selected,...(selected[mode] || {}),mode};
-  basePalette(settings,palette);colorMode(settings);textPalette(settings,palette);
+  const palette = appearancePalette(selected, mode);
+  const textColors = settings.palette.startsWith('user-') ? appearancePalette(selected, mode, true) : palette;
+  basePalette(settings,palette,textColors.bgWidget);colorMode(settings);textPalette(settings,textColors);
   if (settings.colorMode === 'mono') monoPalette(mode);
 }

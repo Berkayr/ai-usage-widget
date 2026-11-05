@@ -442,3 +442,11 @@ fieldset:has(>label):not(:has(>label:not([hidden]))) {
 .settings-actions #save:not(:disabled){background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .settings-actions #save:disabled{background:var(--control);color:var(--disabled);border-color:var(--line);opacity:1}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+
+#palette-tools textarea { width:100%; box-sizing:border-box; margin-top:12px; font-family:monospace; }
+.palette-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+#palette-tools button:focus-visible, .palette-option:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.palette-token { display:grid; grid-template-columns:minmax(110px,1fr) 44px minmax(90px,1fr); gap:8px; align-items:center; }
+.palette-token input { min-width:0; width:100%; box-sizing:border-box; }
+#palette-tools fieldset { margin-top:12px; }
+.palette-warning { font-size:.875rem; }
