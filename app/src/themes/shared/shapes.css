@@ -30,7 +30,7 @@
 
 /* Dense cells drop timing after metadata. Primary usage stays prominent. */
 :root[data-dense-shape=true] :is(.window-bottom,.quota-window>.reset){display:none}
-:root[data-dense-shape=true]:not([data-theme=frosted-glass]):not([data-theme=retro-lcd]) .quota-window:not(:first-child){display:none}
+:root[data-shape=landscape][data-dense-shape=true]:not([data-theme=frosted-glass]):not([data-theme=retro-lcd]) .quota-window:not(:first-child){display:none}
 :root[data-dense-shape=true] .windows{align-content:stretch;grid-template-columns:minmax(0,1fr)}
 :root[data-dense-shape=true] .quota-window{display:flex;flex-direction:column;justify-content:space-around}
 /* Segments fit their capsule instead of wrapping outside a fixed-height track. */
@@ -39,16 +39,7 @@
 :root:is([data-shape=landscape],[data-shape=square]) .widget .dot-bar i{height:auto;aspect-ratio:1;align-self:center}
 :root:is([data-shape=landscape],[data-shape=square])[data-theme=brutalist]:not([data-dense-shape=true]) .window-top{flex-direction:row;align-items:baseline}
 :root:is([data-shape=landscape],[data-shape=square])[data-theme=retro-lcd] .quota-window{border:1px solid var(--border);border-radius:.25rem;background:var(--bgWidget)}
-/* An odd square page fills its final row and restores both quota metrics. */
-:root[data-shape=square] .provider-card.featured-provider:nth-child(n){grid-column:1/-1}
-:root[data-shape=square] .provider-card.featured-provider:nth-child(n) .windows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:stretch}
-:root[data-shape=square] .provider-card.featured-provider:nth-child(n) .quota-window{display:flex;flex-direction:column;justify-content:space-around}
-/* Keep the center to two lines; the secondary window has its own ring. */
-:root[data-theme=circular-rings][data-shape=square] .provider-card.featured-provider:nth-child(n){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr)}
-:root[data-theme=circular-rings][data-shape=square] .provider-card.featured-provider:nth-child(n) .windows{display:flex;flex-direction:column;justify-content:center;padding-left:.5rem}
-:root[data-theme=circular-rings][data-shape=square] .provider-card.featured-provider:nth-child(n) .quota-window:first-child{display:none}
 :root[data-shape=landscape][data-theme=brutalist] .provider-card.featured-provider:nth-child(n) .windows{grid-template-columns:minmax(0,1fr)}
-:root[data-theme=circular-rings][data-shape=square] .provider-card.featured-provider:nth-child(n) .ring-display{height:100%;min-width:0}
 :root[data-dense-shape=true][data-theme=circular-rings] .provider-card{padding:.375rem}
 :root[data-dense-shape=true][data-theme=circular-rings] .ring-center strong{font-size:max(var(--shape-min-font),.875rem);line-height:1}
 :root[data-dense-shape=true][data-theme=circular-rings] .ring-center small{line-height:1}
@@ -92,7 +83,6 @@
 :root[data-shape=pill] .widget .quota-window:first-child .window-bottom .reset{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 :root[data-shape=pill] .widget .provider-card{flex:1 1 0}
 
-:root[data-shape=pill][data-large-shape=true] .widget .window-bottom{display:flex;margin:0;font-size:max(var(--shape-min-font),.625rem);line-height:1.1}
 :root[data-shape=pill] .widget .segments>em{top:0;height:100%}
 :root[data-shape=pill] .widget .provider-card{position:relative}
 /* Reserve line boxes for font ascenders/descenders and both large-size reset rows. */
@@ -127,8 +117,6 @@
 :root[data-shape=pill] .widget .window-top>span{flex-shrink:0}
 :root[data-shape=pill] .widget .window-top b{flex-shrink:0}
 :root[data-shape=pill] .widget .quota-window .window-bottom{display:none}
-:root[data-shape=pill][data-large-shape=true] .widget .quota-window .window-bottom{display:flex}
-:root[data-shape=pill]:not([data-micro-shape=true]) .widget .plan{display:inline-block;border:0;padding:0;font-size:max(var(--shape-min-font),.5625rem);line-height:1.2;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 :root[data-shape=pill] .widget .provider-heading>div{display:flex;align-items:baseline;gap:.25rem;flex-wrap:nowrap}
 :root[data-shape=pill]:not([data-large-shape=true]) .widget .window-top b{font-size:max(var(--shape-min-font),.75rem)}
 :root:is([data-shape=circle],[data-shape=pill]){color-scheme:only light}
@@ -155,7 +143,7 @@
 
 /* Layout choices preserve each theme's fixed content budget. */
 :root:is([data-shape=portrait],[data-shape=square]) .provider-card.featured-provider:nth-child(n){grid-column:1/-1}
-:root[data-featured-layout=none]:is([data-shape=square],[data-shape=portrait]:is([data-theme=brutalist],[data-theme=circular-rings],[data-theme=reactor])) .provider-card:last-child:nth-child(odd):not(:only-child){grid-column:1/-1;width:50%;justify-self:center}
+:root[data-featured-layout=none][data-shape=portrait]:is([data-theme=brutalist],[data-theme=circular-rings],[data-theme=reactor]) .provider-card:last-child:nth-child(odd):not(:only-child){grid-column:1/-1;width:50%;justify-self:center}
 :root[data-color-mode=calm] :is(.dial-value,.meter,.segments,.dot-bar,.ring-value){filter:saturate(.55)}
 :root[data-color-mode=calm] .provider-card::after{filter:saturate(.55)}
 :root[data-color-mode=calm] .dial-track{opacity:.45}
@@ -186,7 +174,7 @@
 :root .provider-card[data-usage-compact=true] .ring-display{min-height:0;max-height:100%;height:100%;aspect-ratio:auto;margin-bottom:0}
 :root .provider-card[data-usage-compact=true] .ring-display svg{object-fit:contain}
 /* A quote leaves a shallow landscape row: keep both metrics side by side. */
-:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true]{padding:.125rem}
+:root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true]{padding:.125rem .375rem}
 :root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .windows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 :root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .window-top{display:flex;flex-direction:row;align-items:baseline;gap:.125rem}
 
@@ -199,3 +187,57 @@
 :root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] :is(.meter,.segments,.dot-bar){height:.25rem;margin-top:.125rem}
 :root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .segments i{height:100%}
 :root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .segments>em{top:0;height:100%}
+
+/* Full-width square rows retain both windows at every preset. */
+.heading-reset{display:none}
+:root[data-shape=square] .widget .provider-list{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(var(--provider-count),minmax(0,1fr));gap:.375rem;padding-bottom:0}
+:root[data-shape=square] .widget .provider-card:nth-child(n){grid-column:1/-1;grid-row:auto;width:100%;padding:.25rem .5rem;overflow:hidden}
+:root[data-shape=square] .widget .provider-heading{display:flex;min-height:0;margin:0 0 .125rem;flex-wrap:nowrap;gap:.25rem}
+:root[data-shape=square] .widget .provider-heading h2{font-size:max(var(--shape-min-font),.875rem)}
+:root[data-shape=square] .widget .heading-reset{display:block;font-size:max(var(--shape-min-font),.6875rem);color:var(--textMuted);white-space:nowrap}
+:root[data-shape=square] .widget .windows{display:grid;flex:1 1 0;grid-template-columns:repeat(2,minmax(0,1fr));align-content:stretch;gap:.5rem}
+:root[data-shape=square] .widget .quota-window:nth-child(n){display:flex;flex-direction:column;justify-content:center;gap:.125rem;padding:0;border:0;background:none}
+:root[data-shape=square] .widget .window-top{display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;gap:.125rem}
+:root[data-shape=square] .widget .window-top b{font-size:max(var(--shape-min-font),1.125rem);line-height:1.2;margin:0}
+:root[data-shape=square] .widget :is(.plan,.window-bottom,.quota-window>.reset,.ring-display,.balance-row){display:none}
+:root[data-shape=square] .widget :is(.meter,.segments,.dot-bar){width:100%;height:.25rem;margin:0;flex-wrap:nowrap}
+:root[data-shape=square] .widget :is(.segments,.dot-bar) i{flex:1;min-width:0;max-width:none;width:auto;height:100%}
+:root[data-shape=square][data-small-size=true] .widget .heading-reset{display:none}
+
+/* Round shapes have no inherited card separators. */
+:root[data-shape=circle] .widget .header{border:0!important;box-shadow:none!important}
+:root[data-shape=circle] .widget .header::before,:root[data-shape=circle] .widget .header::after{display:none}
+:root[data-shape=circle] .widget .dial-safe{left:25%;right:25%;top:29%;bottom:25%;align-items:center;text-align:center;border:0!important;padding:0}
+:root[data-shape=circle] .widget .dial-arc-label{border-width:1px;border-radius:.25rem;text-decoration:none}
+:root[data-shape=circle] .widget .dial-weekly{font-size:max(var(--shape-min-font),.75rem)}
+
+/* The capsule spends its inner rectangle on data; controls share the right tip. */
+:root[data-shape=pill] .widget .provider-list{padding:.5rem 3rem .5rem 2rem;gap:.75rem}
+:root[data-shape=pill] .widget .provider-card{padding:0;border:0;background:none;box-shadow:none!important;border-radius:0}
+:root[data-shape=pill] .widget .provider-card::before,:root[data-shape=pill] .widget .provider-card::after{display:none}
+:root[data-shape=pill] .widget .provider-heading h2{color:var(--provider-identity);font-size:max(var(--shape-min-font),.8125rem)}
+:root[data-shape=pill] .widget .provider-heading h2::before{content:'';display:inline-block;width:.3rem;height:.3rem;background:currentColor;margin-right:.25rem}
+:root[data-shape=pill] .widget .plan{display:none}
+:root[data-shape=pill] .widget .quota-window:nth-child(n){display:flex;flex-direction:column;border:0;background:none;padding:0}
+:root[data-shape=pill] .widget .window-top{font-size:max(var(--shape-min-font),.6875rem)}
+:root[data-shape=pill] .widget .window-top b{font-size:max(15px,1rem);line-height:1.2}
+:root[data-shape=pill][data-small-size=true] .widget .window-top b{font-size:max(13px,1rem)}
+:root[data-shape=pill] .widget .quota-window .window-bottom{display:none}
+:root[data-shape=pill][data-large-shape=true] .widget .quota-window[data-kind=session] .window-bottom{display:flex}
+:root[data-shape=pill] .widget .header{right:1rem;top:1.5rem}
+:root[data-shape=pill] .widget .gear{min-width:0;min-height:0;width:1.5rem;height:1.5rem}
+:root[data-shape=pill] .widget .quote-section{left:auto;right:1rem;top:4rem;width:1.5rem;justify-content:center}
+:root[data-shape=pill] .widget .quote-toggle{padding:0;width:1.5rem;height:1.5rem}
+
+/* Small removes secondary chrome before reducing core usage. */
+:root[data-small-size=true]:is([data-shape=portrait],[data-shape=landscape]) .widget :is(.footer,.plan,.pace-context,.sync-line){display:none}
+:root[data-quote=true][data-shape=portrait] .widget .featured-provider:nth-child(n) .windows{flex:1 1 auto;align-content:space-evenly}
+:root[data-quote=true][data-shape=portrait] .widget .featured-provider:nth-child(n) .quota-window{justify-content:center}
+
+:root[data-shape=pill]:is([data-large-shape=true],[data-large-shape=false]) .widget .window-top b{font-size:max(var(--shape-min-font),1rem);line-height:1.2}
+:root .widget :is(.reset,.dial-reset){color:var(--textMuted)}
+:root .widget:has(#provider-onboarding:not([hidden])){border-radius:1rem;clip-path:none;height:100%;overflow:hidden}
+:root .widget #provider-onboarding:not([hidden]){flex:1;min-height:0;display:flex;flex-direction:column;padding:.5rem}
+:root #provider-onboarding .provider-choices{flex:1;min-height:0;max-height:none}
+:root #provider-onboarding .provider-consent-actions{flex:none}
+:root[data-shape=circle] .widget .quote-section{border:0;box-shadow:none}

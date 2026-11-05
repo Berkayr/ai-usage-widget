@@ -1,6 +1,7 @@
 //! Native input masks. GTK receives logical pixels; Win32 receives physical pixels.
 use crate::Shape;
 use std::sync::{Mutex, atomic::{AtomicBool, AtomicU64, Ordering}};
+static ONBOARDING: AtomicBool = AtomicBool::new(false);
 static RUNNING: AtomicBool = AtomicBool::new(false);
 static REVISION: AtomicU64 = AtomicU64::new(0);
 static LAST: Mutex<Option<(Shape,i32,i32)>> = Mutex::new(None);
@@ -18,6 +19,12 @@ fn scanlines(shape: &Shape, width: i32, height: i32) -> Vec<(i32,i32,i32,i32)> {
         let right=(w/2.0+half-0.5).floor().min(w-1.0) as i32;
         (right>=left).then_some((left,y,right-left+1,1))
     }).collect()
+}
+fn effective_shape(shape: Shape, onboarding: bool) -> Shape {
+    if onboarding { Shape::Portrait } else { shape }
+}
+pub fn set_onboarding(window: &tauri::WebviewWindow, active: bool) {
+    if ONBOARDING.swap(active, Ordering::SeqCst) != active { request(window); }
 }
 pub fn request(window: &tauri::WebviewWindow) {
     REVISION.fetch_add(1,Ordering::SeqCst);
@@ -37,7 +44,7 @@ pub fn request(window: &tauri::WebviewWindow) {
     });
 }
 fn apply(window: &tauri::WebviewWindow) -> Result<(),String> {
-    let shape=crate::settings_window::current().shape;
+    let shape=effective_shape(crate::settings_window::current().shape, ONBOARDING.load(Ordering::SeqCst));
     let size=window.inner_size().map_err(|e|e.to_string())?;
     #[cfg(target_os="linux")]
     let (width,height)={use gtk::prelude::*;let widget=window.gtk_window().map_err(|e|e.to_string())?;(widget.allocated_width(),widget.allocated_height())};
@@ -70,6 +77,13 @@ fn apply(window: &tauri::WebviewWindow) -> Result<(),String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn onboarding_uses_rectangular_region_without_changing_saved_shape() {
+        for shape in [Shape::Circle, Shape::Pill, Shape::Square] {
+            assert!(effective_shape(shape.clone(), true) == Shape::Portrait);
+            assert!(effective_shape(shape.clone(), false) == shape);
+        }
+    }
     #[test]
     fn masks_follow_shape_and_dpi() {
         for dpi in [1.0,1.5,2.0] {for shape in [Shape::Circle,Shape::Pill] {

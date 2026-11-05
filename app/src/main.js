@@ -4,8 +4,9 @@ import { orderedProviders, arrangeCards } from './provider-layout.js';
 import { loadQuote, renderQuote, sampleQuote } from './quote.js';
 import './quote.css';
 import { providerIndex } from './themes/shared/identity.js';
+import { createRenderer } from './themes/shared/render.js';
 import { renderRound } from './themes/shared/round.js';
-import { normalizeSize, widgetWidth, widgetHeight, widgetProviders, fittedGeometry, selectedWorkArea } from './sizing.js';
+import { effectiveSizeMode, normalizeSize, widgetWidth, widgetHeight, widgetProviders, fittedGeometry, selectedWorkArea } from './sizing.js';
 import { hiddenStates } from './themes/dot-matrix/render.js';
 import { repairTextContrast } from './text-contrast.js';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -72,13 +73,17 @@ let desktopInfo = null;
 let monitorScale = 1;
 let placementMonitors = [];
 let layoutScale = 100;
+function renderSettings() { return $('#provider-onboarding').hidden ? settings : {...settings, shape:'portrait', theme:settings.theme === 'compact-strip' ? 'system' : settings.theme, quoteEnabled:false, sizeMode:'fixed', fitHeight:true}; }
 function updateLayoutScale(count) {
-  const monitor=selectedWorkArea(placementMonitors,settings);
-  layoutScale=monitor ? fittedGeometry(settings.sizeMode==='screen'?{...settings,matchPhysicalSize:false}:settings,count,monitor,desktopInfo?.platform || 'linux').scale : settings.scale;
-  const effective=layoutScale/(settings.matchPhysicalSize && settings.sizeMode!=='screen' ? monitorScale : 1);
+  if (!$('#provider-onboarding').hidden) count=3;
+  const monitor=selectedWorkArea(placementMonitors,renderSettings());
+  layoutScale=monitor ? fittedGeometry(renderSettings(),count,monitor,desktopInfo?.platform || 'linux').scale : settings.scale;
+  const effective=layoutScale/(settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
   document.documentElement.style.setProperty('--ui-scale',effective/100);
   document.documentElement.style.fontSize=`${16*effective/100}px`;
   document.documentElement.dataset.microShape=String(effective<65);
+  document.documentElement.dataset.readableSize=String(effective>=84.99);
+  document.documentElement.style.setProperty('--shape-min-font',effective>=84.99?'11px':'9px');
   updateNarrowViewport();
 }
 async function refreshWorkArea() {
@@ -107,22 +112,23 @@ function updateNarrowViewport() {
 function applySettings() {
   if (!theme) return;
   settings = normalizeSize(settings);
-  document.documentElement.dataset.shape = settings.shape;
+  document.documentElement.dataset.shape = $('#provider-onboarding').hidden ? settings.shape : 'portrait';
+  document.documentElement.dataset.smallSize = String(settings.sizePreset === 'Small');
   document.documentElement.dataset.reactorMotion = String(settings.reactorMotion === true && !document.hidden);
-  document.documentElement.dataset.largeShape = String(settings.scale >= 150);
-  document.documentElement.style.setProperty('--shape-min-font', '9px');
+  document.documentElement.dataset.largeShape = String(settings.scale >= 120);
+  document.documentElement.style.setProperty('--shape-min-font', '11px');
   applyAppearance(settings, theme, systemAppearance.matches);
   settings.dotCount = [10,20,30].includes(Number(settings.dotCount)) ? Number(settings.dotCount) : 20;
   document.documentElement.dataset.dotCount = settings.dotCount;
   updateLayoutScale(Math.max(1,$('#providers').querySelectorAll('.provider-card').length));
-  const effectiveScale = layoutScale / (settings.matchPhysicalSize && settings.sizeMode!=='screen' ? monitorScale : 1);
+  const effectiveScale = layoutScale / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
   document.documentElement.dataset.microShape = String(effectiveScale < 65);
   document.documentElement.style.setProperty('--widget-opacity', settings.widgetOpacity / 100);
   document.documentElement.style.setProperty('--background-opacity', settings.backgroundOpacity / 100);
   document.documentElement.style.setProperty('--ui-scale', effectiveScale / 100);
   document.documentElement.style.fontSize = `${16 * effectiveScale / 100}px`;
   updateNarrowViewport();
-  document.documentElement.classList.toggle('fit-height', Boolean((settings.fitHeight || settings.sizeMode === 'screen') && settings.shape === 'portrait')); lastFitHeight = 0;
+  document.documentElement.classList.toggle('fit-height', Boolean((settings.fitHeight || effectiveSizeMode(settings) === 'screen') && settings.shape === 'portrait')); lastFitHeight = 0;
   settings.taskbar = { ...defaultTaskbar, ...settings.taskbar, colorMode: settings.colorMode, dotCount: settings.dotCount };
   document.documentElement.dataset.translucent = String(settings.widgetOpacity * settings.backgroundOpacity < 7000);
   $('#widget').classList.toggle('placing', !!settings.placementEditing);
@@ -172,7 +178,7 @@ function draw(snapshot, noData = false) {
     const paged = round ? {...visible,providers:selectedProviders} : pages > 1 ? {...visible, providers:allProviders.slice(shapePage*4, shapePage*4+4)} : {...visible,providers:allProviders};
     const pageNav = $('.shape-pages'); pageNav.hidden = pages <= 1; pageNav.replaceChildren();
     for (let page=0;page<pages && pages>1;page++) { const button=document.createElement('button'); button.textContent=`${page+1}`; button.setAttribute('aria-label', `Provider page ${page+1} of ${pages}`); button.setAttribute('aria-current', String(page===shapePage)); button.onclick=()=>{shapePage=page;draw(currentSnapshot,currentNoData);}; pageNav.append(button); }
-    (round ? (root,snapshot)=>renderRound(root,snapshot,settings) : renderSnapshot)($('#providers'), paged, { noData, showExtraWindows: settings.showExtraWindows });
+    (settings.shape === 'square' ? createRenderer(settings.theme) : round ? (root,snapshot)=>renderRound(root,snapshot,settings) : renderSnapshot)($('#providers'), paged, { noData, showExtraWindows: settings.showExtraWindows });
     $('#providers').querySelectorAll('.provider-card').forEach((card,i) => {
       const index=providerIndex(paged.providers[i],i);
       card.style.setProperty('--provider-identity',`var(--provider-${index})`);
@@ -186,9 +192,10 @@ function draw(snapshot, noData = false) {
     $('#widget').style.setProperty('--shape-columns', settings.shape === 'square' ? (count > 1 ? 2 : 1) : Math.min(3, Math.max(1,count)));
     $('#widget').style.setProperty('--shape-rows', settings.shape === 'square' ? (count > 2 ? 2 : 1) : (count > 3 ? 2 : 1));
     updateLayoutScale(count);
-    const width = widgetWidth(settings,count) * layoutScale / 100 / (settings.matchPhysicalSize && settings.sizeMode!=='screen' ? monitorScale : 1);
-    if (!isSample) invoke('resize_widget', {scale:settings.scale,widthCssPx:width}).catch(error=>showToast(String(error)));
-    renderQuote($('#quote'),settings,quoteData,()=>draw(currentSnapshot,currentNoData),repairTextContrast);
+    const width = widgetWidth(renderSettings(),count) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
+    const maxHeight = widgetHeight(renderSettings(),$('#provider-onboarding').hidden ? count : 3) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
+    if (!isSample) invoke('resize_widget', {scale:layoutScale,widthCssPx:width,maxHeightCssPx:maxHeight,onboarding:!$('#provider-onboarding').hidden}).catch(error=>showToast(String(error)));
+    renderQuote($('#quote'),renderSettings(),quoteData,()=>draw(currentSnapshot,currentNoData),repairTextContrast);
     updateQuote();
     repairTextContrast($('#widget'));
     usageFit.refresh();
@@ -205,13 +212,13 @@ let lastFitHeight = 0;
 let fitPending = false;
 async function requestFit() {
   // The contract is independent of theme content; native code caps it to the monitor.
-  if ((!(settings.fitHeight || settings.sizeMode === 'screen') && settings.shape === 'portrait') || isSample || fitPending || document.hidden) return;
+  if ((!(renderSettings().fitHeight || effectiveSizeMode(renderSettings()) === 'screen') && renderSettings().shape === 'portrait') || isSample || fitPending || document.hidden) return;
   fitPending = true;
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   fitPending = false;
   if (disposed) return;
   const count = $('#providers').querySelectorAll('.provider-card').length;
-  const height = widgetHeight(settings,count) * layoutScale / 100 / (settings.matchPhysicalSize && settings.sizeMode!=='screen' ? monitorScale : 1);
+  const height = widgetHeight(renderSettings(),$('#provider-onboarding').hidden ? count : 3) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
   if (Math.abs(height - lastFitHeight) < 2) return;
   lastFitHeight = height;
   invoke('fit_window_height', { heightCssPx: height }).catch(() => {});
@@ -253,7 +260,7 @@ $('#widget').addEventListener('pointerdown', event => { if (event.button === 0 &
 let lastTier;
 meterObserver = new ResizeObserver(() => { updateNarrowViewport(); const tier = $('#app').clientWidth < 220 * parseFloat(getComputedStyle(document.documentElement).fontSize) / 16; if (tier !== lastTier) { lastTier = tier; if (currentSnapshot || currentNoData) draw(currentSnapshot,currentNoData); } });
 meterObserver.observe($('#app'));
-fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === ',') {event.preventDefault();openSettings();return;} const key=settings.sizeMode==='screen'?'fitFineTune':'fineTune',value=Number(settings[key] ?? 100); if (event.key === '+' || event.key === '=') settings[key] = Math.min(150, value + 5); else if (event.key === '-') settings[key] = Math.max(50, value - 5); else if (event.key === '0') settings[key] = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
+fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === ',') {event.preventDefault();openSettings();return;} const key=effectiveSizeMode(settings)==='screen'?'fitFineTune':'fineTune',value=Number(settings[key] ?? 100); if (event.key === '+' || event.key === '=') settings[key] = Math.min(150, value + 5); else if (event.key === '-') settings[key] = Math.max(50, value - 5); else if (event.key === '0') settings[key] = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
 if (isSample) draw(currentSample());
 else {
   try {
@@ -278,6 +285,7 @@ else {
       };
       $('#provider-onboarding').hidden = config.initialized;
       $('#providers').hidden = !config.initialized;
+      applySettings();
       if (!config.initialized) mountProviders($('#provider-onboarding'), config, save, saved);
     }
     await loadProviders();
@@ -329,7 +337,8 @@ if (new URLSearchParams(location.search).has('sample') && window.__QUOTA_DOCS_FI
     };
     $('#provider-onboarding').hidden = config.initialized;
     $('#providers').hidden = !config.initialized;
-    if (!config.initialized) mountProviders($('#provider-onboarding'), config, save, () => { $('#provider-onboarding').hidden = true; $('#providers').hidden = false; });
+      applySettings();
+    if (!config.initialized) mountProviders($('#provider-onboarding'), config, save, () => { $('#provider-onboarding').hidden = true; $('#providers').hidden = false; applySettings(); });
   }
   window.__QUOTA_DOCS_READY__ = true;
 }

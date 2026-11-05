@@ -19,14 +19,6 @@ export const dialStyles = {
 const usage = w => pctOf(w || {});
 const label = p => providerNames[p.id] || p.label || p.id || 'Provider';
 const providerWindow = p => (p.windows || []).find(w => w.kind === 'session') || (p.windows || [])[0];
-function elapsedMarker(w, r) {
-  const duration = w?.window_minutes || ({weekly:10080,session:300})[w?.kind];
-  const end = Date.parse(w?.resets_at);
-  if (!duration || !Number.isFinite(end)) return '';
-  const elapsed = Math.max(0, Math.min(1, 1 - (end - Date.now()) / (duration * 60000)));
-  const angle = elapsed * 2 * Math.PI - Math.PI / 2;
-  return `<line class="dial-elapsed" x1="${170+(r-5)*Math.cos(angle)}" y1="${170+(r-5)*Math.sin(angle)}" x2="${170+(r+5)*Math.cos(angle)}" y2="${170+(r+5)*Math.sin(angle)}"/>`;
-}
 function endpoint(w, r) {
   const p = usage(w) ?? 0, level = severity(p);
   if (level === 'normal') return '';
@@ -39,12 +31,12 @@ function dialTrack(item, i, context) {
   const r = 151 - i * 17, p = usage(w), index = providerIndex(provider, i);
   const pattern = multi && settings.colorMode === 'mono' ? identityPatterns[index] : style.pattern;
   const dash = pattern ? `stroke-dasharray="${pattern}"` : '';
-  return `<defs><mask id="dial-mask-${i}"><circle class="dial-pattern" cx="170" cy="170" r="${r}" pathLength="100" fill="none" stroke="white" stroke-width="${style.width*(settings.colorMode==='vivid'?1.12:1)}" stroke-linecap="${style.cap}" ${dash}/></mask></defs><g transform="rotate(-90 170 170)"><circle mask="url(#dial-mask-${i})" class="dial-track" cx="170" cy="170" r="${r}"/><circle mask="url(#dial-mask-${i})" class="dial-value" style="stroke:${color(provider,w,i)}" data-identity="${index}" data-severity="${severity(p??0)}" cx="170" cy="170" r="${r}" pathLength="100" stroke-dasharray="${p??0} 100"/></g>${endpoint(w,r)}${settings.theme==='minimal-pace'?elapsedMarker(w,r):''}`;
+  return `<defs><mask id="dial-mask-${i}"><circle class="dial-pattern" cx="170" cy="170" r="${r}" pathLength="100" fill="none" stroke="white" stroke-width="${style.width*(settings.colorMode==='vivid'?1.12:1)}" stroke-linecap="${style.cap}" ${dash}/></mask></defs><g transform="rotate(-90 170 170)"><circle mask="url(#dial-mask-${i})" class="dial-track" cx="170" cy="170" r="${r}"/><circle mask="url(#dial-mask-${i})" class="dial-value" style="stroke:${color(provider,w,i)}" data-identity="${index}" data-severity="${severity(p??0)}" cx="170" cy="170" r="${r}" pathLength="100" stroke-dasharray="${p??0} 100"/></g>${endpoint(w,r)}`;
 }
 function center(hero, count) {
   if (!hero) return `<div class="dial-safe"><strong class="dial-number">—</strong><div class="dial-name">${count?'ALL PROVIDERS':'NO ACTIVE PROVIDERS'}</div><small class="dial-reset">${count?'Select a featured provider':'Choose providers in Settings'}</small></div>`;
-  const value = usage(hero.w);
-  return `<div class="dial-safe"><strong class="dial-number">${value === null?'—':Math.round(value)+'%'}</strong><div class="dial-name">${esc(label(hero.p))}</div><small class="dial-reset">${esc(countdown(hero.w?.resets_at))}</small></div>`;
+  const value = usage(hero.w), weekly = usage((hero.p.windows || []).find(w=>w.kind==='weekly'));
+  return `<div class="dial-safe"><strong class="dial-number">${value === null?'—':Math.round(value)+'%'}</strong><div class="dial-name">${esc(label(hero.p))}</div><small class="dial-weekly">Weekly ${weekly === null?'—':Math.round(weekly)+'%'}</small><small class="dial-reset">${esc(countdown(hero.w?.resets_at))}</small></div>`;
 }
 function quotaTracks(providers, items) {
   if (providers.length !== 1) return items;

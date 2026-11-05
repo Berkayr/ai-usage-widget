@@ -14,7 +14,15 @@ export async function browser() {
   try {
     chrome=spawn(process.env.CHROME_BIN||'/opt/google/chrome/chrome',['--headless=new',...(process.env.CHROME_NO_SANDBOX==='1'?['--no-sandbox']:[]),'--disable-gpu','--disable-dev-shm-usage','--no-first-run','--disable-background-networking','--no-default-browser-check','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
     const port=await new Promise((resolve,reject)=>{let log='';const timer=setTimeout(()=>reject(Error('Chrome startup timeout: '+log.slice(-1000))),15000);chrome.once('error',e=>{clearTimeout(timer);reject(e);});chrome.once('exit',code=>{clearTimeout(timer);reject(Error(`Chrome exited ${code}: ${log.slice(-1000)}`));});chrome.stderr.on('data',chunk=>{log+=chunk;const m=log.match(/DevTools listening on ws:\/\/127\.0\.0\.1:(\d+)/);if(m){clearTimeout(timer);resolve(Number(m[1]));}});});
-    const pages=await(await fetch(`http://127.0.0.1:${port}/json/list`)).json();ws=new WebSocket(pages.find(p=>p.type==='page').webSocketDebuggerUrl);await once(ws,'open');
+    let page;
+    for(let attempt=0;attempt<150;attempt++){
+      const pages=await(await fetch(`http://127.0.0.1:${port}/json/list`)).json();
+      page=pages.find(p=>p.type==='page' && p.webSocketDebuggerUrl);
+      if(page)break;
+      await new Promise(r=>setTimeout(r,100));
+    }
+    if(!page)throw Error('Browser page target timeout');
+    ws=new WebSocket(page.webSocketDebuggerUrl);await once(ws,'open');
     ws.addEventListener('message',e=>{const m=JSON.parse(e.data),p=pending.get(m.id);if(p){pending.delete(m.id);clearTimeout(p.timer);if(m.error)p.reject(Error(m.error.message));else p.resolve(m.result);}});
     const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence;const timer=setTimeout(()=>{pending.delete(id);reject(Error(`Timeout: ${method}`));},60000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params}));});
     await cdp('Page.enable');await cdp('Runtime.enable');await cdp('Emulation.setDeviceMetricsOverride',{width:900,height:900,deviceScaleFactor:1,mobile:false});

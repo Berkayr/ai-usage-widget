@@ -16,13 +16,13 @@ export function featuredProvider(providers, settings, legacyLast = false) {
 }
 export function arrangeCards(root, providers, settings) {
   const cards = [...root.querySelectorAll('.provider-card')];
-  const grid = ['portrait', 'square'].includes(settings.shape);
+  const grid = settings.shape === 'portrait';
   const hero = grid && cards.length % 2 ? featuredProvider(providers, settings, true) : null;
   document.documentElement.dataset.featuredLayout = hero ? settings.featuredPosition || 'bottom' : 'none';
   cards.forEach((card, i) => {
     card.classList.toggle('featured-provider', hero != null && providers[i] === hero);
     card.dataset.provider = providers[i]?.id || '';
   });
-  const featured = root.querySelector('.featured-provider');
+  const featured = settings.shape === 'square' ? cards[providers.indexOf(featuredProvider(providers, settings))] : root.querySelector('.featured-provider');
   if (featured) settings.featuredPosition === 'top' ? root.prepend(featured) : root.append(featured);
 }

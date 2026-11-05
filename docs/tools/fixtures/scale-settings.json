@@ -3,37 +3,37 @@
     "sizePreset": "Small",
     "fineTune": 50,
     "shape": "portrait",
-    "scale": 37.5
+    "scale": 42.5
   },
   {
     "sizePreset": "Small",
     "fineTune": 79,
     "shape": "portrait",
-    "scale": 59.25
+    "scale": 67.15
   },
   {
     "sizePreset": "Small",
     "fineTune": 82,
     "shape": "portrait",
-    "scale": 61.5
+    "scale": 69.7
   },
   {
     "sizePreset": "Small",
     "fineTune": 83,
     "shape": "portrait",
-    "scale": 62.25
+    "scale": 70.55
   },
   {
     "sizePreset": "Small",
     "fineTune": 97,
     "shape": "portrait",
-    "scale": 72.75
+    "scale": 82.45
   },
   {
     "sizePreset": "Small",
     "fineTune": 150,
     "shape": "portrait",
-    "scale": 112.5
+    "scale": 127.5
   },
   {
     "sizePreset": "Medium",
@@ -75,103 +75,103 @@
     "sizePreset": "Large",
     "fineTune": 50,
     "shape": "portrait",
-    "scale": 62.5
+    "scale": 60
   },
   {
     "sizePreset": "Large",
     "fineTune": 79,
     "shape": "portrait",
-    "scale": 98.75
+    "scale": 94.8
   },
   {
     "sizePreset": "Large",
     "fineTune": 82,
     "shape": "portrait",
-    "scale": 102.5
+    "scale": 98.4
   },
   {
     "sizePreset": "Large",
     "fineTune": 83,
     "shape": "portrait",
-    "scale": 103.75
+    "scale": 99.6
   },
   {
     "sizePreset": "Large",
     "fineTune": 97,
     "shape": "portrait",
-    "scale": 121.25
+    "scale": 116.4
   },
   {
     "sizePreset": "Large",
     "fineTune": 150,
     "shape": "portrait",
-    "scale": 187.5
+    "scale": 180
   },
   {
     "sizePreset": "X-Large",
+    "fineTune": 50,
+    "shape": "portrait",
+    "scale": 75
+  },
+  {
+    "sizePreset": "X-Large",
+    "fineTune": 79,
+    "shape": "portrait",
+    "scale": 118.5
+  },
+  {
+    "sizePreset": "X-Large",
+    "fineTune": 82,
+    "shape": "portrait",
+    "scale": 123
+  },
+  {
+    "sizePreset": "X-Large",
+    "fineTune": 83,
+    "shape": "portrait",
+    "scale": 124.5
+  },
+  {
+    "sizePreset": "X-Large",
+    "fineTune": 97,
+    "shape": "portrait",
+    "scale": 145.5
+  },
+  {
+    "sizePreset": "X-Large",
+    "fineTune": 150,
+    "shape": "portrait",
+    "scale": 225
+  },
+  {
+    "sizePreset": "2X-Large",
     "fineTune": 50,
     "shape": "portrait",
     "scale": 100
   },
   {
-    "sizePreset": "X-Large",
+    "sizePreset": "2X-Large",
     "fineTune": 79,
     "shape": "portrait",
     "scale": 158
   },
   {
-    "sizePreset": "X-Large",
+    "sizePreset": "2X-Large",
     "fineTune": 82,
     "shape": "portrait",
     "scale": 164
   },
   {
-    "sizePreset": "X-Large",
+    "sizePreset": "2X-Large",
     "fineTune": 83,
     "shape": "portrait",
     "scale": 166
   },
   {
-    "sizePreset": "X-Large",
+    "sizePreset": "2X-Large",
     "fineTune": 97,
     "shape": "portrait",
     "scale": 194
-  },
-  {
-    "sizePreset": "X-Large",
-    "fineTune": 150,
-    "shape": "portrait",
-    "scale": 300
-  },
-  {
-    "sizePreset": "2X-Large",
-    "fineTune": 50,
-    "shape": "portrait",
-    "scale": 125
-  },
-  {
-    "sizePreset": "2X-Large",
-    "fineTune": 79,
-    "shape": "portrait",
-    "scale": 197.5
-  },
-  {
-    "sizePreset": "2X-Large",
-    "fineTune": 82,
-    "shape": "portrait",
-    "scale": 205
-  },
-  {
-    "sizePreset": "2X-Large",
-    "fineTune": 83,
-    "shape": "portrait",
-    "scale": 207.5
-  },
-  {
-    "sizePreset": "2X-Large",
-    "fineTune": 97,
-    "shape": "portrait",
-    "scale": 242.5
   },
   {
     "sizePreset": "2X-Large",

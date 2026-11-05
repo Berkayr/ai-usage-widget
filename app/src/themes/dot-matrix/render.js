@@ -12,7 +12,7 @@ function countdown(value) {
   if (!value) return 'RESET UNKNOWN';
   const delta = new Date(value).getTime() - Date.now();
   if (!Number.isFinite(delta)) return 'RESET UNKNOWN';
-  if (delta <= 0) return 'RESET DUE';
+  if (delta <= 0) return 'Awaiting refresh';
   const minutes = Math.floor(delta / 60000);
   if (minutes < 1440) return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
   return `${Math.floor(minutes / 1440)}d ${Math.floor((minutes % 1440) / 60)}h`;

@@ -1,5 +1,13 @@
 // Design dimensions are logical CSS pixels at 100% fine tuning and DPI 1.
-export const sizePresets = {Small:75, Medium:100, Large:125, 'X-Large':200, '2X-Large':250};
+export const maxScreenCoverage = 0.5;
+export const maxPortraitWidthFraction = 0.3;
+export function effectiveSizeMode(settings) {
+  return settings.sizeMode === 'screen' && settings.shape === 'portrait' && settings.theme !== 'compact-strip' ? 'screen' : 'fixed';
+}
+export function screenCoverage(settings) {
+  return settings.theme === "compact-strip" && settings.shape === "portrait" ? 0.35 : maxScreenCoverage;
+}
+export const sizePresets = {Small:85, Medium:100, Large:120, 'X-Large':150, '2X-Large':200};
 export const shapes = ['portrait', 'landscape', 'square', 'circle', 'pill'];
 export const reservedShapes = [];
 export function normalizeShape(shape) { return shapes.includes(shape) ? shape : 'portrait'; }
@@ -39,11 +47,14 @@ export function widgetProviders(providers, selection) {
 // Work-area dimensions use the same units as the native placement API.
 export function monitorFit(settings, count, monitor, platform = 'linux') {
   const dpi = monitor.scale || 1;
-  const unit = (platform === 'windows' ? dpi : 1) / (settings.matchPhysicalSize ? dpi : 1);
+  const unit = (platform === 'windows' ? dpi : 1) / (settings.matchPhysicalSize && effectiveSizeMode(settings) !== "screen" ? dpi : 1);
   const margin = platform === 'linux' && settings.position !== 'Free' ? Math.max(8, Number(settings.linux?.margin) || 0) : 8 * (platform === 'windows' ? dpi : 1);
   const availableWidth = Math.max(1, monitor.width - 2 * margin);
   const availableHeight = Math.max(1, monitor.height - 2 * margin);
-  const maxScale = Math.min(availableWidth / widgetWidth(settings, count), availableHeight / widgetHeight(settings, count)) * 100 / unit;
+  const baseWidth = widgetWidth(settings, count);
+  const baseHeight = widgetHeight(settings, count);
+  const coverageScale = Math.sqrt(screenCoverage(settings) * availableWidth * availableHeight / (baseWidth * baseHeight));
+  const maxScale = Math.min(availableWidth / baseWidth * (effectiveSizeMode(settings) === 'screen' ? maxPortraitWidthFraction : 1), availableHeight / baseHeight, coverageScale) * 100 / unit;
   const width = widgetWidth(settings, count) * settings.scale / 100 * unit;
   const height = widgetHeight(settings, count) * settings.scale / 100 * unit;
   return {width, height, maxScale, fits:settings.scale <= maxScale, margin, availableWidth, availableHeight};
@@ -61,12 +72,13 @@ export function workAreaMonitor(monitor, settings, platform = 'linux') {
 export function fittedGeometry(settings, count, monitor, platform = 'linux') {
   const area = workAreaMonitor(monitor, settings, platform);
   const fit = monitorFit(settings, count, area, platform);
-  const unit = (platform === 'windows' ? monitor.scale || 1 : 1) / (settings.matchPhysicalSize ? monitor.scale || 1 : 1);
-  const wide = ['landscape','pill'].includes(settings.shape);
+  const unit = (platform === 'windows' ? monitor.scale || 1 : 1) / (settings.matchPhysicalSize && effectiveSizeMode(settings) !== "screen" ? monitor.scale || 1 : 1);
+  const wide = ['landscape','pill'].includes(settings.shape) || (settings.theme === 'compact-strip' && settings.shape === 'portrait');
   const target = (wide ? fit.availableWidth / widgetWidth(settings,count) : fit.availableHeight / widgetHeight(settings,count)) * 100 / unit;
   const fraction = [1,.75,.5,1/3].includes(Number(settings.fitFraction)) ? Number(settings.fitFraction) : 1;
-  const scale = settings.sizeMode === 'screen' ? Math.min(fit.maxScale,target*fraction*Math.max(.5,Math.min(1.5,Number(settings.fitFineTune || 100)/100))) : Math.min(settings.scale,fit.maxScale);
-  return {...fit, fits:settings.sizeMode==='screen'||fit.fits, requestedWidth:fit.width, requestedHeight:fit.height, scale, width:widgetWidth(settings,count)*scale/100*unit, height:widgetHeight(settings,count)*scale/100*unit, area};
+  const requestedScale = effectiveSizeMode(settings) === 'screen' ? target*fraction*Math.max(.5,Math.min(1.5,Number(settings.fitFineTune || 100)/100)) : settings.scale;
+  const scale = Math.min(requestedScale, fit.maxScale);
+  return {...fit, limited:requestedScale > fit.maxScale + 1e-6, fits:effectiveSizeMode(settings)==='screen'||fit.fits, requestedWidth:fit.width, requestedHeight:fit.height, scale, width:widgetWidth(settings,count)*scale/100*unit, height:widgetHeight(settings,count)*scale/100*unit, area};
 }
 
 export function selectedWorkArea(monitors, settings) {

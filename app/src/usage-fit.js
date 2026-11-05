@@ -17,15 +17,22 @@ export function observeUsageFit(root) {
 export function fitUsage(root) {
   if (!root.clientHeight) return;
   const cards = [...root.querySelectorAll('.provider-card')];
+  for (const el of root.closest('.widget').querySelectorAll('[data-usage-font]')) {
+    el.style.fontSize = el.dataset.usageFont;
+    delete el.dataset.usageFont;
+  }
   // Recompute from authored styles after viewport, theme, quote or font changes.
   root.style.removeProperty('grid-template-rows');
   root.style.removeProperty('padding-bottom');
   for (const card of cards) {
     delete card.dataset.usageCompact;
     card.style.removeProperty('padding-bottom');
-    for (const el of card.querySelectorAll('[data-usage-font]')) {
-      el.style.fontSize = el.dataset.usageFont;
-      delete el.dataset.usageFont;
+  }
+  // The scale changes geometry, but readable text has a physical 11px floor.
+  for (const el of root.closest('.widget').querySelectorAll('*')) {
+    if (document.documentElement.dataset.readableSize === 'true' && [...el.childNodes].some(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()) && parseFloat(getComputedStyle(el).fontSize) < 11) {
+      if (!el.hasAttribute('data-usage-font')) el.dataset.usageFont = el.style.fontSize;
+      el.style.fontSize = '11px';
     }
   }
   donateFeaturedSpace(root, cards);

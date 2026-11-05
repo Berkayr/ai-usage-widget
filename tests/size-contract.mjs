@@ -6,8 +6,8 @@ test('legacy settings preserve effective scale, including migration boundaries',
   const value=normalizeSize({scale});assert.ok(Math.abs(value.scale-scale)<1e-8);
   assert.deepEqual(normalizeSize(value),value);
  }
- assert.equal(normalizeSize({scale:90}).sizePreset,'Medium');
- assert.equal(normalizeSize({scale:90}).fineTune,90);
+ assert.equal(normalizeSize({scale:90}).sizePreset,'Small');
+ assert.equal(normalizeSize({scale:90}).fineTune,90/85*100);
 });
 test('renamed presets and explicit choices survive theme changes',()=>{
  assert.equal(normalizeSize({sizePreset:'Normal'}).sizePreset,'Medium');
@@ -28,7 +28,7 @@ test('five sizes use proportional boxes, including the independent strip orienta
   for(const theme of ['system','brutalist','circular-rings','compact-strip']) {
    const s={...settings,theme};
    assert.equal(widgetHeight(s,count),theme==='compact-strip'?326:116+210*Math.max(1,count));
-   assert.equal(widgetWidth(s,count)*factor/(widgetHeight(s,count)*factor),widgetWidth(s,count)/widgetHeight(s,count));
+   assert.ok(Math.abs(widgetWidth(s,count)*factor/(widgetHeight(s,count)*factor)-widgetWidth(s,count)/widgetHeight(s,count))<1e-12);
   }
  }
 });
@@ -83,7 +83,7 @@ test('frontend scale matrix matches the fixture deserialized by Rust',async()=>{
  const fixture=JSON.parse(await readFile(new URL('../docs/tools/fixtures/scale-settings.json',import.meta.url),'utf8'));
  const expected=Object.keys(sizePresets).flatMap(sizePreset=>[50,79,82,83,97,150].map(fineTune=>normalizeSize({sizePreset,fineTune})));
  assert.deepEqual(fixture,expected);
- assert.equal(normalizeSize({sizePreset:'Large',fineTune:82}).scale,102.5);
- assert.equal(normalizeSize({sizePreset:'Small',fineTune:82}).scale,61.5);
+ assert.equal(normalizeSize({sizePreset:'Large',fineTune:82}).scale,98.4);
+ assert.equal(normalizeSize({sizePreset:'Small',fineTune:82}).scale,69.7);
  assert.equal(normalizeSize({sizePreset:'2X-Large',fineTune:150}).scale,300);
 });
