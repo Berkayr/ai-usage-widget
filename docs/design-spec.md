@@ -279,20 +279,23 @@ Native input regions match the silhouette: Win32 applies physical-pixel ellipse/
 
 ### Daily quote reading and work-area fit
 
-Quote is opt-in. In portrait, enabled quotes use a 320px reading block and
-160px provider cards (170px including the gap), instead of 200px quotes and
-200px cards. Quote-off dimensions and layout remain unchanged. With three
-providers the total remains 946px at 100%. Grid themes share this same budget.
+Quote is opt-in. Portrait retains the 320px reading budget and the existing
+scaled typography and meter tokens. Fit promotes quota numbers up to the existing display tier and headings up to
+the title tier, and increases row spacing only while measured content fits.
+Ring graphics reserve their labels before using remaining height. Provider rows
+and cards use intrinsic content height; the previous 200px (160px with a quote) per-provider budget is
+an overflow ceiling, rather than an instruction to pad every card to that size.
+Grid rows no longer multiply unused height when providers share a row. The quote
+reading budget can yield height to essential card labels. Small
+reclaims the height of hidden secondary chrome. The native portrait window
+requests the measured surface height, including after content grows again.
+
 Usage overflow is measured after rendering and on list resize/font readiness.
-In a three-provider portrait grid, the featured row first donates spare height
-to the paired row. Featured quote content shares spare height between its quota windows.
-Only cards that still overflow compact their internal spacing and then reduce
+Only cards that exceed their ceiling compact internal spacing and then reduce
 text, stopping at 11px (existing smaller labels keep their authored size).
 Dense Minimal Pace cards show the signed percentage-point delta with its
 comparison context in a tooltip. Ring graphics use the remaining cell height.
-This preserves shell dimensions,
-card borders, theme surfaces and cards that already fit. Overflow is never
-fixed by hiding a scrollbar or clipping quota content.
+Other shapes retain their fixed geometry and fitting behavior.
 
 The quote uses normal case and readable body weight; theme signatures remain on
 its label. Attribution is a small, borderless source line near the lower right;
@@ -327,7 +330,9 @@ Fit to screen. It applies only to Portrait, excluding Compact Strip; other
 combinations use their fixed preset while retaining the stored screen mode.
 Full, 3/4, 1/2 and 1/3 target the available height with independent 50–150% fine
 tuning. Width cannot exceed 30% of the available work area. The coverage and
-height limits remain safety nets, preserving aspect ratio. Fit is disabled in
+height limits remain safety nets for scaling content. These fractions are
+maximum height budgets: Portrait enlarges existing text and meters first, then
+ends at its content, so its final height can be shorter. Fit is disabled in
 Settings with “Portrait only” when unavailable, and returns on switching back.
 
 All geometry, the monitor map and fit warnings use only rendered providers

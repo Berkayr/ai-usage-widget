@@ -236,3 +236,17 @@
 :root #provider-onboarding .provider-choices{flex:1;min-height:0;max-height:none}
 :root #provider-onboarding .provider-consent-actions{flex:none}
 :root[data-shape=circle] .widget .quote-section{border:0;box-shadow:none}
+
+/* Portrait spends its scale on content, then ends at the intrinsic last row.
+   The old budget remains only an overflow ceiling for the existing fit pass. */
+:root[data-shape=portrait] #widget.widget:has(#provider-onboarding[hidden]){height:auto;max-height:var(--portrait-height-limit,100%)}
+:root[data-shape=portrait] .widget .provider-list{height:auto;flex:0 0 auto;grid-auto-rows:max-content;align-items:start;align-content:start;overflow:hidden}
+:root[data-shape=portrait] .widget .provider-card:nth-child(n){height:auto;min-height:0;max-height:var(--portrait-card-limit);align-self:start;overflow:hidden}
+:root[data-shape=portrait] .widget .provider-heading{min-height:0}
+:root[data-shape=portrait] #widget .provider-card:nth-child(n) .windows{flex:0 0 auto;align-content:start}
+:root[data-shape=portrait] #widget .provider-card:nth-child(n) .quota-window{min-height:0;justify-content:flex-start}
+
+/* Fit promotes the existing number/base type tiers before returning spare height. */
+:root[data-shape=portrait][data-portrait-fit=true] .widget .provider-list{--size-font-number:calc(1.25rem + var(--portrait-growth,0) * 1rem);--size-font-base:calc(.9375rem + var(--portrait-growth,0) * .125rem);--size-gap:calc(.625rem + var(--portrait-growth,0) * .25rem)}
+
+:root[data-shape=portrait] .widget .quote-section{flex:0 1 auto;min-height:10rem}
