@@ -22,11 +22,22 @@ class SoakMetricsTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, 'cycle 4'):
             check_memory(samples, memory_metrics(samples, 4))
 
-    def test_transient_peak_still_fails(self):
+    def test_early_spike_then_flat_passes(self):
         samples = self.samples()
-        samples[4]['bytes'] += 20 * MIB
-        with self.assertRaisesRegex(AssertionError, '>=20 MiB'):
-            check_memory(samples, memory_metrics(samples, 4))
+        samples[4]['bytes'] += 25 * MIB
+        check_memory(samples, memory_metrics(samples, 0))
+
+    def test_steady_climb_fails(self):
+        samples = [{'seconds': second + .1, 'bytes': (100 + second // 10 * 3) * MIB}
+                   for second in range(0, 120, 10)]
+        with self.assertRaisesRegex(AssertionError, 'trend >=20 MiB'):
+            check_memory(samples, memory_metrics(samples, 0))
+
+    def test_permanent_step_fails(self):
+        samples = [{'seconds': second + .1, 'bytes': (100 + (30 if second >= 70 else 0)) * MIB}
+                   for second in range(0, 120, 10)]
+        with self.assertRaisesRegex(AssertionError, 'trend >=20 MiB'):
+            check_memory(samples, memory_metrics(samples, 0))
 
     def test_missing_settled_sample_fails(self):
         samples = self.samples()[:-1]

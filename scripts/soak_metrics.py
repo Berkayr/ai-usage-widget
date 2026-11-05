@@ -1,11 +1,16 @@
 """Pure acceptance metrics for the native soak (also tested without a desktop)."""
+import statistics
+
 MIB = 1048576
 
 
 def memory_metrics(samples, cycles):
     # Warm-up opens at 15s and hides at 19s. The first stable sample is 30s.
     stable = [s['bytes'] for s in samples if s['seconds'] >= 30]
-    result = {'growth_after_30_bytes': max(stable) - min(stable) if stable else None}
+    quarter = max(1, len(stable) // 4)
+    growth = (statistics.mean(stable[-quarter:]) - statistics.mean(stable[:quarter])
+              if stable else None)
+    result = {'trend_after_30_bytes': growth}
     if cycles:
         settled = []
         for second in [30] + [50 + 20 * cycle for cycle in range(cycles)]:
@@ -21,6 +26,6 @@ def memory_metrics(samples, cycles):
 
 def check_memory(samples, metrics):
     stable = [s for s in samples if s['seconds'] >= 30]
-    assert len(stable) >= 8 and metrics['growth_after_30_bytes'] < 20 * MIB, 'Memory growth >=20 MiB after warm-up / 30s'
+    assert len(stable) >= 8 and metrics['trend_after_30_bytes'] < 20 * MIB, 'Memory trend >=20 MiB after warm-up / 30s'
     for cycle, growth in enumerate(metrics.get('settings_retained_growth_bytes', []), 1):
         assert growth <= 15 * MIB, f'Settings cycle {cycle}: retained growth >15 MiB from warmed baseline'

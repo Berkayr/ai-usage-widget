@@ -128,3 +128,5 @@ meaningful total-memory reduction. Shared-library charge ownership and concurren
 scopes affect these numbers. A 120-second update soak passed with a 9.94 MiB
 post-warmup range, ten snapshot opens and approximately 0.50-second render
 acknowledgements for all three synthetic changes.
+
+The soak memory limit compares the mean of the first and last quarters of samples after 30 seconds, so isolated peaks do not count as sustained growth.
