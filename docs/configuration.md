@@ -91,7 +91,23 @@ System uses a system-ui font stack without bundled theme fonts, 8 px cards and c
 
 Navigation is Providers, Theme, Size & Shape, Position, Quote, Taskbar strip
 (Windows), Desktop (Linux), and General. Provider order and the featured provider
-are under Providers. Theme includes Palette, Mode, Colors and Provider colors;
+are under Providers. Drag and Up / Down reorder the visible list immediately in
+preview; Save persists it. `featuredProvider: "first"` (First in list) is the
+new-install default. `"auto"` (Highest usage) selects the largest quota percentage
+across windows; the hint names the selection and explains that reordering cannot
+change it. A provider ID pins that provider; `"none"` disables the selection.
+Unknown or unavailable IDs safely select no provider. Missing settings preserve
+legacy behavior (last Portrait cell, highest-usage Circle center).
+
+Portrait features one card only with an odd visible count, whether quotes are on
+or off; `featuredPosition: "top" | "bottom"` places that card. Even counts use
+equal cards. Square uses equal rows and moves the selected provider within each
+page. Landscape and Pill use list order and ignore featured choice and position.
+Circle uses the featured choice for its center and ignores position. Circle and
+Pill first apply Providers on this widget (up to three) and visibility, then order
+and featured selection.
+
+Theme includes Palette, Mode, Colors and Provider colors;
 theme-specific details appear only when applicable. General contains Start at
 login, Show extra windows and diagnostics.
 

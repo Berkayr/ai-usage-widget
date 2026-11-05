@@ -8,6 +8,10 @@ test('order and visibility apply without changing snapshot',()=>{
 });
 test('featured auto, explicit, none, unavailable and legacy',()=>{
  assert.equal(featuredProvider(providers,{featuredProvider:'auto'}).id,'codex');
+ assert.equal(featuredProvider(providers,{featuredProvider:'first'}).id,'claude');
+ assert.equal(featuredProvider(orderedProviders(providers,{providerOrder:['codex','claude']}),{featuredProvider:'first'}).id,'codex');
+ assert.equal(featuredProvider([],{featuredProvider:'first'}),null);
+ assert.equal(featuredProvider(providers,{}).id,'codex');
  assert.equal(featuredProvider(providers,{featuredProvider:'claude'}).id,'claude');
  assert.equal(featuredProvider(providers,{featuredProvider:'none'}),null);
  assert.equal(featuredProvider(providers,{featuredProvider:'missing'}),null);

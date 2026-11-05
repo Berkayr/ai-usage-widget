@@ -383,3 +383,18 @@ file writes in the settings acceptance tool.
 
 Use `AUDIT_THEMES=dot-matrix AUDIT_PALETTES=slate` for a focused contrast recheck;
 omit both filters for the complete built-in matrix.
+
+Provider layout acceptance (headless, in-memory synthetic IPC only):
+
+```sh
+cd app && npm run build && cd ..
+node docs/tools/provider-layout-check.mjs
+```
+
+This drives the actual Settings frontend and widget event listener together,
+asserting rendered order and featured classes before Save and after Save/reopen.
+It covers Up/Down, drag, visibility, First in list, Highest usage, explicit and
+None selections, Top/Bottom, quotes off/on, and two through four visible providers
+in all five shapes (Circle and Pill cap their widget selection at three).
+It also reproduces the Codex-first stored order / Claude-first draft / Gemini
+Auto hero distinction. Screenshots use fictional data under ignored `gorevler/`.

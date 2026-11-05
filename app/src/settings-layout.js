@@ -1,6 +1,8 @@
-import {providerNames} from './themes/dot-matrix/render.js';
+import {orderedProviders, featuredProvider} from './provider-layout.js';
+import {widgetProviders} from './sizing.js';
+import {hiddenStates, providerNames} from './themes/dot-matrix/render.js';
 
-export function layoutControls(root, getDraft, getProviders, update) {
+export function layoutControls(root, getDraft, getProviders, update, getSnapshot = () => []) {
   const field = document.createElement('fieldset');
   field.innerHTML =
       `<legend>Provider layout</legend>
@@ -10,6 +12,7 @@ export function layoutControls(root, getDraft, getProviders, update) {
 <label>Featured provider<select id="featured-provider">
 </select>
 </label>
+<p id="featured-hint" class="setting-note" role="status"></p>
 <label>Featured position<select id="featured-position">
 <option value="top">Top</option>
 <option value="bottom">Bottom</option>
@@ -24,7 +27,7 @@ export function layoutControls(root, getDraft, getProviders, update) {
     update();
   };
   const select = field.querySelector('#featured-provider');
-  select.onchange = () => change('featuredProvider', select.value);
+  select.onchange = () => change('featuredProvider', select.value === 'legacy' ? null : select.value);
   field.querySelector('#featured-position').onchange = e =>
       change('featuredPosition', e.target.value);
   field.querySelector('#reactor-motion').onchange = e =>
@@ -91,10 +94,38 @@ export function layoutControls(root, getDraft, getProviders, update) {
     field.querySelector('#provider-order')
         .replaceChildren(...ids.map((id, i) => row(id, i, ids)));
     select.replaceChildren(
-        ...[[ 'auto', 'Auto (highest usage)' ], [ 'none', 'None' ],
+        ...[[ 'first', 'First in list' ], [ 'auto', 'Highest usage' ], [ 'none', 'None' ],
+            ...(!draft.featuredProvider ? [['legacy', 'Legacy layout']] : []),
+            ...(draft.featuredProvider && !['first', 'auto', 'none', ...ids].includes(draft.featuredProvider)
+                ? [[draft.featuredProvider, 'Unavailable selection']] : []),
             ...ids.map(id => [id, providerNames[id] || id])]
             .map(([ value, label ]) => new Option(label, value)));
-    select.value = draft.featuredProvider || 'auto';
+    select.value = draft.featuredProvider || 'legacy';
+    const round = ['circle', 'pill'].includes(draft.shape);
+    const visible = orderedProviders(getSnapshot().filter(p => ids.includes(p.id) &&
+        !hiddenStates.has(String(p.state).toUpperCase())), draft);
+    const shown = round ? widgetProviders(visible, draft.widgetProviders) :
+        draft.shape === 'square' ? visible.slice(0, 4) : visible;
+    const hero = featuredProvider(shown, draft, draft.shape === 'portrait');
+    const name = hero ? providerNames[hero.id] || hero.id : 'No provider';
+    let hint = draft.featuredProvider === 'auto'
+        ? `${name} selected by highest usage across quota windows. Up / Down changes order, not the featured provider.`
+        : draft.featuredProvider === 'first'
+        ? `${name} is first in the visible list. Up / Down changes the featured provider.`
+        : draft.featuredProvider && draft.featuredProvider !== 'none'
+        ? `${name} selected explicitly. Up / Down changes order, not the featured provider.`
+        : draft.featuredProvider === 'none'
+        ? 'No featured provider selected. Up / Down changes list order.'
+        : `${name} selected by legacy layout (last Portrait cell, highest-usage Circle center).`;
+    if (draft.shape === 'portrait' && shown.length % 2 === 0)
+      hint += ' With an even provider count, all cards are equal; Top / Bottom has no effect.';
+    else if (draft.shape === 'square')
+      hint += ' Square uses equal rows; Top / Bottom changes order only, on each page.';
+    else if (draft.shape === 'circle')
+      hint += ' Circle uses the selection for its center; Top / Bottom has no effect.';
+    else if (['landscape', 'pill'].includes(draft.shape))
+      hint += ' This shape uses list order; featured selection and Top / Bottom have no effect.';
+    field.querySelector('#featured-hint').textContent = hint;
     field.querySelector('#featured-position').value =
         draft.featuredPosition || 'bottom';
     document.querySelector('#reactor-motion').checked =
