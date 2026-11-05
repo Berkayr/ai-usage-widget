@@ -55,7 +55,7 @@
       },
       "rpm": {
         "depends": [
-          "python3 >= 3.10",
+          "python3",
           "gtk3",
           "webkit2gtk4.1"
         ],
