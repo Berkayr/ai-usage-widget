@@ -2,7 +2,7 @@
    scan lines stay on meters, never underneath glyphs used in contrast checks. */
 :root .widget {opacity:1;background-image:none;background-color:color-mix(in srgb,var(--bgWidget) calc(var(--background-opacity)*var(--widget-opacity)*100%),transparent)}
 :root .widget .provider-card {background-image:none}
-:root .widget :is(.header,.footer,.provider-heading,.window-top,.window-bottom,.reset,.pace,.plan,.status-badge,.compact-line,.compact-api,.xs-content,.ring-center,.balance-row,.empty-window,.sync-line,.app-title) {opacity:1}
+:root .widget :is(.header,.footer,.provider-heading,.window-top,.window-bottom,.reset,.pace,.plan,.status-badge,.ring-center,.balance-row,.empty-window,.sync-line,.app-title) {opacity:1}
 :root .widget .gear {min-width:32px;min-height:32px}
 :root[data-translucent=true] .widget :is(span,b,strong,small,h2,button) {text-shadow:0 1px 1px #000,0 -1px 1px #fff}
 :root .widget .placement-bar {position:sticky;top:0;z-index:20;background:var(--bgCard);color:var(--textPrimary);padding:8px;font:12px/1.5 system-ui;display:flex;gap:8px;flex-wrap:wrap}

@@ -15,7 +15,6 @@ import {
   normalizeSize,
   selectedWorkArea,
   shapes,
-  sizePresets,
   widgetHeight,
   widgetProviders,
   widgetWidth,

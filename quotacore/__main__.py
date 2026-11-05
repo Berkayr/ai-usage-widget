@@ -128,7 +128,6 @@ def daemon(interval: int) -> int:
 
 
 def _pace(snapshot_value: dict, *, no_log: bool, mode: str) -> int:
-    from .paths import atomic_json
     config_path = data_path("pace.json")
     state_path = data_path("pace-state.json")
     try:

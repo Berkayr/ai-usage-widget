@@ -56,7 +56,6 @@
 .dial-track{stroke:var(--bgTrackOff)}.dial-value{stroke:var(--severityNormal)}
 .dial-safe{position:absolute;left:21%;right:21%;top:24%;bottom:19%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;text-align:center;min-width:0}
 .dial-safe>*{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;line-height:1.4}
-.dial-legend{font-size:max(var(--shape-min-font),.9375rem);width:100%}.dial-legend>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dial-legend i{display:inline-block;width:.35rem;height:.35rem;border-radius:50%;background:var(--accent);margin-right:.25rem}
 .dial-number{font-size:3rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:0}.dial-name{font-size:max(var(--shape-min-font),.875rem)}.dial-reset{font-size:max(var(--shape-min-font),.6875rem)}
 :root[data-shape=circle][data-theme=brutalist] .dial-number{font-size:3.75rem;font-weight:900}
 :root[data-shape=circle][data-theme=dot-matrix] :is(.dial-track,.dial-value){stroke-linecap:round}
@@ -104,14 +103,13 @@
 
 /* The page itself stays transparent, including browser/iframe previews. */
 :root:is([data-shape=circle],[data-shape=pill]),:root:is([data-shape=circle],[data-shape=pill]) body{background:transparent!important}
-:root[data-shape=circle][data-theme=brutalist] :is(.dial-legend,.dial-name){text-transform:uppercase;font-weight:800}
+:root[data-shape=circle][data-theme=brutalist] .dial-name{text-transform:uppercase;font-weight:800}
 :root[data-shape=circle][data-theme=circular-rings] .dial-number{font-size:3.25rem;font-weight:700}
 :root[data-shape=circle][data-theme=retro-lcd] .dial-number{font-family:JetBrainsMono,monospace;font-weight:500;letter-spacing:.04em;text-shadow:2px 2px var(--bgTrackOff)}
 :root[data-shape=circle][data-theme=terminal] .dial-number{font-weight:400}
 :root[data-shape=circle][data-theme=terminal] .dial-name::before{content:'> '}
 :root[data-shape=circle][data-theme=frosted-glass] .dial-safe{border:1px solid var(--border);border-radius:1.5rem;background:var(--bgCard);box-shadow:inset 0 1px 0 #ffffff40,0 8px 24px #0002}
 :root[data-shape=circle][data-theme=minimal-pace] .dial-number{font-weight:300}
-.dial-elapsed{stroke:var(--chromeText);stroke-width:2}
 /* Preserve a physical gap, then drop timing before plan metadata. */
 :root[data-shape=pill] .widget .window-top{gap:max(4px,.3rem);white-space:nowrap}
 :root[data-shape=pill] .widget .window-top>span{flex-shrink:0}
@@ -127,9 +125,6 @@
 :root[data-color-mode=mono][data-shape=pill] .provider-card::after{border-color:var(--textPrimary)}
 :root[data-color-mode=mono][data-shape=pill] .provider-card[data-identity="1"]::after{border-bottom-style:dashed}
 :root[data-color-mode=mono][data-shape=pill] .provider-card[data-identity="2"]::after{border-bottom-style:dotted}
-:root[data-color-mode=mono] .dial-legend i{border-radius:0;width:.65rem;height:0;border-bottom:3px solid var(--identity);background:none!important}
-:root[data-color-mode=mono] .dial-legend i[data-identity="1"]{border-bottom-style:dashed}
-:root[data-color-mode=mono] .dial-legend i[data-identity="2"]{border-bottom-style:dotted}
 
 /* A narrow identity edge applies to every card without replacing theme styling. */
 :root .widget .provider-card{box-shadow:inset 2px 0 var(--provider-identity)}

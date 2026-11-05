@@ -1,5 +1,4 @@
 """GitHub Copilot quota reader using the existing gh login."""
-import json
 import shutil
 import subprocess
 from ..schema import iso_now, meter_record, provider_record

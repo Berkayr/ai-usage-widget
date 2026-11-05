@@ -11,7 +11,7 @@ from typing import Any
 
 from ..paths import data_path
 from ..schema import iso_now, provider_record
-from .common import kind_for, make_window, number, safe_error, timestamp
+from .common import kind_for, make_window, number, timestamp
 
 META = {"id": "gemini", "label": "Google Gemini", "category": "subscription", "auth": "cli-login", "experimental": False, "docs_url": "https://github.com/google-gemini/gemini-cli"}
 

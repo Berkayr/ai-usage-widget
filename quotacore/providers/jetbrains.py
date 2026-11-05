@@ -4,7 +4,7 @@ import json
 import os
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from ..schema import iso_now, meter_record, provider_record
+from ..schema import meter_record, provider_record
 from .common import number, timestamp
 
 META = {"id": "jetbrains", "label": "JetBrains AI", "category": "credits", "auth": "local-file", "experimental": False, "docs_url": "https://www.jetbrains.com/help/ai-assistant/licensing-and-subscriptions.html"}

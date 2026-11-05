@@ -41,7 +41,6 @@ def load_config(detect: dict[str, bool] | None = None) -> dict[str, Any]:
             return normalize_config(data, detect)
     except (OSError, ValueError):
         pass
-    detect = detect or {key: False for key in IDS}
     result = {"providers": {key: {"enabled": False, "order": i} for i, key in enumerate(DEFAULT_ORDER)},
               "interval": 300, "initialized": False}
     try:
@@ -53,7 +52,6 @@ def load_config(detect: dict[str, bool] | None = None) -> dict[str, Any]:
 
 def normalize_config(data: dict[str, Any], detect: dict[str, bool] | None = None) -> dict[str, Any]:
     source = data.get("providers") if isinstance(data.get("providers"), dict) else {}
-    detect = detect or {}
     providers = {}
     for index, key in enumerate(DEFAULT_ORDER):
         item = source.get(key) if isinstance(source.get(key), dict) else {}

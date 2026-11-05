@@ -3,12 +3,10 @@ from __future__ import annotations
 import io
 import json
 import os
-import subprocess
 import sys
 import tempfile
 import unittest
 import urllib.error
-from datetime import datetime, timezone
 from pathlib import Path
 from unittest import mock
 

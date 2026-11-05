@@ -6,7 +6,6 @@ import json
 import os
 import urllib.error
 import urllib.request
-from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any
 

@@ -9,7 +9,6 @@ export function screenCoverage(settings) {
 }
 export const sizePresets = {Small:85, Medium:100, Large:120, 'X-Large':150, '2X-Large':200};
 export const shapes = ['portrait', 'landscape', 'square', 'circle', 'pill'];
-export const reservedShapes = [];
 export function normalizeShape(shape) { return shapes.includes(shape) ? shape : 'portrait'; }
 export function normalizeSize(value = {}) {
   const aliases = {Normal:'Medium', Huge:'X-Large'};
