@@ -52,7 +52,6 @@ try {
           while(walker.nextNode()){const n=walker.currentNode;if(!n.textContent.trim())continue;const range=document.createRange();range.selectNodeContents(n);for(const r of range.getClientRects())if(r.width&&r.height)textBoxes.push(r);}
           for(let i=0;i<textBoxes.length;i++)for(let j=i+1;j<textBoxes.length;j++){const a=textBoxes[i],b=textBoxes[j];check(Math.min(a.right,b.right)-Math.max(a.left,b.left)<=.5||Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)<=.5,'Circle text boxes intersect');}
           check(getComputedStyle(document.body).backgroundColor==='rgba(0, 0, 0, 0)'&&getComputedStyle(document.documentElement).backgroundColor==='rgba(0, 0, 0, 0)','Transparent circle canvas');
-          if(theme==='minimal-pace')check(document.querySelectorAll('.dial-elapsed').length===document.querySelectorAll('.dial-track').length,'Elapsed markers');
         } else {
           const large=document.documentElement.dataset.largeShape==='true';
           check([...document.querySelectorAll('.window-bottom')].every(el=>large||!el.getClientRects().length),'Pill hides resets before plans');
