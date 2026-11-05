@@ -65,20 +65,20 @@
       "category": "subscription",
       "windows": [
         {
-          "id": "gm-weekly",
-          "label": "Gemini Models \u00b7 weekly",
-          "used_percent": 28,
-          "resets_in_minutes": 2310,
-          "kind": "weekly",
-          "resets_at": "2026-11-03T02:30:00+00:00"
-        },
-        {
           "id": "gm-5h",
           "label": "Gemini Models \u00b7 5h",
           "used_percent": 12,
           "resets_in_minutes": 170,
           "kind": "session",
           "resets_at": "2026-11-01T14:50:00+00:00"
+        },
+        {
+          "id": "gm-weekly",
+          "label": "Gemini Models \u00b7 weekly",
+          "used_percent": 28,
+          "resets_in_minutes": 2310,
+          "kind": "weekly",
+          "resets_at": "2026-11-03T02:30:00+00:00"
         }
       ],
       "meters": []

@@ -8,16 +8,18 @@ Python 3.10+, Node/npm and Rust are required. Native builds also need the platfo
 
 ```sh
 python3 -m unittest discover -s tests
+node tests/render-security.mjs
+node --test tests/*.mjs
 cd app
 npm ci
 npm run build
 cd src-tauri
-cargo check
+cargo test --locked
 ```
 
 For native development, also install quotacore into the Python environment used by the launcher; see [packaging](packaging/README.md) for virtual environment setup and discovery.
 
-Keep changes focused. Update user-facing docs when behavior changes. For visuals, regenerate `node docs/tools/screenshots.mjs` from the root and inspect every affected image with synthetic data. Native desktop behavior needs an actual desktop check; a browser illustration cannot validate window positioning or Win32 rendering. Include the platform, validation performed and remaining limits in the pull request.
+Keep changes focused. Update user-facing docs when behavior changes. For visuals, regenerate `node docs/tools/screenshots.mjs` from the root and inspect every affected image with synthetic data. Run `node --test tests/documentation.mjs` to check local documentation links and the gallery space algorithm. Screenshot generation also rejects gallery scenes with an empty content rectangle larger than 12% of the canvas. It uses only headless Chrome and fictional fixtures. Native desktop behavior needs an actual desktop check; a browser illustration cannot validate window positioning or Win32 rendering. Include the platform, validation performed and remaining limits in the pull request.
 
 Provider collection tests must be isolated from real credentials and state. Do not run the real collector merely to verify documentation. The current hosted CI covers Python tests, frontend builds and Rust checks; distribution builds run separately; see [release workflow notes](docs/releases.md).
 

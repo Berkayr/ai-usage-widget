@@ -9,7 +9,7 @@ export async function auditLayoutVariants(b) {
    await api.setSnapshot({providers});
    if(shape==='circle')check(document.querySelector('.dial-name').textContent==='Claude','Explicit circle featured');
    if(['portrait','square'].includes(shape)){
-    const hero=document.querySelector('.featured-provider');check(hero?.dataset.provider==='claude'&&hero===hero.parentNode.firstElementChild,'Top featured '+theme.id+' '+shape);
+    const hero=shape==='square'?document.querySelector('.provider-card'):document.querySelector('.featured-provider');check(hero?.dataset.provider==='claude'&&hero===hero.parentNode.firstElementChild,'Top featured '+theme.id+' '+shape);
     await api.setSettings({featuredPosition:'bottom'});check(document.querySelector('.provider-card:last-child')?.dataset.provider==='claude','Bottom featured');
    }
    await api.setSettings({featuredProvider:'none'});check(!document.querySelector('.featured-provider'),'None featured');

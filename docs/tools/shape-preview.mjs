@@ -49,5 +49,5 @@ try {
  })()`);
  const {cssContentSize}=await b.cdp('Page.getLayoutMetrics');
  const png=await b.cdp('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip:{x:0,y:0,width:cssContentSize.width,height:cssContentSize.height,scale:1}});
- await writeFile('docs/screenshots/shapes.png',Buffer.from(png.data,'base64'));
+ await writeFile('docs/tools/shape-sheet.png',Buffer.from(png.data,'base64'));
 }finally{await b.close();}

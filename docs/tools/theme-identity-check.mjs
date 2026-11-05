@@ -57,7 +57,7 @@ try {
         } else {
           const large=document.documentElement.dataset.largeShape==='true';
           check([...document.querySelectorAll('.window-bottom')].every(el=>large||!el.getClientRects().length),'Pill hides resets before plans');
-          check([...document.querySelectorAll('.plan')].every(el=>el.getClientRects().length>0),'Pill retains plan at preset sizes');
+          check([...document.querySelectorAll('.plan')].every(el=>!el.getClientRects().length),'Pill spends space on both quota windows instead of plans');
           // Text ranges catch glyph collisions even if flex wrappers look separated.
           for(const card of document.querySelectorAll('.provider-card')) {
             const texts=[],walker=document.createTreeWalker(card,NodeFilter.SHOW_TEXT);
@@ -103,8 +103,15 @@ try {
         const bottomSpace=Math.max(0,cr.bottom-contentBottom(card));
         const ratio=bottomSpace/cr.height;
         metrics.maxCardBottomSpaceRatio=Math.max(metrics.maxCardBottomSpaceRatio,ratio);
-        check(bottomSpace<=cr.height*.25+1,'Card content bottom space >25%');
-        if(theme==='brutalist') {
+        if(shape==='square') {
+          check(getComputedStyle(list).gridTemplateColumns.split(' ').length===1,'Square full-width rows');
+          check(!card.querySelector('.ring-display')?.getClientRects().length,'Square hides decorative rings');
+          for(const q of card.querySelectorAll('.quota-window')) {
+            const top=rect(q.querySelector('.window-top')),meter=rect(q.querySelector('.meter,.segments,.dot-bar')),qr=rect(q);
+            check(Math.abs((top.top+meter.bottom)/2-(qr.top+qr.bottom)/2)<2,'Square centers quota text and meter');
+          }
+        } else check(bottomSpace<=cr.height*.25+1,'Card content bottom space >25%');
+        if(theme==='brutalist'&&shape!=='square') {
           const ratio=parseFloat(getComputedStyle(card.querySelector('.window-top b')).fontSize)/parseFloat(s.fontSize);
           metrics.displayRatio=ratio;check(ratio>=2.2,'Brutalist display size');
           check(getComputedStyle(card.querySelector('.window-top')).textTransform==='uppercase','Uppercase quota label');
@@ -113,7 +120,7 @@ try {
           check(getComputedStyle(list).gridTemplateColumns.split(' ').length===2,'Two provider columns');
           if(cards.length>1)check(Math.abs(rect(cards[0]).top-rect(cards[1]).top)<1&&rect(cards[1]).left>rect(cards[0]).right-1,'Providers must share a row');
         }
-        if(theme==='circular-rings') {
+        if(theme==='circular-rings'&&shape!=='square') {
           const ring=card.querySelector('.ring-display'),r=rect(ring);
           metrics.ringRatio=r.width/cr.width;
           const svg=rect(ring.querySelector('svg'));
@@ -149,7 +156,7 @@ try {
       if(shape==='square'&&cards.length%2===1) {
         const last=cards.at(-1),lr=rect(last),pr=rect(list);
         check(Math.abs(lr.width-pr.width)<2,'Odd square card must fill row');
-        if(theme==='circular-rings') {
+        if(theme==='circular-rings'&&shape!=='square') {
           const ring=rect(last.querySelector('.ring-display')),secondary=rect(last.querySelector('.quota-window:last-child'));
           check(secondary.width>0&&secondary.left>=ring.right-1,'Odd square ring and secondary metric side by side');
         } else {
@@ -189,11 +196,14 @@ try {
       const labels=[...document.querySelectorAll('.dial-arc-label')],failures=[];
       if(labels.length!==3)failures.push('Missing endpoint labels');
       const boxes=labels.map(el=>el.getBoundingClientRect()),shell=document.querySelector('.widget').getBoundingClientRect(),cx=shell.left+shell.width/2,cy=shell.top+shell.height/2;
-      const center=document.querySelector('.dial-safe').getBoundingClientRect();
+      const center=[];
+      for(const el of document.querySelectorAll('.dial-safe>*'))for(const n of el.childNodes)if(n.nodeType===3&&n.textContent.trim()) {
+        const range=document.createRange();range.selectNodeContents(n);center.push(...range.getClientRects());
+      }
       for(let i=0;i<boxes.length;i++){
         const a=boxes[i];
         for(const x of [a.left,a.right])for(const y of [a.top,a.bottom])if(Math.hypot(x-cx,y-cy)>shell.width/2+1)failures.push('Badge outside circle');
-        for(const b of [...boxes.slice(i+1),center])if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>.5&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>.5)failures.push('Endpoint label collision');
+        for(const b of [...boxes.slice(i+1),...center])if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>.5&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>.5)failures.push('Endpoint label collision');
       }
       return {failures};
     })()`);

@@ -5,16 +5,20 @@ All other themes have 20 marks per quota window by default. Settings → Look �
 10, 20 or 30. XS (below 220 design pixels) always uses 10. Marks represent used
 quota, rounded to the nearest mark; the percentage remains the precise label.
 Unknown quota has an explicitly unknown appearance and label. Widening a window
-never increases mark count or mark diameter. Rows center within their available
-space and may wrap at extreme sizes instead of shrinking the marks.
+never increases mark count or maximum mark diameter. Segmented rows center
+within their available space; Dot Matrix distributes round marks across the full row
+on a visible track, shrinking their diameter only when necessary to fit.
 
 Dot Matrix uses circles. The other themes use rectangular segments while retaining
 their typography, borders and layouts. Circular Rings retains its additional
 continuous rings; Minimal Pace retains the elapsed-time marker.
 
-Desktop marks are 0.25rem wide with a 0.125rem gap. Circles are 0.25rem high,
-segments 0.5rem high. The root font is 16 × Scale / 100 CSS pixels. Thus at 100%
-a mark is 4 CSS pixels wide on every monitor, regardless of window width. Scale
+Desktop segments are 0.25rem wide with a 0.125rem gap and 0.5rem height.
+Dot Matrix circles are up to 0.5rem (8 CSS px at Medium), with equal width and
+height in every shape. Quota window labels have a 0.8125rem (13 CSS px at
+Medium) minimum across all ten themes; Dot Matrix uses weight 600, 1rem provider
+names and 0.75rem reset countdowns. Small retains the 11 CSS px reading floor. The root font is 16 × Scale / 100 CSS pixels. Thus at 100%
+a segment is 4 CSS pixels wide on every monitor, regardless of window width. Scale
 changes fonts, spacing and marks together through rem units, without CSS zoom.
 XS breakpoints scale with these same design units.
 
@@ -36,13 +40,11 @@ dimensions are rounded. Settings IPC failures appear in the status line.
 Monitor-fit estimates use snapshot provider states, enabled/hidden filters and
 the same round-widget selection as the widget, excluding unavailable providers.
 
-At Medium, with n = max(1, visible provider count), vertical widgets request
-**width = 340, height = 116 + 210 × n**. The 116px chrome consists of 28px outer
-padding, 2px border, 60px header and 26px footer. Each provider contributes a
-200px card and 10px gap (including the final gap). Empty and error cards keep
-the same block height. All themes currently use one column in this orientation;
-Circular Rings keeps an additional ring inside its card. Extra windows and long
-content scroll inside the card instead of changing the outer box.
+At Medium, with n = max(1, visible provider count), Portrait has a fit ceiling
+of **width = 340, height = 116 + 210 × n** (plus the optional quote budget).
+Its actual height ends at measured content. Provider cards share the theme's
+column layout and compact only when they exceed their budget; see the intrinsic
+height and work-area rules below. Empty and error states retain readable content.
 
 Compact Strip is an independent horizontal orientation. At Medium it requests
 **width = 30 + 310 × n, height = 326**: 300px cards, 10px gaps, the same chrome.
@@ -51,13 +53,12 @@ Every dimension is multiplied by preset × fineTune / 10000, then divided by the
 monitor scale only when Match physical size is enabled. Shared rem tokens drive
 fonts, rows, padding, gaps and meters; no theme defines separate size metrics.
 
-Fit height caps the box at the viewport/monitor work area; the provider list
-scrolls when capped, keeping header and footer reachable. Disabling fit height
-keeps the user's window height, while retaining the same card metrics.
-`size-audit.mjs` checks all ten themes × five sizes × 0/1/3/6 providers against
-these formulas with at most 2 CSS pixels of rounding tolerance, including error
-cards, title font matching and type stretch. It writes `size-audit.json` and
-`size-sheet.png`, with an enlarged header for every theme. These are synthetic
+Portrait caps its content at the viewport/monitor work area and reports the
+measured surface height to the native window. Other shapes retain fixed geometry.
+`size-audit.mjs` checks all ten themes × five shapes × five sizes × 0/1/3/6
+providers × quote off/on (2,000 cases). It checks exact width, the Portrait height
+ceiling and fixed-shape heights within 2 CSS pixels, plus title font matching and
+unstretched type. It writes `size-audit.json` and `size-sheet.png` as synthetic
 review artifacts. README screenshots are generated with `screenshots.mjs`.
 
 Titles read AI USAGE with one literal word space, nonnegative letter spacing,
@@ -295,7 +296,10 @@ Only cards that exceed their ceiling compact internal spacing and then reduce
 text, stopping at 11px (existing smaller labels keep their authored size).
 Dense Minimal Pace cards show the signed percentage-point delta with its
 comparison context in a tooltip. Ring graphics use the remaining cell height.
-Other shapes retain their fixed geometry and fitting behavior.
+Below 65% effective scale, Portrait hides secondary chrome and shows a compact
+quote excerpt with a readable source control. The full quote, author and reason
+remain available in its dialog. Tiny quota rows can borrow height from the quote
+instead of clipping. Other shapes retain their fixed geometry and fitting behavior.
 
 The quote uses normal case and readable body weight; theme signatures remain on
 its label. Attribution is a small, borderless source line near the lower right;

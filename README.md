@@ -28,11 +28,13 @@ Pre-release: installers are coming with v0.1. Gallery values are fictional; prov
 
 Installers are coming with v0.1; no release is available yet.
 
-- **Linux:** `curl -fsSL https://raw.githubusercontent.com/Berkayr/ai-usage-widget/main/scripts/install.sh | sh` or download the `.deb` / `.rpm` / AppImage from GitHub Releases.
-- **Windows 10/11:** Download `windows-x86_64-with-python-AI Usage_*_x64-setup.exe` from GitHub Releases, then choose **Next, Next, Finish**; no Python installation is needed. Windows may show SmartScreen because the installer is not signed yet: choose **More info**, then **Run anyway**.
+- **Linux (after v0.1):** `curl -fsSL https://raw.githubusercontent.com/Berkayr/ai-usage-widget/main/scripts/install.sh | sh` or download the `.deb` / `.rpm` / AppImage from GitHub Releases.
+- **Windows 10/11 (after v0.1):** Download `windows-x86_64-with-python-AI Usage_*_x64-setup.exe` from GitHub Releases, then choose **Next, Next, Finish**; no Python installation is needed. Windows may show SmartScreen because the installer is not signed yet: choose **More info**, then **Run anyway**.
 - **Arch Linux:** AUR package availability is also coming with v0.1; recipe drafts only.
 
 Linux needs host Python 3.10+, provider CLIs and the appropriate GTK/WebKit runtime; AppImage also has host dependencies. Windows slim installers are for users who already have Python 3.10+. Provider tools are installed separately. See [packaging](packaging/README.md) before building or testing a package.
+
+Uninstall after installation: on Windows 11, use **Settings → Apps → Installed apps → AI Usage → Uninstall** (Windows 10: **Apps & features**). On Debian/Ubuntu use `sudo apt remove ai-usage`; on Fedora use `sudo dnf remove ai-usage`. For the script-installed AppImage, run `sh scripts/install.sh --uninstall` from a checkout. Disable **Start at login** first. Configuration and local quota state are separate from the executable; see [their locations](docs/configuration.md) before optionally removing them. Remove panel integrations from their desktop/bar configuration separately.
 
 ## Quick start
 
@@ -55,12 +57,24 @@ Open Vite's displayed URL with `?sample` to see fictional data. For a native sou
 
 ## Make it yours
 
+### Five shapes, the same data
+
+Choose Portrait, Landscape, Square, Circle Dial or Pill in **Layout & Position**. Circle and Pill show up to three selected providers; Square pages through additional providers. All five share size presets and provider colors.
+
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/shapes-light.png">
+  <img src="docs/screenshots/shapes.png" alt="Five shapes with distinct themes and palettes; fictional data" width="1100">
+</picture>
+<sub>Dot Matrix / Ember · Terminal / Phosphor · Reactor · Brutalist / Acid · Frosted Glass / Acrylic. Fictional data.</sub>
+
+In **Providers → Provider layout**, reorder or hide widget rows without disabling collection. Choose a featured provider or None; Portrait supports Top / Bottom placement. Changes preview immediately; **Save** keeps them. See [configuration](docs/configuration.md) for shape-specific behavior.
+
 ### A size for every workspace
 
 Keep a compact row beside your editor or expand into detailed cards. Each theme uses the same local data.
 
 ![Five presets at 85, 100, 120, 150 and 200 percent](docs/screenshots/sizes.png)
-<sub>XS: Terminal / Phosphor · S: Retro LCD / Liquid Crystal, Light · M: Frosted Glass / Acrylic · L: Brutalist / Acid. Vivid, fictional data.</sub>
+<sub>Small: Terminal · Medium: Dot Matrix · Large: Frosted Glass · X-Large: Brutalist · 2X-Large: Reactor. Fictional data.</sub>
 
 Scale text and spacing together from 50% to 300%, with presets or Ctrl +/− and Ctrl+0. Numbers keep their proportions at every size.
 
@@ -69,12 +83,12 @@ Scale text and spacing together from 50% to 300%, with presets or Ctrl +/− and
 
 ### Find your signal
 
-Every theme includes 12 palettes; create your own Dark/Light colors and import or export them in Settings.
+Every theme includes 12 palettes. In **Theme → Palette**, choose **New palette** or **Duplicate**, name it and edit its Dark and Light colors, then **Save**. **Export** copies palette JSON into the transfer field; paste an exported array there and choose **Import** to reuse it. Contrast warnings help flag unreadable combinations.
 
 Choose a quiet Calm look, colorful Vivid palettes or pure black and white Mono. Ten themes change the layout as well as the colors. Theme cards in Settings switch designs immediately; every theme supports Auto, Light and Dark appearance.
 
-![Pink, Nord, blue glass and acid palette examples](docs/screenshots/palettes.png)
-<sub>Dot Matrix / Sakura Pink, Light · Dot Matrix / Nord · Frosted Glass / Acrylic · Brutalist / Acid. Vivid, fictional data.</sub>
+![Pink, custom violet, blue glass and acid palette examples](docs/screenshots/palettes.png)
+<sub>Dot Matrix / Sakura Pink, Light · Terminal / Studio (custom) · Frosted Glass / Acrylic · Brutalist / Acid. Vivid, fictional data.</sub>
 
 ### Know when data needs attention
 
@@ -89,9 +103,9 @@ Change palette, opacity, scale and placement in one panel. Calm uses neutral usa
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/settings-light.png">
-  <img src="docs/screenshots/settings-dark.png" alt="Size and shape settings in light and dark appearance" width="980">
+  <img src="docs/screenshots/settings-dark.png" alt="Palette controls in light and dark settings" width="980">
 </picture>
-<sub>Size & Shape settings · Light and Dark · fictional data.</sub>
+<sub>Theme palette settings · Light and Dark · fictional data.</sub>
 
 Prefer the familiar? System uses your desktop font, light/dark appearance and system accent where supported. It is the default theme.
 
@@ -100,8 +114,8 @@ Prefer the familiar? System uses your desktop font, light/dark appearance and sy
 
 ### Ten designs, one snapshot
 
-![Ten themes in two rows, mixing light and dark appearance](docs/screenshots/themes.png)
-<sub>Top: System, Dot Matrix / Sakura Pink, Circular Rings, Terminal, Frosted Glass. Bottom: Brutalist, Compact Strip, Retro LCD, Minimal Pace. Alternating Dark / Light, Vivid, fictional data.</sub>
+![Ten themes in three rows plus a horizontal strip, mixing light and dark appearance](docs/screenshots/themes.png)
+<sub>Rows: System, Dot Matrix / Sakura Pink, Circular Rings · Terminal, Frosted Glass, Brutalist · Retro LCD, Minimal Pace, Reactor. Compact Strip below. Alternating Dark / Light, Vivid, fictional data.</sub>
 
 [Individual light and dark captures](docs/screenshots/themes/) · [Alternate gallery](docs/screenshots/themes-light.png) · [All themes in Mono](docs/screenshots/mono.png)
 
@@ -138,15 +152,19 @@ Stable marks recorded live-source checks; beta adapters still need live-account 
 
 | Environment | Status |
 | --- | --- |
-| Windows 10/11 | Native widget and strip implemented; live desktop community-tested wanted |
+| Windows 10/11 | Native widget and strip implemented; live desktop community testing wanted |
 | KDE Plasma 6 Wayland | Tested: native layer-shell widget, 16-minute memory run, panel widget in plasmoidviewer |
-| KDE X11, GNOME Wayland/X11 | Community-tested wanted |
-| Ubuntu 24.04 | `.deb` and AppImage install and launch checked in CI under Xvfb; desktop use community-tested wanted |
-| Fedora | `.rpm` install checked in a CI container; launch and desktop use community-tested wanted |
-| Hyprland / Sway | Layer-shell and Waybar implemented; community-tested wanted |
-| Xfce, Cinnamon, MATE, i3 and other X11 desktops | Positioning/panel paths available; community-tested wanted |
+| KDE X11, GNOME Wayland/X11 | Community testing wanted |
+| Ubuntu 24.04 | `.deb` and AppImage install and launch checked in CI under Xvfb; desktop use community testing wanted |
+| Fedora | `.rpm` install checked in a CI container; launch and desktop use community testing wanted |
+| Hyprland / Sway | Layer-shell and Waybar implemented; community testing wanted |
+| Xfce, Cinnamon, MATE, i3 and other X11 desktops | Positioning/panel paths available; community testing wanted |
 
 [Linux details](docs/linux.md) explain the GTK3 layer-shell dependency, GNOME fallback and distribution differences.
+
+## How it works
+
+The widget reads a local JSON snapshot. A separate Python collector calls the enabled providers through their APIs, installed CLIs or local quota caches and writes that snapshot. Panel integrations read the same file; passive reads do not collect quotas. [Set up providers and authentication](docs/providers.md) before enabling real collection.
 
 ## Privacy & security
 
@@ -170,59 +188,20 @@ Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) o
 
 **Why won't a corner stick on Wayland?** Fixed placement needs compositor layer-shell support and the GTK3 runtime. GNOME normally uses an ordinary window; choose its panel integration or the documented XWayland option.
 
+**Can I use it without an account?** Open the source preview with `?sample` for fictional data. Real quotas require the corresponding provider credentials; collection stays off until you opt in.
+
+**Are installers available?** Installers are coming with v0.1. Until a release is published, use a source build and treat packaging recipes as previews.
+
+**Can I share my palette?** Export its JSON from Settings. Share only palette colors; snapshots and settings can contain sensitive usage or local metadata.
+
 ## Roadmap
 
-Cursor, Kiro, Amp and Grok adapters; additional themes; native desktop acceptance across more environments; signed release validation; winget and AUR distribution. These are plans, not current integrations.
+v0.1 installers, AUR and winget distribution, release signing, more providers (including Cursor, Kiro, Amp and Grok), multi-monitor improvements and native desktop acceptance across more environments. These are plans, not current integrations.
 
 ## Contributing
 
-Bug reports, provider samples with invented data, and desktop compatibility checks are welcome. Read [CONTRIBUTING](CONTRIBUTING.md), use the issue templates, and report vulnerabilities through [SECURITY](SECURITY.md).
+Bug reports, provider samples with invented data, and desktop compatibility checks are welcome. Read the [changelog](CHANGELOG.md) and [contribution guide](CONTRIBUTING.md), use the issue templates, and report vulnerabilities through [SECURITY](SECURITY.md).
 
 ## License
 
 AI Usage is licensed under the [MIT License](LICENSE). Bundled font dependencies retain their own upstream licenses; see the app's font resources. Provider names identify compatible tools and do not imply affiliation.
-
-## Shapes
-
-Choose **Portrait**, **Landscape**, or **Square** in **Layout & Position**.
-Every theme fills the same box for the selected shape and size. Landscape
-arranges up to six providers in columns; square shows up to four per page with
-numbered navigation for additional providers. Medium is 680 × 340 for landscape
-and 340 × 340 for square; all five size presets scale proportionally.
-
-![Landscape and square themes with fictional data](docs/screenshots/shapes.png)
-
-
-### Shapes
-
-Choose Portrait, Landscape (2:1), Square, Circle Dial, or Pill (4:1) in Settings → Layout & Position. Every theme uses the same dimensions for a given shape and size. Circle shows percentages beside arc endpoints, with automatic spacing for nearby values. Provider colors are shared across shapes: choose custom colors or reset each provider in **Appearance / Theme → Provider colors**. Low contrast and similar colors trigger a warning; Mono keeps patterned rings. Circle and Pill support up to three providers per widget; choose them in **Providers on this widget**. Other providers remain available in the rectangular layouts. Round shapes keep Settings and the right-click menu inside their silhouette and use native input masks so transparent corners pass clicks through to the desktop.
-
-![Five shapes with fictional usage data](docs/screenshots/shapes.png)
-
-
-Provider layout is configurable in **Providers → Provider layout**.
-Drag rows or use Up / Down, and toggle visibility without disabling collection.
-Choose First in list (the new-install default), Highest usage (across quota
-windows), a specific featured provider, or None. First in list follows the first
-visible provider after ordering and filtering. Settings explains the current
-selection and when reordering cannot change it. Changes preview immediately;
-Save keeps them. Top / Bottom places the large cell in Portrait with an odd
-provider count (with or without quotes); even counts use equal cards. None
-centers its unpaired half-width cell. Square keeps equal full-width rows and uses
-featured selection only for order. Missing layout settings preserve the
-legacy last-cell layout and automatic circle center. Hidden or unselected
-featured providers are not silently replaced. Landscape and Pill use list order
-and ignore featured selection and position; Circle uses the selection for its
-center and ignores position. Circle and Pill apply their widget selection before
-choosing the first provider. Square applies featured ordering within each page.
-
-**Reactor** adds a luminous core, segmented inner ring and cool glow to Circle,
-with matching surfaces in all other shapes. Breathing is off by default and
-respects reduced motion. Calm softens meter hues and tracks; Vivid increases
-saturation and arc weight. Mono retains provider patterns.
-
-Sizes: Small 85%, Medium 100%, Large 120%, X-Large 150%, 2X-Large 200%,
-with separate fine tuning. Small keeps text at least 11 CSS pixels and removes
-secondary chrome. Fit screen applies to Portrait (except Compact Strip), with a
-30% work-area width cap; changing shape preserves the saved Fit choice.
-Square and Pill keep both 5-hour and Weekly meters for every visible provider.

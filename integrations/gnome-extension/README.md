@@ -1,6 +1,6 @@
 # GNOME Shell 45–49
 
-Requires the `quotacore` package launcher on GNOME's PATH, or quotacore installed for GNOME's `python3` (see ../../packaging/README.md). From the repository root:
+Requires the `quotacore` package launcher on GNOME's PATH, or quotacore installed for GNOME's `python3` (see [packaging](../../packaging/README.md)). From the repository root:
 
 ```sh
 mkdir -p ~/.local/share/gnome-shell/extensions/ai-usage@aiusage.dev
@@ -12,4 +12,4 @@ Log out and back in on Wayland if GNOME has not discovered the new extension yet
 
 The extension prefers `quotacore` on PATH and falls back to `python3 -m quotacore`; if unavailable it displays a single-line installation hint. To use a virtual environment, expose its `quotacore` launcher to the desktop PATH or replace the fallback `python3` argv in extension.js with its absolute interpreter path before installing. The ESM metadata targets 45–49; runtime compatibility on each version still needs testing.
 
-Screenshot location: `docs/screenshots/gnome-panel.png` (pending Claude review; fictional data only).
+Native desktop screenshots and compatibility acceptance are still pending.
