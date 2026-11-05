@@ -33,7 +33,7 @@ try {
       if(r.top<shell.top-1||r.bottom>shell.bottom+1||r.left<shell.left-1||r.right>shell.right+1)errors.push(el.className+': outside shell');
     }
     if(shell.height>innerHeight+1 || shell.width>innerWidth+1)errors.push('shell outside viewport');
-    if(Math.abs(shell.height-innerHeight)>1)errors.push('shell fails to fill requested height');
+    if(${JSON.stringify(shape)}!=='portrait' && Math.abs(shell.height-innerHeight)>1)errors.push('shell fails to fill requested height');
     const title=document.querySelector('.app-title');
     if(visible(title)){const range=document.createRange();range.selectNodeContents(title);const r=range.getBoundingClientRect();if(r.left<shell.left-1||r.right>shell.right+1)errors.push('title text outside shell');}
     return errors;

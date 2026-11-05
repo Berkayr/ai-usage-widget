@@ -4,7 +4,7 @@ import {browser} from './browser-harness.mjs';
 import {normalizeSize,fittedGeometry,shapes} from '../../app/src/sizing.js';
 const output=process.env.AUDIT_OUTPUT || 'gorevler/ss-sekil-final';await mkdir(output,{recursive:true});
 const monitor={width:1536,height:926,scale:1,primary:true};
-const b=await browser();const failures=[];let cases=0;
+const b=await browser();const failures=[],geometry=[];let cases=0;
 try{
  await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
  const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
@@ -49,8 +49,10 @@ try{
    if(shell.width>innerWidth+1||shell.height>innerHeight+1)errors.push('outside viewport');
    return [...new Set(errors)];
   })()`);
+  if(shape!=='portrait')geometry.push({theme,shape,sizePreset,quoteEnabled,count,boxes:await b.evaluate(`[...document.querySelectorAll('.widget,.header,#providers,.provider-card,.window-top,.meter,.segments,.dot-bar,.quote-section')].map(el=>{const r=el.getBoundingClientRect();return [el.className,...['x','y','width','height'].map(k=>Math.round(r[k]*100)/100)]})`)});
   cases++;if(cases%90===0)console.log(`${cases} cases, ${failures.length} failures`);if(errors.length)failures.push({theme,shape,sizePreset,quoteEnabled,count,errors});
  }
+ await writeFile(`${output}/geometry.json`,JSON.stringify(geometry));
  await writeFile(`${output}/matrix.json`,JSON.stringify({cases,failures},null,2));
  console.log(`${cases} shape cases; ${failures.length} failures`);
  if(failures.length){console.log(JSON.stringify(failures.slice(0,8),null,2));process.exitCode=1;}

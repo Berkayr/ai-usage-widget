@@ -1,6 +1,6 @@
 const overflows = card => card.scrollHeight > card.clientHeight || card.scrollWidth > card.clientWidth;
 
-// Refit only overflowing cards. Layout budgets and cards that already fit stay intact.
+// Observe content and font changes; Portrait also grows within existing type tiers.
 export function observeUsageFit(root) {
   let frame = 0;
   const fit = () => {
@@ -23,10 +23,13 @@ export function fitUsage(root) {
   }
   // Recompute from authored styles after viewport, theme, quote or font changes.
   root.style.removeProperty('grid-template-rows');
+  root.style.setProperty('--portrait-growth', 0);
   root.style.removeProperty('padding-bottom');
   for (const card of cards) {
     delete card.dataset.usageCompact;
     card.style.removeProperty('padding-bottom');
+    if (document.documentElement.dataset.shape === 'portrait') card.style.removeProperty('min-height');
+    if (document.documentElement.dataset.shape === 'portrait') for (const ring of card.querySelectorAll('.ring-display')) ring.style.removeProperty('height');
   }
   // The scale changes geometry, but readable text has a physical 11px floor.
   for (const el of root.closest('.widget').querySelectorAll('*')) {
@@ -35,30 +38,55 @@ export function fitUsage(root) {
       el.style.fontSize = '11px';
     }
   }
-  donateFeaturedSpace(root, cards);
+  if (document.documentElement.dataset.shape === 'portrait') {
+    const columns = getComputedStyle(root).gridTemplateColumns.split(' ').length;
+    const grid = getComputedStyle(root).display === 'grid';
+    const rows = grid ? Math.ceil(cards.length / columns) : 1;
+    root.style.setProperty('--portrait-card-limit', `calc(${grid ? cards.length : 1} * (var(--size-card) + var(--size-gap)) / ${Math.max(1, rows)} - var(--size-gap))`);
+  } else {
+    root.style.removeProperty('--portrait-card-limit');
+  }
   // Fractional rem budgets can round scrollHeight up while clientHeight rounds down.
   // Remove that rounding debt from trailing space, preserving every card's height.
   const debt = root.scrollHeight - root.clientHeight;
   const padding = parseFloat(getComputedStyle(root).paddingBottom);
   if (debt > 0 && debt <= padding) root.style.paddingBottom = `${padding - debt}px`;
+  cards.forEach(fitPortraitGraphics);
   cards.forEach(compactCard);
+  growPortraitContent(root, cards);
   fitHeader(root.closest('.widget'));
 }
 
-function donateFeaturedSpace(root, cards) {
-  // An odd portrait grid donates only the featured row's unused vertical space.
-  const hero = cards.find(card => card.classList.contains('featured-provider'));
-  if (hero && cards.length === 3 && document.documentElement.dataset.shape === 'portrait' && getComputedStyle(root).display === 'grid' && getComputedStyle(root).gridTemplateColumns.split(' ').length === 2) {
-    const paired = cards.filter(card => card !== hero);
-    const shortage = Math.max(0, ...paired.map(card => card.scrollHeight - card.clientHeight));
-    if (shortage) {
-      const height = hero.getBoundingClientRect().height;
-      const first = Math.max(0, height - shortage);
-      const second = height + shortage;
-      root.style.gridTemplateRows = document.documentElement.dataset.featuredLayout === 'top'
-        ? `${first}px ${second}px` : `${second}px ${first}px`;
-    }
+function growPortraitContent(root, cards) {
+  if (document.documentElement.dataset.portraitFit !== 'true' || !cards.length || root.querySelector('.ring-display')) return;
+  const widget = root.closest('.widget');
+  const fits = () => !overflows(root) && !overflows(widget) && cards.every(card => !overflows(card));
+  root.style.setProperty('--portrait-growth', 1);
+  if (fits()) return;
+  let low=0, high=1;
+  for (let i=0; i<8; i++) {
+    const middle=(low+high)/2;
+    root.style.setProperty('--portrait-growth', middle);
+    if (fits()) low=middle; else high=middle;
   }
+  root.style.setProperty('--portrait-growth', low);
+}
+
+// A constrained grid can overlap its intrinsic graphic without overflowing.
+// Reserve the text rows before sizing graphics, keeping the labels intact.
+function fitPortraitGraphics(card) {
+  if (document.documentElement.dataset.shape !== 'portrait') return;
+  const ring = card.querySelector('.ring-display');
+  if (!ring) return;
+  const style = getComputedStyle(card);
+  const paired = style.gridTemplateColumns.split(' ').length > 1;
+  const outerHeight = el => {const s=getComputedStyle(el);return el.getBoundingClientRect().height + parseFloat(s.marginTop) + parseFloat(s.marginBottom);};
+  const reserved = [...card.children].filter(el => el !== ring && (!paired || !el.classList.contains('windows'))).reduce((sum, el) => sum + outerHeight(el), 0);
+  const labels = [...ring.querySelector('.ring-center').children].reduce((sum, el) => sum + el.getBoundingClientRect().height, 0);
+  const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+  card.style.minHeight = `${reserved + labels + padding + parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth)}px`;
+  const available = card.clientHeight - padding - reserved;
+  ring.style.height = `${Math.max(labels, Math.min(ring.getBoundingClientRect().height, available))}px`;
 }
 
 function compactCard(card) {
