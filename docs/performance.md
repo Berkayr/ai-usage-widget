@@ -67,7 +67,11 @@ once startup has settled. The measurement driver runs outside the app cgroup.
   An unchanged snapshot skips atomic replace/fsync. Provider observation timestamps
   remain significant, so freshness updates are not silently discarded. The
   snapshot generation timestamp alone does not trigger a disk write.
-- The selected theme's CSS/renderer are dynamically imported. `@font-face` alone
+- The selected theme's CSS, renderer and palette manifest are dynamically imported.
+  Settings and synthetic sample audits load all manifests for their pickers; the
+  native widget loads only its selected theme's data. Each of the ten themes has
+  12 built-in palettes; user palettes use existing settings IPC without a new
+  runtime dependency. `@font-face` alone
   does not fetch a font: a rendered element must use it. Hidden theme previews do
   not load all their fonts. The system-theme screenshot check fetched no custom
   fonts. Theme source files were left to the separate design task.

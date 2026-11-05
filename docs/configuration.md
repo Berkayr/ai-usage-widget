@@ -15,6 +15,7 @@ Theme defaults to System when no choice is stored; an existing explicit theme is
 | `colorMode` | `calm` | Neutral or system-accent usage below 50%, soft amber from 50%, muted red from 80%; `vivid` restores theme colors. |
 | `accentEdge` | `off` | `off`, `auto`, `left`, `right`; Auto follows the selected corner, with no edge in Free placement. |
 | `palette` | Theme dependent | System: `default` (Desktop). Dot Matrix: `slate` (neutral default), `signal-orange`, `sakura-pink`, `nord`, `mono-paper`. Existing palette choices remain available. |
+| `userPalettes` | absent | Up to 50 custom palettes, available on every theme; format below. |
 | `accent`, `background` | `null` | Optional CSS color overrides; choosing a palette clears these overrides. |
 | `widgetOpacity` | `100` | Opacity of the entire widget, including text; UI range 20–100. |
 | `backgroundOpacity` | `100` | Background opacity, 0–100; this does not enable compositor blur. |
@@ -107,3 +108,47 @@ compatible, including named corner positions and Free placement ratios.
 Changes preview live. Save and Revert activate for unsaved changes. Save verifies
 the persisted settings by loading them again before displaying a saved time;
 errors remain visible and can be retried.
+
+## User palettes
+
+Settings → Theme shows six palette swatches initially; **Show all** expands the list.
+**New palette** and **Duplicate** copy the current colors. **Edit palette** edits
+its name and both appearances with live preview. Low contrast produces a warning
+without blocking edits or Save. Revert restores saved palettes and selection.
+Delete requires an in-page confirmation; deleting the selected palette restores
+the theme's first built-in palette. Export writes all user palettes to the panel's
+JSON textarea. Import merges by id (matching ids are replaced) and selects the
+first imported palette. Save persists the result; export text alone is not saved.
+
+`userPalettes` is an optional array. Each entry has `id`, `name`, `dark`, and
+`light`. Its id must match `user-[a-z0-9-]{1,64}` and be unique. A name is plain
+text, 1–40 Unicode characters, with no angle brackets or control characters.
+Both color objects require every token shown here:
+
+```json
+{
+  "id": "user-example",
+  "name": "Quiet evening",
+  "dark": {
+    "bgWidget": "#111820", "bgCard": "#18212b", "bgTrackOff": "#354352",
+    "textPrimary": "#f4f6fa", "textSecondary": "#c2ccd6", "textMuted": "#a2afbc",
+    "border": "#526070", "accent": "#a3c6ed", "severityNormal": "#a3c6ed",
+    "severityWarning": "#f0c479", "severityDanger": "#f4a5ad"
+  },
+  "light": {
+    "bgWidget": "#f0f4f8", "bgCard": "#ffffff", "bgTrackOff": "#cad4df",
+    "textPrimary": "#111820", "textSecondary": "#354352", "textMuted": "#526070",
+    "border": "#8897a7", "accent": "#27588d", "severityNormal": "#27588d",
+    "severityWarning": "#805000", "severityDanger": "#a32838"
+  }
+}
+```
+
+Import an array containing entries like this one. Colors accept only `#rgb`,
+`#rrggbb`, or `#rrggbbaa`. Surface colors retain alpha; contrast calculations composite colors against the
+palette's surfaces. Rust validates settings load/save and preview; the
+frontend also validates imports and colors before applying them. Unknown keys are
+dropped. Invalid imports reject the entire operation and display an error.
+Invalid palettes on disk are discarded with a Settings warning while other valid
+settings recover. Missing or deleted selected ids fall back to the theme's first
+palette. Built-in ids and their ordering are preserved.

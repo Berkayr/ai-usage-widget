@@ -44,6 +44,413 @@
         "#56b4e9",
         "#cc79a7"
       ]
+    },
+    "quiet-blue": {
+      "name": "Quiet Blue",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#97b5d8",
+      "severityNormal": "#97b5d8",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#29486b",
+        "severityNormal": "#29486b",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#29486b",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#97b5d8",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-plum": {
+      "name": "Quiet Plum",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#c497d8",
+      "severityNormal": "#c497d8",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#57296b",
+        "severityNormal": "#57296b",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#57296b",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#c497d8",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-fern": {
+      "name": "Quiet Fern",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#97d8aa",
+      "severityNormal": "#97d8aa",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#296b3c",
+        "severityNormal": "#296b3c",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#296b3c",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#97d8aa",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-clay": {
+      "name": "Quiet Clay",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#d8af97",
+      "severityNormal": "#d8af97",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#6b4129",
+        "severityNormal": "#6b4129",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#6b4129",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#d8af97",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-teal": {
+      "name": "Quiet Teal",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#97d8d6",
+      "severityNormal": "#97d8d6",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#296b69",
+        "severityNormal": "#296b69",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#296b69",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#97d8d6",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-rose": {
+      "name": "Quiet Rose",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#d897af",
+      "severityNormal": "#d897af",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#6b2941",
+        "severityNormal": "#6b2941",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#6b2941",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#d897af",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-gold": {
+      "name": "Quiet Gold",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#d8c897",
+      "severityNormal": "#d8c897",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#6b5b29",
+        "severityNormal": "#6b5b29",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#6b5b29",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#d8c897",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-iris": {
+      "name": "Quiet Iris",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#a297d8",
+      "severityNormal": "#a297d8",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#34296b",
+        "severityNormal": "#34296b",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#34296b",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#a297d8",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-olive": {
+      "name": "Quiet Olive",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#c4d897",
+      "severityNormal": "#c4d897",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#576b29",
+        "severityNormal": "#576b29",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#576b29",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#c4d897",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-coral": {
+      "name": "Quiet Coral",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#d8a097",
+      "severityNormal": "#d8a097",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#6b3229",
+        "severityNormal": "#6b3229",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#6b3229",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#d8a097",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "quiet-slate": {
+      "name": "Quiet Slate",
+      "bgWidget": "#202326",
+      "bgCard": "#292d32",
+      "bgTrackOff": "#464d55",
+      "textPrimary": "#f3f6fc",
+      "textSecondary": "#b0becf",
+      "textMuted": "#99a5b8",
+      "border": "#48515b",
+      "accent": "#97c2d8",
+      "severityNormal": "#97c2d8",
+      "severityWarning": "#fbbf24",
+      "severityDanger": "#fb7185",
+      "light": {
+        "bgWidget": "#f3f3f3",
+        "bgCard": "#ffffff",
+        "bgTrackOff": "#dce1e6",
+        "textPrimary": "#0f172a",
+        "textSecondary": "#475569",
+        "textMuted": "#596579",
+        "border": "#cbd1d8",
+        "accent": "#29556b",
+        "severityNormal": "#29556b",
+        "severityWarning": "#925000",
+        "severityDanger": "#b91c1c",
+        "providerColors": [
+          "#29556b",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#97c2d8",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     }
   }
 }

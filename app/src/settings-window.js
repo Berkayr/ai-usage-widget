@@ -22,7 +22,10 @@ import {
 } from './sizing.js';
 import {contrast, luminance, rgba} from './text-contrast.js';
 import {hiddenStates, providerNames} from './themes/dot-matrix/render.js';
-import {themes} from './themes/registry.js';
+import {allThemes} from './themes/registry.js';
+import {paletteChoices, selectedPalette, userPalettes, appearancePalette} from './user-palettes.js';
+import {paletteEditor} from './palette-editor.js';
+const themes = await allThemes();
 import {
   providerColors,
   providerColorWarnings,
@@ -64,6 +67,7 @@ export const defaults = {
   matchPhysicalSize : false,
   accentEdge : 'off',
   palette : 'default',
+  userPalettes : [],
   accent : null,
   background : null,
   widgetOpacity : 100,
@@ -234,7 +238,7 @@ sections.layout.insertAdjacentHTML(
 <option value="screen">Fit to screen</option>
 </select>
 </label>
-<label>Screen fraction<select id="fit-fraction">
+<p class="setting-note">Portrait Fit enlarges content within the screen budget. The chosen share is a maximum; the widget ends where its content ends.</p><label>Screen fraction<select id="fit-fraction">
 <option value="1">Full</option>
 <option value="0.75">3/4</option>
 <option value="0.5">1/2</option>
@@ -440,7 +444,7 @@ for (const theme of themes) {
   button.lastChild.textContent = theme.name;
   button.onclick = () => {
     draft.theme = theme.id;
-    draft.palette = Object.keys(theme.palettes)[0];
+    if (!userPalettes(draft).some(p => p.id === draft.palette)) draft.palette = Object.keys(theme.palettes)[0];
     draft.accent = null;
     draft.background = null;
     update();
@@ -480,11 +484,11 @@ sections.appearance.append(colorControls);
 const mode = matchMedia('(prefers-color-scheme:light)');
 function themePalette(t = themes.find(t => t.id === draft.theme) || themes[0],
                       key = draft.palette) {
-  const p = t.palettes[key] || Object.values(t.palettes)[0];
+  const p = selectedPalette(t, {...draft, palette:key});
   const appearance = draft.appearance === 'auto'
                          ? (mode.matches ? 'light' : 'dark')
                          : draft.appearance;
-  return {...p, ...p[appearance]};
+  return appearancePalette(p, appearance, key.startsWith('user-'));
 }
 // Palette samples retain their hue while keeping their glyphs readable.
 function previewInk(ink, paper) {
@@ -500,7 +504,8 @@ function previewInk(ink, paper) {
 }
 const renderLayout = layoutControls(sections.providers, () => draft,
                                     () => providers || [], update);
-sectionBlock(sections.appearance, 'Palette', [ paletteGrid ]);
+const paletteTools = paletteEditor(() => draft, () => themes.find(t => t.id === draft.theme), update);
+sectionBlock(sections.appearance, 'Palette', [ paletteGrid, paletteTools.element ]);
 sectionBlock(sections.appearance, 'Mode',
              [ control('appearance'), control('color-mode') ]);
 control('appearance').firstChild.textContent = 'Appearance';
@@ -625,7 +630,7 @@ function renderControls() {
   });
   paletteGrid.replaceChildren();
   const t = themes.find(t => t.id === draft.theme) || themes[0];
-  for (const [key, value] of Object.entries(t.palettes)) {
+  for (const [key, value] of Object.entries(paletteChoices(t, draft))) {
     const button = document.createElement('button');
     button.className = 'palette-option';
     button.setAttribute('aria-pressed', String(key === draft.palette));
@@ -646,8 +651,10 @@ function renderControls() {
       draft.background = null;
       update();
     };
+    button.hidden = !paletteTools.expanded && paletteGrid.children.length >= 6 && key !== draft.palette;
     paletteGrid.append(button);
   }
+  paletteTools.render();
   document.querySelectorAll('[data-taskbar-provider]')
       .forEach(el => el.checked = draft.taskbar.providers.includes(
                    el.dataset.taskbarProvider));
@@ -1090,6 +1097,8 @@ async function loadSession() {
     ...defaults,
     ...(sample ? {} : await settingsInvoke('load_settings'))
   };
+  const paletteLoadError = draft.paletteLoadError;
+  delete draft.paletteLoadError;
   draft.providerPreview = null;
   draft.placement = normalizePlacement(draft.placement || {});
   for (const key of ['taskbar', 'linux', 'placement'])
@@ -1097,10 +1106,11 @@ async function loadSession() {
   if (!themes.some(t => t.id === draft.theme))
     draft.theme = 'system';
   const manifest = themes.find(t => t.id === draft.theme);
-  if (!manifest.palettes[draft.palette])
+  if (!paletteChoices(manifest, draft)[draft.palette])
     draft.palette = Object.keys(manifest.palettes)[0];
   draft = normalizeDraft(draft);
   saved = structuredClone(draft);
+  if (paletteLoadError) error(paletteLoadError);
   if (!sample) {
     snapshotProviders =
         (await settingsInvoke('get_snapshot')).snapshot?.providers ?? [];

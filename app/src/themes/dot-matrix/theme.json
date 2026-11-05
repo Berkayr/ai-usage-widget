@@ -254,6 +254,228 @@
         "#56b4e9",
         "#cc79a7"
       ]
+    },
+    "copper-grid": {
+      "name": "Copper Grid",
+      "bgWidget": "#100e0c",
+      "bgCard": "#1b1715",
+      "bgTrackOff": "#4a3d36",
+      "textPrimary": "#f6f4f4",
+      "textSecondary": "#d2c7c1",
+      "textMuted": "#b5a8a1",
+      "border": "#644d40",
+      "accent": "#d8af97",
+      "severityNormal": "#d8af97",
+      "severityWarning": "#FF9E1B",
+      "severityDanger": "#FF2A2A",
+      "light": {
+        "bgWidget": "#f4f2f1",
+        "bgCard": "#fcfbfb",
+        "bgTrackOff": "#d4cac4",
+        "textPrimary": "#171412",
+        "textSecondary": "#4a3d36",
+        "textMuted": "#64564f",
+        "border": "#c7b3a8",
+        "severityNormal": "#6b4129",
+        "severityWarning": "#855500",
+        "severityDanger": "#b91c1c",
+        "accent": "#6b4129",
+        "providerColors": [
+          "#6b4129",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#d8af97",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "moss-signal": {
+      "name": "Moss Signal",
+      "bgWidget": "#0e100c",
+      "bgCard": "#181b15",
+      "bgTrackOff": "#3f4a36",
+      "textPrimary": "#f5f6f4",
+      "textSecondary": "#c9d2c1",
+      "textMuted": "#aab5a1",
+      "border": "#506440",
+      "accent": "#b5d897",
+      "severityNormal": "#b5d897",
+      "severityWarning": "#FF9E1B",
+      "severityDanger": "#FF2A2A",
+      "light": {
+        "bgWidget": "#f2f4f1",
+        "bgCard": "#fbfcfb",
+        "bgTrackOff": "#cbd4c4",
+        "textPrimary": "#141712",
+        "textSecondary": "#3f4a36",
+        "textMuted": "#59644f",
+        "border": "#b7c7a8",
+        "severityNormal": "#486b29",
+        "severityWarning": "#855500",
+        "severityDanger": "#b91c1c",
+        "accent": "#486b29",
+        "providerColors": [
+          "#486b29",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#b5d897",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "polar-dots": {
+      "name": "Polar Dots",
+      "bgWidget": "#0c0f10",
+      "bgCard": "#151a1b",
+      "bgTrackOff": "#36474a",
+      "textPrimary": "#f4f6f6",
+      "textSecondary": "#c1cfd2",
+      "textMuted": "#a1b2b5",
+      "border": "#405e64",
+      "accent": "#97cdd8",
+      "severityNormal": "#97cdd8",
+      "severityWarning": "#FF9E1B",
+      "severityDanger": "#FF2A2A",
+      "light": {
+        "bgWidget": "#f1f3f4",
+        "bgCard": "#fbfbfc",
+        "bgTrackOff": "#c4d1d4",
+        "textPrimary": "#121617",
+        "textSecondary": "#36474a",
+        "textMuted": "#4f6064",
+        "border": "#a8c2c7",
+        "severityNormal": "#29606b",
+        "severityWarning": "#855500",
+        "severityDanger": "#b91c1c",
+        "accent": "#29606b",
+        "providerColors": [
+          "#29606b",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#97cdd8",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "iris-pulse": {
+      "name": "Iris Pulse",
+      "bgWidget": "#0e0c10",
+      "bgCard": "#18151b",
+      "bgTrackOff": "#3e364a",
+      "textPrimary": "#f5f4f6",
+      "textSecondary": "#c8c1d2",
+      "textMuted": "#aaa1b5",
+      "border": "#4f4064",
+      "accent": "#b397d8",
+      "severityNormal": "#b397d8",
+      "severityWarning": "#FF9E1B",
+      "severityDanger": "#FF2A2A",
+      "light": {
+        "bgWidget": "#f2f1f4",
+        "bgCard": "#fbfbfc",
+        "bgTrackOff": "#cbc4d4",
+        "textPrimary": "#141217",
+        "textSecondary": "#3e364a",
+        "textMuted": "#584f64",
+        "border": "#b6a8c7",
+        "severityNormal": "#46296b",
+        "severityWarning": "#855500",
+        "severityDanger": "#b91c1c",
+        "accent": "#46296b",
+        "providerColors": [
+          "#46296b",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#b397d8",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "rose-raster": {
+      "name": "Rose Raster",
+      "bgWidget": "#100c0e",
+      "bgCard": "#1b1518",
+      "bgTrackOff": "#4a363e",
+      "textPrimary": "#f6f4f5",
+      "textSecondary": "#d2c1c8",
+      "textMuted": "#b5a1a9",
+      "border": "#64404f",
+      "accent": "#d897b2",
+      "severityNormal": "#d897b2",
+      "severityWarning": "#FF9E1B",
+      "severityDanger": "#FF2A2A",
+      "light": {
+        "bgWidget": "#f4f1f2",
+        "bgCard": "#fcfbfb",
+        "bgTrackOff": "#d4c4cb",
+        "textPrimary": "#171214",
+        "textSecondary": "#4a363e",
+        "textMuted": "#644f57",
+        "border": "#c7a8b5",
+        "severityNormal": "#6b2944",
+        "severityWarning": "#855500",
+        "severityDanger": "#b91c1c",
+        "accent": "#6b2944",
+        "providerColors": [
+          "#6b2944",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#d897b2",
+        "#56b4e9",
+        "#cc79a7"
+      ]
+    },
+    "sulfur-field": {
+      "name": "Sulfur Field",
+      "bgWidget": "#100f0c",
+      "bgCard": "#1b1b15",
+      "bgTrackOff": "#4a4836",
+      "textPrimary": "#f6f6f4",
+      "textSecondary": "#d2d1c1",
+      "textMuted": "#b5b3a1",
+      "border": "#646140",
+      "accent": "#d8d297",
+      "severityNormal": "#d8d297",
+      "severityWarning": "#FF9E1B",
+      "severityDanger": "#FF2A2A",
+      "light": {
+        "bgWidget": "#f4f4f1",
+        "bgCard": "#fcfcfb",
+        "bgTrackOff": "#d4d3c4",
+        "textPrimary": "#171612",
+        "textSecondary": "#4a4836",
+        "textMuted": "#64624f",
+        "border": "#c7c5a8",
+        "severityNormal": "#6b6629",
+        "severityWarning": "#855500",
+        "severityDanger": "#b91c1c",
+        "accent": "#6b6629",
+        "providerColors": [
+          "#6b6629",
+          "#0072b2",
+          "#a33278"
+        ]
+      },
+      "providerColors": [
+        "#d8d297",
+        "#56b4e9",
+        "#cc79a7"
+      ]
     }
   }
 }

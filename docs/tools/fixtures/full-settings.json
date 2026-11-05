@@ -49,6 +49,7 @@
     "monitor": "Synthetic display"
   },
   "appearance": "light",
+  "userPalettes": [],
   "palette": "default",
   "accent": "#123456",
   "background": "#abcdef",

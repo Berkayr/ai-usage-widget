@@ -6,6 +6,7 @@ pub fn initialize() { let _ = CURRENT.set(Mutex::new(load_settings())); }
 pub fn current() -> Settings { CURRENT.get_or_init(|| Mutex::new(load_settings())).lock().unwrap_or_else(|e| e.into_inner()).clone() }
 pub fn is_previewing() -> bool { PREVIEWING.load(std::sync::atomic::Ordering::Relaxed) }
 pub fn set_preview(app: &tauri::AppHandle, mut settings: Settings) -> Result<(), String> {
+    user_palettes::validate(&settings.user_palettes)?;
     settings.taskbar.color_mode=settings.color_mode.clone();
     settings.taskbar.dot_count=settings.dot_count;
     *CURRENT.get_or_init(|| Mutex::new(load_settings())).lock().unwrap_or_else(|e|e.into_inner()) = settings.clone();

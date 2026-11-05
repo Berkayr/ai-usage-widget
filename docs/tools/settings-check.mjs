@@ -1,3 +1,4 @@
+import {auditPaletteSettings} from './palette-settings-check.mjs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { browser } from './browser-harness.mjs';
 const scaleMatrix=JSON.parse(await readFile(new URL('./fixtures/scale-settings.json',import.meta.url),'utf8'));
@@ -104,7 +105,7 @@ try {
     await b.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:scheme}]});
     await new Promise(r=>setTimeout(r,50));
     const png=await b.cdp('Page.captureScreenshot',{format:'png'});
-    await writeFile(`docs/tools/settings-preview-${scheme}.png`,Buffer.from(png.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`docs/tools/settings-preview-${scheme}.png`,Buffer.from(png.data,'base64'));
   }
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:640,height:480,deviceScaleFactor:1,mobile:false});
   const small=await b.evaluate(`(()=>{for(const button of document.querySelectorAll('[data-category]')) {button.click();if(document.documentElement.scrollWidth>innerWidth)throw Error('Page overflow: '+button.textContent);const section=document.querySelector('.settings-content');if(section.scrollWidth>section.clientWidth+1)throw Error('Content overflow: '+button.textContent);}return 'PASS: all categories at 640 × 480';})()`);console.log(small);
@@ -134,6 +135,7 @@ try {
       throw Error('Unexpected synthetic IPC: '+cmd);
     }};
   })()`});
+  await auditPaletteSettings(b);
   await b.navigate('/?settings','window.__SETTINGS_READY__');
   console.log(await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
@@ -174,7 +176,7 @@ try {
     return 'PASS: '+verifiedRows+' enabled preset/fine-tune drafts match Rust fixtures (oversized choices disabled), fractional save/reopen/revert, three IPC errors visible, fit excludes unavailable provider';
   })()`));
   const errorPng=await b.cdp('Page.captureScreenshot',{format:'png'});
-  await writeFile('docs/tools/settings-error-preview.png',Buffer.from(errorPng.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile('docs/tools/settings-error-preview.png',Buffer.from(errorPng.data,'base64'));
   for(const action of ['discard','save']) {
     await b.navigate('/?settings','window.__SETTINGS_READY__');
     console.log(await b.evaluate(`(async()=>{
@@ -236,13 +238,13 @@ try {
   await b.evaluate("document.querySelector('#size-mode').scrollIntoView({block:'center'})");
   await mkdir('gorevler/ss-sekil-final',{recursive:true});
   const screenPng=await b.cdp('Page.captureScreenshot',{format:'png'});
-  await writeFile('gorevler/ss-sekil-final/screen-fit-settings.png',Buffer.from(screenPng.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile('gorevler/ss-sekil-final/screen-fit-settings.png',Buffer.from(screenPng.data,'base64'));
   // Verify all Save states against synthetic persisted state, including dropped fields.
   const finalOutput='gorevler/ss-sekil-final/settings';
   await mkdir(finalOutput,{recursive:true});
   const screenshot=async name=>{
     const png=await b.cdp('Page.captureScreenshot',{format:'png'});
-    await writeFile(`${finalOutput}/${name}.png`,Buffer.from(png.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`${finalOutput}/${name}.png`,Buffer.from(png.data,'base64'));
   };
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:900,height:900,deviceScaleFactor:1,mobile:false});
   for(const scheme of ['light','dark']) {
@@ -297,7 +299,7 @@ try {
         await screenshot(`${platform}-${id}-${scheme}`);
         if(platform==='linux'&&id==='layout') {
           const png=await b.cdp('Page.captureScreenshot',{format:'png'});
-          await writeFile(`docs/screenshots/settings-${scheme}.png`,Buffer.from(png.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`docs/screenshots/settings-${scheme}.png`,Buffer.from(png.data,'base64'));
         }
         if(platform==='linux'&&id==='appearance') {
           await b.evaluate(`document.querySelector('#provider-colors').scrollIntoView({block:'end'})`);

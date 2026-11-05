@@ -15,6 +15,7 @@ mod placement;
 #[cfg(target_os="linux")]
 mod work_area;
 mod settings_window;
+mod user_palettes;
 mod shape_region;
 use std::io::Write;
 use std::{fs, path::PathBuf, thread, time::Duration};
@@ -23,6 +24,10 @@ use tauri::{Emitter, Manager};
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub(crate) struct Settings {
+    #[serde(default, rename="userPalettes", deserialize_with="user_palettes::deserialize")]
+    user_palettes: Vec<user_palettes::UserPalette>,
+    #[serde(skip_deserializing, rename="paletteLoadError", skip_serializing_if="Option::is_none")]
+    palette_load_error: Option<String>,
     #[serde(rename="sizeMode")] size_mode: String,
     #[serde(rename="fitFraction")] fit_fraction: f64,
     #[serde(rename="fitFineTune")] fit_fine_tune: f64,
@@ -49,7 +54,7 @@ fn deserialize_scale<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Resul
     Ok(normalize_scale(Option::<f64>::deserialize(deserializer)?.unwrap_or_else(default_scale)))
 }
 
-impl Default for Settings { fn default() -> Self { Self { size_mode: "fixed".into(), fit_fraction: 1., fit_fine_tune: 100., reserved_top: None, reserved_bottom: None, provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), #[cfg(not(target_os = "linux"))] linux: default_linux_options(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
+impl Default for Settings { fn default() -> Self { Self { user_palettes: vec![], palette_load_error: None, size_mode: "fixed".into(), fit_fraction: 1., fit_fine_tune: 100., reserved_top: None, reserved_bottom: None, provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), #[cfg(not(target_os = "linux"))] linux: default_linux_options(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
 struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32, style: String, theme: String, color_mode: String, dot_count: u8 }
@@ -176,10 +181,21 @@ fn parse_settings(data: &[u8]) -> Settings {
     if let Ok(Value::Object(fields)) = serde_json::from_slice::<Value>(data) {
         overlay(&mut value, &mut Vec::new(), &Value::Object(fields));
     }
-    serde_json::from_value(value).unwrap_or_default()
+    let mut settings: Settings = serde_json::from_value(value).unwrap_or_default();
+    if let Ok(Value::Object(fields)) = serde_json::from_slice::<Value>(data) {
+        if let Some(palettes) = fields.get("userPalettes") {
+            let check = serde_json::from_value::<Settings>(json!({"userPalettes":palettes}));
+            match check {
+                Ok(valid) => settings.user_palettes = valid.user_palettes,
+                Err(error) => settings.palette_load_error = Some(format!("User palettes rejected: {error}")),
+            }
+        }
+    }
+    settings
 }
 #[tauri::command]
 fn save_settings(app: tauri::AppHandle, mut settings: Settings) -> Result<(), String> {
+    user_palettes::validate(&settings.user_palettes)?;
     settings.taskbar.color_mode=settings.color_mode.clone();
     settings.taskbar.dot_count=settings.dot_count;
     private_write(settings_path(), serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?)?;
