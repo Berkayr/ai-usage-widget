@@ -1,0 +1,1231 @@
+[
+  {
+    "id": "category:providers",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Providers",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"providers\"]"
+  },
+  {
+    "id": "category:appearance",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Theme",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"appearance\"]"
+  },
+  {
+    "id": "category:layout",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Size & Shape",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"layout\"]"
+  },
+  {
+    "id": "category:position",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Position",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"position\"]"
+  },
+  {
+    "id": "category:quote",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Quote",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"quote\"]"
+  },
+  {
+    "id": "category:taskbar",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Taskbar strip",
+    "modes": "windows",
+    "disabledWhen": "Hidden on Linux (visible only on Windows)",
+    "selector": "button[data-category=\"taskbar\"]"
+  },
+  {
+    "id": "category:desktop",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Desktop",
+    "modes": "linux",
+    "disabledWhen": "Hidden on Windows (visible only on Linux)",
+    "selector": "button[data-category=\"desktop\"]"
+  },
+  {
+    "id": "category:about",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to General",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"about\"]"
+  },
+  {
+    "id": "save",
+    "where": "shell",
+    "setting": null,
+    "effect": "Persists draft settings, provider configuration and autostart to disk",
+    "modes": "all",
+    "disabledWhen": "Disabled when clean (no unsaved changes) or while saving is in progress",
+    "selector": "button#save"
+  },
+  {
+    "id": "revert",
+    "where": "shell",
+    "setting": null,
+    "effect": "Discards unsaved draft changes and restores settings from last saved state",
+    "modes": "all",
+    "disabledWhen": "Disabled when clean (no unsaved changes) or while saving is in progress",
+    "selector": "button#revert"
+  },
+  {
+    "id": "close-save",
+    "where": "shell",
+    "setting": null,
+    "effect": "Saves pending changes and closes the settings window",
+    "modes": "all",
+    "disabledWhen": "Hidden unless settings window close requested with unsaved changes",
+    "selector": "button#close-save"
+  },
+  {
+    "id": "close-discard",
+    "where": "shell",
+    "setting": null,
+    "effect": "Discards pending changes, restores saved preview, and closes settings window",
+    "modes": "all",
+    "disabledWhen": "Hidden unless settings window close requested with unsaved changes",
+    "selector": "button#close-discard"
+  },
+  {
+    "id": "close-cancel",
+    "where": "shell",
+    "setting": null,
+    "effect": "Cancels close request and keeps settings window open with pending changes",
+    "modes": "all",
+    "disabledWhen": "Hidden unless settings window close requested with unsaved changes",
+    "selector": "button#close-cancel"
+  },
+  {
+    "id": "provider-choice:*",
+    "where": "providers",
+    "setting": null,
+    "effect": "Enables or disables tracking and collection consent for provider",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": ".provider-choice input[type=\"checkbox\"]",
+    "pattern": true
+  },
+  {
+    "id": "provider-consent-save",
+    "where": "providers",
+    "setting": null,
+    "effect": "Saves chosen provider consents on onboarding screen",
+    "modes": "all",
+    "disabledWhen": "Hidden in Settings window (superseded by footer Save button)",
+    "selector": ".provider-consent-actions button"
+  },
+  {
+    "id": "provider-order-show:*",
+    "where": "providers",
+    "setting": "hiddenProviders",
+    "effect": "Toggles provider visibility on widget without disabling background collection",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": ".provider-order-row input[type=\"checkbox\"]",
+    "pattern": true
+  },
+  {
+    "id": "provider-order-up:*",
+    "where": "providers",
+    "setting": "providerOrder",
+    "effect": "Moves provider earlier in the display order list",
+    "modes": "all",
+    "disabledWhen": "Disabled when provider is already first in the list",
+    "selector": ".provider-order-row button:first-of-type",
+    "pattern": true
+  },
+  {
+    "id": "provider-order-down:*",
+    "where": "providers",
+    "setting": "providerOrder",
+    "effect": "Moves provider later in the display order list",
+    "modes": "all",
+    "disabledWhen": "Disabled when provider is already last in the list",
+    "selector": ".provider-order-row button:last-of-type",
+    "pattern": true
+  },
+  {
+    "id": "featured-provider",
+    "where": "providers",
+    "setting": "featuredProvider",
+    "effect": "Selects featured provider: first in list, auto (highest usage), none, legacy, or pinned provider",
+    "modes": "portrait, square, circle",
+    "disabledWhen": "never (note: featured selection has no visual effect in Landscape and Pill shapes)",
+    "selector": "select#featured-provider"
+  },
+  {
+    "id": "featured-position",
+    "where": "providers",
+    "setting": "featuredPosition",
+    "effect": "Places featured provider at top or bottom in Portrait shape",
+    "modes": "portrait",
+    "disabledWhen": "never (note: has no effect with even provider count or in non-portrait shapes)",
+    "selector": "select#featured-position"
+  },
+  {
+    "id": "theme:reactor",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to Reactor",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"reactor\"]"
+  },
+  {
+    "id": "theme:system",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to System",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"system\"]"
+  },
+  {
+    "id": "theme:dot-matrix",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to Dot Matrix",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"dot-matrix\"]"
+  },
+  {
+    "id": "theme:circular-rings",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to Circular Rings",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"circular-rings\"]"
+  },
+  {
+    "id": "theme:terminal",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to Terminal",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"terminal\"]"
+  },
+  {
+    "id": "theme:frosted-glass",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to Frosted Glass",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"frosted-glass\"]"
+  },
+  {
+    "id": "theme:brutalist",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to Brutalist",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"brutalist\"]"
+  },
+  {
+    "id": "theme:compact-strip",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to Compact Strip",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"compact-strip\"]"
+  },
+  {
+    "id": "theme:retro-lcd",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to Retro LCD",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"retro-lcd\"]"
+  },
+  {
+    "id": "theme:minimal-pace",
+    "where": "appearance",
+    "setting": "theme",
+    "effect": "Switches theme to Minimal Pace",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"minimal-pace\"]"
+  },
+  {
+    "id": "palette-option:*",
+    "where": "appearance",
+    "setting": "palette",
+    "effect": "Selects palette swatch for current theme",
+    "modes": "all",
+    "disabledWhen": "Hidden when beyond first 6 unless Show all is clicked",
+    "selector": "#palette-grid button.palette-option",
+    "pattern": true
+  },
+  {
+    "id": "palette-show-all",
+    "where": "appearance",
+    "setting": null,
+    "effect": "Toggles showing all built-in and user palette swatches versus first 6",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#palette-tools .palette-actions button:nth-of-type(1)"
+  },
+  {
+    "id": "palette-new",
+    "where": "appearance",
+    "setting": "userPalettes",
+    "effect": "Creates a new custom user palette cloned from current colors and opens editor",
+    "modes": "all",
+    "disabledWhen": "Message shown when user palette limit of 50 reached",
+    "selector": "#palette-tools .palette-actions button:nth-of-type(2)"
+  },
+  {
+    "id": "palette-duplicate",
+    "where": "appearance",
+    "setting": "userPalettes",
+    "effect": "Duplicates currently selected palette as a new editable user palette",
+    "modes": "all",
+    "disabledWhen": "Message shown when user palette limit of 50 reached",
+    "selector": "#palette-tools .palette-actions button:nth-of-type(3)"
+  },
+  {
+    "id": "palette-edit",
+    "where": "appearance",
+    "setting": null,
+    "effect": "Toggles user palette editor panel to customize colors and name",
+    "modes": "all",
+    "disabledWhen": "Disabled when selected palette is not a user palette",
+    "selector": "#palette-tools .palette-actions button:nth-of-type(4)"
+  },
+  {
+    "id": "palette-delete",
+    "where": "appearance",
+    "setting": null,
+    "effect": "Shows inline confirmation prompt to delete selected user palette",
+    "modes": "all",
+    "disabledWhen": "Disabled when selected palette is not a user palette",
+    "selector": "#palette-tools .palette-actions button:nth-of-type(5)"
+  },
+  {
+    "id": "palette-delete-confirm",
+    "where": "appearance",
+    "setting": "userPalettes",
+    "effect": "Confirms deletion of user palette and reverts selection to first built-in palette",
+    "modes": "all",
+    "disabledWhen": "Hidden unless Delete was clicked for active user palette",
+    "selector": "#palette-tools > div:not(.palette-actions) button:nth-of-type(1)"
+  },
+  {
+    "id": "palette-delete-cancel",
+    "where": "appearance",
+    "setting": null,
+    "effect": "Cancels user palette deletion and hides confirmation prompt",
+    "modes": "all",
+    "disabledWhen": "Hidden unless Delete was clicked for active user palette",
+    "selector": "#palette-tools > div:not(.palette-actions) button:nth-of-type(2)"
+  },
+  {
+    "id": "palette-export",
+    "where": "appearance",
+    "setting": null,
+    "effect": "Serializes all user palettes to JSON and places them in the transfer textarea",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#palette-tools .palette-actions button:nth-of-type(6)"
+  },
+  {
+    "id": "palette-import",
+    "where": "appearance",
+    "setting": "userPalettes",
+    "effect": "Parses user palettes JSON from transfer textarea, merges by ID, and selects first imported",
+    "modes": "all",
+    "disabledWhen": "never (shows error note if JSON is invalid)",
+    "selector": "#palette-tools .palette-actions button:nth-of-type(7)"
+  },
+  {
+    "id": "palette-transfer",
+    "where": "appearance",
+    "setting": null,
+    "effect": "Textarea for pasting or copying user palettes JSON data",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#palette-tools textarea[aria-label=\"Palette JSON\"]"
+  },
+  {
+    "id": "palette-name",
+    "where": "appearance",
+    "setting": "userPalettes.name",
+    "effect": "Edits the display name of the selected user palette (up to 40 characters)",
+    "modes": "all",
+    "disabledWhen": "Hidden unless editing a user palette",
+    "selector": "input[data-palette-name]"
+  },
+  {
+    "id": "user-palette-token-color:*",
+    "where": "appearance",
+    "setting": "userPalettes",
+    "effect": "Color picker for user palette token in dark or light mode",
+    "modes": "all",
+    "disabledWhen": "Hidden unless editing a user palette",
+    "selector": "#palette-tools .palette-token input[type=\"color\"]",
+    "pattern": true
+  },
+  {
+    "id": "user-palette-token-hex:*",
+    "where": "appearance",
+    "setting": "userPalettes",
+    "effect": "Text input for user palette token color hex value in dark or light mode",
+    "modes": "all",
+    "disabledWhen": "Hidden unless editing a user palette",
+    "selector": "#palette-tools .palette-token input[data-token]",
+    "pattern": true
+  },
+  {
+    "id": "appearance",
+    "where": "appearance",
+    "setting": "appearance",
+    "effect": "Selects desktop appearance mode: auto (follows system), light, or dark",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#appearance"
+  },
+  {
+    "id": "color-mode",
+    "where": "appearance",
+    "setting": "colorMode",
+    "effect": "Selects color mode: calm (neutral ink below 50%), vivid (theme hues), mono (pure B&W with hatched warning marks)",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#color-mode"
+  },
+  {
+    "id": "accent",
+    "where": "appearance",
+    "setting": "accent",
+    "effect": "Sets custom accent color override; clears on palette selection",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#accent"
+  },
+  {
+    "id": "accent-reset",
+    "where": "appearance",
+    "setting": "accent",
+    "effect": "Clears custom accent override and resets to active palette accent color",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#accent + button"
+  },
+  {
+    "id": "background",
+    "where": "appearance",
+    "setting": "background",
+    "effect": "Sets custom widget background color override; clears on palette selection",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#background"
+  },
+  {
+    "id": "background-reset",
+    "where": "appearance",
+    "setting": "background",
+    "effect": "Clears custom background override and resets to active palette background color",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#background + button"
+  },
+  {
+    "id": "widget-opacity",
+    "where": "appearance",
+    "setting": "widgetOpacity",
+    "effect": "Adjusts widget surface opacity from 20% to 100% while keeping text opaque",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#widget-opacity"
+  },
+  {
+    "id": "background-opacity",
+    "where": "appearance",
+    "setting": "backgroundOpacity",
+    "effect": "Adjusts widget background opacity from 0% to 100%",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#background-opacity"
+  },
+  {
+    "id": "accent-edge",
+    "where": "appearance",
+    "setting": "accentEdge",
+    "effect": "Configures colored accent edge indicator: off, auto (corner-following), left, or right",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#accent-edge"
+  },
+  {
+    "id": "dot-count",
+    "where": "appearance",
+    "setting": "dotCount",
+    "effect": "Selects number of meter marks per quota window (10, 20, or 30)",
+    "modes": "all except theme: system and shape: circle",
+    "disabledWhen": "Hidden when theme is system or shape is circle",
+    "selector": "select#dot-count"
+  },
+  {
+    "id": "reactor-motion",
+    "where": "appearance",
+    "setting": "reactorMotion",
+    "effect": "Toggles core breathing glow animation in Reactor theme",
+    "modes": "theme: reactor, shape: circle",
+    "disabledWhen": "Hidden unless theme is reactor and shape is circle",
+    "selector": "input#reactor-motion"
+  },
+  {
+    "id": "provider-color:*",
+    "where": "appearance",
+    "setting": "providerColors",
+    "effect": "Overrides identity color for provider across all shapes",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input[data-provider-color]",
+    "pattern": true
+  },
+  {
+    "id": "provider-color-reset:*",
+    "where": "appearance",
+    "setting": "providerColors",
+    "effect": "Clears identity color override for provider and resets to theme default",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input[data-provider-color] + button",
+    "pattern": true
+  },
+  {
+    "id": "shape:portrait",
+    "where": "layout",
+    "setting": "shape",
+    "effect": "Switches widget silhouette to vertical Portrait card stack",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-shape=\"portrait\"]"
+  },
+  {
+    "id": "shape:landscape",
+    "where": "layout",
+    "setting": "shape",
+    "effect": "Switches widget silhouette to wide Landscape columns (680 x 340 px at Medium)",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-shape=\"landscape\"]"
+  },
+  {
+    "id": "shape:square",
+    "where": "layout",
+    "setting": "shape",
+    "effect": "Switches widget silhouette to Square grid (340 x 340 px at Medium) with paged rows",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-shape=\"square\"]"
+  },
+  {
+    "id": "shape:circle",
+    "where": "layout",
+    "setting": "shape",
+    "effect": "Switches widget silhouette to Circle Dial (340 x 340 px at Medium) with concentric tracks",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-shape=\"circle\"]"
+  },
+  {
+    "id": "shape:pill",
+    "where": "layout",
+    "setting": "shape",
+    "effect": "Switches widget silhouette to Pill capsule (480 x 120 px at Medium)",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-shape=\"pill\"]"
+  },
+  {
+    "id": "size-preset:Small",
+    "where": "layout",
+    "setting": "sizePreset",
+    "effect": "Applies Small fixed size preset (85% scale)",
+    "modes": "all",
+    "disabledWhen": "Disabled when candidate dimensions exceed monitor work area (title: 'Too big for this screen')",
+    "selector": "button[data-size=\"Small\"]"
+  },
+  {
+    "id": "size-preset:Medium",
+    "where": "layout",
+    "setting": "sizePreset",
+    "effect": "Applies Medium fixed size preset (100% scale)",
+    "modes": "all",
+    "disabledWhen": "Disabled when candidate dimensions exceed monitor work area (title: 'Too big for this screen')",
+    "selector": "button[data-size=\"Medium\"]"
+  },
+  {
+    "id": "size-preset:Large",
+    "where": "layout",
+    "setting": "sizePreset",
+    "effect": "Applies Large fixed size preset (120% scale)",
+    "modes": "all",
+    "disabledWhen": "Disabled when candidate dimensions exceed monitor work area (title: 'Too big for this screen')",
+    "selector": "button[data-size=\"Large\"]"
+  },
+  {
+    "id": "size-preset:X-Large",
+    "where": "layout",
+    "setting": "sizePreset",
+    "effect": "Applies X-Large fixed size preset (150% scale)",
+    "modes": "all",
+    "disabledWhen": "Disabled when candidate dimensions exceed monitor work area (title: 'Too big for this screen')",
+    "selector": "button[data-size=\"X-Large\"]"
+  },
+  {
+    "id": "size-preset:2X-Large",
+    "where": "layout",
+    "setting": "sizePreset",
+    "effect": "Applies 2X-Large fixed size preset (200% scale)",
+    "modes": "all",
+    "disabledWhen": "Disabled when candidate dimensions exceed monitor work area (title: 'Too big for this screen')",
+    "selector": "button[data-size=\"2X-Large\"]"
+  },
+  {
+    "id": "fit-screen",
+    "where": "layout",
+    "setting": "sizeMode",
+    "effect": "Enables Fit screen sizing mode within work area budget",
+    "modes": "portrait (except compact-strip)",
+    "disabledWhen": "Disabled when shape is not portrait or theme is compact-strip (title: 'Portrait only')",
+    "selector": "button#fit-screen"
+  },
+  {
+    "id": "scale",
+    "where": "layout",
+    "setting": "fineTune",
+    "effect": "Adjusts scale fine-tuning multiplier between 50% and 150% in Fixed size mode",
+    "modes": "sizeMode: fixed",
+    "disabledWhen": "Hidden when in Fit screen mode",
+    "selector": "input#scale"
+  },
+  {
+    "id": "fit-height",
+    "where": "layout",
+    "setting": "fitHeight",
+    "effect": "Dynamically adjusts window height to measured rendered content",
+    "modes": "portrait (sizeMode: fixed)",
+    "disabledWhen": "Disabled and hidden when shape is not portrait or in screen mode",
+    "selector": "input#fit-height"
+  },
+  {
+    "id": "match-physical-size",
+    "where": "layout",
+    "setting": "matchPhysicalSize",
+    "effect": "Compensates for OS monitor scaling factor to match physical appearance across displays",
+    "modes": "sizeMode: fixed",
+    "disabledWhen": "Disabled and hidden when in screen mode",
+    "selector": "input#match-physical-size"
+  },
+  {
+    "id": "fit-fraction:1",
+    "where": "layout",
+    "setting": "fitFraction",
+    "effect": "Sets screen share budget to Full (Largest)",
+    "modes": "sizeMode: screen",
+    "disabledWhen": "Hidden when in fixed size mode",
+    "selector": "button[data-fraction=\"1\"]"
+  },
+  {
+    "id": "fit-fraction:0.75",
+    "where": "layout",
+    "setting": "fitFraction",
+    "effect": "Sets screen share budget to 3/4",
+    "modes": "sizeMode: screen",
+    "disabledWhen": "Hidden when in fixed size mode",
+    "selector": "button[data-fraction=\"0.75\"]"
+  },
+  {
+    "id": "fit-fraction:0.5",
+    "where": "layout",
+    "setting": "fitFraction",
+    "effect": "Sets screen share budget to 1/2",
+    "modes": "sizeMode: screen",
+    "disabledWhen": "Hidden when in fixed size mode",
+    "selector": "button[data-fraction=\"0.5\"]"
+  },
+  {
+    "id": "fit-fraction:0.333",
+    "where": "layout",
+    "setting": "fitFraction",
+    "effect": "Sets screen share budget to 1/3",
+    "modes": "sizeMode: screen",
+    "disabledWhen": "Hidden when in fixed size mode",
+    "selector": "button[data-fraction=\"0.3333333333333333\"]"
+  },
+  {
+    "id": "fit-fine-tune",
+    "where": "layout",
+    "setting": "fitFineTune",
+    "effect": "Adjusts scale fine-tuning multiplier between 50% and 150% in Fit screen mode",
+    "modes": "sizeMode: screen",
+    "disabledWhen": "Hidden when in fixed size mode",
+    "selector": "input#fit-fine-tune"
+  },
+  {
+    "id": "reset-fine-tune",
+    "where": "layout",
+    "setting": "fineTune",
+    "effect": "Resets the active fine-tune multiplier (fixed or screen) to 100%",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button#reset-fine-tune"
+  },
+  {
+    "id": "widget-provider:*",
+    "where": "layout",
+    "setting": "widgetProviders",
+    "effect": "Selects which providers (up to 3) appear on Circle or Pill widget",
+    "modes": "circle, pill",
+    "disabledWhen": "Disabled when 3 providers are already selected and this provider is unchecked",
+    "selector": "input[data-widget-provider]",
+    "pattern": true
+  },
+  {
+    "id": "place",
+    "where": "position",
+    "setting": "placementEditing",
+    "effect": "Enters interactive placement mode, unlocking monitor map and widget dragging",
+    "modes": "all",
+    "disabledWhen": "Disabled while placement mode is already active",
+    "selector": "button#place"
+  },
+  {
+    "id": "lock-position",
+    "where": "position",
+    "setting": "lockPosition",
+    "effect": "Prevents dragging the widget header on desktop",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#lock-position"
+  },
+  {
+    "id": "placement-monitor",
+    "where": "position",
+    "setting": "placement.monitor",
+    "effect": "Selects monitor target for placement map",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#placement-monitor"
+  },
+  {
+    "id": "snap",
+    "where": "position",
+    "setting": "placement.snap",
+    "effect": "Selects snapping mode on monitor map: off, edges & center (12px), or grid (8px)",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#snap"
+  },
+  {
+    "id": "map-widget",
+    "where": "position",
+    "setting": "placement.xRatio, placement.yRatio",
+    "effect": "Interactive widget proxy button draggable on monitor work area map; arrow keys move by 8px",
+    "modes": "all",
+    "disabledWhen": "Disabled when not in placement mode",
+    "selector": "button#map-widget"
+  },
+  {
+    "id": "placement-preset:top-left",
+    "where": "position",
+    "setting": "position",
+    "effect": "Moves widget to Top left corner",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#placement-presets button:nth-of-type(1)"
+  },
+  {
+    "id": "placement-preset:top-center",
+    "where": "position",
+    "setting": "position",
+    "effect": "Moves widget to Top center edge",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#placement-presets button:nth-of-type(2)"
+  },
+  {
+    "id": "placement-preset:top-right",
+    "where": "position",
+    "setting": "position",
+    "effect": "Moves widget to Top right corner",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#placement-presets button:nth-of-type(3)"
+  },
+  {
+    "id": "placement-preset:bottom-left",
+    "where": "position",
+    "setting": "position",
+    "effect": "Moves widget to Bottom left corner",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#placement-presets button:nth-of-type(4)"
+  },
+  {
+    "id": "placement-preset:bottom-center",
+    "where": "position",
+    "setting": "position",
+    "effect": "Moves widget to Bottom center edge",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#placement-presets button:nth-of-type(5)"
+  },
+  {
+    "id": "placement-preset:bottom-right",
+    "where": "position",
+    "setting": "position",
+    "effect": "Moves widget to Bottom right corner",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#placement-presets button:nth-of-type(6)"
+  },
+  {
+    "id": "placement-preset:center",
+    "where": "position",
+    "setting": "position",
+    "effect": "Centers widget on screen work area",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "#placement-presets button:nth-of-type(7)"
+  },
+  {
+    "id": "save-position",
+    "where": "position",
+    "setting": null,
+    "effect": "Locks current placement, updates ratios, and exits placement mode",
+    "modes": "all",
+    "disabledWhen": "Hidden when not in placement mode",
+    "selector": "button#save-position"
+  },
+  {
+    "id": "cancel-position",
+    "where": "position",
+    "setting": null,
+    "effect": "Cancels placement changes, restores previous position, and exits placement mode",
+    "modes": "all",
+    "disabledWhen": "Hidden when not in placement mode",
+    "selector": "button#cancel-position"
+  },
+  {
+    "id": "disconnected",
+    "where": "position",
+    "setting": "placement.disconnected",
+    "effect": "Chooses behavior when current monitor disconnects: move to primary, move to fallback monitor, or hide until return",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#disconnected"
+  },
+  {
+    "id": "fallback-monitor",
+    "where": "position",
+    "setting": "placement.fallbackMonitor",
+    "effect": "Selects secondary monitor fallback destination when primary monitor disconnects",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#fallback-monitor"
+  },
+  {
+    "id": "reserved-top",
+    "where": "position",
+    "setting": "reservedTop",
+    "effect": "Explicit logical pixel reservation for top screen margin (Auto when blank; zero removes reservation)",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#reserved-top"
+  },
+  {
+    "id": "reserved-bottom",
+    "where": "position",
+    "setting": "reservedBottom",
+    "effect": "Explicit logical pixel reservation for bottom screen margin (Auto when blank; zero removes reservation)",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#reserved-bottom"
+  },
+  {
+    "id": "quote-enabled",
+    "where": "quote",
+    "setting": "quoteEnabled",
+    "effect": "Toggles daily quote fetching and display",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#quote-enabled"
+  },
+  {
+    "id": "quote-position",
+    "where": "quote",
+    "setting": "quotePosition",
+    "effect": "Places quote at bottom or top of provider stack in Portrait and Landscape shapes",
+    "modes": "portrait, landscape",
+    "disabledWhen": "never",
+    "selector": "select#quote-position"
+  },
+  {
+    "id": "quote-mode",
+    "where": "quote",
+    "setting": "quoteMode",
+    "effect": "Selects daily quote mode: quote of the day, born on this day, died on this day, on this day, or mixed",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#quote-mode"
+  },
+  {
+    "id": "quote-navigation",
+    "where": "quote",
+    "setting": "quoteNavigation",
+    "effect": "Shows quote previous/next navigation buttons when multiple quotes are available",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#quote-navigation"
+  },
+  {
+    "id": "taskbar-enabled",
+    "where": "taskbar",
+    "setting": "taskbar.enabled",
+    "effect": "Enables Windows taskbar integration strip",
+    "modes": "windows",
+    "disabledWhen": "Hidden on Linux",
+    "selector": "input#taskbar-enabled"
+  },
+  {
+    "id": "taskbar-provider:*",
+    "where": "taskbar",
+    "setting": "taskbar.providers",
+    "effect": "Toggles provider visibility on the Windows taskbar strip",
+    "modes": "windows",
+    "disabledWhen": "Hidden on Linux",
+    "selector": "input[data-taskbar-provider]",
+    "pattern": true
+  },
+  {
+    "id": "taskbar-style",
+    "where": "taskbar",
+    "setting": "taskbar.style",
+    "effect": "Selects taskbar strip visual style: transparent or chip",
+    "modes": "windows",
+    "disabledWhen": "Hidden on Linux",
+    "selector": "select#taskbar-style"
+  },
+  {
+    "id": "taskbar-theme",
+    "where": "taskbar",
+    "setting": "taskbar.theme",
+    "effect": "Selects taskbar strip color theme: auto, light, or dark",
+    "modes": "windows",
+    "disabledWhen": "Hidden on Linux",
+    "selector": "select#taskbar-theme"
+  },
+  {
+    "id": "taskbar-window",
+    "where": "taskbar",
+    "setting": "taskbar.window",
+    "effect": "Selects quota window shown in taskbar strip: session, weekly, or both",
+    "modes": "windows",
+    "disabledWhen": "Hidden on Linux",
+    "selector": "select#taskbar-window"
+  },
+  {
+    "id": "taskbar-bars",
+    "where": "taskbar",
+    "setting": "taskbar.showBars",
+    "effect": "Shows mini progress bar tracks in taskbar strip",
+    "modes": "windows",
+    "disabledWhen": "Hidden on Linux",
+    "selector": "input#taskbar-bars"
+  },
+  {
+    "id": "linux-layer",
+    "where": "desktop",
+    "setting": "linux.layer",
+    "effect": "Selects layer-shell layer: top (above windows) or bottom (on desktop)",
+    "modes": "linux",
+    "disabledWhen": "Hidden on Windows or when layer-shell is unavailable on Linux",
+    "selector": "select#linux-layer"
+  },
+  {
+    "id": "linux-margin",
+    "where": "desktop",
+    "setting": "linux.margin",
+    "effect": "Sets screen margin in logical pixels (0–64 px) for layer-shell anchor",
+    "modes": "linux",
+    "disabledWhen": "Hidden on Windows or when layer-shell is unavailable on Linux",
+    "selector": "input#linux-margin"
+  },
+  {
+    "id": "linux-monitor",
+    "where": "desktop",
+    "setting": "linux.monitor",
+    "effect": "Selects specific monitor connector for Linux layer-shell surface (or Auto)",
+    "modes": "linux",
+    "disabledWhen": "Hidden on Windows or when layer-shell is unavailable on Linux",
+    "selector": "select#linux-monitor"
+  },
+  {
+    "id": "start-at-login",
+    "where": "about",
+    "setting": null,
+    "effect": "Registers application to start automatically at user login via OS autostart mechanism",
+    "modes": "all",
+    "disabledWhen": "Disabled when autostart registration is not supported or accessible on host system",
+    "selector": "input#start-at-login"
+  },
+  {
+    "id": "show-extra-windows",
+    "where": "about",
+    "setting": "showExtraWindows",
+    "effect": "Reveals secondary/model-specific quota windows hidden by default",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#show-extra-windows"
+  },
+  {
+    "id": "size-mode",
+    "where": "layout",
+    "setting": "sizeMode",
+    "effect": "Switches sizing between fixed preset and fit to screen",
+    "modes": "all",
+    "disabledWhen": "Hidden in UI (superseded by Size preset buttons and Fit screen button)",
+    "selector": "select#size-mode"
+  },
+  {
+    "id": "palette-select",
+    "where": "appearance",
+    "setting": "palette",
+    "effect": "Selects active palette by ID",
+    "modes": "all",
+    "disabledWhen": "Hidden in UI (superseded by palette-grid swatches)",
+    "selector": "select#palette"
+  },
+  {
+    "id": "position-select",
+    "where": "position",
+    "setting": "position",
+    "effect": "Selects corner position or Free",
+    "modes": "all",
+    "disabledWhen": "Hidden in UI (superseded by placement-presets buttons and monitor map)",
+    "selector": "select#position"
+  },
+  {
+    "id": "fit-fraction-select",
+    "where": "layout",
+    "setting": "fitFraction",
+    "effect": "Selects screen share ratio fraction",
+    "modes": "portrait",
+    "disabledWhen": "Hidden in UI (superseded by segmented buttons)",
+    "selector": "select#fit-fraction"
+  },
+  {
+    "id": "widget-gear",
+    "where": "widget",
+    "setting": null,
+    "effect": "Opens Settings window",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button#gear"
+  },
+  {
+    "id": "widget-menu-refresh",
+    "where": "widget",
+    "setting": null,
+    "effect": "Triggers immediate quota collection and redraws widget",
+    "modes": "all",
+    "disabledWhen": "Hidden unless widget context menu is invoked",
+    "selector": "nav#context-menu button#refresh"
+  },
+  {
+    "id": "widget-menu-settings",
+    "where": "widget",
+    "setting": null,
+    "effect": "Opens Settings window from widget context menu",
+    "modes": "all",
+    "disabledWhen": "Hidden unless widget context menu is invoked",
+    "selector": "nav#context-menu button#menu-settings"
+  },
+  {
+    "id": "widget-quote-toggle",
+    "where": "widget",
+    "setting": null,
+    "effect": "Switches between quota cards and quote page (circle/square) or opens full quote dialog (pill)",
+    "modes": "circle, square, pill",
+    "disabledWhen": "Hidden when quoteEnabled is false or in portrait/landscape",
+    "selector": "button.quote-toggle"
+  },
+  {
+    "id": "widget-quote-text",
+    "where": "widget",
+    "setting": null,
+    "effect": "Opens full modal dialog showing complete quote text and details",
+    "modes": "all (quote on)",
+    "disabledWhen": "Hidden when quoteEnabled is false or on pill",
+    "selector": "button.quote-text"
+  },
+  {
+    "id": "widget-quote-source",
+    "where": "widget",
+    "setting": null,
+    "effect": "Opens full modal dialog showing quote source and CC BY-SA 4.0 license",
+    "modes": "all (quote on)",
+    "disabledWhen": "Hidden when quoteEnabled is false or on pill",
+    "selector": "button.quote-source"
+  },
+  {
+    "id": "widget-quote-nav-prev",
+    "where": "widget",
+    "setting": null,
+    "effect": "Advances to previous quote in the daily collection",
+    "modes": "all (quote on)",
+    "disabledWhen": "Hidden when quoteNavigation is false or fewer than 2 quotes available",
+    "selector": ".quote-nav button:first-child"
+  },
+  {
+    "id": "widget-quote-nav-next",
+    "where": "widget",
+    "setting": null,
+    "effect": "Advances to next quote in the daily collection",
+    "modes": "all (quote on)",
+    "disabledWhen": "Hidden when quoteNavigation is false or fewer than 2 quotes available",
+    "selector": ".quote-nav button:last-child"
+  },
+  {
+    "id": "widget-quote-dialog-prev",
+    "where": "widget",
+    "setting": null,
+    "effect": "Switches to previous quote inside open modal quote dialog",
+    "modes": "all",
+    "disabledWhen": "Hidden when fewer than 2 quotes available",
+    "selector": "dialog.quote-dialog button:first-of-type"
+  },
+  {
+    "id": "widget-quote-dialog-next",
+    "where": "widget",
+    "setting": null,
+    "effect": "Switches to next quote inside open modal quote dialog",
+    "modes": "all",
+    "disabledWhen": "Hidden when fewer than 2 quotes available",
+    "selector": "dialog.quote-dialog button:nth-of-type(2)"
+  },
+  {
+    "id": "widget-quote-dialog-close",
+    "where": "widget",
+    "setting": null,
+    "effect": "Closes the modal quote dialog",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "dialog.quote-dialog button:last-of-type"
+  },
+  {
+    "id": "widget-shape-page:*",
+    "where": "widget",
+    "setting": null,
+    "effect": "Switches visible provider page in Square layout",
+    "modes": "square (>4 providers)",
+    "disabledWhen": "Hidden when provider count is 4 or fewer",
+    "selector": ".shape-pages button",
+    "pattern": true
+  },
+  {
+    "id": "widget-placement-save",
+    "where": "widget",
+    "setting": null,
+    "effect": "Saves dragged widget position from on-screen placement bar",
+    "modes": "all",
+    "disabledWhen": "Hidden unless placementEditing is active",
+    "selector": ".placement-bar button:first-of-type"
+  },
+  {
+    "id": "widget-placement-cancel",
+    "where": "widget",
+    "setting": null,
+    "effect": "Reverts widget position and cancels on-screen placement bar",
+    "modes": "all",
+    "disabledWhen": "Hidden unless placementEditing is active",
+    "selector": ".placement-bar button:last-of-type"
+  },
+  {
+    "id": "shortcut:ctrl-plus",
+    "where": "shortcut",
+    "setting": "fineTune / fitFineTune",
+    "effect": "Increases scale fine-tune multiplier by 5% (capped at 150%)",
+    "modes": "all",
+    "disabledWhen": "never"
+  },
+  {
+    "id": "shortcut:ctrl-minus",
+    "where": "shortcut",
+    "setting": "fineTune / fitFineTune",
+    "effect": "Decreases scale fine-tune multiplier by 5% (floor at 50%)",
+    "modes": "all",
+    "disabledWhen": "never"
+  },
+  {
+    "id": "shortcut:ctrl-zero",
+    "where": "shortcut",
+    "setting": "fineTune / fitFineTune",
+    "effect": "Resets scale fine-tune multiplier to 100%",
+    "modes": "all",
+    "disabledWhen": "never"
+  },
+  {
+    "id": "shortcut:ctrl-comma",
+    "where": "shortcut",
+    "setting": null,
+    "effect": "Opens Settings window from anywhere in the application",
+    "modes": "all",
+    "disabledWhen": "never"
+  },
+  {
+    "id": "shortcut:ctrl-s",
+    "where": "shortcut",
+    "setting": null,
+    "effect": "Saves pending draft settings in Settings window",
+    "modes": "all",
+    "disabledWhen": "Disabled when there are no unsaved changes"
+  },
+  {
+    "id": "shortcut:escape",
+    "where": "shortcut",
+    "setting": null,
+    "effect": "Dismisses close prompt or active dialog in Settings window",
+    "modes": "all",
+    "disabledWhen": "never"
+  },
+  {
+    "id": "shortcut:map-arrow-keys",
+    "where": "shortcut",
+    "setting": "placement.xRatio, placement.yRatio",
+    "effect": "Moves widget position by 8px on monitor map using arrow keys in placement mode",
+    "modes": "all",
+    "disabledWhen": "Disabled when not in placement mode or when #map-widget is not focused"
+  }
+]

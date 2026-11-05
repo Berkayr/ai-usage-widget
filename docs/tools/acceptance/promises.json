@@ -1,0 +1,786 @@
+[
+  {
+    "id": "p-readme-01",
+    "source": "README.md:23",
+    "claim": "Keep Claude Code, Codex and Gemini quota windows visible while you work.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:121,143",
+    "reason": null
+  },
+  {
+    "id": "p-readme-02",
+    "source": "README.md:31",
+    "claim": "Linux: curl install script or download .deb / .rpm / AppImage; Windows: setup.exe",
+    "verify": "not-verified",
+    "test": null,
+    "reason": "Installers are coming with v0.1; no release binary or installer has been published yet"
+  },
+  {
+    "id": "p-readme-03",
+    "source": "README.md:54",
+    "claim": "Cached and unavailable data remain distinguishable; missing quota never becomes a reassuring zero.",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs:29,45",
+    "reason": null
+  },
+  {
+    "id": "p-readme-04",
+    "source": "README.md:62",
+    "claim": "Choose Portrait, Landscape, Square, Circle Dial or Pill in Layout & Position.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:46",
+    "reason": null
+  },
+  {
+    "id": "p-readme-05",
+    "source": "README.md:62",
+    "claim": "Circle and Pill show up to three selected providers; Square pages through additional providers.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:78 and docs/tools/theme-identity-check.mjs:29,183",
+    "reason": null
+  },
+  {
+    "id": "p-readme-06",
+    "source": "README.md:70",
+    "claim": "In Providers → Provider layout, reorder or hide widget rows without disabling collection.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:57,60 and docs/tools/layout-variants.mjs:20",
+    "reason": null
+  },
+  {
+    "id": "p-readme-07",
+    "source": "README.md:70",
+    "claim": "Choose a featured provider or None; Portrait supports Top / Bottom placement.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:62,69 and docs/tools/layout-variants.mjs:12,15",
+    "reason": null
+  },
+  {
+    "id": "p-readme-08",
+    "source": "README.md:76",
+    "claim": "Five size presets at 85, 100, 120, 150 and 200 percent (Small, Medium, Large, X-Large, 2X-Large).",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:83 and docs/tools/size-audit.mjs:11",
+    "reason": null
+  },
+  {
+    "id": "p-readme-09",
+    "source": "README.md:79",
+    "claim": "Scale text and spacing together from 50% to 300%, with presets or Ctrl +/− and Ctrl+0. Numbers keep proportions.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:348-360",
+    "reason": null
+  },
+  {
+    "id": "p-readme-10",
+    "source": "README.md:86",
+    "claim": "Every theme includes 12 palettes. New palette, Duplicate, Edit Dark and Light, Export, Import, and contrast warnings.",
+    "verify": "headless",
+    "test": "docs/tools/palette-settings-check.mjs:8-18 and docs/tools/settings-check.mjs:35",
+    "reason": null
+  },
+  {
+    "id": "p-readme-11",
+    "source": "README.md:88",
+    "claim": "Choose Calm, Vivid, or Mono color modes. Ten themes change layout and colors. Auto, Light, Dark appearance.",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs:15 and docs/tools/contrast-audit.mjs:20",
+    "reason": null
+  },
+  {
+    "id": "p-readme-12",
+    "source": "README.md:95",
+    "claim": "Cached data stays marked, sign-in failures ask for attention, unavailable never becomes zero. Providers without active subscription stay hidden.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:143",
+    "reason": null
+  },
+  {
+    "id": "p-readme-13",
+    "source": "README.md:102",
+    "claim": "Calm uses neutral ink below 50%, amber from 50%, red from 80%. Mono adds hollow warning marks and inverse percentage labels.",
+    "verify": "headless",
+    "test": "docs/tools/palette-identity-check.mjs:11 and docs/tools/theme-identity-check.mjs:15",
+    "reason": null
+  },
+  {
+    "id": "p-readme-14",
+    "source": "README.md:102",
+    "claim": "Choose 10, 20 or 30 meter marks; XS uses 10.",
+    "verify": "unit",
+    "test": "tests/render-security.mjs:9",
+    "reason": null
+  },
+  {
+    "id": "p-readme-15",
+    "source": "README.md:110",
+    "claim": "System theme uses desktop font, light/dark appearance and system accent where supported. It is the default theme.",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs:146",
+    "reason": null
+  },
+  {
+    "id": "p-readme-16",
+    "source": "README.md:122",
+    "claim": "Windows has an optional taskbar strip with independent provider, window and theme settings.",
+    "verify": "native",
+    "test": null,
+    "reason": "Requires native Windows desktop environment with Explorer WinEvent hook and GDI strip rendering"
+  },
+  {
+    "id": "p-readme-17",
+    "source": "README.md:171",
+    "claim": "First launch asks which providers to track; all providers stay disabled until you choose Start. New providers default off.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_fresh_collection_never_reads_detected_providers and test_new_provider_does_not_inherit_detection",
+    "reason": null
+  },
+  {
+    "id": "p-readme-18",
+    "source": "README.md:172",
+    "claim": "Requests retrieve usage or balances; collector does not submit prompts or request model completions. Does not scan chat history.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_fresh_collection_never_reads_detected_providers",
+    "reason": null
+  },
+  {
+    "id": "p-readme-19",
+    "source": "README.md:173",
+    "claim": "There is no application telemetry or analytics code.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Negative architectural property verified by repository-wide audit of all source files"
+  },
+  {
+    "id": "p-readme-20",
+    "source": "README.md:177",
+    "claim": "Daily quote off by default. Contacts en.wikiquote.org and wikidata.org once a day. No account or identifiers sent.",
+    "verify": "unit",
+    "test": "tests/test_quote.py:test_disabled_never_calls_network_or_cache",
+    "reason": null
+  },
+  {
+    "id": "p-readme-21",
+    "source": "README.md:179",
+    "claim": "Daily quote batches twelve same-date pages and one Wikidata sitelink; <= 2 HTTP requests; no redirects, cookies or credentials.",
+    "verify": "unit",
+    "test": "tests/test_quote.py:test_daily_pool_modes_and_cleaning and test_http_size_timeout_and_headers",
+    "reason": null
+  },
+  {
+    "id": "p-readme-22",
+    "source": "README.md:179",
+    "claim": "Source and CC BY-SA 4.0 attribution accessible from every shape.",
+    "verify": "headless",
+    "test": "docs/tools/quote-check.mjs:33",
+    "reason": null
+  },
+  {
+    "id": "p-changelog-01",
+    "source": "CHANGELOG.md:9",
+    "claim": "Windows and Linux desktop widget with ten themes, five shapes and shared local quota snapshots.",
+    "verify": "headless",
+    "test": "docs/tools/size-audit.mjs:11 and docs/tools/theme-identity-check.mjs:15",
+    "reason": null
+  },
+  {
+    "id": "p-changelog-02",
+    "source": "CHANGELOG.md:10",
+    "claim": "Provider opt-in, palette editing/import/export, layout and placement settings.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:12-101 and docs/tools/palette-settings-check.mjs:8-18",
+    "reason": null
+  },
+  {
+    "id": "p-changelog-03",
+    "source": "CHANGELOG.md:11",
+    "claim": "Panel integration sources for Plasma, GNOME Shell, Waybar, Polybar and i3blocks.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Panel integration scripts and plasmoid/extension manifests are verified manually in desktop panel environments"
+  },
+  {
+    "id": "p-changelog-04",
+    "source": "CHANGELOG.md:15",
+    "claim": "Bolder Dot Matrix quota labels, round marks and full-width tracks.",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs:48",
+    "reason": null
+  },
+  {
+    "id": "p-config-01",
+    "source": "docs/configuration.md:5",
+    "claim": "Theme defaults to System when no choice is stored; an existing explicit theme is preserved.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:1109",
+    "reason": null
+  },
+  {
+    "id": "p-config-02",
+    "source": "docs/configuration.md:9",
+    "claim": "settings.json in $XDG_CONFIG_HOME/ai-usage (Linux) or %APPDATA%/ai-usage (Windows); window.json separate.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Requires inspecting real file paths created by native app during execution on Linux and Windows"
+  },
+  {
+    "id": "p-config-03",
+    "source": "docs/configuration.md:20",
+    "claim": "widgetOpacity (UI range 20–100) sets surface opacity; text remains opaque.",
+    "verify": "headless",
+    "test": "docs/tools/contrast-audit.mjs:29-32",
+    "reason": null
+  },
+  {
+    "id": "p-config-04",
+    "source": "docs/configuration.md:22",
+    "claim": "Ctrl +/− changes active fine-tune by 5; Ctrl+0 resets fine-tune to 100.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:348-360",
+    "reason": null
+  },
+  {
+    "id": "p-config-05",
+    "source": "docs/configuration.md:24",
+    "claim": "Fit screen effective only for Portrait except Compact Strip; other shapes retain choice but use preset. Width capped at 30% of available width.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:330-339",
+    "reason": null
+  },
+  {
+    "id": "p-config-06",
+    "source": "docs/configuration.md:26",
+    "claim": "fitHeight (true) resizes window to measured content height.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:81 and docs/tools/size-audit.mjs:27",
+    "reason": null
+  },
+  {
+    "id": "p-config-07",
+    "source": "docs/configuration.md:55",
+    "claim": "config.json collection interval minimum 30 seconds (default 300); native widget refreshes on startup and every 300s.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Verified by code inspection of interval validation and timer loops; no headless test asserts real 300s interval"
+  },
+  {
+    "id": "p-config-08",
+    "source": "docs/configuration.md:84",
+    "claim": "key set stores plaintext keys with Unix 0600 or current-user protected Windows DACL.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_private_json_and_history_permissions and WindowsAclTests",
+    "reason": null
+  },
+  {
+    "id": "p-config-09",
+    "source": "docs/configuration.md:86",
+    "claim": "Hook chaining uses JSON argv array, raw stdin, 5 seconds timeout, max 64 KiB stdout.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_chain_arguments_are_literal_and_stdin_is_preserved and test_chain_timeout_and_output_cap",
+    "reason": null
+  },
+  {
+    "id": "p-config-10",
+    "source": "docs/configuration.md:117",
+    "claim": "Every size, including Ctrl +/- shortcuts, stays inside work area and covers at most 50% (35% for strip).",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:353",
+    "reason": null
+  },
+  {
+    "id": "p-config-11",
+    "source": "docs/configuration.md:124",
+    "claim": "Save verifies persisted settings by loading them again before displaying saved time; errors remain retryable.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:168,276,286",
+    "reason": null
+  },
+  {
+    "id": "p-config-12",
+    "source": "docs/configuration.md:133",
+    "claim": "Delete requires in-page confirmation; deleting selected palette restores theme first built-in palette.",
+    "verify": "headless",
+    "test": "docs/tools/palette-settings-check.mjs:14-16",
+    "reason": null
+  },
+  {
+    "id": "p-config-13",
+    "source": "docs/configuration.md:136",
+    "claim": "Import merges user palettes by ID (matching IDs replaced) and selects first imported palette.",
+    "verify": "headless",
+    "test": "docs/tools/palette-settings-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-config-14",
+    "source": "docs/configuration.md:140",
+    "claim": "userPalettes format: ID user-[a-z0-9-]{1,64}, name 1-40 unicode chars, 11 tokens per dark/light mode.",
+    "verify": "unit",
+    "test": "docs/tools/palette-settings-check.mjs:9",
+    "reason": null
+  },
+  {
+    "id": "p-config-15",
+    "source": "docs/configuration.md:167",
+    "claim": "Invalid imports reject entire operation and display error. Invalid palettes on disk discarded with warning.",
+    "verify": "headless",
+    "test": "docs/tools/palette-settings-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-design-01",
+    "source": "docs/design-spec.md:4",
+    "claim": "All themes have 20 marks per quota window by default. Settings selects 10, 20 or 30. XS uses 10.",
+    "verify": "unit",
+    "test": "tests/render-security.mjs:9",
+    "reason": null
+  },
+  {
+    "id": "p-design-02",
+    "source": "docs/design-spec.md:28",
+    "claim": "Five presets multiply all logical dimensions uniformly: Small 85%, Medium 100%, Large 120%, X-Large 150%, 2X-Large 200%.",
+    "verify": "headless",
+    "test": "docs/tools/size-audit.mjs:11",
+    "reason": null
+  },
+  {
+    "id": "p-design-03",
+    "source": "docs/design-spec.md:35",
+    "claim": "Effective scale bounded to 10–300% at IPC boundary; non-finite falls back to 100%.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:145-152",
+    "reason": null
+  },
+  {
+    "id": "p-design-04",
+    "source": "docs/design-spec.md:43",
+    "claim": "At Medium, with n = visible provider count, Portrait ceiling width = 340, height = 116 + 210 * n.",
+    "verify": "headless",
+    "test": "docs/tools/size-audit.mjs:28",
+    "reason": null
+  },
+  {
+    "id": "p-design-05",
+    "source": "docs/design-spec.md:49",
+    "claim": "Compact Strip at Medium requests width = 30 + 310 * n, height = 326: 300px cards, 10px gaps.",
+    "verify": "headless",
+    "test": "docs/tools/size-audit.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-design-06",
+    "source": "docs/design-spec.md:64",
+    "claim": "Titles read AI USAGE with one literal word space, nonnegative letter spacing, same family as body, no stretch.",
+    "verify": "headless",
+    "test": "docs/tools/size-audit.mjs:23",
+    "reason": null
+  },
+  {
+    "id": "p-design-07",
+    "source": "docs/design-spec.md:72",
+    "claim": "Thresholds: <50% normal, 50% to <80% warning (hollow marks), >=80% danger (inverse labels).",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-design-08",
+    "source": "docs/design-spec.md:98",
+    "claim": "Match physical size across monitors is off by default; when enabled, divides Scale by native scale factor.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-design-09",
+    "source": "docs/design-spec.md:133",
+    "claim": "Text must not use transform scale, font-stretch or vw/cqw units for font size.",
+    "verify": "headless",
+    "test": "docs/tools/size-audit.mjs:23",
+    "reason": null
+  },
+  {
+    "id": "p-design-10",
+    "source": "docs/design-spec.md:148",
+    "claim": "Settings window created lazily, hidden on close, reused without listener leak; Save/Discard/Cancel before hide.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:192-208",
+    "reason": null
+  },
+  {
+    "id": "p-design-11",
+    "source": "docs/design-spec.md:154",
+    "claim": "Gear and context menu open decorated settings window (900 x 680, min 640 x 480).",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:7,111",
+    "reason": null
+  },
+  {
+    "id": "p-design-12",
+    "source": "docs/design-spec.md:177",
+    "claim": "Placement defaults to locked; Place widget temporarily unlocks header; 12px edges/center and 8px grid snapping.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:94-98",
+    "reason": null
+  },
+  {
+    "id": "p-design-13",
+    "source": "docs/design-spec.md:237",
+    "claim": "Landscape is 680 x 340 and Square is 340 x 340 at Medium, independent of provider count.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:71,73 and docs/tools/size-audit.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-design-14",
+    "source": "docs/design-spec.md:267",
+    "claim": "Medium circle is 340 x 340 px; Medium pill is 480 x 120 px.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:75-76 and docs/tools/theme-identity-check.mjs:26",
+    "reason": null
+  },
+  {
+    "id": "p-design-15",
+    "source": "docs/design-spec.md:278",
+    "claim": "Native input regions match silhouette: Win32 physical-pixel ellipse/capsule, GTK logical-pixel cairo scanlines.",
+    "verify": "native",
+    "test": null,
+    "reason": "Requires native X11/Wayland/Windows compositor hit-testing"
+  },
+  {
+    "id": "p-design-16",
+    "source": "docs/design-spec.md:307",
+    "claim": "Quote text shrinks to 11px (9px circle), then truncates at word boundary with explicit ellipsis.",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs:37 and docs/tools/quote-check.mjs:28",
+    "reason": null
+  },
+  {
+    "id": "p-design-17",
+    "source": "docs/design-spec.md:335",
+    "claim": "Portrait Fit width cannot exceed 30% of available work area.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-linux-01",
+    "source": "docs/linux.md:7",
+    "claim": "KDE Plasma 6 Wayland: GTK3 layer-shell corners; ordinary window fallback without library.",
+    "verify": "native",
+    "test": null,
+    "reason": "Requires native KDE Plasma 6 Wayland desktop session with libgtk-layer-shell installed"
+  },
+  {
+    "id": "p-linux-02",
+    "source": "docs/linux.md:18",
+    "claim": "libgtk-layer-shell.so.0 loaded dynamically; absence does not prevent startup.",
+    "verify": "native",
+    "test": null,
+    "reason": "Verified only by launching on native Linux systems without libgtk-layer-shell"
+  },
+  {
+    "id": "p-linux-03",
+    "source": "docs/linux.md:20",
+    "claim": "Layer-shell default: bottom layer, top-right, 12px margin, Auto monitor.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-linux-04",
+    "source": "docs/linux.md:26",
+    "claim": "Panel readers are passive: `python3 -m quotacore bar --format waybar` reads snapshot without network/credentials.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_fresh_collection_never_reads_detected_providers",
+    "reason": null
+  },
+  {
+    "id": "p-pace-01",
+    "source": "docs/pace.md:3",
+    "claim": "quotacore pace collects fresh snapshot and prints pacing profile (SAVE, NORMAL, SPARE, LAST_CALL, UNKNOWN).",
+    "verify": "unit",
+    "test": "tests/test_pace.py:test_behind_and_ahead_gap_math and test_spare_hysteresis_enter_and_exit",
+    "reason": null
+  },
+  {
+    "id": "p-pace-02",
+    "source": "docs/pace.md:8",
+    "claim": "Optional pacing ceilings in pace.json, default 90%.",
+    "verify": "unit",
+    "test": "tests/test_pace.py:test_last_call_and_weekly_save",
+    "reason": null
+  },
+  {
+    "id": "p-pace-03",
+    "source": "docs/pace.md:10",
+    "claim": "Recent stale snapshots remain usable up to max_age_minutes; older or undated stale data reported as UNKNOWN.",
+    "verify": "unit",
+    "test": "tests/test_pace.py:test_recent_stale_snapshot_remains_usable_and_reports_age and test_old_or_undated_stale_snapshot_and_auth_stay_unknown",
+    "reason": null
+  },
+  {
+    "id": "p-pace-04",
+    "source": "docs/pace.md:11",
+    "claim": "Expired windows are treated as reset, with zero usage for the new period.",
+    "verify": "unit",
+    "test": "tests/test_pace.py:test_expired_window_rolls_usage_and_reset_forward",
+    "reason": null
+  },
+  {
+    "id": "p-pace-05",
+    "source": "docs/pace.md:13",
+    "claim": "Profile history stored in pace-state.json to preserve SPARE hysteresis.",
+    "verify": "unit",
+    "test": "tests/test_pace.py:test_spare_hysteresis_enter_and_exit",
+    "reason": null
+  },
+  {
+    "id": "p-pace-06",
+    "source": "docs/pace.md:15",
+    "claim": "History private (0600), pruned to 30 days and 1 MiB. quotacore pace --purge removes history and state.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_history_retention_size_and_purge_do_not_collect",
+    "reason": null
+  },
+  {
+    "id": "p-perf-01",
+    "source": "docs/performance.md:49",
+    "claim": "Filesystem watcher forwards snapshot changes; fallback read runs every 300 seconds.",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-perf-02",
+    "source": "docs/performance.md:51",
+    "claim": "Frontend stops polling while page is hidden, and recovers on visibility.",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-perf-03",
+    "source": "docs/performance.md:52",
+    "claim": "Rendering requests coalesced into one animation frame; hidden pages defer drawing.",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-perf-04",
+    "source": "docs/performance.md:55",
+    "claim": "Infinite CSS animations disabled when reactorMotion is false or prefers-reduced-motion: reduce.",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs:228",
+    "reason": null
+  },
+  {
+    "id": "p-perf-05",
+    "source": "docs/performance.md:70",
+    "claim": "Theme CSS, renderer and palette dynamically imported.",
+    "verify": "headless",
+    "test": "docs/tools/theme-identity-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-perf-06",
+    "source": "docs/performance.md:79",
+    "claim": "Release profile uses size profile z, LTO, one codegen unit, abort-on-panic and symbol stripping.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Static Rust compiler configuration in app/src-tauri/Cargo.toml"
+  },
+  {
+    "id": "p-perf-07",
+    "source": "docs/performance.md:126",
+    "claim": "Idle CPU <0.1% target passed; <150 MB memory target did NOT pass (measured 154-157 MiB).",
+    "verify": "not-verified",
+    "test": null,
+    "reason": "Documented in performance.md that the <150 MB memory target was not delivered by the release binary"
+  },
+  {
+    "id": "p-prov-01",
+    "source": "docs/providers.md:3",
+    "claim": "Writer collects enabled providers into shared snapshot. Missing values are unknown, never assumed zero.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_fresh_collection_never_reads_detected_providers",
+    "reason": null
+  },
+  {
+    "id": "p-prov-02",
+    "source": "docs/providers.md:9",
+    "claim": "Claude: Reads credentials, GET api.anthropic.com/api/oauth/usage. No token renewal. Falls back to observations, then cache.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_http_body_limit_and_exact_boundary",
+    "reason": null
+  },
+  {
+    "id": "p-prov-03",
+    "source": "docs/providers.md:10",
+    "claim": "Codex: Starts codex app-server, JSON-RPC account/rateLimits/read, stops process. No direct auth.json read.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Requires installed Codex CLI with working app-server subcommand"
+  },
+  {
+    "id": "p-prov-04",
+    "source": "docs/providers.md:11",
+    "claim": "Gemini: Reads gemini-kota.json; explicit refresh runs `agy -p /usage --output-format json`; cache older than 7 days rejected.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Requires Antigravity agy command installed and signed in"
+  },
+  {
+    "id": "p-prov-05",
+    "source": "docs/providers.md:12",
+    "claim": "Copilot: Runs `gh auth token`, GET api.github.com/copilot_internal/user.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Requires GitHub CLI token with internal Copilot endpoint permissions"
+  },
+  {
+    "id": "p-prov-06",
+    "source": "docs/providers.md:19",
+    "claim": "Failure states: STALE, AUTH_REQUIRED, RATE_LIMITED, SOURCE_UNAVAILABLE, SCHEMA_CHANGED, DISABLED, NOT_INSTALLED, NO_SUBSCRIPTION (hidden).",
+    "verify": "headless",
+    "test": "docs/tools/settings-check.mjs:121,143 and tests/render-security.mjs:5",
+    "reason": null
+  },
+  {
+    "id": "p-rel-01",
+    "source": "docs/releases.md:5",
+    "claim": "CI checks Ubuntu and Windows frontend builds and Rust compilation, plus Python tests on Ubuntu.",
+    "verify": "unit",
+    "test": "tests/test_security.py",
+    "reason": null
+  },
+  {
+    "id": "p-rel-02",
+    "source": "docs/releases.md:11",
+    "claim": "Build matrix targets Windows x86_64 (.exe and .msi) and Linux x86_64 (AppImage, deb, rpm).",
+    "verify": "manual",
+    "test": null,
+    "reason": "Installer compilation is configured in CI build workflows and triggered on tag push"
+  },
+  {
+    "id": "p-rel-03",
+    "source": "docs/releases.md:19",
+    "claim": "All external actions pinned to full commit SHAs; Rust pinned to 1.99.1; release builds use --locked.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Verified by static review of .github/workflows/*.yml"
+  },
+  {
+    "id": "p-sec-01",
+    "source": "docs/security-model.md:6",
+    "claim": "No application telemetry, analytics, developer upload, background update check, or remote webview content.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Negative property verified by source code inspection"
+  },
+  {
+    "id": "p-sec-02",
+    "source": "docs/security-model.md:12",
+    "claim": "New installation starts with every provider disabled. Choose what to track lists access disclosures and unchecked choices. Start persists choices.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_fresh_collection_never_reads_detected_providers and test_init_and_configure_persist_explicit_choices",
+    "reason": null
+  },
+  {
+    "id": "p-sec-03",
+    "source": "docs/security-model.md:20",
+    "claim": "Detection checks directory/file existence; never opens credential contents, runs provider CLIs, or sends requests.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_detection_never_opens_api_key_file",
+    "reason": null
+  },
+  {
+    "id": "p-sec-04",
+    "source": "docs/security-model.md:50",
+    "claim": "Direct HTTP calls are bodyless GETs to fixed HTTPS URLs (anthropic, copilot, openrouter, deepseek).",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_http_body_limit_and_exact_boundary",
+    "reason": null
+  },
+  {
+    "id": "p-sec-05",
+    "source": "docs/security-model.md:60",
+    "claim": "Direct requests reject HTTP redirects, have 15-second timeout and 1 MiB response limit.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_http_body_limit_and_exact_boundary",
+    "reason": null
+  },
+  {
+    "id": "p-sec-06",
+    "source": "docs/security-model.md:69",
+    "claim": "key set reads stdin and saves unencrypted plaintext keys in secrets.json with Unix 0600 or current-user Windows DACL.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_private_json_and_history_permissions and WindowsAclTests",
+    "reason": null
+  },
+  {
+    "id": "p-sec-07",
+    "source": "docs/security-model.md:73",
+    "claim": "Atomic temporary files receive restriction before secret contents are written; failure aborts save.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_permission_failure_does_not_publish_secret",
+    "reason": null
+  },
+  {
+    "id": "p-sec-08",
+    "source": "docs/security-model.md:95",
+    "claim": "Pace history retains at most 1 MiB and records from last 30 days, pruning on each run. pace --purge removes history without collection.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_history_retention_size_and_purge_do_not_collect",
+    "reason": null
+  },
+  {
+    "id": "p-sec-09",
+    "source": "docs/security-model.md:143",
+    "claim": "Native collector runner has 120s deadline, 1 MiB stdout limit, process tree isolated in process group or Job Object with kill-on-close.",
+    "verify": "unit",
+    "test": "app/src-tauri/src/collector.rs:tests::bounds_runtime_and_output and stops_descendants_holding_stdout",
+    "reason": null
+  },
+  {
+    "id": "p-sec-10",
+    "source": "docs/security-model.md:153",
+    "claim": "Hook input limited to 1 MiB; chain-cmd uses argv; chain timeout 5s, stdout 64 KiB.",
+    "verify": "unit",
+    "test": "tests/test_security.py:test_chain_arguments_are_literal_and_stdin_is_preserved and test_chain_timeout_and_output_cap",
+    "reason": null
+  },
+  {
+    "id": "p-sec-11",
+    "source": "docs/security-model.md:165",
+    "claim": "Start at login is an explicit toggle: HKCU Run value (Windows) or per-user autostart desktop entry (Linux).",
+    "verify": "native",
+    "test": null,
+    "reason": "Requires host operating system login registration test"
+  },
+  {
+    "id": "p-sec-12",
+    "source": "docs/security-model.md:169",
+    "claim": "Windows taskbar strip creates no GUI thread/window/hook while off; SetWinEventHook listens only for Explorer location changes; no keylogging or injection.",
+    "verify": "native",
+    "test": null,
+    "reason": "Requires Windows Explorer runtime and UI thread inspection"
+  },
+  {
+    "id": "p-sec-13",
+    "source": "docs/security-model.md:183",
+    "claim": "Production frontend bundled locally; CSP restricts resources and IPC.",
+    "verify": "manual",
+    "test": null,
+    "reason": "Verified by static inspection of index.html and tauri.conf.json security CSP fields"
+  },
+  {
+    "id": "p-sec-14",
+    "source": "docs/security-model.md:185",
+    "claim": "Snapshot text is escaped; state classes use a fixed allowlist.",
+    "verify": "unit",
+    "test": "tests/render-security.mjs:34-38",
+    "reason": null
+  }
+]
