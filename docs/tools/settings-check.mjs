@@ -7,8 +7,8 @@ try {
   await b.navigate('/?settings&sample','window.__SETTINGS_READY__');
   const check=await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)};
-    assert(!$('#status').textContent,'Initialization: '+$('#status').textContent);
-    assert(document.querySelectorAll('[data-category]').length===7,'Categories');
+    assert($('#status').dataset.state!=='failure','Initialization: '+$('#status').textContent);
+    assert(document.querySelectorAll('[data-category]').length===8,'Categories');
     $('[data-category=quote]').click();
     assert(!$('#quote-enabled').checked,'Quote off by default');
     assert($('#category-quote').textContent.includes('Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.'),'Quote disclosure');
@@ -22,14 +22,14 @@ try {
     $('[data-category=appearance]').click();
     $('[data-theme="dot-matrix"]').click();
     assert($('#palette-grid .palette-option i'),'Palette colors');
-    assert($('#dirty').textContent==='Unsaved changes','Dirty theme');
+    assert($('#status').textContent==='Unsaved changes','Dirty theme');
     const palette=$('#palette-grid .palette-option:last-child');palette.click();
     assert(paletteGridSelected(),'Palette selection');
     function paletteGridSelected(){return !!$('#palette-grid [aria-pressed=true]');}
     assert(document.querySelectorAll('[data-provider-color]').length===7,'Seven provider color pickers');
     const color=()=>document.querySelector('[data-provider-color="claude"]');
     color().value='#ffffff';color().dispatchEvent(new Event('input'));
-    assert($('#dirty').textContent==='Unsaved changes','Dirty provider color');
+    assert($('#status').textContent==='Unsaved changes','Dirty provider color');
     const codex=document.querySelector('[data-provider-color="codex"]');codex.value='#ffffff';codex.dispatchEvent(new Event('input'));
     assert($('#provider-color-warning').textContent.includes('too similar'),'Similar colors warning');
     $('#appearance').value='light';$('#appearance').dispatchEvent(new Event('change'));assert($('#provider-color-warning').textContent.includes('low background contrast'),'Low contrast warning');
@@ -39,10 +39,17 @@ try {
     color().nextElementSibling.click();assert(color().value!=='#ffffff','Reset provider color');
     const a=$('#accent');a.value='#123456';a.dispatchEvent(new Event('input'));
     a.nextElementSibling.click();assert(a.value!=='#123456','Reset palette');
-    $('#save').click();await new Promise(r=>setTimeout(r,50));assert($('#dirty').textContent==='All changes saved','Save');
+    $('#save').click();await new Promise(r=>setTimeout(r,50));assert($('#save').disabled&&['success','clean'].includes($('#status').dataset.state),'Save');
     $('[data-theme="terminal"]').click();$('#revert').click();assert($('[data-theme="dot-matrix"]').getAttribute('aria-pressed')==='true','Revert theme');
     $('[data-category=layout]').click();
     assert(document.querySelectorAll('[data-shape]').length===5,'Five shapes');
+    assert(document.querySelectorAll('.scale-presets button').length===6,'Six visible size choices');
+    $('[data-theme=reactor]').click();$('[data-shape=circle]').click();
+    assert(!$('#reactor-motion').closest('label').hidden&&$('#dot-count').closest('label').hidden,'Reactor motion applies to circle');
+    $('[data-shape=portrait]').click();assert($('#reactor-motion').closest('label').hidden&&!$('#dot-count').closest('label').hidden,'Portrait reactor uses dot count');
+    $('[data-theme=system]').click();assert($('#dot-count').closest('label').hidden,'System does not use dot count');
+    $('[data-theme=dot-matrix]').click();
+
     const order=()=>[...document.querySelectorAll('[data-layout-provider]')].map(el=>el.dataset.layoutProvider);
     const original=order();
     document.querySelector('[data-layout-provider] button:last-child').click();
@@ -73,13 +80,15 @@ try {
     $('[data-shape=portrait]').click();assert(!$('#fit-height').disabled,'Portrait fit-height');
     const sizes=[...document.querySelectorAll('[data-size]')];
     assert(sizes.map(b=>b.dataset.size).join(',')==='Small,Medium,Large,X-Large,2X-Large','Five size choices');
-    for(const button of sizes){button.click();assert(button.getAttribute('aria-pressed')==='true'&&$('#scale').value==='100','Preset selection');}
+    for(const button of sizes.filter(b=>!b.disabled)){button.click();assert(button.getAttribute('aria-pressed')==='true'&&$('#scale').value==='100','Preset selection');}
     $('#scale').value=82;$('#scale').dispatchEvent(new Event('input'));
     $('[data-size=Large]').click();$('[data-size=Medium]').click();assert($('#scale').value==='82','Preset roundtrip preserves fine-tune');
-    $('[data-size="2X-Large"]').click();assert(!$('#size-fit-warning').hidden&&$('#map-widget').dataset.overflow==='true','Oversize monitor warning / preview');
+    $('#scale').value=150;$('#scale').dispatchEvent(new Event('input'));
+    assert($('[data-size="2X-Large"]').disabled&&$('[data-size="2X-Large"]').title.includes('Too big'),'Oversize preset disabled');
+    const selectedSize=document.querySelector('[data-size][aria-pressed=true]').dataset.size;
     $('#scale').value=90;$('#scale').dispatchEvent(new Event('input'));
     $('[data-theme="terminal"]').click();
-    assert($('#scale').value==='90'&&$('[data-size="2X-Large"]').getAttribute('aria-pressed')==='true','Theme changed size');
+    assert($('#scale').value==='90'&&document.querySelector('[data-size][aria-pressed=true]').dataset.size===selectedSize,'Theme changed size');
     $('#revert').click();
     $('#place').click();
     assert(!$('#placement-actions').hidden&&!$('#map-widget').disabled,'Placement mode');
@@ -116,7 +125,7 @@ try {
       if(cmd==='get_placement_monitors')return {layerShell:true,monitors:[{name:'Synthetic display',width:1920,height:1080,primary:true}],widgetWidth:340,widgetHeight:600};
       if(cmd==='get_runtime_diagnostics')return {paths:{python_version:'3.x',runtime_source:'synthetic'}};
       if(cmd==='preview_settings'){await new Promise(r=>setTimeout(r,5));state.previews.push(structuredClone(args.settings));return;}
-      if(cmd==='save_settings'){state.saves.push(structuredClone(args.settings));disk=structuredClone(args.settings);return;}
+      if(cmd==='save_settings'){state.saves.push(structuredClone(args.settings));await new Promise(r=>setTimeout(r,state.saveDelay||0));disk=structuredClone(args.settings);disk.taskbar.colorMode=disk.colorMode;disk.taskbar.dotCount=disk.dotCount;if(state.mismatch)delete disk.fineTune;return;}
       if(cmd==='plugin:event|listen'){events.set(args.handler,args.event);return args.handler;}
       if(cmd==='finish_settings'){state.hidden++;return;}
       state.listenerCount=()=>events.size;
@@ -130,14 +139,16 @@ try {
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
     $('[data-category=layout]').click();
     assert($('[data-size=Medium] small').textContent==='340 × 746 px','Fit must exclude unavailable fourth provider');
+    let verifiedRows=0;
     for(const row of ${JSON.stringify(scaleMatrix)}) {
       $('#scale').value=row.fineTune;$('#scale').dispatchEvent(new Event('input'));
-      $('[data-size="'+row.sizePreset+'"]').click();
+      const button=$('[data-size="'+row.sizePreset+'"]');
+      if(button.disabled)continue;button.click();verifiedRows++;
       await new Promise(r=>setTimeout(r,25));
       const value=native.previews.at(-1);
       for(const key of ['scale','fineTune','sizePreset','shape'])assert(value[key]===row[key],'Rust fixture mismatch: '+key+' '+JSON.stringify(row));
     }
-    for(const [preset,expected] of [['Large',102.5],['Small',61.5]]) {
+    for(const [preset,expected] of [['Large',98.4],['Small',69.7]]) {
       $('#scale').value=82;$('#scale').dispatchEvent(new Event('input'));$('[data-size='+preset+']').click();
       $('#save').click();await new Promise(r=>setTimeout(r,50));
       assert(native.saves.at(-1).scale===expected,'Fractional save lost precision');
@@ -152,7 +163,7 @@ try {
         $('[data-size=Large]').click();await new Promise(r=>setTimeout(r,30));
       }else if(command==='save_settings'){
         $('#save').click();await new Promise(r=>setTimeout(r,50));
-        assert($('#dirty').textContent==='Unsaved changes','Failed save marked clean');
+        assert($('#status').dataset.state==='failure'&&!$('#save').disabled,'Failed save must remain retryable');
       }else{
         $('#revert').click();await new Promise(r=>setTimeout(r,30));await native.close();await new Promise(r=>setTimeout(r,30));
         assert(native.hidden===0,'Failed finish hid settings');
@@ -160,7 +171,7 @@ try {
       assert($('#status').textContent.includes('Synthetic serialization failure: '+command),'Missing readable IPC error: '+command);
       native.fail=null;
     }
-    return 'PASS: 30 preset/fine-tune drafts match Rust fixtures, fractional save/reopen/revert, three IPC errors visible, fit excludes unavailable provider';
+    return 'PASS: '+verifiedRows+' enabled preset/fine-tune drafts match Rust fixtures (oversized choices disabled), fractional save/reopen/revert, three IPC errors visible, fit excludes unavailable provider';
   })()`));
   const errorPng=await b.cdp('Page.captureScreenshot',{format:'png'});
   await writeFile('docs/tools/settings-error-preview.png',Buffer.from(errorPng.data,'base64'));
@@ -168,7 +179,7 @@ try {
     await b.navigate('/?settings','window.__SETTINGS_READY__');
     console.log(await b.evaluate(`(async()=>{
       const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
-      assert(!$('#status').textContent,'Native bridge initialization: '+$('#status').textContent);
+      assert($('#status').dataset.state!=='failure','Native bridge initialization: '+$('#status').textContent);
       $('[data-category=layout]').click();
       $('[data-shape=circle]').click();assert(document.querySelectorAll('[data-widget-provider]:checked').length===3,'Default first three');
       assert($('[data-widget-provider=copilot]').disabled,'Fourth selection must be disabled');
@@ -182,12 +193,12 @@ try {
       if('${action}'==='discard') {
         await native.close();$('#close-discard').click();await new Promise(r=>setTimeout(r,40));assert(native.hidden===1,'Discard did not close');assert(native.previews.at(-1).scale===100&&native.previews.at(-1).shape==='portrait'&&native.saves.length===0,'Discard did not restore saved settings');
       } else {
-        window.dispatchEvent(new KeyboardEvent('keydown',{key:'s',ctrlKey:true}));await new Promise(r=>setTimeout(r,50));assert(native.saves.length===1&&native.saves[0].scale===150&&native.saves[0].shape==='square','Ctrl+S failed');assert($('#dirty').textContent==='All changes saved','Saved state');await native.close();await new Promise(r=>setTimeout(r,40));assert(native.hidden===1,'Clean close blocked');
+        window.dispatchEvent(new KeyboardEvent('keydown',{key:'s',ctrlKey:true}));await new Promise(r=>setTimeout(r,50));assert(native.saves.length===1&&native.saves[0].scale===150&&native.saves[0].shape==='square','Ctrl+S failed');assert($('#save').disabled&&['success','clean'].includes($('#status').dataset.state),'Saved state');await native.close();await new Promise(r=>setTimeout(r,40));assert(native.hidden===1,'Clean close blocked');
       }
       const count=native.listenerCount();assert(count===5,'Unexpected initial listener count');
       for(let cycle=0;cycle<4;cycle++){
         await native.reopen();await new Promise(r=>setTimeout(r,50));
-        assert($('#dirty').textContent==='All changes saved'&&$('#close-prompt').hidden,'Reopened session not reset');
+        assert($('#save').disabled&&['success','clean'].includes($('#status').dataset.state)&&$('#close-prompt').hidden,'Reopened session not reset');
         assert($('#scale').value===('${action}'==='save'?'150':'100'),'Reopen failed to load persisted baseline');
         await native.close();await new Promise(r=>setTimeout(r,40));
         assert(native.listenerCount()===count,'Listeners grew on reopen');
@@ -202,11 +213,12 @@ try {
     const set=(id,value)=>{const el=$('#'+id);el.value=value;el.dispatchEvent(new Event('change'));};
     assert($('#size-mode').value==='fixed','Existing settings must default to fixed');
     const fixed=native.previews.at(-1)?.scale ?? 150;
+    $('[data-shape=portrait]').click();
     set('size-mode','screen');set('fit-fraction','0.5');
     $('#fit-fine-tune').value=82;$('#fit-fine-tune').dispatchEvent(new Event('input'));
     set('reserved-top','0');set('reserved-bottom','20.4');
-    assert($('.scale-presets').hidden&&!$('#fit-fraction').closest('label').hidden,'Size mode controls');
-    assert($('#size-fit-warning').hidden,'Screen mode shows fixed size warning');
+    assert(!$('.scale-presets').hidden&&!$('#fit-fraction').closest('label').hidden,'Size mode controls');
+    assert($('#size-fit-warning').hidden||$('#size-fit-warning').textContent.includes('space budget'),'Screen mode limit note');
     assert($('#detected-area').textContent.includes('Detected work area 1920 × 1080'),'Detected area label');
     $('#save').click();await new Promise(r=>setTimeout(r,60));
     const saved=native.saves.at(-1);
@@ -222,7 +234,128 @@ try {
   })()`));
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:900,height:680,deviceScaleFactor:1,mobile:false});
   await b.evaluate("document.querySelector('#size-mode').scrollIntoView({block:'center'})");
-  await mkdir('gorevler/ss-ayar',{recursive:true});
+  await mkdir('gorevler/ss-sekil-final',{recursive:true});
   const screenPng=await b.cdp('Page.captureScreenshot',{format:'png'});
-  await writeFile('gorevler/ss-ayar/screen-fit-settings.png',Buffer.from(screenPng.data,'base64'));
+  await writeFile('gorevler/ss-sekil-final/screen-fit-settings.png',Buffer.from(screenPng.data,'base64'));
+  // Verify all Save states against synthetic persisted state, including dropped fields.
+  const finalOutput='gorevler/ss-sekil-final/settings';
+  await mkdir(finalOutput,{recursive:true});
+  const screenshot=async name=>{
+    const png=await b.cdp('Page.captureScreenshot',{format:'png'});
+    await writeFile(`${finalOutput}/${name}.png`,Buffer.from(png.data,'base64'));
+  };
+  await b.cdp('Emulation.setDeviceMetricsOverride',{width:900,height:900,deviceScaleFactor:1,mobile:false});
+  for(const scheme of ['light','dark']) {
+    await b.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:scheme}]});
+    await b.navigate('/?settings','window.__SETTINGS_READY__');
+    console.log(await b.evaluate(`(()=>{
+      const $=s=>document.querySelector(s),assert=(v,m)=>{if(!v)throw Error(m)};
+      assert($('#save').disabled&&$('#revert').disabled,'Initially clean buttons');
+      assert($('#status').textContent==='Changes preview live on the widget','Initial live preview status');
+      window.dispatchEvent(new KeyboardEvent('keydown',{key:'s',ctrlKey:true}));
+      assert(window.__FAKE_NATIVE__.saves.length===0,'Clean Ctrl+S wrote settings');
+      $('[data-category=appearance]').click();
+      const color=$('[data-provider-color=claude]');color.value='#123456';color.dispatchEvent(new Event('input'));
+      color.nextElementSibling.click();assert($('#save').disabled&&$('#revert').disabled,'Color reset left an empty-object dirty state');
+      return 'PASS: clean buttons, clean Ctrl+S, provider color reset returns clean';
+    })()`));
+    await b.evaluate(`(()=>{
+      const $=s=>document.querySelector(s);
+      [...document.querySelectorAll('#placement-presets button')].find(b=>b.textContent==='Bottom left').click();
+      if($('#position').value!=='Bottom left'||!$('#placement-actions').hidden)throw Error('Corner preset must update legacy position without requiring placement mode');
+      $('#revert').click();
+    })()`);
+    await screenshot(`save-clean-${scheme}`);
+    await b.evaluate(`document.querySelector('[data-shape=square]').click()`);
+    await screenshot(`save-dirty-${scheme}`);
+    await b.evaluate(`window.__FAKE_NATIVE__.mismatch=true;document.querySelector('#save').click()`);
+    await new Promise(r=>setTimeout(r,100));
+    console.log(await b.evaluate(`(()=>{
+      const status=document.querySelector('#status');
+      if(status.dataset.state!=='failure'||!status.textContent.includes('fineTune')||document.querySelector('#save').disabled)throw Error('Dropped serde field was reported saved');
+      return 'PASS: persisted mismatch names fineTune and remains retryable';
+    })()`));
+    await screenshot(`save-failure-${scheme}`);
+    await b.evaluate(`window.__FAKE_NATIVE__.mismatch=false;window.__FAKE_NATIVE__.saveDelay=800;document.querySelector('#save').click()`);
+    await new Promise(r=>setTimeout(r,100));
+    await b.evaluate(`if(document.querySelector('#status').textContent!=='Saving…')throw Error('Missing saving state')`);
+    await screenshot(`save-saving-${scheme}`);
+    await new Promise(r=>setTimeout(r,900));
+    await b.evaluate(`if(!document.querySelector('#save').disabled||!document.querySelector('#status').textContent.startsWith('✓ Saved at '))throw Error('Missing verified saved state')`);
+    await screenshot(`save-success-${scheme}`);
+    for(const platform of ['linux','windows']) {
+      await b.navigate('/?settings&sample&platform='+platform,'window.__SETTINGS_READY__');
+      const categories=await b.evaluate(`[...document.querySelectorAll('[data-category]')].filter(b=>!b.hidden).map(b=>b.dataset.category)`);
+      if(categories.includes(platform==='linux'?'taskbar':'desktop'))throw Error('Inapplicable platform category visible');
+      for(const id of categories) {
+        await b.evaluate(`document.querySelector('[data-category=${id}]').click();document.querySelector('.settings-content').scrollTop=0`);
+        await b.evaluate(`(()=>{
+          const section=document.querySelector('#category-${id}');
+          if(section.firstElementChild.tagName!=='H1')throw Error('Page title is not first');
+          if(section.scrollWidth>section.clientWidth+1)throw Error('Page overflow: ${platform}/${id} '+section.scrollWidth+'/'+section.clientWidth);
+        })()`);
+        await screenshot(`${platform}-${id}-${scheme}`);
+        if(platform==='linux'&&id==='layout') {
+          const png=await b.cdp('Page.captureScreenshot',{format:'png'});
+          await writeFile(`docs/screenshots/settings-${scheme}.png`,Buffer.from(png.data,'base64'));
+        }
+        if(platform==='linux'&&id==='appearance') {
+          await b.evaluate(`document.querySelector('#provider-colors').scrollIntoView({block:'end'})`);
+          await screenshot(`theme-colors-${scheme}`);
+        }
+        if(platform==='linux'&&id==='layout') {
+          await b.evaluate(`document.querySelector('#fit-screen').click()`);
+          await screenshot(`screen-share-${scheme}`);
+          await b.evaluate(`document.querySelector('#revert').click()`);
+        }
+        if(platform==='linux'&&id==='position') {
+          await b.evaluate(`const details=document.querySelector('#category-position details');details.open=true;details.scrollIntoView({block:'end'})`);
+          await screenshot(`position-advanced-${scheme}`);
+          await b.evaluate(`document.querySelector('#category-position details').open=false`);
+        }
+        if(platform==='linux'&&id==='providers') {
+          await b.evaluate(`document.querySelector('#featured-position').scrollIntoView({block:'end'})`);
+          await screenshot(`providers-order-${scheme}`);
+        }
+      }
+    }
+  }
+  console.log('PASS: all pages at 900 × 900 in light/dark on both platforms; all five Save states captured');
+  console.log(await b.evaluate(`(()=>{
+    const $=s=>document.querySelector(s),assert=(v,m)=>{if(!v)throw Error(m)};
+    $('[data-category=layout]').click();$('[data-theme=system]').click();$('[data-shape=portrait]').click();
+    $('#scale').value=100;$('#scale').dispatchEvent(new Event('input'));$('[data-size=Medium]').click();$('#fit-screen').click();
+    for(const shape of ['landscape','square','circle','pill']){
+      $('[data-shape='+shape+']').click();
+      assert($('#fit-screen').disabled&&$('#fit-screen small').textContent==='Portrait only','Fit hint '+shape);
+      assert($('#size-mode').value==='screen','Stored Fit lost '+shape);
+      assert($('[data-size=Medium]').getAttribute('aria-pressed')==='true','Effective preset '+shape);
+      $('[data-shape=portrait]').click();assert(!$('#fit-screen').disabled&&$('#fit-screen').getAttribute('aria-pressed')==='true','Fit restoration');
+    }
+    $('[data-theme=compact-strip]').click();assert($('#fit-screen').disabled,'Strip Fit disabled');
+    $('[data-theme=system]').click();assert($('#fit-screen').getAttribute('aria-pressed')==='true','Theme Fit restoration');
+    return 'PASS: Portrait-only Fit hint, effective preset and stored Fit restored across all shapes and Strip';
+  })()`));
+  await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
+  console.log(await b.evaluate(`(async()=>{
+    const api=window.__AI_USAGE_DEMO__, monitor={name:'Synthetic small display',width:800,height:560,scale:1,primary:true};
+    await api.setWorkArea([monitor]);
+    await api.setSnapshot({providers:['claude','codex','gemini'].map(id=>({id,state:'OK',windows:[]}))});
+    for(const sizeMode of ['fixed','screen']) {
+      await api.setSettings({sizeMode,theme:'compact-strip',shape:'portrait',sizePreset:'2X-Large',fineTune:100,fitFineTune:100,fitFraction:1,quoteEnabled:true,linux:{margin:12}});
+      for(const key of ['+','-','0']) {
+        for(let i=0;i<22;i++)window.dispatchEvent(new KeyboardEvent('keydown',{key,ctrlKey:true}));
+        await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+        const scale=parseFloat(getComputedStyle(document.documentElement).fontSize)/16;
+        const s=api.getSettings(), height=320+116+170, width=960;
+        if(width*height*scale*scale>.35*(800-24)*(560-24)+1)throw Error('Keyboard size escaped screen coverage');
+        const before=[s.sizeMode,s.sizePreset,s.fineTune,s.fitFineTune];
+        await api.setSettings({theme:'system',shape:'landscape'});
+        const after=api.getSettings();
+        if(JSON.stringify(before)!==JSON.stringify([after.sizeMode,after.sizePreset,after.fineTune,after.fitFineTune]))throw Error('Theme/shape rewrote stored size');
+        await api.setSettings({theme:'compact-strip',shape:'portrait'});
+      }
+    }
+    return 'PASS: runtime Ctrl +/−/0 coverage and stored sizing across theme/shape changes';
+  })()`));
 }finally{await b.close();}
