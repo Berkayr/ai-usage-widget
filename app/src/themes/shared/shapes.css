@@ -250,3 +250,18 @@
 :root[data-shape=portrait][data-portrait-fit=true] .widget .provider-list{--size-font-number:calc(1.25rem + var(--portrait-growth,0) * 1rem);--size-font-base:calc(.9375rem + var(--portrait-growth,0) * .125rem);--size-gap:calc(.625rem + var(--portrait-growth,0) * .25rem)}
 
 :root[data-shape=portrait] .widget .quote-section{flex:0 1 auto;min-height:10rem}
+
+/* Shape compression may shrink circles, but must never stretch them into pills. */
+:root[data-theme=dot-matrix] .widget .dot-bar i {flex:0 1 .5rem;width:.5rem;min-width:0;max-width:.5rem;height:auto;aspect-ratio:1;align-self:center;border-radius:50%}
+:root .widget .window-top>span {font-size:max(var(--shape-min-font),.8125rem)}
+:root[data-shape=portrait] .widget .ring-center small {font-size:max(var(--shape-min-font),.8125rem)}
+/* Externally narrowed strips retain access to providers beyond the viewport. */
+:root[data-shape=portrait][data-theme=compact-strip] .widget .provider-list {overflow-x:auto}
+/* At tiny Fit fractions, readable quota rows borrow space from the quote. */
+:root[data-shape=portrait][data-quote=true][data-readable-size=false] .widget .provider-card:nth-child(n) {max-height:none}
+
+:root[data-shape=portrait][data-micro-shape=true] .widget :is(.sync-line,.footer,.plan,.pace-context) {display:none}
+:root[data-shape=portrait][data-micro-shape=true] .widget .quote-section {min-height:max(6rem,calc(var(--shape-min-font)*4.25))}
+:root[data-shape=portrait][data-micro-shape=true] .widget .quote-content {display:flex}
+:root[data-shape=portrait][data-micro-shape=true] .widget :is(.quote-label,.quote-author,.quote-reason) {display:none}
+:root[data-shape=portrait][data-micro-shape=true] .widget .quote-source {font-size:max(var(--shape-min-font),var(--size-font-small))}
