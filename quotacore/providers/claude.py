@@ -12,7 +12,7 @@ from typing import Any
 
 from ..paths import data_path
 from ..schema import iso_now, provider_record
-from .common import kind_for, make_window, safe_error, timestamp, read_response
+from .common import NoRedirect, kind_for, make_window, safe_error, timestamp, read_response
 
 LABEL = "Claude Code"
 META = {"id": "claude", "label": LABEL, "category": "subscription", "auth": "local-file", "experimental": False, "docs_url": "https://docs.anthropic.com/"}
@@ -42,10 +42,6 @@ def _live() -> tuple[dict[str, Any] | None, str | None, str | None]:
     expiry = auth.get("expiresAt")
     if not isinstance(token, str) or not token or isinstance(expiry, (int, float)) and expiry / 1000 < time.time():
         return None, "AUTH_REQUIRED", "Claude credentials unavailable or expired"
-
-    class NoRedirect(urllib.request.HTTPRedirectHandler):
-        def redirect_request(self, req, fp, code, msg, headers, newurl):
-            return None
 
     request = urllib.request.Request(USAGE_URL, headers={
         "Authorization": "Bearer " + token,
@@ -77,13 +73,12 @@ def _usage_windows(data: dict[str, Any]) -> list[dict[str, Any]]:
         if not isinstance(entry, dict):
             continue
         pct = entry.get("utilization", entry.get("used_percentage"))
-        pct_num = pct
         known = {"five_hour": "5 hour", "fiveHour": "5 hour", "seven_day": "7 day", "sevenDay": "7 day"}
         raw_label = key.replace("_", " ").title()
         is_extra = key not in known
         label = "Extra window" if is_extra else known[key]
         minutes = 300 if key in ("five_hour", "fiveHour") else 10080 if key in ("seven_day", "sevenDay") else None
-        window = make_window(key, label, pct_num, entry.get("resets_at"), minutes, kind_for(label, minutes))
+        window = make_window(key, label, pct, entry.get("resets_at"), minutes, kind_for(label, minutes))
         if is_extra:
             window.update(hidden_by_default=True, raw_label=raw_label)
         windows.append(window)

@@ -112,7 +112,7 @@ for (const id of themeIds) scenes.set(`checks/typography-${id}`, {
 });
 function measureGlyphs(d) {
  const w=d.defaultView;
- const numbers=[...d.querySelectorAll('.window-top b,.xs-content b,.xs-content small,.compact-line b,.ring-center strong')].filter(el=>el.getBoundingClientRect().width>0);
+ const numbers=[...d.querySelectorAll('.window-top b,.ring-center strong')].filter(el=>el.getBoundingClientRect().width>0);
  return numbers.map(el=>{
   const css=w.getComputedStyle(el),probe=d.createElement('span');
   for(const key of ['fontFamily','fontSize','fontWeight','fontStyle','fontVariantNumeric','fontFeatureSettings','fontVariationSettings','fontStretch','letterSpacing','lineHeight'])probe.style[key]=css[key];
@@ -127,13 +127,13 @@ function measure(d) {
  const visible=el=>el.getClientRects().length && w.getComputedStyle(el).visibility!=='hidden' && el.getBoundingClientRect().width>0;
  const leaves=[...d.querySelectorAll('#widget *')].filter(el=>visible(el)&&[...el.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())&&!el.closest('.segments,svg,select'));
  const minFont=Math.min(...leaves.map(el=>parseFloat(w.getComputedStyle(el).fontSize)));
- const numbers=[...d.querySelectorAll('.window-top b,.xs-content b,.xs-content small,.compact-line b,.ring-center strong')].filter(visible);
+ const numbers=[...d.querySelectorAll('.window-top b,.ring-center strong')].filter(visible);
  const numberFont=Math.min(...numbers.map(el=>parseFloat(w.getComputedStyle(el).fontSize)));
  const canvas=d.createElement('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});canvas.width=canvas.height=1;
  const rgba=color=>{ctx.clearRect(0,0,1,1);ctx.fillStyle=color;ctx.fillRect(0,0,1,1);return [...ctx.getImageData(0,0,1,1).data].map((v,i)=>i===3?v/255:v)};
  const lum=c=>c.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
  const contrast=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
- const ratios=[...d.querySelectorAll('.sync-line,.plan,.window-top>span,.reset,.pace,.footer,.balance-row,.ring-center small,.xs-name')].filter(el=>visible(el)&&el.textContent.trim()).map(el=>{
+ const ratios=[...d.querySelectorAll('.sync-line,.plan,.window-top>span,.reset,.pace,.footer,.balance-row,.ring-center small')].filter(el=>visible(el)&&el.textContent.trim()).map(el=>{
   const layers=[];for(let p=el;p;p=p.parentElement)layers.unshift(rgba(w.getComputedStyle(p).backgroundColor));
   // Test the translucent widget against the least favorable desktop polarity.
   let bg=d.documentElement.dataset.mode==='light'?[0,0,0]:[255,255,255];

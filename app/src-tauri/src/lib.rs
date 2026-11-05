@@ -225,10 +225,9 @@ fn fit_window_height(window: tauri::WebviewWindow, height_css_px: f64) -> Result
     let factor=window.scale_factor().map_err(|e|e.to_string())?;
     // Shared placement caps the configured work area, including manual overrides.
     let height=(height_css_px.max(1.0)*factor).round() as u32;
-    let old_position=window.outer_position().unwrap_or(tauri::PhysicalPosition::new(0,0)); let old_size=window.inner_size().map_err(|e|e.to_string())?;
+    let old_size=window.inner_size().map_err(|e|e.to_string())?;
     if (old_size.height as i64 - height as i64).abs() <= 1 { return Ok(()); }
     window.set_size(tauri::PhysicalSize::new(old_size.width,height)).map_err(|e|e.to_string())?;
-    let _ = old_position;
     placement::apply(&window, &settings_window::current())
 }
 #[tauri::command]

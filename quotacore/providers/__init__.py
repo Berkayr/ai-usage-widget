@@ -60,10 +60,8 @@ class ProviderRegistry(Mapping):
 PROVIDERS = ProviderRegistry()
 
 def __getattr__(name):
-    if name == "REGISTRY":
-        return tuple(PROVIDERS.values())
     if name in METADATA:
         return PROVIDERS[name]
     raise AttributeError(name)
 
-__all__ = [*METADATA, "REGISTRY", "PROVIDERS", "METADATA"]
+__all__ = [*METADATA, "PROVIDERS", "METADATA"]

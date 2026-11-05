@@ -16,8 +16,6 @@ from datetime import datetime, timezone
 from typing import Any
 
 SCHEMA_VERSION = 1
-STATES = {"OK", "STALE", "AUTH_REQUIRED", "RATE_LIMITED", "SOURCE_UNAVAILABLE", "NOT_INSTALLED", "SCHEMA_CHANGED", "DISABLED", "NO_SUBSCRIPTION"}
-PROVIDER_IDS = {"claude", "codex", "gemini"}
 
 
 def iso_now() -> str:
