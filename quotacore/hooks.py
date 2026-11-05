@@ -87,6 +87,7 @@ def _chain(command, raw: str, *, shell: bool = False) -> tuple[int, bytes]:
     try:
         code = process.wait(timeout=CHAIN_TIMEOUT)
         reader.join(timeout=max(0.1, CHAIN_TIMEOUT / 10))
+        writer.join(timeout=max(0.1, CHAIN_TIMEOUT / 10))
         if reader.is_alive() or writer.is_alive():
             stop()
             return 124, b""

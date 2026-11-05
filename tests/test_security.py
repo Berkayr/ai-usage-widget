@@ -141,6 +141,26 @@ class SecurityTests(unittest.TestCase):
         with mock.patch("sys.stdin",io.StringIO("{}")):
             self.assertEqual(hooks.run_hook("claude","echo unsafe"),2)
 
+    def test_chain_waits_for_slow_stdin_close(self):
+        original_popen = hooks.subprocess.Popen
+
+        class SlowClose:
+            def __init__(self, stream): self.stream = stream
+            def write(self, value): return self.stream.write(value)
+            def close(self):
+                time.sleep(0.1)
+                self.stream.close()
+
+        def popen(*args, **kwargs):
+            process = original_popen(*args, **kwargs)
+            process.stdin = SlowClose(process.stdin)
+            return process
+
+        with mock.patch.object(hooks.subprocess, "Popen", side_effect=popen):
+            code, output = hooks._chain("echo fictional", "", shell=True)
+        self.assertEqual(code, 0)
+        self.assertIn(b"fictional", output)
+
     def test_no_log_still_saves_private_state_without_history(self):
         with contextlib.redirect_stdout(io.StringIO()):
             cli._pace({"providers":[]}, no_log=True, mode="json")
