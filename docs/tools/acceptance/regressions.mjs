@@ -229,7 +229,24 @@ try {
   executedRegressions.push({ name: 'fit-circle-pill', result: resFitCirclePill });
 
   // ==========================================
-  // 4. `fit-strip`
+  // 4. `pill-status-badge-hidden-text`
+  // Readable text sizing must not expose a pill badge's visually hidden label.
+  // ==========================================
+  const resPillStatusBadgeHiddenText = await evaluate('PillStatusBadgeHiddenText', `(async () => {
+    const api = window.__AI_USAGE_DEMO__;
+    await api.setSettings({ theme: 'system', shape: 'pill', sizeMode: 'fixed', sizePreset: 'Medium', fineTune: 100 });
+    await api.setSnapshot({ providers: [{ id: 'claude', plan: 'DEMO', state: 'STALE', windows: [{ kind: 'session', used_percent: 42, resets_at: '2099-01-01T00:00:00Z' }] }] });
+    const badge = document.querySelector('.status-badge');
+    const fontSize = getComputedStyle(badge).fontSize;
+    if (document.documentElement.dataset.readableSize !== 'true') throw new Error('Readable size mode is not active');
+    if (fontSize !== '0px') throw new Error('Expected hidden badge font-size 0px, got ' + fontSize);
+    if (badge.textContent !== 'STALE') throw new Error('Badge text was changed');
+    return 'PASS: pill-status-badge-hidden-text (readable size keeps computed font-size at 0px)';
+  })()`);
+  executedRegressions.push({ name: 'pill-status-badge-hidden-text', result: resPillStatusBadgeHiddenText });
+
+  // ==========================================
+  // 5. `fit-strip`
   // The strip never covers most of the screen, at every Fit choice.
   // ==========================================
   const resFitStrip = await evaluate('FitStrip', `(async () => {
@@ -251,7 +268,7 @@ try {
   executedRegressions.push({ name: 'fit-strip', result: resFitStrip });
 
   // ==========================================
-  // 5. `portrait-not-clipped`
+  // 6. `portrait-not-clipped`
   // Portrait at every size with quote on and off: all provider cards fully in view, no scrollbars.
   // ==========================================
   const resPortraitNotClipped = await evaluate('PortraitNotClipped', `(async () => {
