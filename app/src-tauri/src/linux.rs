@@ -280,7 +280,9 @@ pub fn set_autostart(enabled: bool) -> Result<(),String> {
 }
 pub(crate) fn write_autostart(path: &std::path::Path, exe: &std::path::Path, enabled: bool) -> Result<(),String> {
     if !enabled { return match fs::remove_file(path) { Ok(())=>Ok(()),Err(e) if e.kind()==std::io::ErrorKind::NotFound=>Ok(()),Err(e)=>Err(e.to_string()) }; }
-    let escaped=exe.to_string_lossy().replace('\\',"\\\\").replace('"',"\\\"").replace('`',"\\`").replace('$',"\\$").replace('%',"%%");
+    // Quoted-argument escapes pass through key-file unescaping first, so they double (Desktop Entry spec).
+    // shortcut: GIO looks up argv[0] literally and rejects a path with %, upgrade if such a path is reported.
+    let escaped=exe.to_string_lossy().replace('\\',"\\\\\\\\").replace('"',"\\\\\"").replace('`',"\\\\`").replace('$',"\\\\$").replace('%',"%%");
     if escaped.contains(['\n','\r']) { return Err("Invalid executable path".into()); }
     fs::create_dir_all(path.parent().unwrap()).map_err(|e|e.to_string())?;
     fs::write(path,format!("[Desktop Entry]\nType=Application\nName=AI Usage\nExec=\"{escaped}\"\nIcon=ai-usage\nTerminal=false\nX-GNOME-Autostart-enabled=true\n")).map_err(|e|e.to_string())
@@ -337,7 +339,7 @@ mod tests {
         write_autostart(&path,std::path::Path::new("/opt/A B/widget%\"$`"),true).unwrap();
         assert!(read_autostart(&path).unwrap());
         let value=fs::read_to_string(&path).unwrap();
-        assert!(value.contains("Exec=\"/opt/A B/widget%%\\\"\\$\\`\""));
+        assert!(value.contains("Exec=\"/opt/A B/widget%%\\\\\"\\\\$\\\\`\""));
         write_autostart(&path,std::path::Path::new("/unused"),false).unwrap();
         assert!(!path.exists()); assert!(!read_autostart(&path).unwrap()); assert_eq!(fs::read_to_string(&other).unwrap(),"fixture");
         write_autostart(&path,std::path::Path::new("/unused"),false).unwrap();

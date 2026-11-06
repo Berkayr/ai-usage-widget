@@ -17,6 +17,8 @@ main() {
     FROM_DIR=$2
   elif [ "$#" -ne 0 ]; then echo "Usage: $0 [--uninstall | --from-dir DIR]" >&2; return 2; fi
 
+  case "$HOME" in *'
+'*|*=*) echo "AI Usage cannot be installed under a home path with a line break or =." >&2; return 1 ;; esac
   ARCH=$(uname -m)
   [ "$ARCH" = x86_64 ] || { echo "AI Usage installer supports x86_64 only (found $ARCH)." >&2; return 1; }
   PYTHON_INSTALL='install python3 with your distribution package manager'
@@ -77,12 +79,13 @@ main() {
       if [ -n "$ICON" ]; then
         mkdir -p "$ICON_DIR"
         install -m 644 "$ICON" "$ICON_DIR/ai-usage.png"
-        ICON_LINE="Icon=$ICON_DIR/ai-usage.png"
+        ICON_LINE="Icon=$(printf '%s' "$ICON_DIR/ai-usage.png" | sed 's/\\/\\\\/g')"
       else
         ICON_LINE=''
       fi
-      EXEC_LINE="$BIN_DIR/ai-usage.AppImage"
-      if ! ldconfig -p 2>/dev/null | grep -q 'libfuse.so.2'; then EXEC_LINE="sh -c 'APPIMAGE_EXTRACT_AND_RUN=1 $BIN_DIR/ai-usage.AppImage'"; fi
+      # env avoids a second shell parse and GIO's literal lookup of argv[0], which fails on %%.
+      EXEC_LINE=\"$(printf '%s' "$BIN_DIR/ai-usage.AppImage" | sed -e 's/\\/\\\\\\\\/g' -e 's/["`$]/\\\\&/g' -e 's/%/%%/g')\"
+      if ldconfig -p 2>/dev/null | grep -q 'libfuse.so.2'; then EXEC_LINE="env $EXEC_LINE"; else EXEC_LINE="env APPIMAGE_EXTRACT_AND_RUN=1 $EXEC_LINE"; fi
       { printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=AI Usage' "Exec=$EXEC_LINE"; [ -z "$ICON_LINE" ] || printf '%s\n' "$ICON_LINE"; printf '%s\n' 'Categories=Utility;' 'Terminal=false'; } > "$DESKTOP_DIR/ai-usage.desktop"
       chmod 644 "$DESKTOP_DIR/ai-usage.desktop"
       echo "AI Usage is installed. Open it from your app menu (AI Usage) or run: $BIN_DIR/ai-usage.AppImage. Uninstall with: curl -fsSL https://raw.githubusercontent.com/Berkayr/ai-usage-widget/main/scripts/install.sh | sh -s -- --uninstall."

@@ -1,8 +1,12 @@
 import hashlib
+import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
+import sys
 import tempfile
+import time
 import unittest
 
 
@@ -61,6 +65,51 @@ class InstallScriptTests(unittest.TestCase):
         self.assertTrue((self.home / ".local/share/applications/ai-usage.desktop").exists())
         self.assertFalse((self.home / ".local/share/icons/hicolor/128x128/apps/ai-usage.svg").exists())
         self.assertFalse((self.home / ".local/share/icons/hicolor/128x128/apps/ai-usage.png").exists())
+
+    def launch_from_menu(self, home, fuse):
+        """Install a fixture under home and open its entry with a real desktop reader."""
+        marker = self.root / "launch.json"
+        marker.unlink(missing_ok=True)
+        name = "linux-x86_64-ai-usage_0.1.0_amd64.AppImage"
+        (self.source / name).write_text(
+            f"#!{sys.executable}\nimport json, os, sys\n"
+            "if sys.argv[1:] == ['--appimage-extract']: sys.exit(1)\n"
+            f"json.dump([sys.argv, os.environ.get('APPIMAGE_EXTRACT_AND_RUN')], open({str(marker)!r}, 'w'))\n"
+        )
+        digest = hashlib.sha256((self.source / name).read_bytes()).hexdigest()
+        (self.source / "SHA256SUMS.txt").write_text(f"{digest}  {name}\n")
+        ldconfig = self.path / "ldconfig"
+        ldconfig.write_text("#!/bin/sh\necho 'libfuse.so.2 (libc6,x86-64) => /fake'\n" if fuse else "#!/bin/sh\n")
+        home.mkdir(parents=True, exist_ok=True)
+        env = {**self.env, "HOME": str(home)}
+        result = subprocess.run(["sh", str(SCRIPT), "--from-dir", str(self.source)], env=env, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        subprocess.run(["gio", "launch", str(home / ".local/share/applications/ai-usage.desktop")], env=env, check=True, capture_output=True)
+        for _ in range(100):
+            if marker.exists() and marker.read_text():
+                return json.loads(marker.read_text()), home / ".local/bin/ai-usage.AppImage"
+            time.sleep(0.05)
+        self.fail(f"menu entry did not start the app under {home!r}")
+
+    @unittest.skipUnless(shutil.which("gio"), "gio is the desktop entry reader")
+    def test_menu_entry_opens_app_under_unusual_home_paths(self):
+        for label in ("normal", "with space", "per%cent", "dollar$HOME", "back`tick", "quo'te", 'dou"ble', "back\\slash"):
+            for fuse in (True, False):
+                with self.subTest(label=label, fuse=fuse):
+                    (argv, extract), app = self.launch_from_menu(self.root / "homes" / label, fuse)
+                    self.assertEqual(argv, [str(app)])
+                    self.assertEqual(extract, None if fuse else "1")
+
+    def test_unsupported_home_is_refused_before_writing(self):
+        self.package("linux-x86_64-ai-usage_0.1.0_amd64.AppImage")
+        for name in ("line\nbreak", "equals=sign"):
+            with self.subTest(name=name):
+                home = self.root / name
+                home.mkdir()
+                self.env["HOME"] = str(home)
+                result = self.run_script("--from-dir", self.source)
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(list(home.iterdir()), [])
 
     def test_deb_and_rpm_use_package_managers(self):
         for filename, manager in (("linux-x86_64-ai-usage.deb", "apt"), ("linux-x86_64-ai-usage.rpm", "dnf")):
