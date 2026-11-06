@@ -542,6 +542,26 @@ try {
     executedRegressions.push({ name: 'portrait-many-providers', result: `FAIL: ${error.message}` });
   }
 
+  try {
+    await b.navigate('/?sample', 'window.__AI_USAGE_DEMO__');
+    await b.evaluate(`window.__AI_USAGE_DEMO__.setWorkArea([{width:1536,height:960,scale:1,primary:true}])`);
+    await b.cdp('Emulation.setDeviceMetricsOverride', { width: 460, height: 880, deviceScaleFactor: 1, mobile: false });
+    const providers = ['codex', 'claude', 'gemini'].map(id => ({ id, state: 'OK', plan: 'Pro', windows: [{ kind: 'session', used_percent: 54 }, { kind: 'weekly', used_percent: 61 }] }));
+    await b.evaluate(`window.__AI_USAGE_DEMO__.setSnapshot(${JSON.stringify({ providers })})`);
+    let cases = 0;
+    for (const theme of ['system', 'brutalist', 'terminal']) for (const shape of ['portrait', 'landscape', 'square']) for (const size of ['sizeMode:"fixed",sizePreset:"Small"', 'sizeMode:"fixed",sizePreset:"Medium"', 'sizeMode:"screen",fitFraction:1']) {
+      await b.evaluate(`window.__AI_USAGE_DEMO__.setSettings({theme:'${theme}',shape:'${shape}',quoteEnabled:true,fineTune:100,fitFineTune:100,${size}})`);
+      await new Promise(resolve => setTimeout(resolve, 60));
+      const broken = await b.evaluate(`[...document.querySelectorAll('#providers .window-top>span')].filter(el=>{const range=document.createRange();range.selectNodeContents(el);return new Set([...range.getClientRects()].map(rect=>Math.round(rect.top))).size>1}).map(el=>el.textContent)`);
+      if (broken.length) throw new Error(`${theme}/${shape}/${size}: ${broken[0]} wraps`);
+      cases++;
+    }
+    executedRegressions.push({ name: 'quota-labels-whole', result: `PASS: ${cases} labels stay on one line` });
+  } catch (error) {
+    process.exitCode = 1;
+    executedRegressions.push({ name: 'quota-labels-whole', result: `FAIL: ${error.message}` });
+  }
+
   // Summary
   console.log(`\n${executedRegressions.length} Named Regression Results:`);
   for (const reg of executedRegressions) {
