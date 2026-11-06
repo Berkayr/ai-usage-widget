@@ -6,13 +6,15 @@ using System.Runtime.InteropServices;
 public static class StripWindow {
   [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
   [DllImport("user32.dll", CharSet=CharSet.Unicode)] public static extern IntPtr FindWindow(string cls, string title);
+  [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hwnd);
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hwnd, out Rect rect);
 }
 '@
+if (-not [StripWindow]::SetProcessDPIAware()) { throw 'Cannot enable process DPI awareness' }
 $deadline = (Get-Date).AddSeconds(10)
 do {
-  $handle = [StripWindow]::FindWindow('AIUsageTaskbarStrip', $null)
+  $handle = [StripWindow]::FindWindow('AIUsageTaskbarStrip', [NullString]::Value)
   if ($handle -ne [IntPtr]::Zero -and [StripWindow]::IsWindowVisible($handle)) { break }
   Start-Sleep -Milliseconds 200
 } while ((Get-Date) -lt $deadline)

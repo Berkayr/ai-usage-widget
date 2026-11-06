@@ -1,12 +1,20 @@
 // CI only: real Tauri windows, real IPC and isolated fictional state. No mocks.
 import assert from 'node:assert/strict';
 import {spawn, execFileSync} from 'node:child_process';
-import {mkdtemp, mkdir, readFile, writeFile, rm, copyFile} from 'node:fs/promises';
+import {existsSync} from 'node:fs';
+import {mkdtemp, mkdir, readFile, writeFile, rm, rename} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve, join} from 'node:path';
 
 assert.equal(process.env.CI, 'true', 'Native acceptance is restricted to CI');
 const windows = process.platform === 'win32';
+if (windows) {
+  const profile = process.env.USERPROFILE;
+  const credentials = ['.claude/.credentials.json','.codex/auth.json','.gemini/oauth_creds.json'];
+  if (profile && credentials.some(path=>existsSync(join(profile,path)))) {
+    throw Error('refusing to run: real credentials present');
+  }
+}
 const binary = resolve(`app/src-tauri/target/debug/ai-usage${windows ? '.exe' : ''}`);
 const output = resolve('native-artifacts');
 await mkdir(output, {recursive:true});
@@ -17,13 +25,30 @@ const settingsPath = join(config, 'ai-usage', 'settings.json');
 const ids = ['claude','codex','gemini','copilot','openrouter','deepseek','jetbrains'];
 for (const dir of ['home','config/ai-usage','state','data','cache']) await mkdir(join(root, dir), {recursive:true});
 await writeFile(join(state, 'config.json'), JSON.stringify({initialized:false,providers:Object.fromEntries(ids.map(id=>[id,{enabled:false}]))}));
-await copyFile('app/src/sample-snapshot.json', join(state, 'snapshot.json'));
-const env = {...process.env, HOME:join(root,'home'), USERPROFILE:join(root,'home'),
+const snapshotFixture = await readFile('app/src/sample-snapshot.json');
+async function writeSnapshotFixture() {
+  const temporary = join(state, 'snapshot.fixture.tmp');
+  await writeFile(temporary, snapshotFixture);
+  const destination = join(state, 'snapshot.json');
+  const deadline = Date.now() + 2000;
+  while (true) {
+    try {
+      await rename(temporary, destination);
+      return;
+    } catch (error) {
+      if (!['EPERM', 'EACCES', 'EBUSY'].includes(error.code) || Date.now() >= deadline) throw error;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+}
+await writeSnapshotFixture();
+const env = {...process.env, HOME:join(root,'home'), ...(windows ? {} : {USERPROFILE:join(root,'home')}),
   AI_USAGE_TEST_CONFIG_HOME:config, APPDATA:config, LOCALAPPDATA:join(root,'data'), XDG_CONFIG_HOME:config,
   XDG_DATA_HOME:join(root,'data'), XDG_CACHE_HOME:join(root,'cache'),
   XDG_STATE_HOME:join(root,'state'), QUOTACORE_HOME:state,
   GDK_BACKEND:'x11', XDG_SESSION_TYPE:'x11', WAYLAND_DISPLAY:'',
   AI_USAGE_SETTINGS_TEST_POSITION:'20,20'};
+// Windows WebView2 requires the real USERPROFILE for its runtime data directory.
 // Do not pass provider credentials inherited from the runner to the application.
 for (const key of Object.keys(env)) if (/(TOKEN|SECRET|API_KEY|PASSWORD)/i.test(key)) delete env[key];
 let application = binary;
@@ -63,6 +88,9 @@ async function waitFor(check, message) {
 async function screenshot(name) {
   const png = await command('GET','/screenshot');
   await writeFile(join(output,`${name}.png`),Buffer.from(png,'base64'));
+}
+function checkWindowRegion(shape) {
+  execFileSync('powershell.exe',['-NoProfile','-Command',`$ErrorActionPreference='Stop'; $processes=@(Get-Process -Name ai-usage); if ($processes.Count -ne 1) { throw "Expected one ai-usage process, found $($processes.Count)" }; & 'docs/tools/acceptance/check-window-region.ps1' -ProcessId $processes[0].Id -Shape '${shape}'`],{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']});
 }
 async function selectWindow(query) {
   await waitFor(async()=>{
@@ -151,9 +179,14 @@ try {
   // Finish collection while everything is disabled, then install display fixtures.
   await asyncScript("window.__TAURI_INTERNALS__.invoke('refresh_now')");
   await writeFile(join(state,'config.json'),JSON.stringify({initialized:true,providers:Object.fromEntries(ids.map(id=>[id,{enabled:['claude','codex','gemini'].includes(id)}]))}));
-  await copyFile('app/src/sample-snapshot.json',join(state,'snapshot.json'));
-  await waitFor(()=>execute("return document.querySelectorAll('.provider-card').length>0"),'Fictional snapshot was not rendered');
-  let medium, large;
+  await writeSnapshotFixture();
+  await waitFor(async()=>{
+    if(await execute("return document.querySelectorAll('.provider-card').length>0")) return true;
+    // A startup collector may finish after refresh_now and replace the fixture.
+    await writeSnapshotFixture();
+    return false;
+  },'Fictional snapshot was not rendered');
+  let medium, small;
   for(const shape of ['portrait','landscape','square','circle','pill']) for(const preset of ['Small','Medium','Large','X-Large','2X-Large']) {
     await openSettings();
     await click('[data-category="layout"]');
@@ -169,13 +202,16 @@ try {
     assert.equal(await execute("return document.querySelector('#fit-screen').disabled"),shape!=='portrait');
     const disk=await save();assert.equal(disk.shape,shape);assert.equal(disk.sizePreset,preset);
     const size=await geometry(`${shape}-${preset}`);
+    if(windows && ['circle','pill'].includes(shape)) {
+      await new Promise(r=>setTimeout(r,100));
+      checkWindowRegion(shape);
+    }
     console.log(`PASS: ${shape}/${preset}: outer ${size.width}x${size.height}; disk matches`);
     if(shape==='portrait' && preset==='Medium') medium=size;
+    if(shape==='portrait' && preset==='Small') small=size;
   }
-  await openSettings();await click('[data-category="layout"]');await click('[data-shape="portrait"]');await click('[data-size="Large"]');await save();
-  large=await geometry('portrait-large');
-  assert(large.width>medium.width,'Size selection did not resize native outer window');
-  await openSettings();await click('[data-category="layout"]');await click('#fit-screen');
+  assert(medium.width>small.width,'Portrait Medium must be wider than Small');
+  await openSettings();await click('[data-category="layout"]');await click('[data-shape="portrait"]');await click('#fit-screen');
   assert.equal((await save()).sizeMode,'screen');
   for(const fraction of ['1','0.75','0.5',String(1/3)]) {
     await selectWindow('window.__SETTINGS_READY__');
