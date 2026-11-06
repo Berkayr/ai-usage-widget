@@ -67,3 +67,34 @@ print(json.dumps([m for m in sys.modules if m.startswith('quotacore.providers.')
                                     capture_output=True, text=True, check=True)
             self.assertEqual(set(json.loads(result.stdout)), {
                 'quotacore.providers.gemini', 'quotacore.providers.common'})
+
+
+class LightnessBudgetTests(unittest.TestCase):
+    def test_thresholds_and_appimage_memory_accounting(self):
+        from scripts.footprint import budget_failures
+        result = {'idle_cpu_percent': 0.1, 'first_render_seconds': 5,
+                  'idle_median': {'memory_bytes': 250 * 1024**2}}
+        self.assertEqual(budget_failures(result), [])
+        result['idle_cpu_percent'] += 0.0001
+        result['first_render_seconds'] += 0.001
+        result['idle_median']['memory_bytes'] += 1
+        self.assertEqual(len(budget_failures(result)), 3)
+        self.assertEqual(len(budget_failures(result, appimage=True)), 2)
+
+    def test_bare_binary_resources_and_monitor_are_staged_before_launch(self):
+        from scripts import footprint
+        class Staged(Exception):
+            pass
+        def inspect_launch(command, **kwargs):
+            root = Path(kwargs['env']['HOME']).parent
+            self.assertTrue((root / 'lib/ai-usage/quotacore/__main__.py').is_file())
+            settings = json.loads((root / 'config/ai-usage/settings.json').read_text())
+            self.assertEqual(settings['linux']['monitor'], 'Fictional-1')
+            self.assertNotIn('API_KEY', kwargs['env'])
+            raise Staged()
+        with tempfile.TemporaryDirectory() as temp:
+            binary = Path(temp) / 'ai-usage'
+            binary.write_bytes(b'fictional executable, never launched')
+            with patch.object(footprint.subprocess, 'Popen', side_effect=inspect_launch):
+                with self.assertRaises(Staged):
+                    footprint.measure(binary, False, 40, 'Fictional-1')

@@ -2,6 +2,8 @@
 use std::{fs, io, path::Path};
 
 pub fn run() -> Result<(), io::Error> {
+    #[cfg(debug_assertions)]
+    if std::env::var_os("AI_USAGE_TEST_CONFIG_HOME").is_some() { return Ok(()); }
     let root = dirs::config_dir().ok_or_else(|| io::Error::other("Config directory unavailable"))?;
     copy_settings(&root)?;
     #[cfg(target_os="linux")]

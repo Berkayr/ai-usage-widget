@@ -3,10 +3,16 @@ import * as identity from '../../app/src/themes/shared/identity.js';
 // Production DOM, fictional quotas. CIE76 ΔE in D65 Lab; no provider credentials.
 import {readFile,readdir,writeFile} from 'node:fs/promises';
 import {browser} from './browser-harness.mjs';
+import {pairwise} from './pairwise.mjs';
 const b=await browser();
 try {
  await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
- const result=await b.evaluate(`(async()=>{
+ const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>({id:t.id,palettes:Object.keys(t.palettes)}))');
+ const result={combinations:0,minDelta:Infinity,failures:[],batches:[]};
+ for(const theme of themes) {
+ const cases=pairwise({palette:theme.palettes,appearance:['dark','light'],colorMode:['calm','vivid','mono'],used:[20,65,90],shape:['circle','pill']});
+ const started=performance.now();
+ const batch=await b.evaluate(`(async()=>{
  const api=window.__AI_USAGE_DEMO__,failures=[];let combinations=0,minDelta=Infinity;
  const lab=color=>{
   const rgb=color.match(/[\\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});
@@ -14,7 +20,8 @@ try {
   return [116*xyz[1]-16,500*(xyz[0]-xyz[1]),200*(xyz[1]-xyz[2])];
  };
  const check=(ok,message,context)=>{if(!ok)failures.push({message,...context})};
- for(const theme of api.themes)for(const palette of Object.keys(theme.palettes))for(const appearance of ['dark','light'])for(const colorMode of ['calm','vivid','mono'])for(const used of [20,65,90])for(const shape of ['circle','pill']) {
+ for(const {palette,appearance,colorMode,used,shape} of ${JSON.stringify(cases)}) {
+  const theme=${JSON.stringify(theme)};
   const context={theme:theme.id,palette,appearance,colorMode,used,shape};combinations++;
   await api.setSettings({...context,theme:theme.id,sizePreset:'Medium',fineTune:100,widgetProviders:['claude','codex','gemini']});
   await api.setSnapshot({providers:['claude','codex','gemini'].map(id=>({id,state:'OK',windows:[{kind:'session',used_percent:used}]}))});
@@ -36,6 +43,14 @@ try {
    check(delta>=20,'Identity ΔE '+delta.toFixed(2)+' < 20',context);
   }
  }
+ return {combinations,minDelta,failures};
+ })()`);
+ result.combinations+=batch.combinations;result.minDelta=Math.min(result.minDelta,batch.minDelta);result.failures.push(...batch.failures);
+ result.batches.push({theme:theme.id,cases:batch.combinations,seconds:(performance.now()-started)/1000});
+ console.log(JSON.stringify(result.batches.at(-1)));
+ }
+ const stable=await b.evaluate(`(async()=>{
+ const api=window.__AI_USAGE_DEMO__,failures=[];const check=(ok,message,context)=>{if(!ok)failures.push({message,...context})};
  // Known providers must retain colors when reordered/subselected.
  await api.setSettings({shape:'circle',colorMode:'vivid',widgetProviders:['gemini','claude']});
  await api.setSnapshot({providers:['gemini','claude'].map(id=>({id,state:'OK',windows:[{kind:'session',used_percent:20}]}))});
@@ -49,8 +64,9 @@ try {
    check(!!mark&&getComputedStyle(mark).getPropertyValue('--provider-0').trim()==='#b85d40','User override in '+shape,{});
  }
  await api.setSettings({providerColors:{}});
- return {combinations,minDelta,failures};
+ return failures;
  })()`);
+ result.failures.push(...stable);
  for(const dir of await readdir('app/src/themes')) {
    let theme;try{theme=JSON.parse(await readFile(`app/src/themes/${dir}/theme.json`,'utf8'));}catch{continue;}
    for(const palette of Object.values(theme.palettes))for(const appearance of ['dark','light']){

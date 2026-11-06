@@ -1,5 +1,6 @@
 // Offline usage geometry matrix, including featured placement and quote placement.
 import {mkdir, writeFile} from 'node:fs/promises';
+import {pairwise} from './pairwise.mjs';
 import {browser} from './browser-harness.mjs';
 import {shapes, sizePresets, widgetWidth, widgetHeight} from '../../app/src/sizing.js';
 const b = await browser();
@@ -56,7 +57,7 @@ try {
   // Reported 82% geometry is always measured, including after viewport changes.
   await check({theme:'brutalist',shape:'portrait',sizePreset:'Medium',fineTune:82,featuredProvider:'auto',featuredPosition:'top',quoteEnabled:true,quotePosition:'bottom'},3,process.env.AUDIT_CAPTURE || 'featured-after');
   if(!process.env.AUDIT_REPRO_ONLY) for(const theme of select(themes,'AUDIT_THEMES')) {
-    for(const shape of select(shapes,'AUDIT_SHAPES')) for(const sizePreset of select(Object.keys(sizePresets),'AUDIT_SIZES')) for(const featured of ['none','auto','top','bottom']) for(const quote of ['off','top','bottom']) for(const count of [1,2,3]) {
+    for(const {shape,sizePreset,featured,quote,count} of pairwise({shape:select(shapes,'AUDIT_SHAPES'),sizePreset:select(Object.keys(sizePresets),'AUDIT_SIZES'),featured:['none','auto','top','bottom'],quote:['off','top','bottom'],count:[1,2,3]})) {
       await check({theme,shape,sizePreset,fineTune:100,featuredProvider:featured==='none'?'none':'auto',featuredPosition:featured==='auto'?'bottom':featured,quoteEnabled:quote!=='off',quotePosition:quote==='top'?'top':'bottom'},count);
     }
     await writeFile(`${output}/usage-fit-results.json`,JSON.stringify({cases,failures},null,2)+'\n');

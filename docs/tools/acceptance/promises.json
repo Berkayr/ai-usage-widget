@@ -123,9 +123,9 @@
     "id": "p-readme-16",
     "source": "README.md:122",
     "claim": "Windows has an optional taskbar strip with independent provider, window and theme settings.",
-    "verify": "native",
+    "verify": "manual",
     "test": null,
-    "reason": "Requires native Windows desktop environment with Explorer WinEvent hook and GDI strip rendering"
+    "reason": "Windows Explorer taskbar strip is not exercised by the headless browser suite; requires native Windows desktop acceptance."
   },
   {
     "id": "p-readme-17",
@@ -443,9 +443,9 @@
     "id": "p-design-15",
     "source": "docs/design-spec.md:278",
     "claim": "Native input regions match silhouette: Win32 physical-pixel ellipse/capsule, GTK logical-pixel cairo scanlines.",
-    "verify": "native",
+    "verify": "manual",
     "test": null,
-    "reason": "Requires native X11/Wayland/Windows compositor hit-testing"
+    "reason": "Input-region hit testing requires a native Windows or GTK compositor; no local native window is launched by this acceptance run."
   },
   {
     "id": "p-design-16",
@@ -467,17 +467,17 @@
     "id": "p-linux-01",
     "source": "docs/linux.md:7",
     "claim": "KDE Plasma 6 Wayland: GTK3 layer-shell corners; ordinary window fallback without library.",
-    "verify": "native",
+    "verify": "manual",
     "test": null,
-    "reason": "Requires native KDE Plasma 6 Wayland desktop session with libgtk-layer-shell installed"
+    "reason": "Requires native KDE Plasma 6 Wayland with layer-shell; the CI/headless harness does not provide that compositor."
   },
   {
     "id": "p-linux-02",
     "source": "docs/linux.md:18",
     "claim": "libgtk-layer-shell.so.0 loaded dynamically; absence does not prevent startup.",
-    "verify": "native",
+    "verify": "manual",
     "test": null,
-    "reason": "Verified only by launching on native Linux systems without libgtk-layer-shell"
+    "reason": "Dynamic library absence/startup fallback requires launching the native binary on Linux with and without libgtk-layer-shell."
   },
   {
     "id": "p-linux-03",
@@ -755,17 +755,17 @@
     "id": "p-sec-11",
     "source": "docs/security-model.md:165",
     "claim": "Start at login is an explicit toggle: HKCU Run value (Windows) or per-user autostart desktop entry (Linux).",
-    "verify": "native",
+    "verify": "manual",
     "test": null,
-    "reason": "Requires host operating system login registration test"
+    "reason": "Autostart registration requires native OS integration; the acceptance suite does not modify the host login configuration."
   },
   {
     "id": "p-sec-12",
     "source": "docs/security-model.md:169",
     "claim": "Windows taskbar strip creates no GUI thread/window/hook while off; SetWinEventHook listens only for Explorer location changes; no keylogging or injection.",
-    "verify": "native",
+    "verify": "manual",
     "test": null,
-    "reason": "Requires Windows Explorer runtime and UI thread inspection"
+    "reason": "Requires Windows Explorer runtime inspection; this suite does not validate native taskbar hooks."
   },
   {
     "id": "p-sec-13",

@@ -134,3 +134,29 @@ post-warmup range, ten snapshot opens and approximately 0.50-second render
 acknowledgements for all three synthetic changes.
 
 The soak memory limit compares the mean of the first and last quarters of samples after 30 seconds, so isolated peaks do not count as sustained growth.
+
+
+## Enforced acceptance budgets
+
+`footprint.py` exits 1 if either scenario exceeds **0.1% of one CPU core**,
+**5 seconds to first render**, or **250 MiB median idle cgroup memory for a bare
+binary**. CPU and first-render budgets also apply to AppImages. An AppImage can
+read higher because its extracted bundled libraries and file cache are charged
+to the same cgroup; its memory figure is reported without the bare-binary gate.
+Pass `--monitor Fictional-1` (replace with the intended connector) to write
+`linux.monitor` in the temporary settings. The resource staging directory uses
+`mainBinaryName`, matching Tauri's Linux resource lookup.
+
+Previously recorded 180-second release measurements (not rerun during the final
+acceptance task) were:
+
+| Scenario | First render | Idle CPU, one core | Median cgroup memory |
+| --- | ---: | ---: | ---: |
+| All providers disabled | 1.005 s | 0.01038% | 154.53 MiB |
+| Fictional passive Gemini | 1.005 s | 0.01001% | 157.48 MiB |
+
+Both recorded scenarios satisfy the new budgets. These historical numbers do
+not certify the current binary or an AppImage. Native measurement was forbidden
+locally for this task; current native performance remains unverified. The unit
+suite checks exact budget boundaries, failure above each boundary, AppImage
+memory handling and staging of resources/monitor before any process launch.
