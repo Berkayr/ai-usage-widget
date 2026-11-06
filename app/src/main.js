@@ -10,6 +10,7 @@ import { renderRound } from './themes/shared/round.js';
 import { effectiveSizeMode, normalizeSize, widgetWidth, widgetHeight, widgetProviders, fittedGeometry, selectedWorkArea } from './sizing.js';
 import { hiddenStates } from './themes/dot-matrix/render.js';
 import { repairTextContrast } from './text-contrast.js';
+import { startupFailure } from './live-startup.js';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { mountProviders } from './themes/shared/providers.js';
 import './themes/shared/chrome.css';
@@ -98,7 +99,7 @@ async function refreshWorkArea() {
 document.querySelector('#app').innerHTML = `
   <main class="widget" id="widget">
     <header class="header"><div class="title-block"><div class="app-title">AI USAGE</div><div class="sync-line"><i class="beacon"></i><span id="updated">WAITING FOR DATA</span></div></div><button class="gear" id="gear" aria-label="Settings">⚙</button></header>
-    <section id="provider-onboarding" hidden></section><div class="provider-list" id="providers"></div>
+    <section id="provider-onboarding" hidden></section><div class="provider-list" id="providers"></div><p id="runtime-error" role="alert" hidden style="color:var(--textPrimary);font-size:var(--size-font-small);overflow-wrap:anywhere"></p>
     <nav class="shape-pages" aria-label="Provider pages" hidden></nav>
     <section class="quote-section" id="quote" hidden aria-label="Daily quote"></section>
     <footer class="footer"><span>AI USAGE</span><span>SYSTEM</span></footer>
@@ -150,6 +151,7 @@ let drawFrame = 0;
 let lastSnapshotKey;
 let lastAgeState;
 function acceptSnapshot(snapshot) {
+  $('#runtime-error').hidden = true;
   const key = JSON.stringify(snapshot);
   const old = snapshotOld(snapshot);
   if (key === lastSnapshotKey && old === lastAgeState) return;
@@ -324,7 +326,13 @@ else {
     });
     await subscribe('taskbar-settings-changed', event => { settings.taskbar = { ...defaultTaskbar, ...event.payload }; applySettings(); });
     await subscribe('refresh-error', event => showToast(event.payload));
-  } catch (error) { draw(sample, true); showToast(`Unable to load quota data: ${error}`); }
+  } catch (error) {
+    const failure = startupFailure(error, currentSnapshot);
+    $('#runtime-error').textContent = failure.message;
+    $('#runtime-error').hidden = false;
+    draw(failure.snapshot, failure.noData);
+    showToast(failure.message);
+  }
 }
 
 
