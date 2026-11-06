@@ -49,6 +49,9 @@ jobs:
       - name: Headless controls and behavior acceptance
         if: runner.os == 'Linux'
         run: node docs/tools/acceptance/run.mjs
+      - name: Native driver failure diagnostics regression
+        if: runner.os == 'Linux'
+        run: node --test tests/native-webdriver.mjs
       - run: cargo check --locked
         working-directory: app/src-tauri
   native-linux:
@@ -70,7 +73,7 @@ jobs:
       - name: Native driver and build prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libssl-dev librsvg2-dev patchelf webkit2gtk-driver xvfb
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libssl-dev librsvg2-dev patchelf webkit2gtk-driver xvfb openbox x11-utils
           cargo install tauri-driver --version 2.1.0 --locked
       - run: npm ci
         working-directory: app
@@ -78,7 +81,23 @@ jobs:
         run: npx tauri build --debug --no-bundle
         working-directory: app
       - name: Drive actual windows under Xvfb (X11)
-        run: xvfb-run -a -s '-screen 0 1920x1080x24' node docs/tools/acceptance/native-webdriver.mjs
+        run: |
+          mkdir -p native-artifacts
+          xvfb-run -a -s '-screen 0 1920x1080x24' sh -eu -c '
+            openbox >native-artifacts/window-manager.log 2>&1 &
+            wm=$!
+            trap "kill $wm 2>/dev/null || true" EXIT
+            for attempt in $(seq 1 50); do
+              if xprop -root _NET_SUPPORTING_WM_CHECK | grep -q "window id"; then
+                echo "Openbox ready under Xvfb"
+                wm_ready=1
+                break
+              fi
+              sleep 0.1
+            done
+            if [ "${wm_ready:-0}" != 1 ]; then cat native-artifacts/window-manager.log; exit 1; fi
+            node docs/tools/acceptance/native-webdriver.mjs
+          '
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:

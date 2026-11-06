@@ -26,15 +26,23 @@ const env = {...process.env, HOME:join(root,'home'), USERPROFILE:join(root,'home
   AI_USAGE_SETTINGS_TEST_POSITION:'20,20'};
 // Do not pass provider credentials inherited from the runner to the application.
 for (const key of Object.keys(env)) if (/(TOKEN|SECRET|API_KEY|PASSWORD)/i.test(key)) delete env[key];
+let application = binary;
+if (!windows) {
+  // Scope verbose WebKit/GLib diagnostics to the application, not the driver.
+  application = join(root, 'application.sh');
+  const quotedBinary = "'" + binary.replaceAll("'", "'\\''") + "'";
+  await writeFile(application, `#!/bin/sh\nexport WEBKIT_DEBUG=Automation G_MESSAGES_DEBUG=all\nexec ${quotedBinary} "$@"\n`, {mode:0o700});
+}
 const driver = spawn('tauri-driver', [], {env, stdio:['ignore','pipe','pipe']});
-let log = '', session;
-driver.stdout.on('data', data=>{log+=data;});
-driver.stderr.on('data', data=>{log+=data;});
-driver.on('error', error=>{log+=error.stack;});
-async function request(method, path, body) {
+let log = '', session, failed = false;
+const appendLog = data => { log = (log + data).slice(-65536); };
+driver.stdout.on('data', appendLog);
+driver.stderr.on('data', appendLog);
+driver.on('error', error=>{appendLog(error.stack);});
+async function request(method, path, body, timeout = 30000) {
   const response = await fetch(`http://127.0.0.1:4444${path}`, {
     method, headers:{'content-type':'application/json'},
-    body:body===undefined?undefined:JSON.stringify(body), signal:AbortSignal.timeout(30000)
+    body:body===undefined?undefined:JSON.stringify(body), signal:AbortSignal.timeout(timeout)
   });
   const result = await response.json();
   if (!response.ok || result.value?.error) throw Error(`${method} ${path}: ${JSON.stringify(result)}`);
@@ -109,14 +117,16 @@ async function geometry(name) {
   return native.size;
 }
 async function start() {
-  const value=await request('POST','/session',{capabilities:{alwaysMatch:{'tauri:options':{application:binary}}}});
+  console.log('Starting native WebDriver session (timeout: 120 s)');
+  const value=await request('POST','/session',{capabilities:{alwaysMatch:{'tauri:options':{application}}}},120000);
   session=value.sessionId;
+  console.log('Native WebDriver session established');
   await command('POST','/timeouts',{script:20000,implicit:0,pageLoad:30000});
 }
 try {
   await waitFor(async()=>{
     try { await request('GET','/status'); return true; }
-    catch(error) { if(driver.exitCode!==null)throw Error(log); return false; }
+    catch(error) { if(driver.exitCode!==null)throw Error(`tauri-driver exited with code ${driver.exitCode}; see driver.log`); return false; }
   },'tauri-driver startup timeout');
   await start();
   await selectWindow("document.querySelector('#provider-onboarding .provider-choices input')");
@@ -181,14 +191,21 @@ try {
   await screenshot('restart-persistence');
   console.log('PASS: real onboarding, geometry, Save, restart, autostart and Windows strip');
 } catch(error) {
-  if(session) { try { await screenshot('failure'); } catch(captureError) { log+=`\nScreenshot failed: ${captureError}`; } }
+  failed = true;
+  if(session) { try { await screenshot('failure'); } catch(captureError) { appendLog(`\nScreenshot failed: ${captureError}`); } }
   throw error;
 } finally {
   if(session) {
     try { await command('DELETE',''); }
-    catch(error) { log+=`\nSession cleanup failed: ${error}`; process.exitCode=1; }
+    catch(error) { appendLog(`\nSession cleanup failed: ${error}`); failed=true; process.exitCode=1; }
   }
+  const stopped = new Promise(resolve => {
+    const timer = setTimeout(resolve, 2000);
+    driver.once('close', () => { clearTimeout(timer); resolve(); });
+  });
   driver.kill();
+  await stopped;
+  if(failed) console.error(`driver.log tail (last 8192 characters):\n${log.slice(-8192) || '(empty)'}`);
   await writeFile(join(output,'driver.log'),log);
   await rm(root,{recursive:true,force:true,maxRetries:5,retryDelay:200});
 }

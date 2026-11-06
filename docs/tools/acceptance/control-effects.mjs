@@ -249,6 +249,15 @@ try {
     const $s = sel => sDoc.querySelector(sel);
     const $w = sel => wDoc.querySelector(sel);
     const settle = () => new Promise(r => setTimeout(r, 45));
+    const waitForTheme = async id => {
+      const deadline = Date.now() + 10000;
+      while (Date.now() < deadline) {
+        const style = wDoc.querySelector('#active-theme');
+        if (wDoc.documentElement.dataset.theme === id && style?.sheet?.cssRules.length) return;
+        await new Promise(r => setTimeout(r, 50));
+      }
+      throw new Error('Theme activation timed out: ' + id + '; active=' + wDoc.documentElement.dataset.theme);
+    };
 
     const results = {
       totalInInventory: controlsList.length,
@@ -446,7 +455,7 @@ try {
       const btn = $s(\`button[data-theme="\${t}"]\`);
       if (btn) {
         btn.click();
-        await settle();
+        await waitForTheme(t);
         const activePreview = bus.previews.at(-1)?.theme;
         expect(wDoc.documentElement.dataset.theme===t,'theme:'+t,'Widget actually activates selected theme');
         if (activePreview !== t) {
@@ -456,7 +465,7 @@ try {
       results.testedCount++;
     }
     $s('button[data-theme="system"]')?.click();
-    await settle();
+    await waitForTheme('system');
 
     // 5. Palettes & User Palettes
     const showAllBtn = [...sDoc.querySelectorAll('#palette-tools button')].find(b => b.textContent.includes('Show'));
@@ -594,13 +603,14 @@ try {
     if (dotCountSel && reactorMotionInput) {
       // In theme: system, dot-count must be hidden
       $s('button[data-theme="system"]')?.click();
-      await settle();
+      await waitForTheme('system');
       if (!dotCountSel.closest('label')?.hidden) {
         recordFailure('dot-count', 'theme: system', 'dot-count select is visible', 'Hidden in system theme');
       }
 
       // In theme: reactor and shape: circle, reactor-motion must be visible
       $s('button[data-theme="reactor"]')?.click();
+      await waitForTheme('reactor');
       await navCategory('layout');
       $s('button[data-shape="circle"]')?.click();
       await settle();

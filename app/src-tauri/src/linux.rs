@@ -88,6 +88,15 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
     let _ = window.with_webview(|webview| {
         use webkit2gtk::{SettingsExt, WebContextExt, WebViewExt};
         let view = webview.inner();
+        #[cfg(debug_assertions)]
+        if std::env::var("TAURI_WEBVIEW_AUTOMATION").as_deref() == Ok("true") {
+            eprintln!("native-automation: controlled={} allowed={}", view.is_controlled_by_automation(), view.context().is_some_and(|c| c.is_automation_allowed()));
+            view.connect_map(|_| eprintln!("native-automation: webview mapped"));
+            view.connect_load_changed(|_, event| eprintln!("native-automation: load {:?}", event));
+            if let Some(context) = view.context() {
+                context.connect_automation_started(|_, _| eprintln!("native-automation: session started"));
+            }
+        }
         if let Some(settings) = WebViewExt::settings(&view) {
             settings.set_enable_webgl(false);
             // Legacy engines support this toggle; newer WebKit treats it as a no-op.
