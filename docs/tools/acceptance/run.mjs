@@ -40,6 +40,8 @@ const fast = [
   ['node', ['tests/size-contract.mjs']],
   ['node', ['tests/shapes-content.mjs']],
   ['node', ['tests/quote-privacy.mjs']],
+  ['node', ['tests/live-startup.mjs']],
+  ['node', ['docs/tools/acceptance/live-startup.mjs']],
   ['node', ['tests/documentation.mjs']],
   ['node', ['--test', 'tests/screen-fit.mjs', 'tests/user-palettes.mjs', 'tests/pairwise.mjs']],
   ['python3', ['-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_install_script.py']],
