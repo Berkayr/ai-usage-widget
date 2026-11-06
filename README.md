@@ -34,7 +34,7 @@ Installers are coming with v0.1; no release is available yet.
 
 Linux needs host Python 3.10+, provider CLIs and the appropriate GTK/WebKit runtime; AppImage also has host dependencies. Windows slim installers are for users who already have Python 3.10+. Provider tools are installed separately. See [packaging](packaging/README.md) before building or testing a package.
 
-Uninstall after installation: on Windows 11, use **Settings → Apps → Installed apps → AI Usage → Uninstall** (Windows 10: **Apps & features**). On Debian/Ubuntu use `sudo apt remove ai-usage`; on Fedora use `sudo dnf remove ai-usage`. For the script-installed AppImage, run `sh scripts/install.sh --uninstall` from a checkout. Disable **Start at login** first. Configuration and local quota state are separate from the executable; see [their locations](docs/configuration.md) before optionally removing them. Remove panel integrations from their desktop/bar configuration separately.
+Uninstall after installation: on Windows 11, use **Settings → Apps → Installed apps → AI Usage → Uninstall** (Windows 10: **Apps & features**). On Debian/Ubuntu use `sudo apt remove ai-usage`; on Fedora use `sudo dnf remove ai-usage`. For the script-installed AppImage, run `sh scripts/install.sh --uninstall` from a checkout. Disable **Start at login** first. Configuration and local quota state are separate from the executable; see [their locations](docs/configuration.md) before optionally removing them. Remove panel integrations from their desktop/bar configuration separately. Uninstalling keeps your settings and usage history; on Linux, delete `~/.config/ai-usage`, `~/.config/quotacore`, `~/.local/state/quotacore` and `~/.local/share/ai-usage` to remove them too.
 
 ## Quick start
 
