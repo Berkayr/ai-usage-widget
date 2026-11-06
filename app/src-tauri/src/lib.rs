@@ -241,8 +241,7 @@ fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<
     let height = cap.unwrap_or(current_height);
     let width=(width_css_px.unwrap_or(340.0*scale).clamp(1.0,10000.0)*factor).round() as u32;
     *REQUESTED_SIZE.lock().map_err(|e|e.to_string())? = (width, if requested_height > 0 || cap.is_some() { height } else { 0 });
-    window.set_size(tauri::PhysicalSize::new(width,height)).map_err(|e|e.to_string())?;
-    let settings=settings_window::current(); placement::apply(&window, &settings)?;
+    let settings=settings_window::current(); placement::resize(&window, &settings, width, height)?;
     Ok(())
 }
 #[tauri::command]
@@ -264,8 +263,7 @@ fn fit_window_height(window: tauri::WebviewWindow, height_css_px: f64) -> Result
     let width=if requested.0 > 0 { requested.0 } else { old_size.width };
     *requested=(width,height);
     drop(requested);
-    window.set_size(tauri::PhysicalSize::new(width,height)).map_err(|e|e.to_string())?;
-    placement::apply(&window, &settings_window::current())
+    placement::resize(&window, &settings_window::current(), width, height)
 }
 #[tauri::command]
 fn snap_window(window: tauri::WebviewWindow, corner: String) -> Result<(), String> {

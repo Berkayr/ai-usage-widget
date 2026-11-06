@@ -22,6 +22,12 @@ fn inset_position(r: f64, extent: u32, widget: u32, margin: u32, mode: &str) -> 
     let inset=margin.min(available/2) as i32;
     snap(pixel(r,extent,widget),available as i32,mode).clamp(inset,available as i32-inset)
 }
+#[cfg(any(windows,test))]
+fn windows_inset_position(r: f64, extent: u32, outer: u32, margin: u32, mode: &str) -> i32 {
+    let available=extent.saturating_sub(outer);
+    let inset=margin as i32;
+    snap(pixel(r,extent,outer),available as i32,mode).clamp(inset,(available as i32-inset).max(inset))
+}
 fn select<'a>(list: &'a [Monitor], p: &Placement) -> Option<&'a Monitor> {
     if let Some(found) = p.monitor.as_ref().and_then(|name| list.iter().find(|m| &m.name==name)) { return Some(found); }
     if p.monitor.is_some() && p.disconnected=="hide" { return None; }
@@ -67,24 +73,55 @@ pub(crate) fn selected<'a>(list: &'a [Monitor], settings: &Settings) -> Option<&
     #[cfg(target_os="linux")] if p.monitor.is_none() { match &settings.linux.monitor { Some(linux::MonitorSelection::Name(name))=>p.monitor=Some(name.clone()), Some(linux::MonitorSelection::Index(index))=>p.monitor=usize::try_from(*index).ok().and_then(|i|list.get(i)).map(|m|m.name.clone()), _=>() } }
     select(list,&p)
 }
+#[cfg(any(windows,test))]
+fn windows_size(inner: (u32,u32), frame: (u32,u32), extent: (u32,u32), margin: u32) -> ((u32,u32),(u32,u32)) {
+    let clipped_inner=(inner.0.min(extent.0.saturating_sub(2*margin).max(1)),inner.1.min(extent.1.saturating_sub(2*margin).max(1)));
+    let outer=(clipped_inner.0.saturating_add(frame.0),clipped_inner.1.saturating_add(frame.1));
+    (outer,clipped_inner)
+}
+#[cfg(windows)]
+fn window_frame(window: &tauri::WebviewWindow) -> Result<(u32,u32),String> {
+    let outer=window.outer_size().map_err(|e|e.to_string())?;
+    let inner=window.inner_size().map_err(|e|e.to_string())?;
+    Ok((outer.width.saturating_sub(inner.width),outer.height.saturating_sub(inner.height)))
+}
+pub fn resize(window: &tauri::WebviewWindow, settings: &Settings, width: u32, height: u32) -> Result<(),String> {
+    // Capture the frame before set_size: Windows can still report the previous size afterward.
+    #[cfg(windows)] let frame=window_frame(window)?;
+    window.set_size(tauri::PhysicalSize::new(width,height)).map_err(|e|e.to_string())?;
+    #[cfg(windows)] { apply_size(window,settings,Some(((width,height),frame))) }
+    #[cfg(not(windows))] { apply(window,settings) }
+}
 pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),String> {
+    apply_size(window,settings,#[cfg(windows)] None)
+}
+fn apply_size(window: &tauri::WebviewWindow, settings: &Settings, #[cfg(windows)] requested: Option<((u32,u32),(u32,u32))>) -> Result<(),String> {
     let list=configured_monitors(window,settings);
     let p=&settings.placement;
     let Some(monitor)=selected(&list,settings) else { let _=window.hide(); return Ok(()); };
-    let (width,height)=widget_size(window);
+    #[cfg(not(windows))] let (width,height)=widget_size(window);
+    #[cfg(windows)] let ((width,height),frame)=match requested {
+        Some((inner,frame))=>((inner.0.saturating_add(frame.0),inner.1.saturating_add(frame.1)),frame),
+        None=>(widget_size(window),window_frame(window)?),
+    };
     #[cfg(target_os="linux")] let margin=edge_margin(1.);
     #[cfg(not(target_os="linux"))] let margin=edge_margin(monitor.scale);
     #[cfg(target_os="linux")] let margin=if settings.position!="Free" {margin.max(settings.linux.margin.clamp(0,64) as u32)} else {margin};
+    #[cfg(not(windows))]
     let clipped=(width.min(monitor.width.saturating_sub(2*margin).max(1)),height.min(monitor.height.saturating_sub(2*margin).max(1)));
+    #[cfg(windows)] let (clipped,clipped_inner)=windows_size((width.saturating_sub(frame.0),height.saturating_sub(frame.1)),frame,(monitor.width,monitor.height),margin);
     if clipped!=(width,height) {
         // A size request is a minimum: on X11 it would pin the window at this height for good.
         #[cfg(target_os="linux")] { use gtk::prelude::*;if let Ok(gtk)=window.gtk_window() {if linux::layered() {gtk.set_size_request(clipped.0 as i32,clipped.1 as i32);} else {gtk.resize(clipped.0 as i32,clipped.1 as i32);}} }
-        #[cfg(not(target_os="linux"))] {let _=window.set_size(tauri::PhysicalSize::new(clipped.0,clipped.1));}
+        #[cfg(windows)] {window.set_size(tauri::PhysicalSize::new(clipped_inner.0,clipped_inner.1)).map_err(|e|e.to_string())?;}
+        #[cfg(not(any(target_os="linux",windows)))] {let _=window.set_size(tauri::PhysicalSize::new(clipped.0,clipped.1));}
     }
     let (width,height)=clipped;
     let (xr,yr)=if settings.position=="Free" { (p.x_ratio,p.y_ratio) } else { (if settings.position.ends_with("left") {0.} else {1.},if settings.position.starts_with("Top") {0.} else {1.}) };
-    let x=inset_position(xr,monitor.width,width,margin,&p.snap);
-    let y=inset_position(yr,monitor.height,height,margin,&p.snap);
+    #[cfg(windows)] let x=windows_inset_position(xr,monitor.width,width,margin,&p.snap);
+    #[cfg(windows)] let y=windows_inset_position(yr,monitor.height,height,margin,&p.snap);
+    #[cfg(not(windows))] let x=inset_position(xr,monitor.width,width,margin,&p.snap);
+    #[cfg(not(windows))] let y=inset_position(yr,monitor.height,height,margin,&p.snap);
     #[cfg(target_os="linux")] {
         if linux::layered() { linux::place(window,&settings.linux,&monitor.name,monitor.x+x,monitor.y+y); if !window.is_visible().unwrap_or(false) { let _=window.show(); } return Ok(()); }
     }
@@ -121,6 +158,18 @@ pub fn watch(app: tauri::AppHandle) {
 #[cfg(test)] mod tests {
     use super::*;
     fn monitor(name:&str,primary:bool)->Monitor {Monitor{name:name.into(),x:0,y:0,width:1920,height:1080,primary,scale:1.,..Default::default()}}
+    #[test] fn windows_requested_size_includes_frame_and_clips_inner_size() {
+        let (outer,inner)=windows_size((474,800),(18,10),(1920,1080),10);
+        assert_eq!(outer,(492,810));
+        assert_eq!(inner,(474,800));
+        assert_eq!(windows_inset_position(1.,1920,outer.0,10,"off"),1418);
+        let (outer,inner)=windows_size((1900,1100),(18,10),(1920,1080),10);
+        assert_eq!(inner,(1900,1060));
+        assert_eq!(outer,(1918,1070));
+        assert_eq!(windows_inset_position(1.,1920,outer.0,10,"off"),10);
+        assert_eq!(inner.0+18,outer.0);
+        assert_eq!(inner.1+10,outer.1);
+    }
     #[test]
     fn laptop_layer_surface_stays_inside_panel_workarea() {
         // 1536x960 output, 34px top panel, GTK logical units at DPI 1.
