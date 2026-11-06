@@ -101,6 +101,8 @@ export function layoutControls(root, getDraft, getProviders, update, getSnapshot
             ...ids.map(id => [id, providerNames[id] || id])]
             .map(([ value, label ]) => new Option(label, value)));
     select.value = draft.featuredProvider || 'legacy';
+    select.disabled = ['landscape', 'pill'].includes(draft.shape);
+    select.setAttribute('aria-describedby', 'featured-hint');
     const round = ['circle', 'pill'].includes(draft.shape);
     const visible = orderedProviders(getSnapshot().filter(p => ids.includes(p.id) &&
         !hiddenStates.has(String(p.state).toUpperCase())), draft);
@@ -126,6 +128,9 @@ export function layoutControls(root, getDraft, getProviders, update, getSnapshot
     else if (['landscape', 'pill'].includes(draft.shape))
       hint += ' This shape uses list order; featured selection and Top / Bottom have no effect.';
     field.querySelector('#featured-hint').textContent = hint;
+    const position = field.querySelector('#featured-position');
+    position.disabled = draft.shape !== 'portrait' || shown.length % 2 === 0;
+    position.setAttribute('aria-describedby', 'featured-hint');
     field.querySelector('#featured-position').value =
         draft.featuredPosition || 'bottom';
     document.querySelector('#reactor-motion').checked =
