@@ -240,7 +240,7 @@
 /* Portrait spends its scale on content, then ends at the intrinsic last row.
    The old budget remains only an overflow ceiling for the existing fit pass. */
 :root[data-shape=portrait] #widget.widget:has(#provider-onboarding[hidden]){height:auto;max-height:var(--portrait-height-limit,100%)}
-:root[data-shape=portrait] .widget .provider-list{height:auto;flex:0 0 auto;grid-auto-rows:max-content;align-items:start;align-content:start;overflow:hidden}
+:root[data-shape=portrait] .widget .provider-list{height:auto;flex:0 0 auto;grid-auto-rows:max-content;align-items:start;align-content:start;overflow:auto}
 :root[data-shape=portrait] .widget .provider-card:nth-child(n){height:auto;min-height:0;max-height:var(--portrait-card-limit);align-self:start;overflow:hidden}
 :root[data-shape=portrait] .widget .provider-heading{min-height:0}
 :root[data-shape=portrait] #widget .provider-card:nth-child(n) .windows{flex:0 0 auto;align-content:start}
@@ -265,3 +265,7 @@
 :root[data-shape=portrait][data-micro-shape=true] .widget .quote-content {display:flex}
 :root[data-shape=portrait][data-micro-shape=true] .widget :is(.quote-label,.quote-author,.quote-reason) {display:none}
 :root[data-shape=portrait][data-micro-shape=true] .widget .quote-source {font-size:max(var(--shape-min-font),var(--size-font-small))}
+
+/* Keep the footer visible even when Portrait uses the micro type tier. */
+:root[data-shape=portrait] #widget.widget .footer{display:flex;height:auto;min-height:max(var(--size-footer),1.5em);font-size:max(var(--shape-min-font),var(--size-font-small))}
+:root[data-shape=portrait] .widget .footer span{min-width:0;overflow-wrap:anywhere}
