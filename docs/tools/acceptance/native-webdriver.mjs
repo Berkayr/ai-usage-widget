@@ -97,7 +97,10 @@ async function geometry(name) {
     if (await execute("return document.querySelector('#widget').getBoundingClientRect().bottom<=innerHeight+1")) break;
     await new Promise(r=>setTimeout(r,100));
   }
-  const native = await asyncScript(`(async()=>{
+  let native, dom;
+  // X11 reports a new size only after the window manager has applied it.
+  for (let tries=0;tries<30;tries++) {
+  native = await asyncScript(`(async()=>{
     const invoke=window.__TAURI_INTERNALS__.invoke;
     const size=await invoke('plugin:window|outer_size',{label:'main'});
     const inner=await invoke('plugin:window|inner_size',{label:'main'});
@@ -105,9 +108,12 @@ async function geometry(name) {
     const dpi=await invoke('plugin:window|scale_factor',{label:'main'});
     return {size,inner,position,dpi};
   })()`);
-  const dom = await execute(`const shell=document.querySelector('#widget').getBoundingClientRect();return {marks:document.querySelectorAll('.provider-card,.dial-value').length,shape:document.documentElement.dataset.shape,width:innerWidth,height:innerHeight,shell:shell.toJSON(),overflow:[...document.querySelectorAll('.provider-card')].filter(el=>getComputedStyle(el).visibility!=='hidden').some(el=>{const r=el.getBoundingClientRect();return r.right>shell.right+1||r.bottom>shell.bottom+1||r.left<shell.left-1||r.top<shell.top-1}),screen:{width:screen.width,height:screen.height}};`);
-  assert(Math.abs(native.inner.width/native.dpi-dom.width)<3, 'Native width disagrees with DOM viewport');
-  assert(Math.abs(native.inner.height/native.dpi-dom.height)<3, 'Native height disagrees with DOM viewport');
+  dom = await execute(`const shell=document.querySelector('#widget').getBoundingClientRect();return {marks:document.querySelectorAll('.provider-card,.dial-value').length,shape:document.documentElement.dataset.shape,width:innerWidth,height:innerHeight,shell:shell.toJSON(),overflow:[...document.querySelectorAll('.provider-card')].filter(el=>getComputedStyle(el).visibility!=='hidden').some(el=>{const r=el.getBoundingClientRect();return r.right>shell.right+1||r.bottom>shell.bottom+1||r.left<shell.left-1||r.top<shell.top-1}),screen:{width:screen.width,height:screen.height}};`);
+  if (Math.abs(native.inner.width/native.dpi-dom.width)<3 && Math.abs(native.inner.height/native.dpi-dom.height)<3) break;
+  await new Promise(r=>setTimeout(r,100));
+  }
+  assert(Math.abs(native.inner.width/native.dpi-dom.width)<3, `Native width disagrees with DOM viewport: ${name} ${native.inner.width}/${native.dpi} vs ${dom.width}`);
+  assert(Math.abs(native.inner.height/native.dpi-dom.height)<3, `Native height disagrees with DOM viewport: ${name} ${native.inner.height}/${native.dpi} vs ${dom.height}`);
   assert(dom.marks>0,'Fictional quota marks missing; empty-window geometry is insufficient');
   assert.equal(dom.shape, name.split('-')[0]);
   if(['circle','square'].includes(dom.shape)) assert(Math.abs(native.inner.width-native.inner.height)<=3,`Fixed shape native window is not square: ${native.inner.width}x${native.inner.height}`);
