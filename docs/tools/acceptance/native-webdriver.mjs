@@ -92,6 +92,11 @@ async function save() {
 async function geometry(name) {
   await new Promise(r=>setTimeout(r,350));
   await selectWindow("document.querySelector('#gear')");
+  // The window manager applies the fitted height asynchronously after a save.
+  for (let tries=0;tries<30;tries++) {
+    if (await execute("return document.querySelector('#widget').getBoundingClientRect().bottom<=innerHeight+1")) break;
+    await new Promise(r=>setTimeout(r,100));
+  }
   const native = await asyncScript(`(async()=>{
     const invoke=window.__TAURI_INTERNALS__.invoke;
     const size=await invoke('plugin:window|outer_size',{label:'main'});
@@ -107,7 +112,7 @@ async function geometry(name) {
   assert.equal(dom.shape, name.split('-')[0]);
   if(['circle','square'].includes(dom.shape)) assert(Math.abs(native.inner.width-native.inner.height)<=3,`Fixed shape native window is not square: ${native.inner.width}x${native.inner.height}`);
   assert(!dom.overflow,'Native provider cards clipped');
-  assert(dom.shell.right<=dom.width+1 && dom.shell.bottom<=dom.height+1,'Widget outside real window');
+  assert(dom.shell.right<=dom.width+1 && dom.shell.bottom<=dom.height+1,`Widget outside real window: ${name} shell ${dom.shell.right}x${dom.shell.bottom} in ${dom.width}x${dom.height}`);
   assert(native.size.width>0 && native.size.height>0,'Missing outer window size');
   assert(native.position.x>=-1 && native.position.y>=-1,'Widget outside screen origin');
   assert(native.position.x+native.size.width<=dom.screen.width*native.dpi+3,'Outer window exceeds screen width');
