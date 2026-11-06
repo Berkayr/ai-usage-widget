@@ -222,6 +222,9 @@ fn get_monitor_scale(window: tauri::WebviewWindow) -> Result<f64, String> { wind
 fn height_cap(current: u32, max_css_px: Option<f64>, factor: f64) -> Option<u32> {
     max_css_px.filter(|h|h.is_finite()).map(|h|(h.max(1.0)*factor).round() as u32).filter(|&h|current>h)
 }
+// X11 applies a resize later, so inner_size can still report the previous one.
+// Last requested (width, height); a zero height means the user owns it.
+static REQUESTED_SIZE: std::sync::Mutex<(u32,u32)> = std::sync::Mutex::new((0,0));
 #[tauri::command]
 fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<f64>, max_height_css_px: Option<f64>, onboarding: Option<bool>) -> Result<(), String> {
     shape_region::set_onboarding(&window, onboarding.unwrap_or(false));
@@ -230,11 +233,14 @@ fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<
     // the same fitted box used by the frontend and settings map.
     let factor = window.scale_factor().map_err(|e|e.to_string())?;
     let old = window.inner_size().map_err(|e|e.to_string())?;
-    let cap = height_cap(old.height, max_height_css_px, factor);
+    let requested_height = REQUESTED_SIZE.lock().map_err(|e|e.to_string())?.1;
+    let current_height = if requested_height > 0 { requested_height } else { old.height };
+    let cap = height_cap(current_height, max_height_css_px, factor);
     #[cfg(target_os = "linux")]
     if linux::layered() { return linux::resize_layer(&window, Some((width_css_px.unwrap_or(340.0 * scale).clamp(1.0, 10000.0)).round() as i32), cap.map(|h| h as f64 / factor)); }
-    let height = cap.unwrap_or(old.height);
+    let height = cap.unwrap_or(current_height);
     let width=(width_css_px.unwrap_or(340.0*scale).clamp(1.0,10000.0)*factor).round() as u32;
+    *REQUESTED_SIZE.lock().map_err(|e|e.to_string())? = (width, if requested_height > 0 || cap.is_some() { height } else { 0 });
     window.set_size(tauri::PhysicalSize::new(width,height)).map_err(|e|e.to_string())?;
     let settings=settings_window::current(); placement::apply(&window, &settings)?;
     Ok(())
@@ -242,15 +248,23 @@ fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<
 #[tauri::command]
 fn fit_window_height(window: tauri::WebviewWindow, height_css_px: f64) -> Result<(), String> {
     let settings = settings_window::current();
-    if !settings.fit_height && settings.size_mode != "screen" && settings.shape == Shape::Portrait { return Ok(()); }
+    if !settings.fit_height && settings.size_mode != "screen" && settings.shape == Shape::Portrait {
+        REQUESTED_SIZE.lock().map_err(|e|e.to_string())?.1 = 0;
+        return Ok(());
+    }
     #[cfg(target_os = "linux")]
     if linux::layered() { return linux::resize_layer(&window, None, Some(height_css_px)); }
     let factor=window.scale_factor().map_err(|e|e.to_string())?;
     // Shared placement caps the configured work area, including manual overrides.
     let height=(height_css_px.max(1.0)*factor).round() as u32;
     let old_size=window.inner_size().map_err(|e|e.to_string())?;
-    if (old_size.height as i64 - height as i64).abs() <= 1 { return Ok(()); }
-    window.set_size(tauri::PhysicalSize::new(old_size.width,height)).map_err(|e|e.to_string())?;
+    let mut requested=REQUESTED_SIZE.lock().map_err(|e|e.to_string())?;
+    let current=if requested.1 > 0 { requested.1 } else { old_size.height };
+    if (current as i64 - height as i64).abs() <= 1 { return Ok(()); }
+    let width=if requested.0 > 0 { requested.0 } else { old_size.width };
+    *requested=(width,height);
+    drop(requested);
+    window.set_size(tauri::PhysicalSize::new(width,height)).map_err(|e|e.to_string())?;
     placement::apply(&window, &settings_window::current())
 }
 #[tauri::command]
