@@ -37,7 +37,7 @@ export function fitUsage(root) {
   }
   // The scale changes geometry, but readable text has a physical 11px floor.
   for (const el of root.closest('.widget').querySelectorAll('*')) {
-    if (document.documentElement.dataset.readableSize === 'true' && [...el.childNodes].some(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()) && parseFloat(getComputedStyle(el).fontSize) < 11) {
+    if (document.documentElement.dataset.readableSize === 'true' && [...el.childNodes].some(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()) && parseFloat(getComputedStyle(el).fontSize) > 0 && parseFloat(getComputedStyle(el).fontSize) < 11) {
       if (!el.hasAttribute('data-usage-font')) el.dataset.usageFont = el.style.fontSize;
       el.style.fontSize = '11px';
     }
@@ -109,7 +109,7 @@ function compactCard(card) {
   card.dataset.usageCompact = 'true';
   settleCardRounding(card);
   if (!overflows(card)) return;
-  const texts = [...card.querySelectorAll('*')].filter(el => [...el.childNodes].some(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()));
+  const texts = [...card.querySelectorAll('*')].filter(el => [...el.childNodes].some(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()) && parseFloat(getComputedStyle(el).fontSize) > 0);
   const sizes = texts.map(el => parseFloat(getComputedStyle(el).fontSize));
   for (const el of texts) el.dataset.usageFont = el.style.fontSize;
   // Existing small labels keep their authored size; newly reduced text stops at 11px.
