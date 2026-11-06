@@ -105,7 +105,7 @@ async function geometry(name) {
   assert(Math.abs(native.inner.height/native.dpi-dom.height)<3, 'Native height disagrees with DOM viewport');
   assert(dom.marks>0,'Fictional quota marks missing; empty-window geometry is insufficient');
   assert.equal(dom.shape, name.split('-')[0]);
-  if(['circle','square'].includes(dom.shape)) assert(Math.abs(native.inner.width-native.inner.height)<=3,'Fixed shape native window is not square');
+  if(['circle','square'].includes(dom.shape)) assert(Math.abs(native.inner.width-native.inner.height)<=3,`Fixed shape native window is not square: ${native.inner.width}x${native.inner.height}`);
   assert(!dom.overflow,'Native provider cards clipped');
   assert(dom.shell.right<=dom.width+1 && dom.shell.bottom<=dom.height+1,'Widget outside real window');
   assert(native.size.width>0 && native.size.height>0,'Missing outer window size');
