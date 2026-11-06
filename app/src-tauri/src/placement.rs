@@ -77,7 +77,8 @@ pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),St
     #[cfg(target_os="linux")] let margin=if settings.position!="Free" {margin.max(settings.linux.margin.clamp(0,64) as u32)} else {margin};
     let clipped=(width.min(monitor.width.saturating_sub(2*margin).max(1)),height.min(monitor.height.saturating_sub(2*margin).max(1)));
     if clipped!=(width,height) {
-        #[cfg(target_os="linux")] { use gtk::prelude::*;if let Ok(gtk)=window.gtk_window() {gtk.set_size_request(clipped.0 as i32,clipped.1 as i32);if !linux::layered() {gtk.resize(clipped.0 as i32,clipped.1 as i32);}} }
+        // A size request is a minimum: on X11 it would pin the window at this height for good.
+        #[cfg(target_os="linux")] { use gtk::prelude::*;if let Ok(gtk)=window.gtk_window() {if linux::layered() {gtk.set_size_request(clipped.0 as i32,clipped.1 as i32);} else {gtk.resize(clipped.0 as i32,clipped.1 as i32);}} }
         #[cfg(not(target_os="linux"))] {let _=window.set_size(tauri::PhysicalSize::new(clipped.0,clipped.1));}
     }
     let (width,height)=clipped;
