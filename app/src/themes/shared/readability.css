@@ -61,3 +61,7 @@
 :root[data-theme=dot-matrix][data-shape=portrait][data-readable-size=true] .widget .window-bottom {font-size:max(var(--shape-min-font),.75rem)}
 :root[data-theme=dot-matrix] .widget .dot-bar {width:100%;height:auto;min-height:.5rem;flex-wrap:nowrap;justify-content:space-between;background:color-mix(in srgb,var(--textSecondary) 22%,var(--bgCard));border-radius:.5rem;padding:.125rem 0}
 :root[data-theme=dot-matrix] .widget .dot-bar i:not(.on) {background:color-mix(in srgb,var(--textSecondary) 38%,var(--bgCard))}
+
+/* Quota labels stay whole: when the value does not fit beside one, it moves to the next line. */
+.widget .window-top{flex-wrap:wrap}
+.widget .window-top>span{white-space:nowrap}
