@@ -33,6 +33,25 @@ class CoreTests(unittest.TestCase):
         self.assertEqual(set(record), {"id", "label", "plan", "state", "source", "captured_at", "last_success_at", "stale", "error", "windows", "category", "meters", "experimental", "auth"})
         self.assertIsNone(record["windows"][0]["used_percent"])
 
+    def test_atomic_json_retries_permission_error_and_cleans_up_on_failure(self):
+        path = Path(self.temp.name) / "retry.json"
+        data = {"ready": True}
+        real_replace = os.replace
+        attempts = 0
+        def fail_once_then_replace(source, destination):
+            nonlocal attempts
+            attempts += 1
+            if attempts == 1:
+                raise PermissionError("busy")
+            return real_replace(source, destination)
+        with mock.patch("quotacore.paths.os.replace", side_effect=fail_once_then_replace):
+            atomic_json(path, data)
+        self.assertEqual(json.loads(path.read_text(encoding="utf-8")), data)
+        with mock.patch("quotacore.paths.os.replace", side_effect=PermissionError("busy")):
+            with self.assertRaises(PermissionError):
+                atomic_json(path, data)
+        self.assertEqual(list(path.parent.glob("retry.json.*.tmp")), [])
+
     def test_claude_429_preserves_previous_without_zero(self):
         prev = provider_record("claude", "Claude Code", state="OK", source="statusline",
                                windows=[{"id": "five", "label": "5 hour", "used_percent": 42.0}])

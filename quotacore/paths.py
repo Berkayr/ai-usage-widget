@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -84,7 +85,14 @@ def atomic_json(path: Path, data: Any) -> None:
             handle.write("\n")
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temporary, path)
+        for attempt in range(11):
+            try:
+                os.replace(temporary, path)
+                break
+            except PermissionError:
+                if attempt == 10:
+                    raise
+                time.sleep(0.1)
     finally:
         try:
             os.unlink(temporary)
