@@ -109,7 +109,7 @@ async function geometry(name) {
     return {size,inner,position,dpi};
   })()`);
   dom = await execute(`const shell=document.querySelector('#widget').getBoundingClientRect();return {marks:document.querySelectorAll('.provider-card,.dial-value').length,shape:document.documentElement.dataset.shape,width:innerWidth,height:innerHeight,shell:shell.toJSON(),overflow:[...document.querySelectorAll('.provider-card')].filter(el=>getComputedStyle(el).visibility!=='hidden').some(el=>{const r=el.getBoundingClientRect();return r.right>shell.right+1||r.bottom>shell.bottom+1||r.left<shell.left-1||r.top<shell.top-1}),screen:{width:screen.width,height:screen.height}};`);
-  if (Math.abs(native.inner.width/native.dpi-dom.width)<3 && Math.abs(native.inner.height/native.dpi-dom.height)<3) break;
+  if (Math.abs(native.inner.width/native.dpi-dom.width)<3 && Math.abs(native.inner.height/native.dpi-dom.height)<3 && (!['circle','square'].includes(dom.shape) || Math.abs(native.inner.width-native.inner.height)<=3)) break;
   await new Promise(r=>setTimeout(r,100));
   }
   assert(Math.abs(native.inner.width/native.dpi-dom.width)<3, `Native width disagrees with DOM viewport: ${name} ${native.inner.width}/${native.dpi} vs ${dom.width}`);
