@@ -2,6 +2,25 @@
 
 From the repository root:
 
+## Acceptance suite
+
+Run the bounded control and behavior checks with:
+
+```sh
+node docs/tools/acceptance/run.mjs
+```
+
+Run the exhaustive browser matrices once before a public release with:
+
+```sh
+node docs/tools/acceptance/run.mjs --full
+```
+
+Both modes use synthetic fixtures and never launch the native app or read real
+settings. Native window geometry, Windows Explorer/taskbar behavior, autostart
+integration and compositor hit-testing remain desktop acceptance items until
+the WebDriver CI job is available.
+
 ```sh
 node docs/tools/screenshots.mjs
 ```
@@ -410,3 +429,30 @@ Every published gallery (themes, sizes, scale, palettes, states, system, Mono an
 Portrait size audits now treat `widgetHeight` as a ceiling and check exact width; fixed-height shapes retain the ±2 px equality check. `portrait-gap-check.mjs` independently checks intrinsic content spacing, clipping and overlaps.
 
 Circle endpoint collision checks compare actual center text ranges, rather than the larger `.dial-safe` layout wrapper. Square featured ordering is checked independently of the Portrait-only featured card class.
+
+
+The acceptance runner exports `SKIP_AUDIT_SCREENSHOTS=1`, preserving tracked
+settings screenshots, and prints elapsed seconds for each command. Full sweeps
+use deterministic pairwise arrays **within each theme** for size, theme identity,
+provider identity, contrast, usage fit, screen fit and portrait gaps. Every theme × shape ×
+size triple remains covered where those axes exist; palette, provider count,
+appearance, quote and placement values remain represented, including every pair
+of factor values. Dedicated reported-case and boundary checks remain exhaustive.
+`node --test tests/pairwise.mjs` verifies the covering-array contract. The full
+runner has not been rerun to certify its total wall time; the target is about
+25 minutes, not a measured guarantee.
+
+`ci.yml` runs native acceptance on Ubuntu 24.04/Xvfb/X11, then Windows with a
+matching Edge driver, using `tauri-driver` 2.1.0 and a debug build containing the
+frontend. Each native job has a 15-minute timeout. The dependency-free W3C client
+is `acceptance/native-webdriver.mjs`; it refuses to launch outside CI. It uses
+fictional snapshots, a temporary HOME and an explicit debug-only config override
+because Windows known-folder APIs ignore HOME/APPDATA environment overrides.
+All shapes/sizes, Portrait Fit fractions, disabled Fit modes, actual native outer
+bounds, disk Save, restart and autostart are asserted. Screenshots, geometry JSON
+and driver logs are uploaded even on failure. Windows taskbar strip is a native
+GDI HWND, so `taskbar-window.ps1` checks/captures it through Win32 rather than a
+WebDriver DOM. Wayland layer-shell remains outside this X11 CI coverage. Native
+jobs are prepared but have not been dispatched or verified locally.
+
+Reference: [Tauri native WebDriver CI](https://v2.tauri.app/develop/tests/webdriver/ci/).

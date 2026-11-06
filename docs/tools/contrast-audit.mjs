@@ -1,12 +1,15 @@
 // npm --prefix app run build; node docs/tools/contrast-audit.mjs
 // CHROME_BIN may point to Chromium/Edge. Set CHROME_NO_SANDBOX=1 only in an
 // already isolated environment whose user namespace sandbox is unavailable.
+import {pairwise} from './pairwise.mjs';
 import { auditSettings } from './settings-contrast-audit.mjs';
 import { sizePresets } from '../../app/src/sizing.js';
 import { browser } from './browser-harness.mjs';
 const session=await browser();
 try {
   await session.navigate('/?sample','window.__AI_USAGE_DEMO__');
+  const themes=await session.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>({id:t.id,palettes:Object.keys(t.palettes)}))');
+  const cases=themes.flatMap(theme=>pairwise({sizePreset:Object.keys(sizePresets),shape:['portrait','landscape','square','circle','pill'],widthIndex:[0,1,2],palette:theme.palettes,appearance:['light','dark'],colorMode:['calm','vivid','mono']}).map(row=>({...row,theme:theme.id,widthIndex:row.shape==='portrait'?row.widthIndex:0})));
   const total={combinations:0,texts:0,arcLabels:0,failures:[]};
   for(const sizePreset of Object.keys(sizePresets)) for(const shape of ['portrait','landscape','square','circle','pill']) for(const width of (shape==='portrait'?[200,340,600]:[shape==='landscape'?680:shape==='pill'?480:340])) {
   await session.cdp('Emulation.setDeviceMetricsOverride',{width:Math.round(width*sizePresets[sizePreset]/100),height:Math.ceil(1400*sizePresets[sizePreset]/100),deviceScaleFactor:1,mobile:false});
@@ -18,6 +21,7 @@ try {
     const contrast=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
     const failures=[];let combinations=0,texts=0,arcLabels=0;
     for(const theme of api.themes.filter(t=>!${JSON.stringify(process.env.AUDIT_THEMES?.split(',') || null)} || ${JSON.stringify(process.env.AUDIT_THEMES?.split(',') || null)}.includes(t.id)))for(const palette of Object.keys(theme.palettes).filter(p=>!${JSON.stringify(process.env.AUDIT_PALETTES?.split(',') || null)} || ${JSON.stringify(process.env.AUDIT_PALETTES?.split(',') || null)}.includes(p)))for(const appearance of ['light','dark'])for(const colorMode of ['calm','vivid','mono']) {
+      if(!${JSON.stringify(cases)}.some(row=>row.theme===theme.id&&row.palette===palette&&row.appearance===appearance&&row.colorMode===colorMode&&row.shape===${JSON.stringify(shape)}&&row.sizePreset===${JSON.stringify(sizePreset)}&&row.widthIndex===${shape==='portrait'?[200,340,600].indexOf(width):0}))continue;
       await api.setSettings({sizePreset:${JSON.stringify(sizePreset)},fineTune:100,quoteEnabled:true,shape:${JSON.stringify(shape)},theme:theme.id,palette,appearance,colorMode,widgetOpacity:100,backgroundOpacity:100,accent:null,background:null});combinations++;
       const toggle=document.querySelector('#quote .quote-toggle');
       if(['circle','square'].includes(${JSON.stringify(shape)})&&document.documentElement.dataset.quotePage!=='true'){toggle.click();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}

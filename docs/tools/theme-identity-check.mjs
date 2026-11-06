@@ -1,3 +1,4 @@
+import {pairwise} from './pairwise.mjs';
 import {auditPaletteIdentity} from './palette-identity-check.mjs';
 import { auditLayoutVariants } from './layout-variants.mjs';
 import { auditQuotes } from './quote-check.mjs';
@@ -12,7 +13,7 @@ try {
   await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
   const palettes = await auditPaletteIdentity(b); if(palettes.failures.length) { console.table(palettes.failures); process.exitCode=1; }
   const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
-  for(const shape of shapes.filter(s=>!process.env.AUDIT_SHAPES||process.env.AUDIT_SHAPES.split(',').includes(s))) for(const theme of themes) for(const sizePreset of Object.keys(sizePresets)) for(const count of [1,2,3,4,5,6]) for(const appearance of ['dark','light']) for(const page of (shape==='square'&&count>4?[0,1]:[0])) {
+  for(const theme of themes) for(const {shape,sizePreset,count,appearance} of pairwise({shape:shapes.filter(s=>!process.env.AUDIT_SHAPES||process.env.AUDIT_SHAPES.split(',').includes(s)),sizePreset:Object.keys(sizePresets),count:[1,2,3,4,5,6],appearance:['dark','light']})) for(const page of (shape==='square'&&count>4?[0,1]:[0])) {
     const settings={shape,theme,sizePreset,fineTune:100,fitHeight:true,appearance};
     const scale=sizePresets[sizePreset]/100;
     await b.cdp('Emulation.setDeviceMetricsOverride',{width:Math.round(widgetWidth(settings,count)*scale),height:Math.ceil(widgetHeight(settings,count)*scale)+10,deviceScaleFactor:1,mobile:false});

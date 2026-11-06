@@ -46,7 +46,7 @@ def read_sample(group):
             'processes': processes}
 
 
-def measure(binary, enabled, duration):
+def measure(binary, enabled, duration, monitor=None):
     unit = f'ai-usage-footprint-{os.getpid()}-{os.urandom(4).hex()}.scope'
     with tempfile.TemporaryDirectory(prefix='ai-usage-footprint-') as tmp:
         root = Path(tmp)
@@ -67,7 +67,7 @@ def measure(binary, enabled, duration):
         cli.write_text('#!/bin/sh\nexit 1\n')
         cli.chmod(0o700)
         (root / 'config/ai-usage/settings.json').write_text(json.dumps({
-            'linux': {'layer': 'bottom'}, 'position': 'Top right'}))
+            'linux': {'layer': 'bottom', 'monitor': int(monitor) if monitor and monitor.isdigit() else monitor}, 'position': 'Top right'}))
         allowed = ('DISPLAY', 'WAYLAND_DISPLAY', 'XDG_RUNTIME_DIR', 'DBUS_SESSION_BUS_ADDRESS',
                    'XDG_SESSION_TYPE', 'GDK_BACKEND', 'LANG', 'XAUTHORITY')
         env = {key: os.environ[key] for key in allowed if key in os.environ}
@@ -90,7 +90,7 @@ def measure(binary, enabled, duration):
             resources = binary.parent / 'quotacore'
             if not resources.is_dir():
                 resources = ROOT / 'quotacore'
-            product = json.loads((ROOT / 'app/src-tauri/tauri.conf.json').read_text())['productName']
+            product = json.loads((ROOT / 'app/src-tauri/tauri.conf.json').read_text())['mainBinaryName']
             destination = root / 'lib' / product / 'quotacore'
             shutil.copytree(resources, destination, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
         command = ['systemd-run', '--user', '--scope', f'--unit={unit}', '-p', 'MemoryMax=1500M',
@@ -135,6 +135,7 @@ def measure(binary, enabled, duration):
                           'idle_voluntary_switches_delta_surviving_processes': switches,
                           'idle_median': {k: statistics.median(s[k] for s in stable) for k in ('memory_bytes', 'rss_bytes', 'pss_bytes')},
                           'samples': samples}
+                result['budget_failures'] = budget_failures(result, binary.suffix.lower() == '.appimage')
                 return result
             finally:
                 subprocess.run(['systemctl', '--user', 'stop', unit], capture_output=True)
@@ -145,12 +146,27 @@ def measure(binary, enabled, duration):
                     child.wait()
 
 
+def budget_failures(result, appimage=False):
+    failures = []
+    for key, value, limit in (
+        ('idle CPU percent', result['idle_cpu_percent'], 0.1),
+        ('first render seconds', result['first_render_seconds'], 5),
+        ('idle cgroup bytes', result['idle_median']['memory_bytes'], 250 * 1024**2),
+    ):
+        if key == 'idle cgroup bytes' and appimage:
+            continue
+        if value > limit:
+            failures.append(f'{key}: {value} > {limit}')
+    return failures
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', action='append', type=Path, help='Repeat for debug/release/AppImage')
     parser.add_argument('--duration', type=int, default=180)
     parser.add_argument('--scenario', choices=('both', 'off', 'on'), default='both')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--monitor', help='Linux connector name or legacy index')
     args = parser.parse_args()
     if args.duration < 40:
         parser.error('At least 40 seconds required (30 second warmup)')
@@ -163,12 +179,15 @@ def main():
     results = []
     for binary in binaries:
         for enabled in ([False, True] if args.scenario == 'both' else [args.scenario == 'on']):
-            result = measure(binary.resolve(strict=True), enabled, args.duration)
+            result = measure(binary.resolve(strict=True), enabled, args.duration, args.monitor)
             results.append(result)
             print(json.dumps({k: v for k, v in result.items() if k != 'samples'}), flush=True)
             if args.output:
                 args.output.parent.mkdir(parents=True, exist_ok=True)
                 args.output.write_text(json.dumps(results, indent=2) + '\n')
+
+    if any(result['budget_failures'] for result in results):
+        raise SystemExit(1)
 
 
 if __name__ == '__main__':

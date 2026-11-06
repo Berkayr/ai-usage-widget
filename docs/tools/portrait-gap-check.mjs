@@ -1,5 +1,6 @@
 // Offline synthetic portrait spacing audit; baseline mode records failures without failing.
 import {mkdir, writeFile} from 'node:fs/promises';
+import {pairwise} from './pairwise.mjs';
 import {browser} from './browser-harness.mjs';
 import {normalizeSize,fittedGeometry,sizePresets} from '../../app/src/sizing.js';
 const output=process.env.AUDIT_OUTPUT || 'gorevler/portrait-gap';
@@ -8,8 +9,9 @@ const b=await browser(),results=[];
 try {
  await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
  const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
- for(const [width,height] of [[1536,960],[1920,1080]])for(const theme of themes.filter(t=>!process.env.AUDIT_THEMES||process.env.AUDIT_THEMES.split(',').includes(t)))for(const count of [1,2,3].filter(n=>!process.env.AUDIT_COUNTS||process.env.AUDIT_COUNTS.split(',').includes(String(n))))for(const featured of [false,true])for(const quoteEnabled of [false,true])for(const choice of [...Object.keys(sizePresets),1,.75,.5,1/3]) {
+ for(const theme of themes.filter(t=>!process.env.AUDIT_THEMES||process.env.AUDIT_THEMES.split(',').includes(t)))for(const {width,count,featured,quoteEnabled,choice} of pairwise({width:[1536,1920],count:[1,2,3].filter(n=>!process.env.AUDIT_COUNTS||process.env.AUDIT_COUNTS.split(',').includes(String(n))),featured:[false,true],quoteEnabled:[false,true],choice:[...Object.keys(sizePresets),1,.75,.5,1/3]})) {
   if(process.env.AUDIT_CHOICES&&!process.env.AUDIT_CHOICES.split(',').includes(String(choice)))continue;
+  const height=width===1536?960:1080;
   const monitor={width,height,scale:1.25,primary:true};
   const settings=normalizeSize({theme,shape:'portrait',sizePreset:typeof choice==='string'?choice:'Medium',fineTune:100,sizeMode:typeof choice==='number'?'screen':'fixed',fitFraction:typeof choice==='number'?choice:1,fitFineTune:100,quoteEnabled,fitHeight:true,appearance:'dark',featuredProvider:featured?'claude':'none',featuredPosition:'top',position:'Top right',linux:{margin:12}});
   const box=fittedGeometry(settings,count,monitor);

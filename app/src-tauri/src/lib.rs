@@ -69,7 +69,14 @@ fn snapshot_path() -> PathBuf {
     #[cfg(target_os = "windows")] { return std::env::var_os("LOCALAPPDATA").map(PathBuf::from).unwrap_or_else(|| dirs::data_local_dir().unwrap_or_else(|| dirs::home_dir().unwrap())).join("quotacore").join("snapshot.json"); }
     #[cfg(not(target_os = "windows"))] { std::env::var_os("XDG_STATE_HOME").map(PathBuf::from).unwrap_or_else(|| dirs::home_dir().unwrap().join(".local").join("state")).join("quotacore").join("snapshot.json") }
 }
-fn settings_path() -> PathBuf { dirs::config_dir().unwrap_or_else(|| dirs::home_dir().unwrap()).join("ai-usage").join("settings.json") }
+fn settings_path() -> PathBuf {
+    // Windows known folders ignore HOME/APPDATA overrides; isolate debug CI explicitly.
+    #[cfg(debug_assertions)]
+    if let Some(root) = std::env::var_os("AI_USAGE_TEST_CONFIG_HOME") {
+        return PathBuf::from(root).join("ai-usage/settings.json");
+    }
+    dirs::config_dir().unwrap_or_else(|| dirs::home_dir().unwrap()).join("ai-usage").join("settings.json")
+}
 fn window_path() -> PathBuf { settings_path().parent().unwrap().join("window.json") }
 fn read_snapshot() -> Option<Value> { fs::read(snapshot_path()).ok().and_then(|bytes| serde_json::from_slice(&bytes).ok()) }
 const COLLECTOR_TIMEOUT: u64 = 120;
@@ -352,6 +359,19 @@ pub fn run() {
 #[cfg(test)]
 mod settings_tests {
     use super::*;
+    #[cfg(debug_assertions)]
+    #[test]
+    fn debug_config_override_is_isolated_from_known_folders() {
+        let key = "AI_USAGE_TEST_CONFIG_HOME";
+        let previous = std::env::var_os(key);
+        let root = std::env::temp_dir().join("fictional-acceptance-config");
+        std::env::set_var(key, &root);
+        let actual = settings_path();
+        if let Some(value) = previous { std::env::set_var(key, value); }
+        else { std::env::remove_var(key); }
+        assert_eq!(actual, root.join("ai-usage/settings.json"));
+    }
+
     #[test]
     fn full_settings_json_preserves_every_key_and_value() {
         let mut fixture: serde_json::Value = serde_json::from_str(include_str!("../../../docs/tools/fixtures/full-settings.json")).unwrap();

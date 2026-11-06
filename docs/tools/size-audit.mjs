@@ -1,5 +1,6 @@
 // Production render path, fictional data, no native application or credentials.
 import { writeFile } from 'node:fs/promises';
+import {pairwise} from './pairwise.mjs';
 import { browser } from './browser-harness.mjs';
 import { shapes, sizePresets, normalizeSize, widgetWidth, widgetHeight } from '../../app/src/sizing.js';
 if(shapes.join(',')!=='portrait,landscape,square,circle,pill')throw Error('Five-shape audit contract');
@@ -8,7 +9,7 @@ try {
   await b.navigate('/?sample', 'window.__AI_USAGE_DEMO__');
   const themes = await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
   const rows = [];
-  for (const quoteEnabled of [false,true]) for (const shape of shapes) for (const theme of themes) for (const sizePreset of Object.keys(sizePresets)) for (const count of [0,1,3,6]) {
+  for (const theme of themes) for (const {quoteEnabled,shape,sizePreset,count} of pairwise({quoteEnabled:[false,true],shape:shapes,sizePreset:Object.keys(sizePresets),count:[0,1,3,6]})) {
     const settings = normalizeSize({shape,theme,sizePreset,fineTune:100,quoteEnabled});
     const factor = settings.scale / 100;
     const width = widgetWidth(settings,count)*factor, height = widgetHeight(settings,count)*factor;

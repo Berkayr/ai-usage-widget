@@ -1,5 +1,6 @@
 // Offline production renderer: every screen fraction, shape, theme and card count.
 import {mkdir, writeFile} from 'node:fs/promises';
+import {pairwise} from './pairwise.mjs';
 import {browser} from './browser-harness.mjs';
 import {normalizeSize, fittedGeometry, shapes} from '../../app/src/sizing.js';
 import {displays} from './fixtures/work-areas.mjs';
@@ -12,7 +13,13 @@ try {
  const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
  for(const monitor of displays) {
   if(process.env.AUDIT_DISPLAYS && !process.env.AUDIT_DISPLAYS.split(',').includes(monitor.name))continue;
-  for(const theme of themes.filter(t=>!process.env.AUDIT_THEMES||process.env.AUDIT_THEMES.split(',').includes(t)))for(const shape of shapes.filter(s=>!process.env.AUDIT_SHAPES||process.env.AUDIT_SHAPES.split(',').includes(s)))for(const fitFraction of [1,.75,.5,1/3])for(const quoteEnabled of [false,true])for(const count of [1,2,3]) {
+  for(const theme of themes.filter(t=>!process.env.AUDIT_THEMES||process.env.AUDIT_THEMES.split(',').includes(t))) {
+  const selectedShapes=shapes.filter(s=>!process.env.AUDIT_SHAPES||process.env.AUDIT_SHAPES.split(',').includes(s));
+  const samples=pairwise({shape:selectedShapes,fitFraction:[1,.75,.5,1/3],quoteEnabled:[false,true],count:[1,2,3]});
+  // Keep the reported KDE Portrait case even if the covering array omits it.
+  if(theme==='system' && selectedShapes.includes('portrait') && !samples.some(row=>row.shape==='portrait'&&row.fitFraction===1&&row.count===3&&row.quoteEnabled))
+    samples.push({shape:'portrait',fitFraction:1,count:3,quoteEnabled:true});
+  for(const {shape,fitFraction,quoteEnabled,count} of samples) {
    const settings=normalizeSize({theme,shape,sizeMode:'screen',fitFraction,fitFineTune:100,quoteEnabled,position:'Top right',linux:{margin:12},fitHeight:true,appearance:'dark',featuredProvider:'auto',featuredPosition:'top'});
    const geometry=fittedGeometry(settings,count,monitor,monitor.platform);
    const unit=monitor.platform==='windows'?monitor.scale:1;
@@ -42,6 +49,7 @@ try {
    if(monitor.name==='KDE 1200p 125%'&&theme==='system'&&shape==='portrait'&&fitFraction===1&&count===3&&quoteEnabled) {
     const png=await b.cdp('Page.captureScreenshot',{format:'png'});await writeFile(`${output}/screen-fit-portrait.png`,Buffer.from(png.data,'base64'));
    }
+  }
   }
   console.log(`${monitor.name}: ${cases} cases, ${failures.length} failures`);
   await writeFile(`${output}/screen-fit-results.json`,JSON.stringify({cases,failures},null,2)+'\n');
