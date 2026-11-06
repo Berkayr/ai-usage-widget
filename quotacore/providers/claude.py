@@ -136,8 +136,9 @@ def _read_cache() -> tuple[dict[str, Any] | None, str | None]:
 
 
 def _success(source: str, data: dict[str, Any], plan: str | None = None) -> dict[str, Any]:
-    windows = data.get("windows") if source == "statusline" else _usage_windows(data)
-    captured = data.get("captured_at") if source == "statusline" else iso_now()
+    normalized = source in ("statusline", "cache")
+    windows = data.get("windows") if normalized else _usage_windows(data)
+    captured = data.get("captured_at") if normalized else iso_now()
     return provider_record("claude", LABEL, plan=plan, state="OK", source=source,
                            captured_at=captured, last_success_at=iso_now(), windows=windows)
 

@@ -54,6 +54,19 @@ class CoreTests(unittest.TestCase):
             result = claude.read()
         self.assertEqual(result["state"], "AUTH_REQUIRED")
 
+    def test_claude_cache_preserves_normalized_windows_and_capture_time(self):
+        captured = "2026-11-06T10:00:00+00:00"
+        cached = {"windows": [{"id": "five", "label": "5 hour", "used_percent": 42.0}],
+                  "captured_at": captured, "plan": None}
+        with mock.patch.object(claude, "detect", return_value=True), \
+             mock.patch.object(claude, "_oauth", return_value={}), \
+             mock.patch.object(claude, "_live", return_value=(None, "AUTH_REQUIRED", "offline")), \
+             mock.patch.object(claude, "_read_observation", return_value=(None, None)), \
+             mock.patch.object(claude, "_read_cache", return_value=(cached, "cache")):
+            result = claude.read()
+        self.assertEqual(result["windows"], cached["windows"])
+        self.assertEqual(result["captured_at"], captured)
+
     def test_claude_http_429_records_retry_after_without_token_output(self):
         failure = urllib.error.HTTPError("https://service.invalid/usage", 429, "limited",
                                          {"Retry-After": "37"}, io.BytesIO())
