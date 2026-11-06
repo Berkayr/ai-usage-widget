@@ -177,7 +177,20 @@ try {
     assert.equal((await save()).fitFraction,Number(fraction));
     await geometry(`portrait-fit-${fraction}`);
   }
-  await openSettings();await click('[data-category="about"]');await click('#start-at-login');await save();
+  await openSettings();await click('[data-category="appearance"]');
+  await execute("[...document.querySelectorAll('#palette-tools button')].find(button=>button.textContent==='New palette').click()");
+  const palettes=(await save()).userPalettes;
+  assert.equal(palettes?.length,1,'Custom palette did not reach disk through real IPC');
+  console.log('PASS: custom palette saved through the real settings window');
+  await selectWindow("document.querySelector('#gear')");
+  await execute("document.querySelector('#widget').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:40,clientY:40}))");
+  assert.equal(await execute("return document.querySelector('#context-menu').hidden"),false,'Context menu did not open');
+  await click('#refresh');
+  await execute("document.querySelector('#widget').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:40,clientY:40}))");
+  await click('#menu-settings');
+  await selectWindow('window.__SETTINGS_READY__');
+  console.log('PASS: context menu Refresh now and Settings work natively');
+  await click('[data-category="about"]');await click('#start-at-login');await save();
   assert.equal(await asyncScript("window.__TAURI_INTERNALS__.invoke('get_autostart')"),true);
   await click('#start-at-login');await save();
   assert.equal(await asyncScript("window.__TAURI_INTERNALS__.invoke('get_autostart')"),false);
