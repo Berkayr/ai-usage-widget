@@ -40,7 +40,7 @@ fn test_position() -> Option<(f64, f64)> {
     (x.is_finite() && y.is_finite()).then_some((x, y))
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn open_settings(app: tauri::AppHandle) -> Result<(), String> {
     if let Some(window) = app.get_webview_window("settings") {
         if !window.is_visible().map_err(|e| e.to_string())? {
