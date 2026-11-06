@@ -24,11 +24,15 @@ export function fitUsage(root) {
   // Recompute from authored styles after viewport, theme, quote or font changes.
   root.style.removeProperty('grid-template-rows');
   root.style.setProperty('--portrait-growth', 0);
+  root.style.removeProperty('flex-shrink');
   root.style.removeProperty('padding-bottom');
   for (const card of cards) {
     delete card.dataset.usageCompact;
     card.style.removeProperty('padding-bottom');
-    if (document.documentElement.dataset.shape === 'portrait') card.style.removeProperty('min-height');
+    if (document.documentElement.dataset.shape === 'portrait') {
+      card.style.removeProperty('min-height');
+      card.style.removeProperty('max-height');
+    }
     if (document.documentElement.dataset.shape === 'portrait') for (const ring of card.querySelectorAll('.ring-display')) ring.style.removeProperty('height');
   }
   // The scale changes geometry, but readable text has a physical 11px floor.
@@ -46,14 +50,25 @@ export function fitUsage(root) {
   } else {
     root.style.removeProperty('--portrait-card-limit');
   }
+  cards.forEach(fitPortraitGraphics);
+  cards.forEach(compactCard);
+  // Spend the existing compact tier before scrolling a long Portrait list.
+  if (document.documentElement.dataset.shape === 'portrait' && overflows(root.closest('.widget'))) {
+    cards.forEach(card => { card.dataset.usageCompact = 'true'; });
+    cards.forEach(compactCard);
+  }
+  cards.forEach(fitPortraitGraphics);
+  // Once text reaches its floor, preserve the card and scroll the list.
+  if (document.documentElement.dataset.shape === 'portrait') {
+    cards.filter(overflows).forEach(card => { card.style.maxHeight = 'none'; });
+  }
+  if (document.documentElement.dataset.shape === 'portrait' && overflows(root.closest('.widget'))) root.style.flexShrink = '1';
+  growPortraitContent(root, cards);
   // Fractional rem budgets can round scrollHeight up while clientHeight rounds down.
   // Remove that rounding debt from trailing space, preserving every card's height.
   const debt = root.scrollHeight - root.clientHeight;
   const padding = parseFloat(getComputedStyle(root).paddingBottom);
   if (debt > 0 && debt <= padding) root.style.paddingBottom = `${padding - debt}px`;
-  cards.forEach(fitPortraitGraphics);
-  cards.forEach(compactCard);
-  growPortraitContent(root, cards);
   fitHeader(root.closest('.widget'));
 }
 

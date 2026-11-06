@@ -19,9 +19,11 @@ try {
     await b.cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
     console.log(await b.evaluate(`(async()=>{
       const api=window.__AI_USAGE_DEMO__,assert=(v,s)=>{if(!v)throw Error(s)},$=s=>document.querySelector(s);
+      // Match the native monitor cap; the viewport may still be externally narrowed.
+      await api.setWorkArea([{width:1920,height:${height}+24,scale:1,primary:true}]);
       const snapshot={generated_at:new Date().toISOString(),providers:Array.from({length:12},(_,i)=>({id:'synthetic-'+i,label:'Provider '+(i+1),state:'OK',windows:[{kind:'session',used_percent:33},{kind:'weekly',used_percent:42}]}))};
       for(const fitHeight of [true,false]) {
-        await api.setSettings({theme:'system',appearance:'dark',fitHeight});
+        await api.setSettings({theme:'system',appearance:'dark',linux:{margin:12},fitHeight});
         for(const value of [null,{providers:[]},snapshot,{providers:[]},snapshot]) {
           await api.setSnapshot(value,!value);
           assert(document.querySelectorAll('#widget').length===1,'Duplicate widget');
@@ -32,11 +34,14 @@ try {
           const list=$('#providers');list.scrollTop=0;
           const header=$('.header').getBoundingClientRect(),first=cards[0].getBoundingClientRect(),box=list.getBoundingClientRect(),footer=$('.footer').getBoundingClientRect();
           assert(header.bottom<=first.top+.5,'Header overlaps first card');
+          assert(footer.height>0,'Footer hidden');
           assert(box.bottom<=footer.top+.5,'List overlaps footer');
           assert(footer.bottom<=innerHeight+.5,'Footer outside viewport');
-          assert(list.scrollHeight>list.clientHeight,'Long content is not scrollable');
-          list.scrollTop=list.scrollHeight;
-          assert(list.scrollTop>0,'Cannot reach long content');
+          if(list.scrollHeight>list.clientHeight+1) {
+            assert(/auto|scroll/.test(getComputedStyle(list).overflowY),'Long content is not scrollable');
+            list.scrollTop=list.scrollHeight;
+            assert(list.scrollTop>0,'Cannot reach long content');
+          }
           assert($('.header').getBoundingClientRect().bottom<=box.top+.5,'Header moved into list');
           const last=cards[cards.length-1].getBoundingClientRect();
           assert(last.bottom<=box.bottom+.5&&last.bottom>box.top,'Last card inaccessible');
@@ -51,6 +56,6 @@ try {
       assert(!$('.no-data'),'noData flag overrode existing providers');
       return 'PASS: ${width} × ${height}, fit on/off, empty ↔ cards, header/footer bounds, scroll to last card';
     })()`));
-    if(width===340&&height===960){const png=await b.cdp('Page.captureScreenshot',{format:'png'});await writeFile('docs/tools/widget-layout-preview.png',Buffer.from(png.data,'base64'));}
+    if(width===340&&height===960){const png=await b.cdp('Page.captureScreenshot',{format:'png'});await writeFile('gorevler/widget-layout-preview.png',Buffer.from(png.data,'base64'));}
   }
 }finally{await b.close();}

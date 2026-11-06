@@ -1,4 +1,5 @@
 import { browser } from '../browser-harness.mjs';
+import { portraitManyProviders } from './portrait-many-providers.mjs';
 
 const b = await browser();
 
@@ -529,8 +530,20 @@ try {
   })()`);
   executedRegressions.push({ name: 'user-palette-flow', result: resUserPaletteFlow });
 
+  // Native-sized Portrait with all supported provider counts and size choices.
+  await b.navigate('/?sample', 'window.__AI_USAGE_DEMO__');
+  try {
+    const rows = await portraitManyProviders(b);
+    const failures = rows.filter(row => row.errors.length);
+    if (failures.length) throw new Error(`${failures.length}/${rows.length} cases: ${JSON.stringify(failures[0])}`);
+    executedRegressions.push({ name: 'portrait-many-providers', result: `PASS: ${rows.length} capped native viewport cases` });
+  } catch (error) {
+    process.exitCode = 1;
+    executedRegressions.push({ name: 'portrait-many-providers', result: `FAIL: ${error.message}` });
+  }
+
   // Summary
-  console.log(`\n13 Named Regression Results:`);
+  console.log(`\n${executedRegressions.length} Named Regression Results:`);
   for (const reg of executedRegressions) {
     console.log(`  ${reg.result.startsWith('FAIL:') ? '✗' : '✓'} ${reg.name}: ${reg.result}`);
   }
