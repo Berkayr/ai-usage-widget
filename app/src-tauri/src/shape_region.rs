@@ -4,7 +4,12 @@ use std::sync::{Mutex, atomic::{AtomicBool, AtomicU64, Ordering}};
 static ONBOARDING: AtomicBool = AtomicBool::new(false);
 static RUNNING: AtomicBool = AtomicBool::new(false);
 static REVISION: AtomicU64 = AtomicU64::new(0);
-static LAST: Mutex<Option<(Shape,i32,i32)>> = Mutex::new(None);
+static LAST: Mutex<Option<(Shape,i32,i32,i32,i32)>> = Mutex::new(None);
+
+#[cfg(any(windows,test))]
+fn client_region_bounds(width: i32, height: i32, offset_x: i32, offset_y: i32) -> (i32,i32,i32,i32) {
+    (offset_x, offset_y, offset_x + width, offset_y + height)
+}
 
 // Scanline rectangles use pixel centers, so the boundary never captures transparent corners.
 #[cfg(any(target_os="linux",test))]
@@ -52,8 +57,16 @@ fn apply(window: &tauri::WebviewWindow) -> Result<(),String> {
     let (width,height)=(size.width as i32,size.height as i32);
     let _=size;
     if width<=1 || height<=1 {return Ok(());}
+    #[cfg(windows)]
+    let (offset_x,offset_y)={
+        let outer=window.outer_position().map_err(|e|e.to_string())?;
+        let inner=window.inner_position().map_err(|e|e.to_string())?;
+        (inner.x-outer.x,inner.y-outer.y)
+    };
+    #[cfg(not(windows))]
+    let (offset_x,offset_y)=(0,0);
     let mut last=LAST.lock().unwrap_or_else(|e|e.into_inner());
-    let key=(shape.clone(),width,height);
+    let key=(shape.clone(),width,height,offset_x,offset_y);
     if last.as_ref()==Some(&key) {return Ok(());}
     #[cfg(target_os="linux")]
     {
@@ -67,7 +80,8 @@ fn apply(window: &tauri::WebviewWindow) -> Result<(),String> {
     unsafe {
         use windows_sys::Win32::Graphics::Gdi::*;
         let hwnd=window.hwnd().map_err(|e|e.to_string())?.0 as _;
-        let region=match shape {Shape::Circle=>CreateEllipticRgn(0,0,width,height),Shape::Pill=>CreateRoundRectRgn(0,0,width+1,height+1,height,height),_=>std::ptr::null_mut()};
+        let (left,top,right,bottom)=client_region_bounds(width,height,offset_x,offset_y);
+        let region=match shape {Shape::Circle=>CreateEllipticRgn(left,top,right,bottom),Shape::Pill=>CreateRoundRectRgn(left,top,right+1,bottom+1,height,height),_=>std::ptr::null_mut()};
         if matches!(shape,Shape::Circle|Shape::Pill) && region.is_null(){return Err("Cannot create window region".into());}
         if SetWindowRgn(hwnd,region,1)==0 {if !region.is_null(){DeleteObject(region);}return Err("Cannot apply window region".into());}
         // Successful SetWindowRgn transfers ownership to the OS.
@@ -83,6 +97,11 @@ mod tests {
             assert!(effective_shape(shape.clone(), true) == Shape::Portrait);
             assert!(effective_shape(shape.clone(), false) == shape);
         }
+    }
+    #[test]
+    fn windows_region_bounds_cover_the_offset_client_rectangle() {
+        assert_eq!(client_region_bounds(425,425,9,5),(9,5,434,430));
+        assert_eq!(client_region_bounds(600,150,9,5),(9,5,609,155));
     }
     #[test]
     fn masks_follow_shape_and_dpi() {
