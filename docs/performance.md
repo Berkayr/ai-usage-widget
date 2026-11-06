@@ -155,8 +155,18 @@ acceptance task) were:
 | All providers disabled | 1.005 s | 0.01038% | 154.53 MiB |
 | Fictional passive Gemini | 1.005 s | 0.01001% | 157.48 MiB |
 
-Both recorded scenarios satisfy the new budgets. These historical numbers do
-not certify the current binary or an AppImage. Native measurement was forbidden
-locally for this task; current native performance remains unverified. The unit
+Both recorded scenarios satisfy the new budgets.
+
+Current measurement, Linux release binary on KDE Plasma 6 Wayland, 60 seconds per
+scenario, 2026-11-06:
+
+| Scenario | First render | Idle CPU, one core | Median cgroup memory | PSS |
+| --- | ---: | ---: | ---: | ---: |
+| All providers disabled | 1.007 s | 0.015% | 158.5 MiB | 263.4 MiB |
+| Fictional passive Gemini | 1.006 s | 0.015% | 164.4 MiB | 269.4 MiB |
+
+The same build as an AppImage with extract-and-run held 502 MiB of cgroup memory
+for two minutes with no growth: 163 MiB anonymous and 318 MiB of reclaimable file
+cache. The <150 MB memory target is still not met. The unit
 suite checks exact budget boundaries, failure above each boundary, AppImage
 memory handling and staging of resources/monitor before any process launch.
