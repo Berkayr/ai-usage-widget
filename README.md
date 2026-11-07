@@ -29,7 +29,7 @@ Pre-release: installers are coming with v0.1. Gallery values are fictional; prov
 Installers are coming with v0.1; no release is available yet.
 
 - **Linux (after v0.1):** `curl -fsSL https://raw.githubusercontent.com/Berkayr/ai-usage-widget/main/scripts/install.sh | sh` or download the `.deb` / `.rpm` / AppImage from GitHub Releases.
-- **Windows 10/11 (after v0.1):** Download `windows-x86_64-with-python-AI Usage_*_x64-setup.exe` from GitHub Releases, then choose **Next, Next, Finish**; no Python installation is needed. Windows may show SmartScreen because the installer is not signed yet: choose **More info**, then **Run anyway**.
+- **Windows 10/11 (after v0.1):** Download `windows-x86_64-with-python-AI Usage_*_x64-setup.exe` from GitHub Releases, then choose **Next, Next, Finish**; no Python installation is needed. Windows may show SmartScreen because the installer is not signed yet: choose **More info**, then **Run anyway**. If Smart App Control is on, Windows blocks unsigned installers and offers no such option, so the installer will not run until a signed build exists. Install one package type: mixing the NSIS `.exe` and the `.msi` creates two entries in Installed apps.
 - **Arch Linux:** AUR package availability is also coming with v0.1; recipe drafts only.
 
 Linux needs host Python 3.10+, provider CLIs and the appropriate GTK/WebKit runtime; AppImage also has host dependencies. Windows slim installers are for users who already have Python 3.10+. Provider tools are installed separately. See [packaging](packaging/README.md) before building or testing a package.
