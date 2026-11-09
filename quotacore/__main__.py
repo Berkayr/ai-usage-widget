@@ -113,7 +113,7 @@ def daemon(interval: int) -> int:
             result = write_snapshot()
             for record in result["providers"]:
                 key = record["id"]
-                if record["state"] in ("OK", "STALE"):
+                if record["state"] in ("OK", "STALE", "DISABLED"):
                     backoff[key] = 0
                 elif key == "claude" and record["state"] != "DISABLED" and PROVIDERS["claude"].RETRY_AFTER:
                     backoff[key] = min(1800, max(backoff[key], int(PROVIDERS["claude"].RETRY_AFTER)))
