@@ -7,6 +7,7 @@ import queue
 import shutil
 import subprocess
 import threading
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -44,25 +45,26 @@ def _command(exe: str) -> list[str] | str:
     return [exe, "app-server"]
 
 
-def _exchange(timeout: float = 20.0) -> dict[str, Any]:
+def _exchange(timeout: float = 20.0) -> tuple[dict[str, Any], Any | None]:
     process = subprocess.Popen(_command(_executable() or "codex"), stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                                text=True, encoding="utf-8", errors="replace", bufsize=1,
                                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-    responses: queue.Queue[dict[str, Any]] = queue.Queue()
+    responses: queue.Queue[dict[str, Any] | None] = queue.Queue()
 
     def reader() -> None:
         try:
             for line in process.stdout:
                 try:
                     message = json.loads(line)
-                    if isinstance(message, dict) and message.get("id") == 2:
+                    if isinstance(message, dict) and message.get("id") in (2, 3):
                         responses.put(message)
-                        return
                 except ValueError:
                     continue
         except (OSError, ValueError):
-            return
+            pass
+        finally:
+            responses.put(None)
 
     thread = threading.Thread(target=reader, daemon=True)
     try:
@@ -71,16 +73,32 @@ def _exchange(timeout: float = 20.0) -> dict[str, Any]:
             {"id": 1, "method": "initialize", "params": {"clientInfo": {"name": "quotacore", "version": "1"}}},
             {"method": "initialized", "params": {}},
             {"id": 2, "method": "account/rateLimits/read", "params": None},
+            {"id": 3, "method": "account/usage/read", "params": None},
         ]
         process.stdin.write("".join(json.dumps(item) + "\n" for item in messages))
         process.stdin.flush()
-        response = responses.get(timeout=timeout)
+        response = None
+        while response is None:
+            response = responses.get(timeout=timeout)
+        if response.get("id") != 2:
+            raise RuntimeError("Codex rate limits unavailable")
         if "error" in response:
             raise RuntimeError("Codex rate limits unavailable")
         result = response.get("result")
         if not isinstance(result, dict):
             raise ValueError("Invalid Codex response")
-        return result
+        history_response = None
+        try:
+            while history_response is None:
+                next_response = responses.get(timeout=5)
+                if next_response is None:
+                    break
+                if next_response.get("id") == 3:
+                    history_response = next_response
+        except queue.Empty:
+            pass
+        history_payload = history_response.get("result") if history_response and "error" not in history_response else None
+        return result, history_payload
     finally:
         try:
             process.kill()
@@ -95,6 +113,46 @@ def _exchange(timeout: float = 20.0) -> dict[str, Any]:
                 process.stdin.close()
             except OSError:
                 pass
+
+
+def history_from_usage(payload: Any) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+    raw_summary = payload.get("summary")
+    fields = {
+        "lifetime_tokens": "lifetimeTokens",
+        "peak_daily_tokens": "peakDailyTokens",
+        "current_streak_days": "currentStreakDays",
+        "longest_streak_days": "longestStreakDays",
+    }
+    summary = {}
+    if isinstance(raw_summary, dict):
+        for key, source in fields.items():
+            value = raw_summary.get(source)
+            summary[key] = value if isinstance(value, int) and not isinstance(value, bool) else None
+    else:
+        summary = {key: None for key in fields}
+
+    buckets = payload.get("dailyUsageBuckets")
+    daily = []
+    if isinstance(buckets, list):
+        for bucket in buckets:
+            if not isinstance(bucket, dict):
+                continue
+            day, tokens = bucket.get("startDate"), bucket.get("tokens")
+            try:
+                if not isinstance(day, str) or date.fromisoformat(day).isoformat() != day:
+                    continue
+            except ValueError:
+                continue
+            if not isinstance(tokens, int) or isinstance(tokens, bool) or tokens < 0:
+                continue
+            daily.append({"date": day, "tokens": tokens})
+    daily = daily[-30:]
+    if not daily and all(value is None for value in summary.values()):
+        return None
+    return {"scope": "account", "source": "app-server", "unit": "tokens",
+            "summary": summary, "daily": daily}
 
 
 def windows_from_response(payload: dict[str, Any]) -> tuple[list[dict[str, Any]], str | None]:
@@ -122,13 +180,17 @@ def read(prev: dict[str, Any] | None = None) -> dict[str, Any]:
     if not detect():
         return provider_record("codex", "OpenAI Codex", state="NOT_INSTALLED", error="Codex CLI not detected")
     try:
-        payload = _exchange()
+        payload, usage = _exchange()
         windows, plan = windows_from_response(payload)
         if not windows:
             return provider_record("codex", "OpenAI Codex", plan=plan, state="SCHEMA_CHANGED",
                                    source="app-server", error="No quota windows in app-server response")
-        return provider_record("codex", "OpenAI Codex", plan=plan, state="OK", source="app-server",
-                               captured_at=iso_now(), last_success_at=iso_now(), windows=windows)
+        record = provider_record("codex", "OpenAI Codex", plan=plan, state="OK", source="app-server",
+                                 captured_at=iso_now(), last_success_at=iso_now(), windows=windows)
+        history = history_from_usage(usage)
+        if history is not None:
+            record["history"] = history
+        return record
     except Exception as exc:
         error = "Codex app-server unavailable" if isinstance(exc, (OSError, subprocess.SubprocessError, queue.Empty)) else "Codex app-server returned invalid data"
         if prev and prev.get("windows"):
