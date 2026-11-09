@@ -59,12 +59,14 @@ Linux data: `$XDG_STATE_HOME/quotacore` or `~/.local/state/quotacore`. Linux con
   "interval": 300,
   "initialized": true,
   "providers": {
-    "claude": {"enabled": true, "order": 0},
+    "claude": {"enabled": true, "order": 0, "local_history": false},
     "codex": {"enabled": true, "order": 1},
     "gemini": {"enabled": false, "order": 2}
   }
 }
 ```
+
+Set `providers.claude.local_history` to `true` to add a 30-day usage summary from local Claude Code logs to the Claude snapshot. It defaults to off. The summary contains token counts, model names, local day/hour and machine-type aggregates, plus estimated Anthropic API price equivalents; it is not a subscription bill. If project logs sync between computers, their sessions are grouped by machine type; two computers of the same type cannot be distinguished. `python3 -m quotacore history [--json]` computes the summary once independently of this setting.
 
 The state directory contains `snapshot.json`, provider observations/caches, and optional [pace](pace.md) files. Local `secrets.json` may contain API keys under `openrouter`, `deepseek`, `zai`, `moonshot`, `siliconflow`, `openai_admin` and `anthropic_admin`; never include it in an issue or commit. Environment API keys take precedence.
 

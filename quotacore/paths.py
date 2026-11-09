@@ -59,6 +59,8 @@ def normalize_config(data: dict[str, Any], detect: dict[str, bool] | None = None
         # New providers always require explicit opt-in.
         default = False
         providers[key] = {"enabled": bool(item.get("enabled", default)), "order": int(item.get("order", index))}
+        if key == "claude" and item.get("local_history") is True:
+            providers[key]["local_history"] = True
     try:
         interval = max(30, int(data.get("interval", 300)))
     except (TypeError, ValueError):

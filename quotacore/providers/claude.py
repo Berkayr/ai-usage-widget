@@ -144,27 +144,58 @@ def _success(source: str, data: dict[str, Any], plan: str | None = None) -> dict
 
 
 def read(prev: dict[str, Any] | None = None) -> dict[str, Any]:
+    history_enabled = False
+    try:
+        from ..paths import load_config
+        history_enabled = load_config()["providers"].get("claude", {}).get("local_history") is True
+    except Exception:  # noqa: BLE001, S110
+        # History configuration failures must not interrupt quota collection.
+        pass
+
+    def with_history(record: dict[str, Any]) -> dict[str, Any]:
+        if not history_enabled:
+            record.pop("history", None)
+            return record
+        previous = (prev or {}).get("history")
+        if isinstance(previous, dict):
+            try:
+                computed = datetime.fromisoformat(previous["computed_at"].replace("Z", "+00:00"))
+                if (datetime.now(timezone.utc) - computed.astimezone(timezone.utc)).total_seconds() < 1800:
+                    record["history"] = previous
+                    return record
+            except (KeyError, ValueError, TypeError):
+                pass
+        try:
+            from ..local_history import claude_history
+            history = claude_history()
+            if history is not None:
+                record["history"] = history
+        except Exception:  # noqa: BLE001, S110
+            # Local history failures must not interrupt quota collection.
+            pass
+        return record
+
     if not detect():
-        return provider_record("claude", LABEL, state="NOT_INSTALLED", error="Claude Code not detected")
+        return with_history(provider_record("claude", LABEL, state="NOT_INSTALLED", error="Claude Code not detected"))
     auth = _oauth()
     plan = auth.get("subscriptionType") if isinstance(auth.get("subscriptionType"), str) else None
     live, state, error = _live()
     if live is not None:
         windows = _usage_windows(live)
         if windows:
-            return provider_record("claude", LABEL, plan=plan, state="OK", source="oauth-usage",
-                                   captured_at=iso_now(), last_success_at=iso_now(), windows=windows)
+            return with_history(provider_record("claude", LABEL, plan=plan, state="OK", source="oauth-usage",
+                                                captured_at=iso_now(), last_success_at=iso_now(), windows=windows))
         state, error = "SCHEMA_CHANGED", "Usage response contained no recognized quota windows"
     observation, _ = _read_observation()
     if observation:
-        return _success("statusline", observation, plan)
+        return with_history(_success("statusline", observation, plan))
     cache, cache_source = _read_cache()
     if cache and cache_source:
-        return _success(cache_source, cache, plan)
+        return with_history(_success(cache_source, cache, plan))
     if prev and prev.get("windows"):
         result = dict(prev)
         result.update(state=(state if state in ("AUTH_REQUIRED", "RATE_LIMITED") else "STALE"),
                       stale=True, error=safe_error(error or "No current quota source available"))
-        return result
-    return provider_record("claude", LABEL, plan=plan, state=state or "SOURCE_UNAVAILABLE",
-                           source=None, error=safe_error(error or "No quota source available"))
+        return with_history(result)
+    return with_history(provider_record("claude", LABEL, plan=plan, state=state or "SOURCE_UNAVAILABLE",
+                                        source=None, error=safe_error(error or "No quota source available")))
