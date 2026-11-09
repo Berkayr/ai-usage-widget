@@ -202,6 +202,8 @@ def main(argv: list[str] | None = None) -> int:
     quote_parser.add_argument("--mode", choices=("qotd", "born", "died", "on-this-day", "mixed"), default="qotd")
     quote_parser.add_argument("--json", action="store_true")
     sub.add_parser("snapshot")
+    history_parser = sub.add_parser("history", help="summarize local Claude Code token usage")
+    history_parser.add_argument("--json", action="store_true")
     write_parser = sub.add_parser("write")
     write_parser.add_argument("--print", dest="print_snapshot", action="store_true",
                               help="also print the written snapshot as JSON")
@@ -231,7 +233,22 @@ def main(argv: list[str] | None = None) -> int:
     pace_parser.add_argument("--no-log", action="store_true", help="skip history appends; still update pace state")
     pace_parser.add_argument("--purge", action="store_true", help="delete pace history and state without collecting")
     args = parser.parse_args(argv)
-    if args.command == "quote":
+    if args.command == "history":
+        from .local_history import claude_history
+        result = claude_history()
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        elif result is None:
+            print("No Claude Code usage found in the last 30 days.")
+        else:
+            totals = result["totals"]
+            print(f"30 days: {totals['tokens']:,} tokens; API price equivalent: ${totals['cost']:.2f}")
+            for machine in result["machines"]:
+                label = " (this computer)" if machine["id"] == result["this_machine"] else ""
+                cost = f"${machine['cost']:.2f}" if machine["cost"] is not None else "unpriced"
+                print(f"  {machine['id']}{label}: {machine['tokens']:,} tokens, {cost}")
+            print("Top models: " + ", ".join(f"{m['model']} ({m['tokens']:,})" for m in result["models"][:3]))
+    elif args.command == "quote":
         from .quote import daily_quote
         result = daily_quote(enabled=True, mode=args.mode)
         print(json.dumps(result) if args.json else "\n\n".join(c["quote"] + " — " + c["author"] + "\n" + c["reason"] + "\n" + c["source_url"] + " · " + c["license"] for c in result["cards"]) or result["status"])
