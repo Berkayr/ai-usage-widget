@@ -264,7 +264,7 @@ class CoreTests(unittest.TestCase):
         self.assertIsNone(jetbrains.parse_file(path))
 
     def test_registry_provider_metadata_and_missing_installation(self):
-        self.assertEqual(set(PROVIDERS), {"claude", "codex", "gemini", "copilot", "openrouter", "deepseek", "jetbrains"})
+        self.assertEqual(set(PROVIDERS), {"claude", "codex", "gemini", "copilot", "openrouter", "deepseek", "jetbrains", "zai", "moonshot", "siliconflow", "openai_admin", "anthropic_admin"})
         with mock.patch.object(copilot, "_gh", return_value=None): self.assertEqual(copilot.read()["state"], "NOT_INSTALLED")
         for module in PROVIDERS.values():
             self.assertTrue({"id", "label", "category", "auth", "experimental", "docs_url"} <= set(module.META))

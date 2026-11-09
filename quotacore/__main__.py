@@ -14,6 +14,7 @@ from .paths import atomic_json, config_dir, data_path, load_config
 from .providers import METADATA, PROVIDERS
 from .schema import provider_record, snapshot
 from .pace import calculate_pace, reset_events
+from .consent import DISCLOSURES
 
 
 
@@ -46,7 +47,11 @@ def collect() -> dict:
         if not config["initialized"] or not settings[key]["enabled"]:
             records.append(provider_record(key, meta["label"], state="DISABLED"))
         else:
-            records.append(PROVIDERS[key].read(previous.get(key)))
+            record = PROVIDERS[key].read(previous.get(key))
+            if record.get("stale") or record.get("state") == "STALE":
+                from .providers.common import estimate_expired_windows  # lazy: disabled runs load no adapter code
+                record = estimate_expired_windows(record)
+            records.append(record)
         records[-1].update(category=meta["category"], experimental=meta["experimental"], auth=meta["auth"])
     return snapshot(records)
 
@@ -210,7 +215,7 @@ def main(argv: list[str] | None = None) -> int:
     key_parser = sub.add_parser("key")
     key_sub = key_parser.add_subparsers(dest="key_command", required=True)
     for name in ("set", "clear"):
-        cmd = key_sub.add_parser(name); cmd.add_argument("provider", choices=("openrouter", "deepseek"))
+        cmd = key_sub.add_parser(name); cmd.add_argument("provider", choices=("openrouter", "deepseek", "zai", "moonshot", "siliconflow", "openai_admin", "anthropic_admin"))
     daemon_parser = sub.add_parser("daemon")
     daemon_parser.add_argument("--interval", type=int, default=None)
     hook_parser = sub.add_parser("hook")
@@ -249,16 +254,16 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(doctor(args.live), ensure_ascii=False, indent=2))
     elif args.command == "provider-config":
         detected, config = _config()
-        from .consent import DISCLOSURES
-        print(json.dumps({"detected": detected, "disclosures": DISCLOSURES, **config}))
+        disclosures = {key: DISCLOSURES[key] for key in PROVIDERS}
+        print(json.dumps({"detected": detected, "disclosures": disclosures, **config}))
     elif args.command in ("init", "configure"):
         detected, config = _config()
         selected = args.providers if args.command == "configure" else []
         if args.command == "init":
-            from .consent import DISCLOSURES
             print("Choose what to track. No provider is enabled until you finish.")
             for key in PROVIDERS:
-                answer = input(f"{key} ({'detected' if detected[key] else 'not detected'}): {DISCLOSURES[key]} Enable? [y/N] ")
+                disclosure = DISCLOSURES[key]
+                answer = input(f"{key} ({'detected' if detected[key] else 'not detected'}): {disclosure} Enable? [y/N] ")
                 if answer.strip().lower() in ("y", "yes"): selected.append(key)
         for key, item in config["providers"].items(): item["enabled"] = key in selected
         config["initialized"] = True

@@ -45,6 +45,11 @@ Implementation: [configuration](../quotacore/paths.py),
 | Copilot | `gh auth token` stdout, kept in process memory | Token to `api.github.com` |
 | OpenRouter | `OPENROUTER_API_KEY`, otherwise `openrouter` in local `secrets.json` | Key to `openrouter.ai` |
 | DeepSeek | `DEEPSEEK_API_KEY`, otherwise `deepseek` in local `secrets.json` | Key to `api.deepseek.com` |
+| Z.ai | `ZAI_API_KEY`, otherwise `zai` | Key to `api.z.ai` |
+| Moonshot | `MOONSHOT_API_KEY`, otherwise `moonshot` | Key to `api.moonshot.ai` |
+| SiliconFlow | `SILICONFLOW_API_KEY`, otherwise `siliconflow` | Key to `api.siliconflow.cn` |
+| OpenAI Admin | `OPENAI_ADMIN_KEY`, otherwise `openai_admin` | Admin key to `api.openai.com` |
+| Anthropic Admin | `ANTHROPIC_ADMIN_KEY`, otherwise `anthropic_admin` | Admin key to `api.anthropic.com` |
 | JetBrains | Quota XML in the platform JetBrains config directory | No credential read or network request |
 
 Direct HTTP calls are bodyless GETs to these fixed HTTPS URLs:
@@ -56,6 +61,11 @@ Direct HTTP calls are bodyless GETs to these fixed HTTPS URLs:
 | `https://openrouter.ai/api/v1/key` | Same common headers |
 | `https://openrouter.ai/api/v1/credits` | Same common headers |
 | `https://api.deepseek.com/user/balance` | Same common headers |
+| `https://api.z.ai/api/monitor/usage/quota/limit` | Bearer key |
+| `https://api.moonshot.ai/v1/users/me/balance` | Bearer key |
+| `https://api.siliconflow.cn/v1/user/info` | Bearer key |
+| `https://api.openai.com/v1/organization/costs` | Bearer organization admin key |
+| `https://api.anthropic.com/v1/organizations/cost_report` | Admin key and `anthropic-version` |
 
 [Provider adapters](../quotacore/providers/) reject HTTP redirects. They use normal
 system TLS verification, including the user's configured trust store and proxy
@@ -77,7 +87,7 @@ take ownership, and malware running as the same user can read these files.
 | Written locally | Contents / purpose |
 | --- | --- |
 | `config.json` | Provider consent, enabled flags, display ordering, interval |
-| `secrets.json` | Optional OpenRouter/DeepSeek keys, plaintext |
+| `secrets.json` | Optional OpenRouter, DeepSeek, Z.ai, Moonshot, SiliconFlow, OpenAI Admin and Anthropic Admin keys, plaintext |
 | `snapshot.json` | Plan labels, usage/balances, reset/capture times, source, state, error summaries |
 | `claude-observation.json`, `gemini-kota.json` | Quota fields extracted from explicitly supplied hooks or Gemini refresh |
 | `pace-log.jsonl`, `pace-state.json` | Usage timing, percentages, profiles, reset events and pacing state |

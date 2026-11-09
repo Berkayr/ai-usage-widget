@@ -43,7 +43,12 @@ METADATA = {'claude': {'id': 'claude',
                'category': 'credits',
                'auth': 'local-file',
                'experimental': False,
-               'docs_url': 'https://www.jetbrains.com/help/ai-assistant/licensing-and-subscriptions.html'}}
+               'docs_url': 'https://www.jetbrains.com/help/ai-assistant/licensing-and-subscriptions.html'},
+ 'zai': {'id':'zai','label':'Z.ai GLM Coding Plan','category':'subscription','auth':'api-key','experimental':True,'docs_url':'https://api.z.ai/'},
+ 'moonshot': {'id':'moonshot','label':'Moonshot / Kimi','category':'api-balance','auth':'api-key','experimental':True,'docs_url':'https://platform.moonshot.ai/docs/api/'} ,
+ 'siliconflow': {'id':'siliconflow','label':'SiliconFlow','category':'api-balance','auth':'api-key','experimental':True,'docs_url':'https://docs.siliconflow.cn/'},
+ 'openai_admin': {'id':'openai_admin','label':'OpenAI API spend','category':'api-balance','auth':'api-key','experimental':True,'docs_url':'https://platform.openai.com/docs/api-reference/organization/costs'},
+ 'anthropic_admin': {'id':'anthropic_admin','label':'Anthropic API spend','category':'api-balance','auth':'api-key','experimental':True,'docs_url':'https://docs.anthropic.com/en/api/admin/cost_report'}}
 
 class ProviderRegistry(Mapping):
     def __iter__(self):

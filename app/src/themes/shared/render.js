@@ -15,14 +15,14 @@ function meter(window, type) {
   const level = pct === null ? 'unknown' : severity(pct);
   const style = `--used:${pct ?? 0}%;--level:var(--severity${level === 'warning' ? 'Warning' : level === 'danger' ? 'Danger' : 'Normal'})`;
   const label = pct === null ? 'Usage unknown' : `${Math.round(pct)}% used`;
-  if (type === 'dot-matrix') return dots(pct);
+  if (type === 'dot-matrix') return dots(pct, window);
   if (type === 'system') return `<div class="meter ${pct === null ? 'unknown' : ''}" data-severity="${level}" style="${style}" role="img" aria-label="${label}"><i></i></div>`;
   const count = dotCount(), active = pct === null ? 0 : Math.round(pct * count / 100);
   return `<div class="segments ${type} ${pct === null ? 'unknown' : ''}" style="${style}" role="img" aria-label="${label}">${Array.from({length: count}, (_,i) => `<i class="${i < active ? `on ${pct >= 50 && i >= Math.floor(count / 2) - 1 ? 'threshold' : ''}` : ''}"></i>`).join('')}${type === 'minimal-pace' && elapsed !== null ? `<em style="left:${elapsed}%" title="${Math.round(elapsed)}% of interval elapsed"></em>` : ''}</div>`;
 }
 function row(window, type) {
   const pct = pctOf(window), elapsed = pace(window);
-  return `<div class="quota-window" data-kind="${esc(window.kind || 'quota')}"><div class="window-top"><span>${esc(document.documentElement.dataset.shape === 'pill' ? ({session:'5h',weekly:'W'}[window.kind] || shortWindowLabel(window)) : shortWindowLabel(window))}</span><b data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : `${Math.round(pct)}%`}</b></div>${meter(window,type)}<div class="window-bottom"><span class="pace" title="Usage compared with elapsed interval">${type === 'minimal-pace' ? (elapsed !== null && pct !== null ? `${pct - elapsed >= 0 ? '+' : ''}${Math.round(pct - elapsed)} pp<span class="pace-context"> vs elapsed</span>` : 'Pace unavailable') : ''}</span><span class="reset">${esc(countdown(window.resets_at))}</span></div></div>`;
+  return `<div class="quota-window" data-kind="${esc(window.kind || 'quota')}"><div class="window-top"><span>${esc(document.documentElement.dataset.shape === 'pill' ? ({session:'5h',weekly:'W'}[window.kind] || shortWindowLabel(window)) : shortWindowLabel(window))}</span><b data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : `${window.estimated ? '~' : ''}${Math.round(pct)}%`}</b></div>${meter(window,type)}<div class="window-bottom"><span class="pace" title="Usage compared with elapsed interval">${type === 'minimal-pace' ? (elapsed !== null && pct !== null ? `${pct - elapsed >= 0 ? '+' : ''}${Math.round(pct - elapsed)} pp<span class="pace-context"> vs elapsed</span>` : 'Pace unavailable') : ''}</span><span class="reset">${esc(countdown(window.resets_at))}</span></div></div>`;
 }
 function rings(windows) {
   const rank = w => w.kind === 'session' ? 0 : w.kind === 'weekly' ? 1 : 2;
@@ -43,7 +43,7 @@ export function createRenderer(type) {
       const windows = (Array.isArray(p.windows) ? p.windows : []).filter(w => showExtraWindows || !w.hidden_by_default);
       const badge = state !== 'OK' || p.stale ? `<span class="status-badge ${p.stale || state === 'STALE' ? 'stale' : state.toLowerCase()}">${esc(p.stale && state === 'OK' ? 'STALE' : state.replaceAll('_',' '))}</span>` : '';
       const name = providerNames[String(p.id).toLowerCase()] || p.label || p.id || 'Provider';
-      const meters = (Array.isArray(p.meters) ? p.meters : []).map(m => `<div class="balance-row"><span>${esc(m.label || 'Balance')}</span><b>${Number.isFinite(m.remaining) ? (m.unit === 'USD' ? '$'+m.remaining.toFixed(2) : `${esc(m.remaining)} ${esc(m.unit)}`) : '—'}</b></div>`).join('');
+      const meters = (Array.isArray(p.meters) ? p.meters : []).map(m => `<div class="balance-row"><span>${esc(m.label || 'Balance')}</span><b>${Number.isFinite(m.remaining) ? (m.unit === 'USD' ? '$'+m.remaining.toFixed(2) : `${esc(m.remaining)} ${esc(m.unit)}`) : Number.isFinite(m.used) ? (m.unit === 'USD' ? '$'+m.used.toFixed(2)+' used' : `${esc(m.used)} ${esc(m.unit)} used`) : '—'}</b></div>`).join('');
       return `<article class="provider-card ${p.stale ? 'is-stale' : ''}"><div class="provider-heading"><div><h2>${esc(name)}</h2>${p.plan ? `<span class="plan">${esc(p.plan)}</span>` : ''}</div>${badge}<small class="heading-reset">${esc(countdown(windows.find(w=>w.kind==='session')?.resets_at))}</small></div>${type === 'circular-rings' ? rings(windows) : ''}<div class="windows">${windows.map(w => row(w,type)).join('')}</div>${meters}${!windows.length && !meters ? '<div class="empty-window">Quota unavailable</div>' : ''}</article>`;
     }).join('') || `<div class="no-data"><strong>${noData ? 'NO DATA YET' : 'NO ACTIVE PROVIDERS'}</strong><small>${noData ? 'Waiting for quotacore snapshot' : 'Enable a provider in quotacore'}</small></div>`;
   };

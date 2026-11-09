@@ -54,11 +54,11 @@ def report(snapshot, providers=None, window="session", now=None):
             if w.get("hidden_by_default") or used is None:
                 continue
             used = max(0, min(100, used))
-            text = f"{used:.0f}%" if used is not None else "?"
+            text = ("~" if w.get("estimated") else "") + f"{used:.0f}%" if used is not None else "?"
             reset = remaining(w.get("resets_at"), now)
             label = str(w.get("label") or w.get("id") or "Quota").replace("\n", " ")
             line = f"{label}: {text} · {reset}"
-            all_windows.append({"label": label, "used_percent": used, "remaining": reset, "text": line, "kind": w.get("kind"), "hidden": bool(w.get("hidden_by_default"))})
+            all_windows.append({"label": label, "used_percent": used, "remaining": reset, "text": line, "kind": w.get("kind"), "hidden": bool(w.get("hidden_by_default")), "estimated": bool(w.get("estimated"))})
         selected = [w for w in all_windows if not w["hidden"] and (window == "both" and w["kind"] in ("session", "weekly") or w["kind"] == window)]
         bits = []
         for w in selected:
@@ -66,7 +66,7 @@ def report(snapshot, providers=None, window="session", now=None):
             if pct is not None:
                 percentages.append(pct)
             prefix = ("S " if w["kind"] == "session" else "W ") if window == "both" else ""
-            bits.append(prefix + (f"{pct:.0f}%" if pct is not None else "?") + " · " + w["remaining"])
+            bits.append(prefix + (("~" if w.get("estimated") else "") + f"{pct:.0f}%" if pct is not None else "?") + " · " + w["remaining"])
         compact = SHORT.get(key, key.upper()) + " " + (" / ".join(bits) or "?") + (" [stale]" if stale else "")
         label = LABELS.get(key) or str(p.get("label") or key).replace("\n", " ")
         rows.append({"id": key, "label": label, "short": SHORT.get(key, key.upper()), "plan": p.get("plan"), "percentage": max((w["used_percent"] for w in selected if w["used_percent"] is not None), default=None), "text": compact, "state": state, "stale": stale, "windows": all_windows})

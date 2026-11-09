@@ -36,7 +36,7 @@ function dialTrack(item, i, context) {
 function center(hero, count) {
   if (!hero) return `<div class="dial-safe"><strong class="dial-number">—</strong><div class="dial-name">${count?'ALL PROVIDERS':'NO ACTIVE PROVIDERS'}</div><small class="dial-reset">${count?'Select a featured provider':'Choose providers in Settings'}</small></div>`;
   const value = usage(hero.w), weekly = usage((hero.p.windows || []).find(w=>w.kind==='weekly'));
-  return `<div class="dial-safe"><strong class="dial-number">${value === null?'—':Math.round(value)+'%'}</strong><div class="dial-name">${esc(label(hero.p))}</div><small class="dial-weekly">Weekly ${weekly === null?'—':Math.round(weekly)+'%'}</small><small class="dial-reset">${esc(countdown(hero.w?.resets_at))}</small></div>`;
+  return `<div class="dial-safe"><strong class="dial-number">${value === null?'—':`${hero.w?.estimated?'~':''}${Math.round(value)}%`}</strong><div class="dial-name">${esc(label(hero.p))}</div><small class="dial-weekly">Weekly ${weekly === null?'—':`${(hero.p.windows || []).find(w=>w.kind==='weekly')?.estimated?'~':''}${Math.round(weekly)}%`}</small><small class="dial-reset">${esc(countdown(hero.w?.resets_at))}</small></div>`;
 }
 function quotaTracks(providers, items) {
   if (providers.length !== 1) return items;
@@ -57,7 +57,7 @@ export function renderRound(root, snapshot, settings) {
   const style = dialStyles[settings.theme] || dialStyles.system;
   const context = {style,settings,multi:providers.length>1,color};
   const core = settings.theme === 'reactor' ? '<div class="reactor-core" aria-hidden="true"></div>' : '';
-  const description = tracks.map(({p,w}) => `${label(p)} ${w?.kind || 'quota'} ${usage(w) ?? 'unknown'}%`).join(', ');
+  const description = tracks.map(({p,w}) => `${label(p)} ${w?.kind || 'quota'} ${w?.estimated?'~':''}${usage(w) ?? 'unknown'}%`).join(', ');
   const width = style.width * (settings.colorMode === 'vivid' ? 1.12 : 1);
   root.innerHTML = `<div class="dial">${core}<svg class="dial-rings" style="stroke-width:${width};stroke-linecap:${style.cap}" viewBox="0 0 340 340" role="img" aria-label="${esc(description)}">${tracks.map((item,i)=>dialTrack(item,i,context)).join('')}</svg>${arcLabels(tracks,color)}${center(hero,providers.length)}</div>`;
 }
@@ -85,6 +85,6 @@ function arcLabels(tracks, color) {
     if (!box) return '';
     placed.push(box);
     const value = usage(w);
-    return `<span class="dial-arc-label" data-provider="${esc(p.id)}" title="${esc(label(p))}" style="left:${(170+box.x)/3.4}%;top:${(170+box.y)/3.4}%;--identity:${color(p,w,i)}">${value===null?'—':Math.round(value)+'%'}</span>`;
+    return `<span class="dial-arc-label" data-provider="${esc(p.id)}" title="${esc(label(p))}" style="left:${(170+box.x)/3.4}%;top:${(170+box.y)/3.4}%;--identity:${color(p,w,i)}">${value===null?'—':`${w?.estimated?'~':''}${Math.round(value)}%`}</span>`;
   }).join('');
 }

@@ -32,7 +32,9 @@ def provider_record(provider_id: str, label: str, *, plan: str | None = None,
     defaults = {"claude": ("subscription", "local-file"), "codex": ("subscription", "cli-login"),
                 "gemini": ("subscription", "cli-login"), "copilot": ("credits", "cli-login"),
                 "openrouter": ("api-balance", "api-key"), "deepseek": ("api-balance", "api-key"),
-                "jetbrains": ("credits", "local-file")}
+                "jetbrains": ("credits", "local-file"), "zai": ("subscription", "api-key"),
+                "moonshot": ("api-balance", "api-key"), "siliconflow": ("api-balance", "api-key"),
+                "openai_admin": ("api-balance", "api-key"), "anthropic_admin": ("api-balance", "api-key")}
     default_category, default_auth = defaults.get(provider_id, ("subscription", "none"))
     return {"id": provider_id, "label": label, "plan": plan, "state": state,
             "source": source, "captured_at": captured_at, "last_success_at": last_success_at,
