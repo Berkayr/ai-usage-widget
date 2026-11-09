@@ -105,7 +105,7 @@ fn refresh() -> Result<(), String> { collector("write", &[]).map(|_| ()) }
 fn get_provider_config() -> Result<Value, String> { collector("provider-config", &[]) }
 #[tauri::command]
 fn configure_providers(app: tauri::AppHandle, providers: Vec<String>) -> Result<(), String> {
-    const IDS: &[&str] = &["claude", "codex", "gemini", "copilot", "openrouter", "deepseek", "jetbrains"];
+    const IDS: &[&str] = &["claude", "codex", "gemini", "copilot", "openrouter", "deepseek", "jetbrains", "zai", "moonshot", "siliconflow", "openai_admin", "anthropic_admin"];
     if providers.iter().any(|id| !IDS.contains(&id.as_str())) { return Err("Unknown provider".into()); }
     collector("configure", &providers)?;
     let _=app.emit("provider-config-changed", ());

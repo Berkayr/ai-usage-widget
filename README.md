@@ -145,8 +145,11 @@ See [configuration](docs/configuration.md) for every setting and environment ove
 | OpenRouter | Beta | API key usage and account credits |
 | DeepSeek API | Beta | Currency balances |
 | JetBrains AI | Beta | Local IDE quota/credit cache |
+| Z.ai GLM Coding Plan | Experimental | 5-hour and monthly quota windows |
+| Moonshot / Kimi, SiliconFlow | Experimental | API balance |
+| OpenAI API, Anthropic API | Experimental | This month's spend (admin key) |
 
-Stable marks recorded live-source checks; beta adapters still need live-account acceptance. [Sources, credentials and limitations](docs/providers.md) are documented per provider.
+Stable marks recorded live-source checks; beta adapters still need live-account acceptance; experimental adapters have not been tried with a real account. [Sources, credentials and limitations](docs/providers.md) are documented per provider.
 
 ## Platforms
 
@@ -168,7 +171,7 @@ The widget reads a local JSON snapshot. A separate Python collector calls the en
 
 ## Privacy & security
 
-First launch asks which providers to track; all providers stay disabled until you choose **Start**. CLI users run `quotacore init`. New providers default off. The widget reads a local snapshot. Collection can contact provider services using existing credentials: Claude's `~/.claude/.credentials.json`, Codex/agy CLI-managed authentication, GitHub CLI's token, or optional OpenRouter/DeepSeek API keys from environment variables or local `secrets.json`. JetBrains reads a local quota XML file.
+First launch asks which providers to track; all providers stay disabled until you choose **Start**. CLI users run `quotacore init`. New providers default off. The widget reads a local snapshot. Collection can contact provider services using existing credentials: Claude's `~/.claude/.credentials.json`, Codex/agy CLI-managed authentication, GitHub CLI's token, or API keys for OpenRouter, DeepSeek, Z.ai, Moonshot, SiliconFlow, OpenAI Admin and Anthropic Admin from environment variables or local `secrets.json`. JetBrains reads a local quota XML file.
 
 Requests retrieve usage or balances; the collector does not submit prompts or request model completions. It does not scan chat history. Passive panel reads make no network requests; explicit refresh runs the collector. There is no application telemetry or analytics code. Third-party CLIs retain their own networking behavior. Snapshots, observations and pace history stay local and can contain sensitive usage metadata; do not attach raw files to issues. See the [security model](docs/security-model.md) for credential destinations, plaintext key storage, process limits, retention and verification; [provider data boundaries](docs/providers.md) describe adapter support.
 

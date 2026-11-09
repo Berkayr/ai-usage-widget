@@ -66,7 +66,7 @@ Linux data: `$XDG_STATE_HOME/quotacore` or `~/.local/state/quotacore`. Linux con
 }
 ```
 
-The state directory contains `snapshot.json`, provider observations/caches, and optional [pace](pace.md) files. Local `secrets.json` may contain `openrouter` and `deepseek` keys; never include it in an issue or commit. Environment API keys take precedence.
+The state directory contains `snapshot.json`, provider observations/caches, and optional [pace](pace.md) files. Local `secrets.json` may contain API keys under `openrouter`, `deepseek`, `zai`, `moonshot`, `siliconflow`, `openai_admin` and `anthropic_admin`; never include it in an issue or commit. Environment API keys take precedence.
 
 | Environment variable | Purpose |
 | --- | --- |

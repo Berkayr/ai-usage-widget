@@ -7,4 +7,9 @@ DISCLOSURES = {
     "openrouter": "Reads OPENROUTER_API_KEY or local secrets.json; connects to openrouter.ai",
     "deepseek": "Reads DEEPSEEK_API_KEY or local secrets.json; connects to api.deepseek.com",
     "jetbrains": "Reads JetBrains quota XML under the platform config directory; no network",
+    "zai": "Reads ZAI_API_KEY or local secrets.json; connects to api.z.ai",
+    "moonshot": "Reads MOONSHOT_API_KEY or local secrets.json; connects to api.moonshot.ai",
+    "siliconflow": "Reads SILICONFLOW_API_KEY or local secrets.json; connects to api.siliconflow.cn",
+    "openai_admin": "Reads OPENAI_ADMIN_KEY or local secrets.json; connects to api.openai.com",
+    "anthropic_admin": "Reads ANTHROPIC_ADMIN_KEY or local secrets.json; connects to api.anthropic.com",
 }

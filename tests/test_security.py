@@ -62,7 +62,7 @@ class SecurityTests(unittest.TestCase):
         self.assertEqual(cli.doctor()["providers"][0]["state"], "DISABLED")
 
     def test_init_and_configure_persist_explicit_choices(self):
-        with mock.patch("builtins.input", side_effect=["y"] + ["n"]*6), contextlib.redirect_stdout(io.StringIO()):
+        with mock.patch("builtins.input", side_effect=["y"] + ["n"]*(len(PROVIDERS)-1)), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(cli.main(["init"]), 0)
         config = load_config()
         self.assertTrue(config["initialized"])

@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-IDS = ("claude", "codex", "gemini", "copilot", "openrouter", "deepseek", "jetbrains")
+IDS = ("claude", "codex", "gemini", "copilot", "openrouter", "deepseek", "jetbrains", "zai", "moonshot", "siliconflow", "openai_admin", "anthropic_admin")
 DEFAULT_ORDER = list(IDS)
 
 

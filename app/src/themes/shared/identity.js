@@ -1,10 +1,10 @@
 // Stable identities are shared by every shape and the settings preview.
-export const providerIds=['claude','codex','gemini','copilot','openrouter','deepseek','jetbrains'];
+export const providerIds=['claude','codex','gemini','copilot','openrouter','deepseek','jetbrains','zai','moonshot','siliconflow','openai_admin','anthropic_admin'];
 export function providerIndex(provider, fallback=0) {
   const index=providerIds.indexOf(String(provider?.id).toLowerCase());
   return index<0 ? fallback%providerIds.length : index;
 }
-export const identityPatterns=['','6 2','1 2','8 2 1 2','3 3','1 1 4 1','8 4'];
+export const identityPatterns=['','6 2','1 2','8 2 1 2','3 3','1 1 4 1','8 4','1 4 1','2 3 2','3 1 3','4 2','5 2'];
 export const identityColor=index=>`var(--provider-${index})`;
 export const validColor=value=>/^#[0-9a-f]{6}$/i.test(value||'');
 const rgb=hex=>hex.slice(1).match(/../g).map(v=>parseInt(v,16));
@@ -17,7 +17,7 @@ export function colorDistance(a,b) {
  const x=lab(a),y=lab(b);return Math.hypot(...x.map((v,i)=>v-y[i]));
 }
 export function defaultProviderColors(background) {
- const seeds=lum(background)>.179?['#a44325','#00745c','#245acb','#8a309d','#725600','#006b82','#ac245e']:['#f09a75','#56d6ac','#78aaff','#dd96eb','#dac04d','#57d6ee','#ff85af'];
+ const seeds=lum(background)>.179?['#a44325','#00745c','#245acb','#8a309d','#725600','#006b82','#ac245e','#8a4b00','#276a3d','#7540a0','#b03c58','#006d70']:['#f09a75','#56d6ac','#78aaff','#dd96eb','#dac04d','#57d6ee','#ff85af','#ffc36e','#8cdda1','#cf9aff','#ff9a9a','#75ded4'];
  return seeds.map(seed=>{const target=lum(background)>.179?0:255;for(let i=0;i<=100;i++){const c=hex(rgb(seed).map(v=>v+(target-v)*i/100));if(colorContrast(c,background)>=4.7)return c;}return seed;});
 }
 export function providerColors(settings,background) {

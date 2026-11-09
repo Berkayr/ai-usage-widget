@@ -1,6 +1,6 @@
 import { escapeHtml } from '../shared/safety.js';
 const hiddenStates = new Set(['DISABLED', 'NOT_INSTALLED', 'NO_SUBSCRIPTION']);
-const providerNames = { claude: 'Claude', codex: 'Codex', gemini: 'Gemini', copilot: 'Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains' };
+const providerNames = { claude: 'Claude', codex: 'Codex', gemini: 'Gemini', copilot: 'Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains', zai: 'Z.ai', moonshot: 'Kimi', siliconflow: 'SiliconFlow', openai_admin: 'OpenAI API', anthropic_admin: 'Anthropic API' };
 
 const severity = pct => pct >= 80 ? 'danger' : pct >= 50 ? 'warning' : 'normal';
 export const dotCount = () => {
@@ -16,10 +16,10 @@ function countdown(value) {
   if (minutes < 1440) return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
   return `${Math.floor(minutes / 1440)}d ${Math.floor((minutes % 1440) / 60)}h`;
 }
-function dots(pct, count = dotCount()) {
+function dots(pct, quotaWindow = {}, count = dotCount()) {
   if (!Number.isFinite(pct)) return `<div class="dot-bar unknown" aria-label="Usage unknown">${'<i></i>'.repeat(count)}</div>`;
   const active = pct > 0 ? Math.max(1, Math.round(count * pct / 100)) : 0;
-  return `<div class="dot-bar" role="img" aria-label="${pct}% used">${Array.from({ length: count }, (_, i) => `<i class="${i < active ? `on ${pct >= 50 && i >= Math.floor(count / 2) - 1 ? 'threshold' : ''}` : ''}" data-severity="${severity(pct)}"></i>`).join('')}</div>`;
+  return `<div class="dot-bar" role="img" aria-label="${quotaWindow.estimated ? '~' : ''}${pct}% used">${Array.from({ length: count }, (_, i) => `<i class="${i < active ? `on ${pct >= 50 && i >= Math.floor(count / 2) - 1 ? 'threshold' : ''}` : ''}" data-severity="${severity(pct)}"></i>`).join('')}</div>`;
 }
 function pctOf(window) {
   return typeof window?.used_percent === 'number' && Number.isFinite(window.used_percent) ? Math.max(0, Math.min(100, window.used_percent)) : null;

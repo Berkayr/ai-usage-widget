@@ -40,8 +40,10 @@ def read_response(response) -> bytes:
     return value
 
 
-def get_json(url: str, key: str) -> tuple[Any, str | None, str | None, str | None]:
-    request = urllib.request.Request(url, headers={"Authorization": "Bearer " + key, "Accept": "application/json", "User-Agent": "quotacore/0.2"})
+def get_json(url: str, key: str, *, headers: dict[str, str] | None = None) -> tuple[Any, str | None, str | None, str | None]:
+    request_headers = {"Authorization": "Bearer " + key, "Accept": "application/json", "User-Agent": "quotacore/0.2"}
+    request_headers.update(headers or {})
+    request = urllib.request.Request(url, headers=request_headers)
     try:
         with urllib.request.build_opener(NoRedirect()).open(request, timeout=15) as response:
             payload = json.loads(read_response(response).decode("utf-8"))
@@ -113,3 +115,21 @@ def safe_error(message: str | None) -> str | None:
     if not message:
         return None
     return " ".join(str(message).replace("\n", " ").split())[:180]
+
+
+def estimate_expired_windows(record: dict[str, Any], now: datetime | None = None) -> dict[str, Any]:
+    """Mark expired cached quota windows as estimated zero on stale records."""
+    now = now or datetime.now(timezone.utc)
+    result = dict(record)
+    windows = []
+    for window in record.get("windows", []):
+        item = dict(window)
+        reset = timestamp(item.get("resets_at"))
+        if reset:
+            parsed = datetime.fromisoformat(reset)
+            if parsed < now:
+                item["used_percent"] = 0.0
+                item["estimated"] = True
+        windows.append(item)
+    result["windows"] = windows
+    return result

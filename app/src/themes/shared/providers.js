@@ -1,4 +1,4 @@
-const providerLabels = { claude: 'Claude Code', codex: 'Codex', gemini: 'Gemini CLI', copilot: 'GitHub Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains AI' };
+const providerLabels = { claude: 'Claude Code', codex: 'Codex', gemini: 'Gemini CLI', copilot: 'GitHub Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains AI', zai: 'Z.ai GLM Coding Plan', moonshot: 'Moonshot / Kimi', siliconflow: 'SiliconFlow', openai_admin: 'OpenAI API spend', anthropic_admin: 'Anthropic API spend' };
 
 // Common consent/settings surface for every theme. DOM text nodes only.
 export function mountProviders(parent, config, save, onSaved = () => {}) {
