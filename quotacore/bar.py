@@ -24,6 +24,13 @@ def remaining(value, now):
 
 def report(snapshot, providers=None, window="session", now=None):
     now = now or datetime.now(timezone.utc)
+    generated_at = snapshot.get("generated_at")
+    try:
+        generated = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
+        age = (now - generated).total_seconds()
+        old_snapshot = age > 10 * 60
+    except (TypeError, ValueError, AttributeError):
+        old_snapshot = False
     records = {p.get("id"): p for p in snapshot.get("providers", []) if isinstance(p, dict)}
     if providers is None:
         providers = [key for key, p in records.items() if key and p.get("state") in ("OK", "STALE")]
@@ -31,6 +38,8 @@ def report(snapshot, providers=None, window="session", now=None):
     for key in providers:
         p = records.get(key, {})
         state = p.get("state", "SOURCE_UNAVAILABLE")
+        if old_snapshot and state in ("OK", "STALE"):
+            state = "STALE"
         stale = bool(p.get("stale")) or state == "STALE"
         all_windows = []
         raw_windows = p.get("windows")
