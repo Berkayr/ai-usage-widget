@@ -147,7 +147,8 @@ class CoreTests(unittest.TestCase):
             self.assertIn('"schema": 1', output.getvalue())
 
     def test_codex_app_server_exchange_uses_json_rpc_and_closes(self):
-        response = {"id": 2, "result": {"rateLimits": {"primary": {"usedPercent": 4}}}}
+        response = [{"id": 2, "result": {"rateLimits": {"primary": {"usedPercent": 4}}}},
+                    {"id": 3, "result": {"dailyUsageBuckets": []}}]
 
         class FakeInput(io.StringIO):
             close_called = False
@@ -158,7 +159,7 @@ class CoreTests(unittest.TestCase):
         class FakeProcess:
             def __init__(self):
                 self.stdin = FakeInput()
-                self.stdout = io.StringIO(json.dumps(response) + "\n")
+                self.stdout = io.StringIO("".join(json.dumps(item) + "\n" for item in response))
                 self.killed = False
 
             def kill(self):
@@ -170,11 +171,59 @@ class CoreTests(unittest.TestCase):
         process = FakeProcess()
         with mock.patch.object(codex, "_executable", return_value="codex"), \
              mock.patch.object(codex.subprocess, "Popen", return_value=process):
-            result = codex._exchange()
+            result, history = codex._exchange()
         self.assertIn("rateLimits", result)
+        self.assertEqual(history, {"dailyUsageBuckets": []})
         self.assertTrue(process.killed)
         self.assertTrue(process.stdin.close_called)
         self.assertIn("account/rateLimits/read", process.stdin.getvalue())
+        self.assertIn("account/usage/read", process.stdin.getvalue())
+
+    def test_codex_history_normalizes_summary_and_skips_null_or_invalid_buckets(self):
+        history = codex.history_from_usage({
+            "summary": {"lifetimeTokens": 12, "peakDailyTokens": None,
+                        "currentStreakDays": 2, "longestStreakDays": 4},
+            "dailyUsageBuckets": [
+                {"startDate": "2026-11-08", "tokens": 0},
+                {"startDate": "2026-11-09", "tokens": None},
+                {"startDate": "2026-02-30", "tokens": 10},
+                {"startDate": "2026-11-07", "tokens": -1},
+            ], "threadUsage": [{"private": "ignored"}],
+        })
+        self.assertEqual(history, {
+            "scope": "account", "source": "app-server", "unit": "tokens",
+            "summary": {"lifetime_tokens": 12, "peak_daily_tokens": None,
+                        "current_streak_days": 2, "longest_streak_days": 4},
+            "daily": [{"date": "2026-11-08", "tokens": 0}],
+        })
+
+    def test_codex_history_keeps_latest_thirty_in_order(self):
+        buckets = [{"startDate": f"2026-09-{day:02d}", "tokens": day} for day in range(1, 30)]
+        buckets += [{"startDate": f"2026-10-{day:02d}", "tokens": day} for day in range(1, 21)]
+        history = codex.history_from_usage({"dailyUsageBuckets": buckets})
+        self.assertEqual(len(history["daily"]), 30)
+        self.assertEqual(history["daily"][0]["date"], "2026-09-20")
+        self.assertEqual(history["daily"][-1]["date"], "2026-10-20")
+
+    def test_codex_history_error_or_missing_does_not_break_quota(self):
+        quota = {"rateLimits": {"primary": {"usedPercent": 4}}}
+        for usage in (None, {"error": {"code": -1}}):
+            with mock.patch.object(codex, "detect", return_value=True), \
+                 mock.patch.object(codex, "_exchange", return_value=(quota, usage)):
+                record = codex.read()
+            self.assertEqual(record["state"], "OK")
+            self.assertNotIn("history", record)
+
+    def test_codex_missing_rate_limit_response_still_fails(self):
+        class FakeProcess:
+            stdin = io.StringIO()
+            stdout = io.StringIO(json.dumps({"id": 3, "result": {}}) + "\n")
+            def kill(self): pass
+            def wait(self, timeout=None): return 0
+        with mock.patch.object(codex, "_executable", return_value="codex"), \
+             mock.patch.object(codex.subprocess, "Popen", return_value=FakeProcess()), \
+             self.assertRaisesRegex(RuntimeError, "Codex rate limits unavailable"):
+            codex._exchange(timeout=0.01)
 
     def test_gemini_weekly_only_bucket(self):
         windows, _ = gemini.windows_from_usage({"command": {"data": {"groups": [{"buckets": [
