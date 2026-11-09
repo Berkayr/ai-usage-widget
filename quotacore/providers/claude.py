@@ -103,7 +103,7 @@ def _read_observation() -> tuple[dict[str, Any] | None, str | None]:
             windows = []
             for key, label, minutes in (("five", "5 hour", 300), ("seven", "7 day", 10080)):
                 pct = data.get(key)
-                if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 100 and pct != 0:
+                if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 100:
                     windows.append(make_window(key, label, pct, data.get(key + "_reset"), minutes, kind_for(label, minutes)))
             if windows:
                 return {"windows": windows, "captured_at": timestamp(epoch), "plan": None}, None

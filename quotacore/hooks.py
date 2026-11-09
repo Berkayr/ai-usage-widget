@@ -26,7 +26,7 @@ def _claude(payload: Any) -> dict[str, Any] | None:
         if not isinstance(value, dict):
             continue
         pct = value.get("used_percentage")
-        if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 < pct <= 100:
+        if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 100:
             output[target] = float(pct)
             reset = value.get("resets_at")
             if isinstance(reset, (int, float)) and not isinstance(reset, bool):
