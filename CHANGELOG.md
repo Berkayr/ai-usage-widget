@@ -12,6 +12,9 @@ Notable changes will be recorded here. No release has been published yet.
 
 ### Changed
 
+- Inline provider logos, setup guidance for enabled providers without data, and equal Portrait card heights across themes.
+- OpenRouter reports missing balance values explicitly without inventing a zero balance.
+
 - Bolder Dot Matrix quota labels, round marks and full-width tracks.
 - Documentation galleries generated from fictional fixtures, with local-link and empty-space checks.
 

@@ -1,6 +1,8 @@
+import { providerLogo } from '../../icons/provider-logos.js';
+
 const providerLabels = { claude: 'Claude Code', codex: 'Codex', gemini: 'Gemini CLI', copilot: 'GitHub Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains AI', zai: 'Z.ai GLM Coding Plan', moonshot: 'Moonshot / Kimi', siliconflow: 'SiliconFlow', openai_admin: 'OpenAI API spend', anthropic_admin: 'Anthropic API spend' };
 
-// Common consent/settings surface for every theme. DOM text nodes only.
+// Common consent/settings surface; provider text uses DOM text nodes.
 export function mountProviders(parent, config, save, onSaved = () => {}) {
   parent.replaceChildren();
   const heading = document.createElement('h3');
@@ -22,7 +24,10 @@ export function mountProviders(parent, config, save, onSaved = () => {}) {
     const description = document.createElement('small');
     description.textContent = config.disclosures[id];
     text.append(name, description);
-    label.append(input, text); choices.append(label); checks.push([id, input]);
+    label.append(input);
+    const logo = providerLogo(id);
+    if (logo) label.insertAdjacentHTML('beforeend', logo);
+    label.append(text); choices.append(label); checks.push([id, input]);
   }
   const status = document.createElement('p');
   status.className = 'setting-note'; status.setAttribute('role', 'status');

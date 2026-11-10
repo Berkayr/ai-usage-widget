@@ -1,5 +1,5 @@
 import { escapeHtml } from '../shared/safety.js';
-const hiddenStates = new Set(['DISABLED', 'NOT_INSTALLED', 'NO_SUBSCRIPTION']);
+const hiddenStates = new Set(['DISABLED', 'NOT_INSTALLED']);
 const providerNames = { claude: 'Claude', codex: 'Codex', gemini: 'Gemini', copilot: 'Copilot', openrouter: 'OpenRouter', deepseek: 'DeepSeek', jetbrains: 'JetBrains', zai: 'Z.ai', moonshot: 'Kimi', siliconflow: 'SiliconFlow', openai_admin: 'OpenAI API', anthropic_admin: 'Anthropic API' };
 
 const severity = pct => pct >= 80 ? 'danger' : pct >= 50 ? 'warning' : 'normal';

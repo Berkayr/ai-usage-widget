@@ -23,11 +23,11 @@ def read(prev=None):
     if not isinstance(value, dict) or not any(k in value for k in ("usage", "limit", "limit_remaining")):
         return provider_record("openrouter", META["label"], state="SCHEMA_CHANGED", error="Unexpected key usage response", category=META["category"], auth=META["auth"])
     used, limit, remaining = (number(value.get(k)) for k in ("usage", "limit", "limit_remaining"))
-    meters = [meter_record("key-usage", "API key usage", "USD", used=used, limit=limit, remaining=remaining)]
+    meters = [meter_record("key-usage", "API key usage", "USD", used=used, limit=limit, remaining=remaining)] if any(v is not None for v in (used, limit, remaining)) else []
     credits, credits_state, _, _ = get_json(CREDITS_URL, key)
     credit_data = credits.get("data") if isinstance(credits, dict) else None
     if not credits_state and isinstance(credit_data, dict):
         total, spent = number(credit_data.get("total_credits")), number(credit_data.get("total_usage"))
         if total is not None and spent is not None:
             meters.append(meter_record("account-credits", "Account credits", "USD", used=spent, limit=total, remaining=max(0.0, total-spent)))
-    return provider_record("openrouter", META["label"], state="OK", source="api", captured_at=iso_now(), last_success_at=iso_now(), meters=meters, category=META["category"], auth=META["auth"])
+    return provider_record("openrouter", META["label"], error="No numeric balance values returned by key usage or account credits endpoints" if not meters else None, state="OK", source="api", captured_at=iso_now(), last_success_at=iso_now(), meters=meters, category=META["category"], auth=META["auth"])

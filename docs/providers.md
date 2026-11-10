@@ -21,8 +21,10 @@ Status describes validation evidence, not an upstream compatibility guarantee. G
 
 ## Failure states
 
-`STALE` preserves earlier data with a visible warning. If a cached quota window reset time has passed, the stale estimate is shown as `~0%`; live `OK` observations are unchanged. `AUTH_REQUIRED` means sign in again through the provider's own tool. `RATE_LIMITED` means wait; repeated refreshes are unhelpful. `SOURCE_UNAVAILABLE` means the source could not be read; `SCHEMA_CHANGED` means its shape was not recognized. `DISABLED`, `NOT_INSTALLED` and `NO_SUBSCRIPTION` providers are hidden by the desktop renderer. Extra/model windows are hidden by default and can be enabled in settings.
+`STALE` preserves earlier data with a visible warning. If a cached quota window reset time has passed, the stale estimate is shown as `~0%`; live `OK` observations are unchanged. `AUTH_REQUIRED` means sign in again through the provider's own tool. `RATE_LIMITED` means wait; repeated refreshes are unhelpful. `SOURCE_UNAVAILABLE` means the source could not be read; `SCHEMA_CHANGED` means its shape was not recognized. `DISABLED` and `NOT_INSTALLED` providers are hidden by the desktop renderer. Enabled `NO_SUBSCRIPTION` providers remain visible with setup instructions. Empty OpenRouter balances remain unknown and show an explanation; zero credit is displayed as zero, never inferred from missing values. Extra/model windows are hidden by default and can be enabled in settings.
 
 Claude status-line input is reduced to quota observations; the application does not scan conversation history. Hook input can contain other fields, so do not publish raw hook payloads or provider responses. Snapshot files can contain plan labels, quota values, timestamps and error summaries: treat them as private even when they contain no token.
 
 See [configuration](configuration.md) for storage locations and provider enablement, and [privacy](../README.md#privacy--security) for the collection boundary.
+
+Themes may set `"providerLogos": false` in `theme.json` to hide widget logos through the shared `--provider-logo-display` CSS variable (`.provider-logo`). Provider choices retain their setup labels and detection hints.

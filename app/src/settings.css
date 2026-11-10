@@ -1,3 +1,4 @@
+@import './icons/provider-logos.css';
 /* Explicit surfaces keep WebKitGTK native system colors out of the sidebar. */
 :root {
   --surface:#ffffff;
