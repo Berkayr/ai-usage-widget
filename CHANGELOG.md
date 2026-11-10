@@ -6,6 +6,9 @@ Notable changes will be recorded here. No release has been published yet.
 
 ### Added
 
+- Usage history below cards, on card activation or in an attached side panel, with optional API price estimates, model shares, activity heatmap and computer splitting.
+- History settings with explicit, saved permission to read local Claude Code logs (off by default).
+
 - Clear Glass, Layer, Aurora, Crisp, Pebble, Glyph and Pastel themes with light/dark palettes and picker previews.
 - Theme-selected Windows desktop Acrylic on Windows 11 and Blur on Windows 10, cleared when switching to an opaque theme.
 

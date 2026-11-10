@@ -221,3 +221,10 @@ summary {cursor:pointer;min-height:32px}
   .setting-copy small {font-size:12px}
   .scale-presets {grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+.theme-picker [data-theme=aurora] .theme-preview{border-width:5px;border-radius:6px;background-image:linear-gradient(transparent 40%,currentColor 41% 60%,transparent 61%)}
+.theme-picker [data-theme=crisp] .theme-preview{border-radius:2px;font-size:18px;letter-spacing:2px}
+.theme-picker [data-theme=glyph] .theme-preview{font-family:monospace;border-radius:16px;border-bottom-width:4px}
+.theme-picker [data-theme=layer] .theme-preview{border-top-width:6px;box-shadow:0 3px 0 -1px currentColor}
+.theme-picker [data-theme=liquid-glass] .theme-preview{border-radius:22px;box-shadow:inset 2px 2px 6px currentColor}
+.theme-picker [data-theme=pastel] .theme-preview{border-radius:18px;border-bottom-width:5px;letter-spacing:5px}
+.theme-picker [data-theme=pebble] .theme-preview{border-radius:14px;border-width:4px;font-family:system-ui,sans-serif;font-weight:800}

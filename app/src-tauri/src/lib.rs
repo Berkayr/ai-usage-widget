@@ -26,6 +26,7 @@ use tauri::{Emitter, Manager};
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub(crate) struct Settings {
+    #[serde(default, flatten)] history: HistorySettings,
     #[serde(default, rename="userPalettes", deserialize_with="user_palettes::deserialize")]
     user_palettes: Vec<user_palettes::UserPalette>,
     #[serde(skip_deserializing, rename="paletteLoadError", skip_serializing_if="Option::is_none")]
@@ -56,7 +57,11 @@ fn deserialize_scale<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Resul
     Ok(normalize_scale(Option::<f64>::deserialize(deserializer)?.unwrap_or_else(default_scale)))
 }
 
-impl Default for Settings { fn default() -> Self { Self { user_palettes: vec![], palette_load_error: None, size_mode: "fixed".into(), fit_fraction: 1., fit_fine_tune: 100., reserved_top: None, reserved_bottom: None, provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), #[cfg(not(target_os = "linux"))] linux: default_linux_options(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
+#[derive(Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default, rename_all="camelCase")]
+struct HistorySettings { history_enabled: bool, history_mode: String, history_cost: bool, history_models: bool, history_heatmap: bool, history_machines: bool, history_panel_open: bool }
+impl Default for HistorySettings { fn default() -> Self { Self { history_enabled:true, history_mode:"card".into(), history_cost:true, history_models:true, history_heatmap:true, history_machines:false, history_panel_open:false } } }
+impl Default for Settings { fn default() -> Self { Self { history: HistorySettings::default(), user_palettes: vec![], palette_load_error: None, size_mode: "fixed".into(), fit_fraction: 1., fit_fine_tune: 100., reserved_top: None, reserved_bottom: None, provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), #[cfg(not(target_os = "linux"))] linux: default_linux_options(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
 struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32, style: String, theme: String, color_mode: String, dot_count: u8 }
@@ -110,6 +115,12 @@ fn configure_providers(app: tauri::AppHandle, providers: Vec<String>) -> Result<
     const IDS: &[&str] = &["claude", "codex", "gemini", "copilot", "openrouter", "deepseek", "jetbrains", "zai", "moonshot", "siliconflow", "openai_admin", "anthropic_admin"];
     if providers.iter().any(|id| !IDS.contains(&id.as_str())) { return Err("Unknown provider".into()); }
     collector("configure", &providers)?;
+    let _=app.emit("provider-config-changed", ());
+    Ok(())
+}
+#[tauri::command]
+fn set_local_history(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
+    collector("local-history", &[if enabled {"on".into()} else {"off".into()}])?;
     let _=app.emit("provider-config-changed", ());
     Ok(())
 }
@@ -367,12 +378,25 @@ async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> 
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_quote,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,load_settings,save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint,settings_window::open_settings,settings_window::finish_settings,settings_window::preview_settings,placement::get_placement_monitors,placement::capture_position]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if webview.label()=="main" && payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); settings_window::initialize(); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=settings_window::current(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } #[cfg(target_os="windows")] window_effects::apply(&window, &settings_window::current().theme)?; shape_region::request(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }) { shape_region::request(&close_window); } if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } placement::watch(app.handle().clone()); #[cfg(debug_assertions)] settings_window::start_soak(app.handle().clone()); #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_quote,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,set_local_history,load_settings,save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint,settings_window::open_settings,settings_window::finish_settings,settings_window::preview_settings,placement::get_placement_monitors,placement::capture_position]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if webview.label()=="main" && payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); settings_window::initialize(); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=settings_window::current(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } #[cfg(target_os="windows")] window_effects::apply(&window, &settings_window::current().theme)?; shape_region::request(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }) { shape_region::request(&close_window); } if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } placement::watch(app.handle().clone()); #[cfg(debug_assertions)] settings_window::start_soak(app.handle().clone()); #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
 }
 
 #[cfg(test)]
 mod settings_tests {
     use super::*;
+    #[test]
+    fn history_settings_round_trip() {
+        assert_eq!(Settings::default().history.history_mode, "card");
+        assert!(!Settings::default().history.history_panel_open);
+        let value = serde_json::json!({"historyEnabled":false,"historyMode":"panel",
+            "historyCost":false,"historyModels":false,"historyHeatmap":false,
+            "historyMachines":true,"historyPanelOpen":true});
+        let settings: Settings = serde_json::from_value(value.clone()).unwrap();
+        let written = serde_json::to_value(settings).unwrap();
+        for (key, expected) in value.as_object().unwrap() {
+            assert_eq!(&written[key], expected, "{key}");
+        }
+    }
     #[cfg(debug_assertions)]
     #[test]
     fn debug_config_override_is_isolated_from_known_folders() {
@@ -389,6 +413,7 @@ mod settings_tests {
     #[test]
     fn full_settings_json_preserves_every_key_and_value() {
         let mut fixture: serde_json::Value = serde_json::from_str(include_str!("../../../docs/tools/fixtures/full-settings.json")).unwrap();
+        fixture.as_object_mut().unwrap().extend(serde_json::to_value(HistorySettings::default()).unwrap().as_object().unwrap().clone());
         let settings: Settings = serde_json::from_value(fixture.clone()).unwrap();
         let output = serde_json::to_value(settings).unwrap();
         let placement = fixture["placement"].as_object_mut().unwrap();

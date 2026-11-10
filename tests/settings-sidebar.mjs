@@ -8,6 +8,7 @@ const b = await browser();
 try {
   await b.cdp('Page.addScriptToEvaluateOnNewDocument', {source:`(() => {
     const callbacks = new Map(), events = new Map();
+    let readLogs = false;
     let next = 0, disk = {theme:'system', palette:'default'};
     const state = window.__FAKE_NATIVE__ = {calls:[], previews:[], saves:[], hidden:0, fail:null, mismatch:false};
     state.emit = async event => {for (const [id, name] of events) if (name === event) await callbacks.get(id)({event, id, payload:{}});};
@@ -20,7 +21,8 @@ try {
         if (cmd === state.fail) throw Error('Synthetic failure: ' + cmd);
         if (cmd === 'load_settings') {const value = structuredClone(disk); if (state.mismatch) delete value.fineTune; return value;}
         if (cmd === 'get_snapshot') return {snapshot:{providers:['claude','codex'].map(id => ({id,state:'OK'}))}};
-        if (cmd === 'get_provider_config') return {initialized:true,providers:{claude:{enabled:true},codex:{enabled:true}},disclosures:{claude:'Synthetic quota metadata',codex:'Synthetic quota metadata'},detected:{}};
+        if (cmd === 'get_provider_config') return {initialized:true,providers:{claude:{enabled:true,local_history:readLogs},codex:{enabled:true}},disclosures:{claude:'Synthetic quota metadata',codex:'Synthetic quota metadata'},detected:{}};
+        if (cmd === 'set_local_history') {readLogs=args.enabled;return;}
         if (cmd === 'get_autostart') return false;
         if (cmd === 'get_desktop_info') return {platform:'linux',layerShell:true};
         if (cmd === 'get_placement_monitors') return {layerShell:true,monitors:[{name:'Synthetic display',width:1920,height:1080,primary:true}],widgetWidth:340,widgetHeight:600};
@@ -51,6 +53,17 @@ try {
     document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true}));
     check(document.activeElement.dataset.category === 'about', 'End skips hidden Taskbar');
     check(visible().filter(t => t.tabIndex === 0).length === 1, 'Roving tab stop');
+    $('[data-category=history]').click();
+    $('#local-history').click();await wait();
+    check(!native.calls.includes('set_local_history'), 'Log permission stays draft');
+    $('#revert').click();check(!$('#local-history').checked,'Revert log permission');
+    $('#local-history').click();native.fail='set_local_history';$('#save').click();await wait();
+    check($('#status').dataset.state==='failure' && !$('#save').disabled,'Permission failure stays retryable');
+    native.fail=null;$('#save').click();await wait();
+    check($('#save').disabled && $('#local-history').checked,'Verified log permission Save');
+    $('#local-history').click();$('#save').click();await wait();
+    check($('#save').disabled && !$('#local-history').checked,'Disable log permission');
+    native.saves.length=0;
     $('[data-category=appearance]').click();
     native.calls.length = 0;
     $('#quote-enabled').click(); $('#start-at-login').click();
@@ -107,7 +120,7 @@ try {
   assert.equal(await b.evaluate(`document.querySelector('[aria-selected=true]').dataset.category`), 'appearance', 'Remember across reload');
   const bindings = Object.keys(Function('return (' + (await readFile(new URL('../app/src/settings-window.js',import.meta.url),'utf8')).match(/export const bindings = ([\s\S]*?);/)[1] + ')')());
   assert.equal(await b.evaluate(`(${JSON.stringify(bindings)}).every(id => document.getElementById(id))`), true, 'All original binding IDs exist');
-  assert.equal(await b.evaluate(`document.querySelector('#category-history fieldset').querySelectorAll('input,select,button').length`), 0);
+  assert.equal(await b.evaluate(`document.querySelector('#category-history').querySelectorAll('input,select').length`), 7);
   assert.equal(await b.evaluate(`/coming soon/i.test(document.querySelector('#category-history').textContent)`), false);
   assert.equal(await b.evaluate(`document.querySelectorAll('#settings>section').length`), 6);
   const destinations = {
@@ -174,5 +187,5 @@ try {
   assert.equal(await b.evaluate(`document.querySelectorAll('fieldset:not(.settings-group)').length`), 0, 'Every group has a separate card');
   const contrast = await auditSettings(b);
   assert.deepEqual(contrast.failures, [], 'Chrome text contrast');
-  console.log('PASS: six categories, original bindings, platform visibility, empty History, storage, ' + combinations + ' responsive combinations, light/dark contrast');
+  console.log('PASS: six categories, original bindings, platform visibility, History controls, storage, ' + combinations + ' responsive combinations, light/dark contrast');
 } finally { await b.close(); }

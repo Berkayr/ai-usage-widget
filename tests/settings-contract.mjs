@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {historyDefaults} from '../app/src/history.js';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {equalSettings,differingKeys} from '../app/src/settings-compare.js';
@@ -10,10 +11,10 @@ test('comparison ignores order, null, absent keys and empty objects, preserving 
 });
 test('every settings binding and default key is covered by full Rust fixture',async()=>{
  const source=await readFile(new URL('../app/src/settings-window.js',import.meta.url),'utf8');
- const fixture=JSON.parse(await readFile(new URL('../docs/tools/fixtures/full-settings.json',import.meta.url),'utf8'));
+ const fixture=Object.assign({...historyDefaults}, JSON.parse(await readFile(new URL('../docs/tools/fixtures/full-settings.json',import.meta.url),'utf8')));
  for(const name of ['defaults','bindings']) {
   const body=source.match(new RegExp('export const '+name+' = ([\\s\\S]*?);'))[1];
-  const obj=Function('return ('+body+')')();
+  const obj=Function('historyDefaults','return ('+body+')')(historyDefaults);
   const paths=value=>Object.entries(value).flatMap(([key,child])=>child&&typeof child==='object'&&!Array.isArray(child)?[key,...paths(child).map(path=>key+'.'+path)]:[key]);
   for(const path of name==='bindings'?Object.values(obj):paths(obj)) {
    let value=fixture;for(const key of path.split('.')) {assert.ok(Object.hasOwn(value,key),`${name}: ${path}`);value=value[key];}

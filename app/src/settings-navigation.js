@@ -57,6 +57,13 @@ export function mountNavigation(sections) {
 }
 
 const descriptions = {
+  'history-enabled':'Show token history when a provider supplies it.',
+  'local-history':"Counts tokens from this computer's logs. Nothing is stored.",
+  'history-mode':'Choose where usage history appears in the widget.',
+  'history-cost':'Estimated API prices, not your actual bill.',
+  'history-models':'Show token shares for models reported by local logs.',
+  'history-heatmap':'Show activity by weekday and hour for Claude.',
+  'history-machines':'Shown only when 2+ computers are found',
   'start-at-login':'Open the widget when you sign in.',
   'show-extra-windows':'Include additional quota windows in the widget.',
   'quote-enabled':'Fetch a daily quote when enabled; see the privacy note above.',

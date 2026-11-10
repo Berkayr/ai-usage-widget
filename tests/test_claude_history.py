@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import tempfile
 import time
 import unittest
@@ -126,6 +127,23 @@ class ClaudeHistoryTests(unittest.TestCase):
             with mock.patch.object(claude, "detect", return_value=False):
                 result = claude.read(prior)
             self.assertIs(result["history"], prior["history"])
+
+
+class HistoryConsentCommandTests(unittest.TestCase):
+    def test_permission_command_preserves_other_config_and_can_disable(self):
+        from quotacore.__main__ import main
+        from quotacore.paths import atomic_json, config_dir
+        with tempfile.TemporaryDirectory() as root, mock.patch.dict(os.environ, {"QUOTACORE_HOME": root}):
+            config = load_config()
+            config["providers"]["codex"]["enabled"] = True
+            atomic_json(config_dir() / "config.json", config)
+            with mock.patch.object(sys, "argv", ["quotacore", "local-history", "on"]):
+                main()
+            self.assertTrue(load_config()["providers"]["claude"]["local_history"])
+            self.assertTrue(load_config()["providers"]["codex"]["enabled"])
+            with mock.patch.object(sys, "argv", ["quotacore", "local-history", "off"]):
+                main()
+            self.assertFalse(load_config()["providers"]["claude"].get("local_history", False))
 
 
 if __name__ == "__main__":

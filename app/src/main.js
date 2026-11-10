@@ -1,3 +1,5 @@
+import {historyDefaults, mountHistory, historyGeometry} from './history.js';
+import './history.css';
 import { paletteChoices } from './user-palettes.js';
 import { observeUsageFit, fittedUsageHeight } from './usage-fit.js';
 import { applyAppearance } from './appearance.js';
@@ -68,7 +70,8 @@ window.addEventListener('pagehide', dispose, { once: true, signal: domEvents.sig
 const isSample = new URLSearchParams(location.search).has('sample') || !('__TAURI_INTERNALS__' in window);
 const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'], window: 'session', showBars: false, offsetX: 0, style: 'transparent', theme: 'auto' };
 const systemAppearance = matchMedia('(prefers-color-scheme: light)');
-let settings = { quoteEnabled:false, quoteMode:'qotd', quotePosition:'bottom', quoteNavigation:true, theme: 'system', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'default', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
+const historyState = {};
+let settings = { ...historyDefaults, quoteEnabled:false, quoteMode:'qotd', quotePosition:'bottom', quoteNavigation:true, theme: 'system', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'default', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
 try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
 let shapePage = 0;
 let currentSnapshot = null;
@@ -195,6 +198,8 @@ function draw(snapshot, noData = false) {
       card.style.setProperty('--provider-identity',`var(--provider-${index})`);
       card.dataset.identity=index;
     });
+    const historyOpen = mountHistory($('#widget'), $('#providers'), paged.providers || [], settings, historyState, () => draw(currentSnapshot,currentNoData), open => { settings.historyPanelOpen=open; persist(); draw(currentSnapshot,currentNoData); });
+    document.documentElement.dataset.historyOpen = String(historyOpen);
     arrangeCards($('#providers'), paged.providers || [], settings);
     $('#updated').textContent = snapshot?.generated_at ? `SYNC ${new Date(snapshot.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'NO DATA YET';
     const count = round ? selectedProviders.length : $('#providers').querySelectorAll('.provider-card').length;
@@ -203,9 +208,16 @@ function draw(snapshot, noData = false) {
     $('#widget').style.setProperty('--shape-columns', settings.shape === 'square' ? (count > 1 ? 2 : 1) : Math.min(3, Math.max(1,count)));
     $('#widget').style.setProperty('--shape-rows', settings.shape === 'square' ? (count > 2 ? 2 : 1) : (count > 3 ? 2 : 1));
     updateLayoutScale(count);
-    const width = widgetWidth(renderSettings(),count) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
+    const baseWidth = widgetWidth(renderSettings(),count) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
+    const monitor = selectedWorkArea(placementMonitors, renderSettings());
+    const availableWidth = monitor ? monitor.width / (desktopInfo?.platform === 'windows' ? monitorScale : 1) - 24 : window.screen.availWidth - 24;
+    const geometry = historyOpen ? historyGeometry(baseWidth,availableWidth,layoutScale) : {panel:0,width:baseWidth};
+    const panelWidth = geometry.panel;
+    const width = geometry.width;
+    $('#widget').style.setProperty('--history-panel-width', `${panelWidth}px`);
+    if (isSample && historyOpen) $('#app').style.width = `${width}px`; else $('#app').style.removeProperty('width');
     const maxHeight = parseFloat(document.documentElement.style.getPropertyValue('--portrait-height-limit'));
-    if (!isSample) invoke('resize_widget', {scale:layoutScale,widthCssPx:width,maxHeightCssPx:maxHeight,onboarding:!$('#provider-onboarding').hidden}).catch(error=>showToast(String(error)));
+    if (!isSample) invoke('resize_widget', {scale:layoutScale,widthCssPx:width,maxHeightCssPx:maxHeight,onboarding:!$('#provider-onboarding').hidden || historyOpen}).catch(error=>showToast(String(error)));
     renderQuote($('#quote'),renderSettings(),quoteData,()=>draw(currentSnapshot,currentNoData),repairTextContrast);
     updateQuote();
     repairTextContrast($('#widget'));
@@ -229,9 +241,13 @@ async function requestFit() {
   fitPending = false;
   if (disposed) return;
   const count = $('#providers').querySelectorAll('.provider-card').length;
-  const height = renderSettings().shape === 'portrait' && $('#provider-onboarding').hidden
-    ? fittedUsageHeight($('#widget'), parseFloat(document.documentElement.style.getPropertyValue('--portrait-height-limit')))
+  const limit = parseFloat(document.documentElement.style.getPropertyValue('--portrait-height-limit'));
+  const contentHeight = renderSettings().shape === 'portrait' && $('#provider-onboarding').hidden
+    ? fittedUsageHeight($('#widget'), limit)
     : widgetHeight(renderSettings(),$('#provider-onboarding').hidden ? count : 3) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
+  const monitor = selectedWorkArea(placementMonitors,renderSettings());
+  const panelLimit = monitor ? monitor.height / (desktopInfo?.platform === 'windows' ? monitorScale : 1) - 24 : window.screen.availHeight - 24;
+  const height = document.querySelector('.history-panel') ? Math.min(panelLimit,Math.max(contentHeight,560)) : contentHeight;
   if (Math.abs(height - lastFitHeight) < 2) return;
   lastFitHeight = height;
   invoke('fit_window_height', { heightCssPx: height }).catch(() => {});
