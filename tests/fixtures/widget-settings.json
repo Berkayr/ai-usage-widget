@@ -1,0 +1,84 @@
+{
+  "historyEnabled": true,
+  "historyMode": "card",
+  "historyCost": true,
+  "historyModels": true,
+  "historyHeatmap": true,
+  "historyMachines": false,
+  "historyPanelOpen": false,
+  "userPalettes": [],
+  "sizeMode": "screen",
+  "fitFraction": 0.75,
+  "fitFineTune": 82.0,
+  "reservedTop": 0,
+  "reservedBottom": 20,
+  "providerOrder": [
+    "codex",
+    "claude"
+  ],
+  "hiddenProviders": [
+    "gemini"
+  ],
+  "featuredProvider": "codex",
+  "featuredPosition": "top",
+  "reactorMotion": true,
+  "quoteEnabled": true,
+  "quoteMode": "mixed",
+  "quotePosition": "top",
+  "quoteNavigation": false,
+  "providerColors": {
+    "claude": "#123456"
+  },
+  "widgetProviders": [
+    "codex"
+  ],
+  "providerPreview": [
+    "claude"
+  ],
+  "placementEditing": true,
+  "theme": "terminal",
+  "shape": "square",
+  "colorMode": "vivid",
+  "dotCount": 30,
+  "matchPhysicalSize": true,
+  "accentEdge": "left",
+  "lockPosition": false,
+  "placement": {
+    "monitor": "Synthetic display",
+    "x_ratio": 0.25,
+    "y_ratio": 0.75,
+    "snap": "grid",
+    "disconnected": "monitor",
+    "fallbackMonitor": "Synthetic fallback"
+  },
+  "linux": {
+    "layer": "top",
+    "margin": 16,
+    "monitor": "Synthetic display"
+  },
+  "appearance": "light",
+  "palette": "default",
+  "accent": "#123456",
+  "background": "#abcdef",
+  "widgetOpacity": 80,
+  "backgroundOpacity": 70,
+  "fitHeight": false,
+  "scale": 102.5,
+  "sizePreset": "Large",
+  "fineTune": 82.0,
+  "position": "Free",
+  "showExtraWindows": true,
+  "taskbar": {
+    "enabled": true,
+    "providers": [
+      "claude"
+    ],
+    "window": "both",
+    "showBars": true,
+    "offsetX": 14,
+    "style": "chip",
+    "theme": "dark",
+    "colorMode": "vivid",
+    "dotCount": 30
+  }
+}

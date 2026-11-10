@@ -4,6 +4,50 @@ Display settings and quota collection settings are separate. Change display sett
 
 Theme defaults to System when no choice is stored; an existing explicit theme is preserved. Theme and appearance fields persist in `settings.json`; optional webview cache values are also kept for startup.
 
+## Additional widget records
+
+The root display settings remain the `main` widget. An optional `widgets` array
+stores future additional widgets; an empty array is omitted on save. This data
+model does not create windows or change the current widget UI or placement.
+
+```json
+{
+  "widgets": [{
+    "id": "side-2",
+    "name": "Secondary display",
+    "placement": {"monitor": "Synthetic display", "disconnected": "hide"},
+    "overrides": {"theme": "terminal", "historyMode": "panel", "linux": {"margin": 16}}
+  }]
+}
+```
+
+IDs must match `[a-z0-9-]{1,24}`, be unique, and cannot be `main`. Additional
+widgets require a nonblank `placement.monitor`; invalid entries are skipped
+with a diagnostic. Their `placement.disconnected` is always normalized to
+`hide`, so the stored policy never moves them to another display.
+
+Overrides accept only `theme`, `shape`, `scale`, `sizePreset`, `fineTune`,
+`sizeMode`, `fitFraction`, `fitFineTune`, `fitHeight`, `matchPhysicalSize`,
+`appearance`, `palette`, `accent`, `background`, `widgetOpacity`,
+`backgroundOpacity`, `colorMode`, `dotCount`, `accentEdge`, `historyEnabled`,
+`historyMode`, `historyCost`, `historyModels`, `historyHeatmap`, `historyMachines`,
+`historyPanelOpen`, `showExtraWindows`, `widgetProviders`, `featuredProvider`,
+`featuredPosition`, `quoteEnabled`, `quoteMode`, `quotePosition`, `quoteNavigation`,
+and nested `linux.layer` / `linux.margin`. Other override keys are discarded;
+invalid values reject the entry. `userPalettes`, `providerOrder`, `providerColors`,
+`hiddenProviders`, `taskbar`, `reservedTop`, `reservedBottom`, `linux.monitor`
+and all remaining fields are shared at the root.
+
+The native `load_settings` and `save_settings` commands accept optional
+`widgetId` (default `main`); unknown IDs return an error. Loading an additional
+widget merges its overrides into the root settings and uses its own placement.
+Saving it stores differences from the root as overrides, removes overrides
+reset to the root value, and writes changed shared fields to the root. Main
+calls retain the existing behavior. Additional-widget saves preview the root
+main settings; no additional window or preview lifecycle is introduced.
+
+Older application versions discard `widgets` when saving the settings file.
+
 ## Display settings
 
 `settings.json` lives in the operating system's config directory under `ai-usage`: Linux `$XDG_CONFIG_HOME/ai-usage` (normally `~/.config/ai-usage`); Windows `%APPDATA%/ai-usage`. Window geometry is saved separately in `window.json`. `QUOTACORE_HOME` does **not** relocate display settings. First launch copies legacy settings and window geometry once, preserving the originals and any existing new settings.
