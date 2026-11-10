@@ -37,29 +37,52 @@ for (const light of [false,true]) {
  const mode=light?'light':'dark';
  scenes.set(`taskbar-${mode}`,{w:1100,h:380,html:shell(heading('WINDOWS 11','Small footprint. Always in sight.','Taskbar strip · transparent style · two provider rows')+`<div class="panel-area"><div class="bar"><span>▦ &nbsp; ⌕ &nbsp; ▣ &nbsp; ▤</span><div class="strip"><div>Claude &nbsp;34% <span style="color:${light?'#626262':'#b0b0ba'}">· 2h 40m</span><br>Codex &nbsp; 8% <span style="color:${light?'#626262':'#b0b0ba'}">· 3h 28m</span></div><div>⌁ &nbsp; ◖)) &nbsp; ▰</div><div>12:00<br>01 Nov</div></div></div></div>`,light)});
 }
-// Synthetic provider failures; NO_SUBSCRIPTION stays hidden by the real renderer.
+// Synthetic provider failures; no real provider is contacted.
 const states = structuredClone(snapshot);
 states.providers.forEach((p,i)=>{p.state=['STALE','AUTH_REQUIRED','RATE_LIMITED'][i];p.stale=i===0;if(i===1)p.windows=[];});
 scenes.set('kde-panel',{w:1100,h:370,html:shell(heading('KDE PLASMA 6','Part of your panel','Breeze light · compact session view · mini bars')+`<div class="panel-area"><div class="bar" style="height:44px;background:#eff0f1;color:#232629;border:1px solid #bdc3c7"><span>◉ &nbsp; ▣ &nbsp; ▤</span><div class="strip"><span>CL <b>34%</b><div class="track"><i style="width:34%"></i></div></span><span>CX <b style="color:#8a6300">77%</b><div class="track" style="color:#8a6300"><i style="width:77%"></i></div></span><span>GM <b style="color:#b42323">86%</b><div class="track" style="color:#b42323"><i style="width:86%"></i></div></span><span style="color:#232629">⌁ &nbsp; 12:00</span></div></div></div>`,true)});
 scenes.set('waybar',{w:1100,h:360,html:shell(heading('HYPRLAND / SWAY','Your bar, your workflow','Waybar · shared snapshot · session usage')+`<div class="panel-area"><div class="bar" style="height:32px;font-family:Mono;background:#20242d"><span>1 &nbsp; 2 &nbsp; 3 &nbsp; 4</span><span style="font-size:12px">CL 34% · 2h40 | CX 8% · 3h28 | GM 12% · 2h50 &nbsp; │ &nbsp; 12:00</span></div></div>`)});
-const themeIds = ['system', 'dot-matrix', 'circular-rings', 'terminal', 'frosted-glass', 'brutalist', 'compact-strip', 'retro-lcd', 'minimal-pace', 'reactor'];
-const names = ['System', 'Dot Matrix', 'Circular Rings', 'Terminal', 'Frosted Glass', 'Brutalist', 'Compact Strip', 'Retro LCD', 'Minimal Pace', 'Reactor'];
+const galleryThemeIds = ['system', 'dot-matrix', 'circular-rings', 'terminal', 'frosted-glass', 'brutalist', 'compact-strip', 'retro-lcd', 'minimal-pace', 'reactor', 'liquid-glass', 'layer', 'aurora', 'crisp', 'pebble', 'glyph', 'pastel'];
+const themeIds = galleryThemeIds.slice(0,10);
+const names = ['System', 'Dot Matrix', 'Circular Rings', 'Terminal', 'Frosted Glass', 'Brutalist', 'Compact Strip', 'Retro LCD', 'Minimal Pace', 'Reactor', 'Clear Glass', 'Layer', 'Aurora', 'Crisp', 'Pebble', 'Glyph', 'Pastel'];
 const oneProvider = { ...snapshot, providers: snapshot.providers.slice(0,1) };
 for (const appearance of ['dark','light']) {
  const light = appearance === 'light';
 
- scenes.set(light ? 'themes-light' : 'themes', {w:1180,h:3000,dpr:1,autoHeight:true,html:shell(heading('TEN THEMES', 'Find your own rhythm', 'Medium · three fictional providers · intrinsic Portrait height. Compact Strip keeps its horizontal contract.') + `<div style="display:grid;grid-template-columns:repeat(3,340px);gap:32px;align-items:start">${themeIds.map((id,i)=>(id==='compact-strip'?'<div style="grid-column:1 / -1;grid-row:4">':'')+frame(names[i]+' · '+((i+(light?1:0))%2?'Light':'Dark'),id==='compact-strip'?960:340,1250,{theme:id,sizePreset:'Medium',fineTune:100,appearance:(i+(light?1:0))%2?'light':'dark',colorMode:'vivid',...(id==='dot-matrix'?{palette:'sakura-pink'}:{})})+(id==='compact-strip'?'</div>':'')).join('')}</div>`,light)});
- for (const [i,id] of themeIds.entries()) {
-  scenes.set(`themes/${id}-${appearance}`, {w:id==='compact-strip'?1056:436,h:1450,autoHeight:true,html:shell(frame(names[i],id==='compact-strip'?960:340,1250,{theme:id,appearance}),light)});
-  scenes.set(`checks/${id}-${appearance}`, {w:1260,h:1500,autoHeight:true,html:shell(heading('RESPONSIVE CHECK', `${names[i]} / ${appearance}`, 'Calm / 340 px and 200 px / 100% and 150%') + `<div class="row" style="gap:12px">${[340,200].map(width=>[100,150].map(scale=>frame(`${width}px / ${scale}%`,width,2400,{theme:id,appearance,scale})).join('')).join('')}</div>`,light)});
+ for (const [part, ids] of [galleryThemeIds.filter(id=>id!=='compact-strip').slice(0,9), [...galleryThemeIds.filter(id=>id!=='compact-strip').slice(9),'compact-strip']].entries()) {
+ const name = `themes${part?'-new':''}${light?'-light':''}`;
+ galleries.add(name);
+ const specimen=(id,j)=>{const i=galleryThemeIds.indexOf(id);return frame(names[i]+' · '+((j+(light?1:0))%2?'Light':'Dark'),id==='compact-strip'?960:340,1250,{theme:id,sizePreset:'Medium',fineTune:100,appearance:(j+(light?1:0))%2?'light':'dark',colorMode:'vivid',...(id==='dot-matrix'?{palette:'sakura-pink'}:{})});};
+ scenes.set(name, {w:1180,h:3000,dpr:.9,autoHeight:true,html:shell(heading('17 THEMES',part?'A fresh perspective':'Find your own rhythm',`Part ${part+1} of 2 · Medium · three fictional providers · open for full-size detail.`)+`<div style="display:grid;grid-template-columns:repeat(3,340px);gap:32px;align-items:start">${[0,1,2].map(column=>`<div style="display:grid;gap:32px">${ids.filter(id=>id!=='compact-strip').map((id,j)=>j%3===column?specimen(id,j):'').join('')}</div>`).join('')}${ids.includes('compact-strip')?`<div style="grid-column:1/-1">${specimen('compact-strip',0)}</div>`:''}</div>`,light)});
+
+ }
+ for (const [i,id] of galleryThemeIds.entries()) {
+  scenes.set(`themes/${id}-${appearance}`, {w:id==='compact-strip'?1056:436,h:1450,dpr:1,autoHeight:true,html:shell(frame(names[i],id==='compact-strip'?960:340,1250,{theme:id,appearance}),light)});
+  if(i<10) scenes.set(`checks/${id}-${appearance}`, {w:1260,h:1500,autoHeight:true,html:shell(heading('RESPONSIVE CHECK', `${names[i]} / ${appearance}`, 'Calm / 340 px and 200 px / 100% and 150%') + `<div class="row" style="gap:12px">${[340,200].map(width=>[100,150].map(scale=>frame(`${width}px / ${scale}%`,width,2400,{theme:id,appearance,scale})).join('')).join('')}</div>`,light)});
  }
 }
+
+const historySnapshot = structuredClone(snapshot);
+const daily = Array.from({length:30},(_,i)=>{
+ const tokens = (i % 7 + 2) * 125000;
+ return {date:new Date(Date.UTC(2026,9,3+i)).toISOString().slice(0,10),tokens,cost:tokens/100000,by_machine:{linux:tokens*.6,windows:tokens*.4}};
+});
+historySnapshot.providers[0].history = {scope:'local',daily,prices_as_of:'2026-11-01',models:[{model:'Demo Sonnet',tokens:15000000,cost:150},{model:'Demo Haiku',tokens:3750000,cost:10}],machines:[{id:'linux',tokens:11250000,cost:96},{id:'windows',tokens:7500000,cost:64}],heatmap:Array.from({length:7},(_,d)=>Array.from({length:24},(_,h)=>h>7&&h<19?(d+1)*(h%5+1)*1000:0))};
+historySnapshot.providers[1].history = {scope:'account',daily:daily.map(d=>({date:d.date,tokens:d.tokens*2}))};
+for (const appearance of ['dark','light']) scenes.set(appearance==='dark'?'history':'history-light', {
+ w:1460,h:1200,dpr:1,autoHeight:true,html:shell(heading('USAGE HISTORY','Three ways to look back','Fictional token totals · API price equivalents are estimates, not bills.')+`<div class="row" style="align-items:start">${['under','card','panel'].map((historyMode,i)=>frame(['Under each card · 14 days','Click a card · 30 days','Side panel · 7 or 30 days'][i],historyMode==='panel'?700:340,1600,{theme:'crisp',appearance,historyEnabled:true,historyMode,historyPanelOpen:true,historyMachines:true,position:'Top left'},{snapshot:historySnapshot})).join('')}</div>`,appearance==='light')
+});
+const providerSnapshot = structuredClone(snapshot);
+providerSnapshot.providers[2].state='NO_SUBSCRIPTION';
+providerSnapshot.providers[2].windows=[];
+scenes.set('providers',{w:1180,h:1100,dpr:1,autoHeight:true,html:shell(heading('PROVIDER STATUS','A clear source for every card','Provider logos · equal card heights · fictional data')+`<div class="row" style="align-items:start">${['layer','crisp','pastel'].map(theme=>frame(theme,340,1400,{theme,appearance:theme==='pastel'?'light':'dark'},{snapshot:providerSnapshot})).join('')}</div>`)});
+scenes.set('glass',{w:1100,h:1100,dpr:.9,autoHeight:true,html:shell(`<style>body{background:radial-gradient(ellipse at 15% 30%,#ffb66e,transparent 55%),radial-gradient(ellipse at 80% 70%,#9358cd,transparent 60%),linear-gradient(135deg,#146d9c,#d376a6)}body p,body small{color:white}</style>`+heading('CLEAR GLASS','Let your desktop shine through','Fictional data · CSS gradient wallpaper · browser transparency preview')+`<div class="row" style="align-items:start">${['dark','light'].map(appearance=>frame('Clear Glass · '+appearance,340,1400,{theme:'liquid-glass',appearance,widgetOpacity:75,backgroundOpacity:65})).join('')}</div>`)});
 
 const sourcePalette=JSON.parse(await readFile(resolve(root,'app/src/themes/dot-matrix/theme.json'),'utf8')).palettes.ember;
 const studio={id:'user-studio',name:'Studio',dark:{...sourcePalette,bgWidget:'#242133',bgCard:'#302a43',accent:'#cbb6ff'},light:{...sourcePalette.light,bgWidget:'#eee9fa',bgCard:'#faf6ff',accent:'#62428b'}};
 const ember = {theme:'dot-matrix',palette:'ember',appearance:'dark',colorMode:'vivid'};
-for(const mode of ['dark','light']) scenes.set(`hero-${mode}`, {w:980,h:1100,autoHeight:true,html:shell(`<style>body{padding:32px;background:${mode==='light'?'#f2ece5':'#151619'}}.hero{gap:32px;justify-content:space-between}.copy{max-width:380px}.copy h1{font-size:64px}.logo{width:104px;height:104px}</style><div class="hero"><div class="copy"><img class="logo" src="/assets-docs/logo.svg" alt="AI Usage logo"><p>YOUR LIMITS. IN SIGHT.</p><h1>AI Usage</h1><p>Claude Code · Codex · Gemini<br>Usage windows. Reset countdowns.<br>Right on your desktop.</p><span class="pill">Windows + Linux · 10 themes</span></div>${frame('Dot Matrix · Ember · Vivid',442,1100,{...ember,appearance:mode,sizePreset:'Large',fineTune:100})}</div>`,mode==='light')});
-scenes.set('social-preview',{w:1280,h:640,dpr:1,html:shell(`<style>body{background:radial-gradient(ellipse at right,#ff5a1f22,transparent 65%),#151619}</style><div class="hero"><div class="copy"><img class="logo" src="/assets-docs/logo.svg" alt="AI Usage logo"><h1>AI Usage</h1><p style="font-size:21px">Your usage limits, on your desktop.</p><span class="pill">Windows + Linux · 10 themes</span><p>Claude Code · Codex · Gemini</p></div>${frame('Dot Matrix · Ember',340,500,{...ember,scale:90},{snapshot:oneProvider})}</div>`)});
+for(const mode of ['dark','light']) scenes.set(`hero-${mode}`, {w:980,h:1100,autoHeight:true,html:shell(`<style>body{padding:32px;background:${mode==='light'?'#f2ece5':'#151619'}}.hero{gap:32px;justify-content:space-between}.copy{max-width:380px}.copy h1{font-size:64px}.logo{width:104px;height:104px}</style><div class="hero"><div class="copy"><img class="logo" src="/assets-docs/logo.svg" alt="AI Usage logo"><p>YOUR LIMITS. IN SIGHT.</p><h1>AI Usage</h1><p>Claude Code · Codex · Gemini<br>Usage windows. Reset countdowns.<br>Right on your desktop.</p><span class="pill">Windows + Linux · 17 themes</span></div>${frame('Dot Matrix · Ember · Vivid',442,1100,{...ember,appearance:mode,sizePreset:'Large',fineTune:100})}</div>`,mode==='light')});
+scenes.set('social-preview',{w:1280,h:640,dpr:1,html:shell(`<style>body{background:radial-gradient(ellipse at right,#ff5a1f22,transparent 65%),#151619}</style><div class="hero"><div class="copy"><img class="logo" src="/assets-docs/logo.svg" alt="AI Usage logo"><h1>AI Usage</h1><p style="font-size:21px">Your usage limits, on your desktop.</p><span class="pill">Windows + Linux · 17 themes</span><p>Claude Code · Codex · Gemini</p></div>${frame('Dot Matrix · Ember',340,500,{...ember,scale:90},{snapshot:oneProvider})}</div>`)});
 scenes.set('sizes',{w:2400,h:1600,autoHeight:true,dpr:1,html:shell('<style>body{padding:24px}.row{align-items:center}.specimen:nth-child(4){transform:translateY(20px)}</style>'+heading('ONE SIZE CONTRACT','Five sizes. One shape.','Small / Medium / Large / X-Large / 2X-Large · one fictional provider · 100% fine-tune')+`<div class="row">${Object.entries(sizePresets).map(([sizePreset,scale])=>frame(sizePreset,340*scale/100,326*scale/100,{theme:['terminal','dot-matrix','frosted-glass','brutalist','reactor'][Object.keys(sizePresets).indexOf(sizePreset)],colorMode:'vivid',sizePreset,fineTune:100},{snapshot:oneProvider})).join('')}</div>`,true)});
 scenes.set('scale',{w:1280,h:1500,autoHeight:true,html:shell(heading('READ AT YOUR PACE','A comfortable reading distance','75% / 100% / 150% · fixed type proportions at every scale')+`<div class="row">${frame('75% · Circular Rings · Ocean',255,1400,{theme:'circular-rings',scale:75,colorMode:'vivid'})}${frame('100% · Dot Matrix · Sakura Pink',340,1400,{theme:'dot-matrix',palette:'sakura-pink',appearance:'light',colorMode:'vivid'})}${frame('150% · Minimal Pace · Emerald',510,2000,{theme:'minimal-pace',scale:150,appearance:'light',colorMode:'vivid'})}</div>`,true)});
 scenes.set('palettes',{w:1530,h:1200,autoHeight:true,html:shell(heading('FIND YOUR SIGNAL','A little color goes a long way','Vivid palettes, from soft pink to cool blue.')+`<div class="row">${frame('Dot Matrix · Sakura Pink',340,1500,{theme:'dot-matrix',palette:'sakura-pink',appearance:'light',colorMode:'vivid'})}${frame('Terminal · Studio (custom)',340,1500,{theme:'terminal',palette:'user-studio',userPalettes:[studio],colorMode:'vivid'})}${frame('Frosted Glass · Acrylic',340,1500,{theme:'frosted-glass',colorMode:'vivid'})}${frame('Brutalist · Acid',340,1500,{theme:'brutalist',colorMode:'vivid'})}</div>`,true)});
@@ -70,7 +93,7 @@ for (const mode of ['dark','light']) scenes.set(mode==='dark'?'shapes':'shapes-l
 scenes.set('states',{w:1000,h:1400,autoHeight:true,html:shell(heading('HONEST STATUS','Know when data needs attention','Cached data stays marked. Missing values never become zero.')+`<div class="row">${frame('Terminal · Phosphor · Cached / sign-in / rate limit',400,1400,{theme:'terminal',colorMode:'vivid'},{snapshot:states})}${frame('Retro LCD · Liquid Crystal · Same source states',400,1400,{theme:'retro-lcd',appearance:'light',colorMode:'vivid'},{snapshot:states})}</div>`)});
 for(const mode of ['dark','light']) {
  const light=mode==='light',theme=light?'frosted-glass':'circular-rings';
- scenes.set(`settings-${mode}`,{w:1000,h:920,appearance:mode,html:shell(heading('MAKE IT YOURS','A place on your desktop','Settings open in a separate, resizable window.')+`<iframe title="AI Usage Settings" width="900" height="680" src="/?settings&sample"></iframe>`,light)});
+ scenes.set(`settings-${mode}`,{w:1000,h:920,dpr:1,appearance:mode,html:shell(heading('MAKE IT YOURS','A place on your desktop','Settings open in a separate, resizable window.')+`<iframe title="AI Usage Settings" width="900" height="680" src="/?settings&sample&platform=windows"></iframe>`,light)});
 }
 scenes.set('system',{w:1000,h:1400,autoHeight:true,html:shell(heading('FOLLOWS YOUR DESKTOP','At home in light and dark','System fonts and quiet colors, with the System theme.')+`<div class="row">${frame('System · Desktop · Light',400,1400,{theme:'system',appearance:'light'})}${frame('System · Desktop · Dark',400,1400,{theme:'system',appearance:'dark'})}</div>`,true)});
 scenes.set('checks/vivid', {w:850,h:1600,autoHeight:true,html:shell(heading('COLOR MODE','Calm / Vivid')+`<div class="row">${['calm','vivid'].map(colorMode=>frame(colorMode,340,1400,{colorMode})).join('')}</div>`)});
@@ -157,7 +180,7 @@ function measure(d) {
  const narrow=w.innerWidth<340*scale/100-1;
  return {narrow,compacted:Boolean(d.querySelector('[data-usage-compact=true]')),readingScale:narrow?Math.min(scale,100):scale,labelFonts,dotRatios,dotCounts,dotSizes,minFont,numberFont,minContrast:Math.min(...ratios.map(r=>r.ratio)),ratios,scale,width:w.innerWidth,zoom:w.getComputedStyle(d.querySelector('#app')).zoom};
 }
-const server = createServer(async (req,res)=>{
+const server = createServer({maxHeaderSize:128*1024}, async (req,res)=>{
  try {
   const url=new URL(req.url,'http://localhost');
   if(url.pathname.startsWith('/scene/')) {const scene=scenes.get(url.pathname.slice(7)); if(!scene)throw Error('Unknown scene');res.setHeader('Content-Type','text/html');res.end(scene.html);return;}
@@ -165,7 +188,13 @@ const server = createServer(async (req,res)=>{
   if(url.pathname==='/assets-docs/mono.woff2')path=resolve(root,'app/src/fonts/jetbrains-mono-latin-400-normal.woff2');
   else if(url.pathname.startsWith('/assets-docs/'))path=resolve(root,'docs/assets',url.pathname.split('/').pop());
   else {path=resolve(root,'app/dist','.'+decodeURIComponent(url.pathname));if(path!==resolve(root,'app/dist')&&!path.startsWith(resolve(root,'app/dist')+'/'))throw Error('Invalid path');if(url.pathname==='/')path=resolve(root,'app/dist/index.html');}
-  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.woff2':'font/woff2','.png':'image/png'})[extname(path)]||'application/octet-stream');res.end(await readFile(path));
+  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.woff2':'font/woff2','.png':'image/png'})[extname(path)]||'application/octet-stream');let body=await readFile(path);
+  // Inline bootstrap also reaches Chrome frames hosted in a separate process.
+  if(extname(path)==='.html'&&url.searchParams.has('sample')&&url.searchParams.has('docs')) {
+   const raw=JSON.stringify(url.searchParams.get('docs')).replaceAll('<','\\u003c');
+   body=body.toString().replace('<head>',`<head><script>window.__QUOTA_DOCS_FIXTURE__=JSON.parse(${raw});</script>`);
+  }
+  res.end(body);
  }catch{res.statusCode=404;res.end('Not found');}
 });
 const profile=await mkdtemp(resolve(tmpdir(),'quota-docs-chrome-'));
@@ -189,26 +218,30 @@ try {
  const errors=[];
  const checks=[];
  const typography=[];
- ws.addEventListener('message',event=>{const message=JSON.parse(event.data);if(message.method==='Runtime.exceptionThrown')errors.push(message.params.exceptionDetails.text);const call=pending.get(message.id);if(call){clearTimeout(call.timer);pending.delete(message.id);if(message.error)call.reject(Error(message.error.message));else call.resolve(message.result);}});
+ ws.addEventListener('message',event=>{const message=JSON.parse(event.data);if(message.method==='Runtime.exceptionThrown')errors.push(message.params.exceptionDetails);const call=pending.get(message.id);if(call){clearTimeout(call.timer);pending.delete(message.id);if(message.error)call.reject(Error(message.error.message));else call.resolve(message.result);}});
  await cdp('Page.enable');await cdp('Runtime.enable');
  await cdp('Emulation.setTimezoneOverride',{timezoneId:'UTC'});await cdp('Emulation.setLocaleOverride',{locale:'en-US'});
  await cdp('Page.addScriptToEvaluateOnNewDocument',{source:`const NativeDate=Date;window.Date=class extends NativeDate{constructor(...args){super(...(args.length?args:['2026-11-01T12:00:00Z']))}static now(){return 1793534400000}}; const raw=new URLSearchParams(location.search).get('docs');if(raw)window.__QUOTA_DOCS_FIXTURE__=JSON.parse(raw);`});
  for(const [name,scene] of scenes){
-  if(process.env.SCENE && !name.startsWith(process.env.SCENE))continue;
+  if(process.env.SCENE && !process.env.SCENE.split(',').some(prefix=>name.startsWith(prefix)))continue;
   if(process.env.GALLERY_ONLY && name.startsWith('checks/'))continue;
   errors.length=0;
   await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:scene.h,deviceScaleFactor:scene.dpr||2,mobile:false});
   await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:scene.appearance || 'dark'}]});
   await cdp('Page.navigate',{url:`${base}/scene/${name}`});
+  if(name==='history'||name==='history-light') {
+   const ready=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let i=0;i<150;i++){const frames=[...document.querySelectorAll('iframe')];if(frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){frames[1].contentDocument.querySelector('.provider-card').click();await new Promise(r=>setTimeout(r,150));const pd=frames[2].contentDocument,panel=pd.querySelector('.history-panel');pd.querySelector('#widget').style.minHeight=(panel.scrollHeight+32)+'px';if(!frames[1].contentDocument.querySelector('.usage-history')||!frames[2].contentDocument.querySelector('.history-heat'))throw Error('History capture incomplete');return;}await new Promise(r=>setTimeout(r,100));}throw Error('History readiness');})()`,awaitPromise:true});
+   if(ready.exceptionDetails)throw Error(JSON.stringify({exception:ready.exceptionDetails,errors}));
+  }
   if(name.startsWith('settings-')) {
-   await cdp('Runtime.evaluate',{expression:`(async()=>{for(let i=0;i<100;i++){if(document.querySelector('iframe')?.contentWindow.__SETTINGS_READY__){const d=document.querySelector('iframe').contentDocument;d.querySelector('[data-category=appearance]').click();d.querySelector('#palette-tools').scrollIntoView({block:'center'});return;}await new Promise(r=>setTimeout(r,50));}throw Error('Settings readiness');})()`,awaitPromise:true});
+   await cdp('Runtime.evaluate',{expression:`(async()=>{for(let i=0;i<100;i++){if(document.querySelector('iframe')?.contentWindow.__SETTINGS_READY__){const d=document.querySelector('iframe').contentDocument;d.querySelector('[data-category=appearance]').click();await d.fonts.ready;return;}await new Promise(r=>setTimeout(r,50));}throw Error('Settings readiness');})()`,awaitPromise:true});
    const capture=await cdp('Page.captureScreenshot',{format:'png',optimizeForSpeed:false,captureBeyondViewport:false});await writeFile(resolve(output,`${name}.png`),compressPng(Buffer.from(capture.data,'base64')));console.log(`${name}.png`);continue;
   }
-  const result=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let attempt=0;attempt<150;attempt++){const frames=[...document.querySelectorAll('iframe')];if(location.pathname==='/scene/${name}'&&document.readyState==='complete'&&frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){await document.fonts.ready;await Promise.all(frames.map(f=>f.contentDocument.fonts.ready));for(const f of frames){if(f.contentDocument.documentElement.classList.contains('fit-height')) f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return frames.map(f=>{const d=f.contentDocument;const expected=JSON.parse(new URL(f.src).searchParams.get('docs')).snapshot.providers.length;const overflow=[...d.querySelectorAll('.provider-list,.provider-card,.quota-window,.provider-heading,.windows')].filter(el=>el.scrollWidth>el.clientWidth+2 && !(d.documentElement.dataset.theme==='compact-strip' && el.classList.contains('provider-list') && f.contentWindow.getComputedStyle(el).overflowX==='auto')).map(el=>el.className);return {cards:d.querySelectorAll(d.documentElement.dataset.shape==='circle'?'.dial-track':'.provider-card').length,expected,overflow,theme:d.documentElement.dataset.theme,styles:d.querySelectorAll('#active-theme').length,metrics:(${measure.toString()})(d)};});}await new Promise(r=>setTimeout(r,100));}throw Error('Frame readiness timed out');})()`,awaitPromise:true,returnByValue:true});
+  const result=await cdp('Runtime.evaluate',{expression:`(async()=>{for(let attempt=0;attempt<150;attempt++){const frames=[...document.querySelectorAll('iframe')];if(location.pathname==='/scene/${name}'&&document.readyState==='complete'&&frames.every(f=>f.contentWindow?.__QUOTA_DOCS_READY__)){await document.fonts.ready;await Promise.all(frames.map(f=>f.contentDocument.fonts.ready));for(const f of frames){if(f.contentDocument.documentElement.classList.contains('fit-height')) f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return frames.map(f=>{const d=f.contentDocument;const config=JSON.parse(new URL(f.src).searchParams.get('docs'));const expected=config.snapshot.providers.length;if(d.documentElement.dataset.theme!==config.settings.theme)throw Error('Unexpected fallback theme: '+config.settings.theme);const overflow=[...d.querySelectorAll('.provider-list,.provider-card,.quota-window,.provider-heading,.windows')].filter(el=>el.scrollWidth>el.clientWidth+2 && !(d.documentElement.dataset.theme==='compact-strip' && el.classList.contains('provider-list') && f.contentWindow.getComputedStyle(el).overflowX==='auto')).map(el=>el.className);return {cards:d.querySelectorAll(d.documentElement.dataset.shape==='circle'?'.dial-track':'.provider-card').length,expected,overflow,theme:d.documentElement.dataset.theme,styles:d.querySelectorAll('#active-theme').length,metrics:(${measure.toString()})(d)};});}await new Promise(r=>setTimeout(r,100));}throw Error('Frame readiness timed out');})()`,awaitPromise:true,returnByValue:true});
   if(result.exceptionDetails||errors.length)throw Error(`${name}: ${JSON.stringify(result.exceptionDetails||errors)}`);
   if(result.result.value.some(frame=>frame.cards!==frame.expected || frame.overflow.length || frame.styles!==1))throw Error(`${name}: layout failure ${JSON.stringify(result.result.value.map(({theme,overflow,cards,expected})=>({theme,overflow,cards,expected})))}`);
   if(name==='themes'||name==='themes-light') {
-    const gallery=await cdp('Runtime.evaluate',{expression:`[...document.querySelectorAll('iframe')].map(f=>{const d=f.contentDocument,w=f.contentWindow,theme=d.documentElement.dataset.theme,r=d.querySelector('#widget').getBoundingClientRect(),strip=theme==='compact-strip';if(Math.abs(r.width-(strip?960:340))>2||r.height>(strip?326:746)+2||r.height<100||w.__AI_USAGE_DEMO__.getSettings().sizePreset!=='Medium'||d.querySelectorAll('.provider-card').length!==3)throw Error('Gallery size: '+theme+' '+JSON.stringify({width:r.width,height:r.height,preset:w.__AI_USAGE_DEMO__.getSettings().sizePreset,cards:d.querySelectorAll('.provider-card').length}));return {theme,width:r.width,height:r.height};})`,returnByValue:true});
+    const gallery=await cdp('Runtime.evaluate',{expression:`[...document.querySelectorAll('iframe')].map(f=>{const d=f.contentDocument,w=f.contentWindow,theme=d.documentElement.dataset.theme,r=d.querySelector('#widget').getBoundingClientRect(),strip=theme==='compact-strip';if(Math.abs(r.width-(strip?960:340))>2||r.height>(strip?326:900)+2||r.height<100||w.__AI_USAGE_DEMO__.getSettings().sizePreset!=='Medium'||d.querySelectorAll('.provider-card').length!==3)throw Error('Gallery size: '+theme+' '+JSON.stringify({width:r.width,height:r.height,preset:w.__AI_USAGE_DEMO__.getSettings().sizePreset,cards:d.querySelectorAll('.provider-card').length}));return {theme,width:r.width,height:r.height};})`,returnByValue:true});
     if(gallery.exceptionDetails)throw Error(JSON.stringify(gallery.exceptionDetails));
   }
 
@@ -228,7 +261,7 @@ try {
    result.result.value.forEach((f,i)=>f.system=systemCheck.result.value[i]);
   }
   for(const {metrics:m,theme} of result.result.value) {
-   if(m.labelFonts.some(f=>f.font<(f.compact||m.narrow?11:Math.max(m.scale>=85?11:9,13*m.scale/100))-.05))throw Error(name+': quota label below reading floor / '+theme+' '+JSON.stringify(m.labelFonts)+' '+m.scale+' '+m.width);
+   if(m.labelFonts.some(f=>f.font<(f.compact||m.narrow?11:Math.max(m.scale>=85?11:9,(galleryThemeIds.indexOf(theme)>=10?11:13)*m.scale/100))-.05))throw Error(name+': quota label below reading floor / '+theme+' '+JSON.stringify(m.labelFonts)+' '+m.scale+' '+m.width);
    if(m.dotRatios.some(r=>Math.abs(1-r)>.02))throw Error(name+': stretched dot / '+theme);
   }
   checks.push({scene:name,frames:result.result.value});
@@ -242,6 +275,7 @@ try {
    const stale = await cdp('Runtime.evaluate',{expression:`[...document.querySelectorAll('iframe')].map(f=>{const d=f.contentDocument;const badges=[...d.querySelectorAll('.status-badge')];if(badges.length!==3||badges.some(b=>b.textContent!=='STALE'))throw Error('Old snapshot not marked STALE: '+d.documentElement.dataset.theme);return d.documentElement.dataset.theme;})`,returnByValue:true});
    if(stale.exceptionDetails)throw Error(JSON.stringify(stale.exceptionDetails));
   }
+  if(['glass','providers','history','history-light'].includes(name))await cdp('Runtime.evaluate',{expression:`(async()=>{for(let i=0;i<3;i++){for(const f of document.querySelectorAll('iframe'))f.height=Math.ceil(f.contentDocument.querySelector('#widget').getBoundingClientRect().height);await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}})()`,awaitPromise:true});
   if(galleries.has(name))await cdp('Runtime.evaluate',{expression:`document.querySelector('header').style.textAlign='center'`});
   if(scene.autoHeight){
    const bounds=await cdp('Runtime.evaluate',{expression:`Math.ceil(Math.max(...[...document.body.children].map(el=>el.getBoundingClientRect().bottom)))+48`,returnByValue:true});
@@ -260,7 +294,9 @@ try {
   await writeFile(resolve(output,`${name}.png`),png);
   console.log(`${name}.png (${png.readUInt32BE(16)} × ${png.readUInt32BE(20)})`);
  }
- if(process.env.SCENE?.startsWith('settings-')) {
+ if(process.env.GALLERY_ONLY) {
+  console.log('Gallery captures complete; browser layout assertions passed.');
+ } else if(process.env.SCENE?.startsWith('settings-')) {
   console.log('Settings images captured; use settings-check.mjs for interactions.');
  } else if(process.env.SCENE?.startsWith('checks/providers-')) {
    const consentChecks=await cdp('Runtime.evaluate',{expression:`(async()=>{

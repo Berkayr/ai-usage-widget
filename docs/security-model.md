@@ -2,15 +2,16 @@
 
 AI Usage runs as the current user. Do not run it elevated. It reads quota
 metadata and, after provider selection, may use existing credentials to retrieve
-usage or balances. It does not scan conversation history or request model
-completions. There is no application telemetry, analytics, developer upload,
+usage or balances. It does not request model completions. Optional Claude history opens local
+Claude Code conversation logs to extract usage metadata after explicit permission;
+message content is not retained or transmitted. There is no application telemetry, analytics, developer upload,
 background update check, or remote webview content in the product code.
 Third-party tools retain their own networking and telemetry behavior.
 
 ## Consent and diagnostics
 
 A new installation starts with every provider disabled. The shared **Choose what
-to track** screen lists access disclosures and unchecked choices in all eight
+to track** screen lists access disclosures and unchecked choices across all 17
 themes. **Start** persists the choices; only selected providers can then collect.
 The same controls remain in settings. CLI users run `quotacore init` (interactive)
 or `quotacore configure claude codex` (explicit selection); `quotacore configure`
@@ -111,6 +112,32 @@ error truncation is not a general secret-redaction guarantee.
 
 Implementation: [atomic files](../quotacore/paths.py),
 [history](../quotacore/history.py), [native writes](../app/src-tauri/src/lib.rs).
+
+## Optional token usage history
+
+**Read Claude Code logs** defaults off. Saving this permission in History settings
+(or explicitly running `quotacore local-history on`) enables reading JSONL files
+under Claude Code's local projects directory. The standalone `quotacore history`
+command is an explicit one-time read, independent of the saved permission.
+The parser opens log records, selects assistant usage metadata and aggregates
+tokens, model names, day/hour, inferred machine types and estimated API prices.
+Message content is not kept or transmitted. Source logs are not modified.
+There is no separate token-history database: aggregates travel in the local
+`snapshot.json` and are private metadata. This differs from the separate pacing
+log and its purge command described above.
+
+Claude history covers locally available logs within the parser's 30-day window,
+not all account activity. Synced logs can include other computers; machine types
+are inferred from paths, so two machines of the same type cannot be separated.
+Disabling permission stops future reads; refreshing replaces the previous
+snapshot. Hiding history in the widget alone does not revoke log access.
+Codex daily totals come from its account usage source and cover all devices;
+model, computer and heatmap breakdowns are unavailable. Gemini has no token
+history. API price equivalents are estimates, not subscription charges.
+
+Implementation: [local parser](../quotacore/local_history.py),
+[Claude adapter](../quotacore/providers/claude.py),
+[Codex adapter](../quotacore/providers/codex.py).
 
 ## Processes and hooks
 

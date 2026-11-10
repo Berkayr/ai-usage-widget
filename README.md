@@ -34,7 +34,7 @@ Installers are coming with v0.1; no release is available yet.
 
 Linux needs host Python 3.10+, provider CLIs and the appropriate GTK/WebKit runtime; AppImage also has host dependencies. Windows slim installers are for users who already have Python 3.10+. Provider tools are installed separately. See [packaging](packaging/README.md) before building or testing a package.
 
-Uninstall after installation: on Windows 11, use **Settings → Apps → Installed apps → AI Usage → Uninstall** (Windows 10: **Apps & features**). On Debian/Ubuntu use `sudo apt remove ai-usage`; on Fedora use `sudo dnf remove ai-usage`. For the script-installed AppImage, run `sh scripts/install.sh --uninstall` from a checkout. Disable **Start at login** first. Configuration and local quota state are separate from the executable; see [their locations](docs/configuration.md) before optionally removing them. Remove panel integrations from their desktop/bar configuration separately. Uninstalling keeps your settings and usage history; on Linux, delete `~/.config/ai-usage`, `~/.config/quotacore`, `~/.local/state/quotacore` and `~/.local/share/ai-usage` to remove them too.
+Uninstall after installation: on Windows 11, use **Settings → Apps → Installed apps → AI Usage → Uninstall** (Windows 10: **Apps & features**). On Debian/Ubuntu use `sudo apt remove ai-usage`; on Fedora use `sudo dnf remove ai-usage`. For the script-installed AppImage, run `sh scripts/install.sh --uninstall` from a checkout. Disable **Start at login** first. Configuration and local quota state are separate from the executable; see [their locations](docs/configuration.md) before optionally removing them. Remove panel integrations from their desktop/bar configuration separately. Uninstalling keeps your settings and local usage metadata; on Linux, delete `~/.config/ai-usage`, `~/.config/quotacore`, `~/.local/state/quotacore` and `~/.local/share/ai-usage` to remove them too.
 
 ## Quick start
 
@@ -59,7 +59,7 @@ Open Vite's displayed URL with `?sample` to see fictional data. For a native sou
 
 ### Five shapes, the same data
 
-Choose Portrait, Landscape, Square, Circle Dial or Pill in **Layout & Position**. Circle and Pill show up to three selected providers; Square pages through additional providers. All five share size presets and provider colors.
+Choose Portrait, Landscape, Square, Circle Dial or Pill in **General → Layout & Position**. Circle and Pill show up to three selected providers; Square pages through additional providers. All five share size presets and provider colors.
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/shapes-light.png">
@@ -83,41 +83,71 @@ Scale text and spacing together from 50% to 300%, with presets or Ctrl +/− and
 
 ### Find your signal
 
-Every theme includes 12 palettes. In **Theme → Palette**, choose **New palette** or **Duplicate**, name it and edit its Dark and Light colors, then **Save**. **Export** copies palette JSON into the transfer field; paste an exported array there and choose **Import** to reuse it. Contrast warnings help flag unreadable combinations.
+Every theme includes 12 palettes. In **Appearance → Palette**, choose **New palette** or **Duplicate**, name it and edit its Dark and Light colors, then **Save**. **Export** copies palette JSON into the transfer field; paste an exported array there and choose **Import** to reuse it. Contrast warnings help flag unreadable combinations.
 
-Choose a quiet Calm look, colorful Vivid palettes or pure black and white Mono. Ten themes change the layout as well as the colors. Theme cards in Settings switch designs immediately; every theme supports Auto, Light and Dark appearance.
+Choose a quiet Calm look, colorful Vivid palettes or pure black and white Mono. Seventeen themes change the layout as well as the colors. Theme cards in Settings switch designs immediately; every theme supports Auto, Light and Dark appearance.
 
 ![Pink, custom violet, blue glass and acid palette examples](docs/screenshots/palettes.png)
 <sub>Dot Matrix / Sakura Pink, Light · Terminal / Studio (custom) · Frosted Glass / Acrylic · Brutalist / Acid. Vivid, fictional data.</sub>
 
 ### Know when data needs attention
 
-Cached data stays marked, sign-in failures ask for attention, and unavailable quotas never become zero. Providers without an active subscription stay hidden.
+Cached data stays marked, sign-in failures ask for attention, and unavailable quotas never become zero. Enabled providers without quota data keep an explanatory card, such as **No subscription found**, with setup guidance. Provider logos identify each source; Portrait cards keep equal heights.
 
 ![Terminal and Retro LCD show cached, sign-in and rate-limit states](docs/screenshots/states.png)
 <sub>Terminal / Phosphor, Dark · Retro LCD / Liquid Crystal, Light. Vivid, fictional data.</sub>
 
 ### Your desktop, your settings
 
-Change palette, opacity, scale and placement in one panel. Calm uses neutral usage ink below 50%, soft amber from 50% and muted red from 80%. Mono adds hollow warning marks and inverse percentage labels. Choose 10, 20 or 30 meter marks; XS uses 10. Optional monitor scale compensation and the fixed type scale are explained in the [design standard](docs/design-spec.md).
+Settings open in a separate, resizable window with six sidebar categories: **General**, **Appearance**, **Providers**, **History**, **Taskbar** and **About**. The sidebar becomes horizontal tabs in narrow windows. Changes preview live; **Save** keeps them, while **Revert** or **Discard** restores saved settings. Change layout and placement in General, themes and palettes in Appearance, collection and card order in Providers, and optional log access in History. Calm uses neutral usage ink below 50%, soft amber from 50% and muted red from 80%. Mono adds hollow warning marks and inverse percentage labels. Choose 10, 20 or 30 meter marks; XS uses 10. Optional monitor scale compensation and the fixed type scale are explained in the [design standard](docs/design-spec.md).
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/settings-light.png">
-  <img src="docs/screenshots/settings-dark.png" alt="Palette controls in light and dark settings" width="980">
+  <img src="docs/screenshots/settings-dark.png" alt="Appearance settings with sidebar navigation, theme picker and Save/Revert controls; fictional data" width="980">
 </picture>
-<sub>Theme palette settings · Light and Dark · fictional data.</sub>
+<sub>Appearance settings with sidebar · Light and Dark · fictional data.</sub>
 
 Prefer the familiar? System uses your desktop font, light/dark appearance and system accent where supported. It is the default theme.
 
 ![System theme adapts to light and dark desktop appearance](docs/screenshots/system.png)
 <sub>System / Desktop · Light and Dark · Calm · fictional data.</sub>
 
-### Ten designs, one snapshot
+### Seventeen designs, one snapshot
 
-![Ten themes in three rows plus a horizontal strip, mixing light and dark appearance](docs/screenshots/themes.png)
-<sub>Rows: System, Dot Matrix / Sakura Pink, Circular Rings · Terminal, Frosted Glass, Brutalist · Retro LCD, Minimal Pace, Reactor. Compact Strip below. Alternating Dark / Light, Vivid, fictional data.</sub>
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/themes-light.png">
+  <img src="docs/screenshots/themes.png" alt="Original nine portrait theme layouts in the first gallery sheet; fictional data" width="1100">
+</picture>
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/themes-new-light.png">
+  <img src="docs/screenshots/themes-new.png" alt="Seven new themes and Compact Strip complete the seventeen-theme gallery; fictional data" width="1100">
+</picture>
+<sub>All 17 designs across two sheets · alternating Light / Dark · Vivid · fictional data. Open the image for full-size detail.</sub>
 
-[Individual light and dark captures](docs/screenshots/themes/) · [Alternate gallery](docs/screenshots/themes-light.png) · [All themes in Mono](docs/screenshots/mono.png)
+| Theme | Character |
+| --- | --- |
+| System | Familiar desktop typography and continuous meters; the default. |
+| Dot Matrix | Dotted meters and bold display numbers. |
+| Circular Rings | Concentric quota rings with centered totals. |
+| Terminal | Monospaced readouts and ruled sections. |
+| Frosted Glass | Soft translucent surfaces and capsule meters. |
+| Brutalist | Oversized numbers and strong geometric contrast. |
+| Compact Strip | Horizontal rows for a narrow desktop footprint. |
+| Retro LCD | Segmented display styling and instrument-like columns. |
+| Minimal Pace | Quiet typography and restrained progress marks. |
+| Reactor | Instrument-style rings with optional motion. |
+| Clear Glass | Transparent glass surfaces that let wallpaper show through. |
+| Layer | Stacked panels and prominent provider logos. |
+| Aurora | Glossy window frames and luminous segmented meters. |
+| Crisp | Clean borders and compact, structured readouts. |
+| Pebble | Rounded, tactile surfaces and soft tones. |
+| Glyph | Expressive typography and graphic quota marks. |
+| Pastel | Gentle colors and softly rounded cards. |
+
+[Individual light and dark captures](docs/screenshots/themes/) · [Alternate gallery](docs/screenshots/themes-light.png) · [Mono gallery](docs/screenshots/mono.png) (the original ten designs)
+
+![Clear Glass in dark and light appearance over a colorful gradient wallpaper; fictional data, browser preview](docs/screenshots/glass.png)
+<sub>Clear Glass · fictional data · CSS wallpaper and browser transparency preview. Clear Glass and Layer request Acrylic on Windows 11 and Blur on Windows 10; actual desktop composition depends on the OS and needs native validation.</sub>
 
 Windows has an optional taskbar strip with independent provider, window and theme settings. Linux integrations include KDE Plasma, GNOME Shell, Waybar, Polybar and i3blocks. The following taskbar/panel images are HTML illustrations using fictional data; native rendering and desktop compatibility need separate testing.
 
@@ -134,22 +164,46 @@ Windows has an optional taskbar strip with independent provider, window and them
 
 See [configuration](docs/configuration.md) for every setting and environment override.
 
+## Usage history
+
+Choose a layout in **Settings → History**:
+
+- **Under each card:** a compact 14-day chart with today and seven-day totals.
+- **Click a card:** expand one card for a 30-day chart and Today / 7d / 30d totals; Enter or Space works too.
+- **Side panel:** an attached panel with a provider selector and 7 / 30-day charts; the arrow remembers its open state.
+
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/history-light.png">
+  <img src="docs/screenshots/history.png" alt="Under-card chart, expanded Claude card and side panel with model shares, heatmap and computer totals; fictional data" width="1400">
+</picture>
+<sub>Three history layouts · Crisp · fictional data, including invented models and computer totals.</sub>
+
+Claude history comes only from Claude Code logs available on **this computer**, not account-wide activity. **Read Claude Code logs** is off by default and requires Save to enable. It reads local usage records to summarize tokens; it does not store or transmit conversation text or create a separate history database. Aggregated usage metadata is included in the local quota snapshot. Turning permission off stops future reads; refresh replaces the previous snapshot.
+
+Optional extras include **API price equivalents** (estimates, not your subscription bill), model shares, an activity heatmap in the side panel, and computer splitting when logs contain two distinct machine types. Synced logs may include other computers; two computers of the same type cannot be distinguished. Model/activity breakdowns cover available parsed records; charts and price totals follow the selected range.
+
+Codex supplies **account-wide** daily totals across devices, without model, computer or activity breakdowns. Gemini has no usage history. History display is separate from permission to read Claude logs. See [history configuration](docs/configuration.md#widget-usage-history).
+
 ## Supported tools
 
 | Tool | Status | What is shown |
 | --- | --- | --- |
-| Claude Code | Beta | OAuth usage windows; observation/cache fallback |
-| Codex | Beta | CLI app-server quota windows |
-| Gemini CLI / Antigravity | Stable Antigravity adapter; direct Gemini CLI planned | agy quota snapshot and explicit refresh |
-| GitHub Copilot | Beta | Internal usage endpoint |
-| OpenRouter | Beta | API key usage and account credits |
-| DeepSeek API | Beta | Currency balances |
-| JetBrains AI | Beta | Local IDE quota/credit cache |
-| Z.ai GLM Coding Plan | Experimental | 5-hour and monthly quota windows |
-| Moonshot / Kimi, SiliconFlow | Experimental | API balance |
-| OpenAI API, Anthropic API | Experimental | This month's spend (admin key) |
+| <img src="app/src/icons/providers/claude.svg" width="20" height="20" alt=""> Claude Code | Beta | OAuth usage windows; observation/cache fallback |
+| <img src="app/src/icons/providers/codex.svg" width="20" height="20" alt=""> Codex | Beta | CLI app-server quota windows |
+| <img src="app/src/icons/providers/gemini.svg" width="20" height="20" alt=""> Gemini CLI / Antigravity | Stable Antigravity adapter; direct Gemini CLI planned | agy quota snapshot and explicit refresh |
+| <img src="app/src/icons/providers/copilot.svg" width="20" height="20" alt=""> GitHub Copilot | Beta | Internal usage endpoint |
+| <img src="app/src/icons/providers/openrouter.svg" width="20" height="20" alt=""> OpenRouter | Beta | API key usage and account credits |
+| <img src="app/src/icons/providers/deepseek.svg" width="20" height="20" alt=""> DeepSeek API | Beta | Currency balances |
+| <img src="app/src/icons/providers/jetbrains.svg" width="20" height="20" alt=""> JetBrains AI | Beta | Local IDE quota/credit cache |
+| <img src="app/src/icons/providers/zai.svg" width="20" height="20" alt=""> Z.ai GLM Coding Plan | Experimental | 5-hour and monthly quota windows |
+| <img src="app/src/icons/providers/moonshot.svg" width="20" height="20" alt=""> Moonshot / Kimi, <img src="app/src/icons/providers/siliconflow.svg" width="20" height="20" alt=""> SiliconFlow | Experimental | API balance |
+| <img src="app/src/icons/providers/openai_admin.svg" width="20" height="20" alt=""> OpenAI API, <img src="app/src/icons/providers/anthropic_admin.svg" width="20" height="20" alt=""> Anthropic API | Experimental | This month's spend (admin key) |
 
 Stable marks recorded live-source checks; beta adapters still need live-account acceptance; experimental adapters have not been tried with a real account. [Sources, credentials and limitations](docs/providers.md) are documented per provider.
+
+![Layer, Crisp and Pastel cards show provider logos, quota windows and a Gemini No subscription found explanation; fictional data](docs/screenshots/providers.png)
+
+**Provider states:** OK shows current data; STALE marks cached data; AUTH_REQUIRED asks you to sign in; RATE_LIMITED asks you to wait. NO_SUBSCRIPTION, NOT_INSTALLED and SOURCE_UNAVAILABLE keep a setup or availability explanation for enabled providers. Missing data never means zero usage; disabled providers are excluded.
 
 ## Platforms
 
@@ -173,7 +227,7 @@ The widget reads a local JSON snapshot. A separate Python collector calls the en
 
 First launch asks which providers to track; all providers stay disabled until you choose **Start**. CLI users run `quotacore init`. New providers default off. The widget reads a local snapshot. Collection can contact provider services using existing credentials: Claude's `~/.claude/.credentials.json`, Codex/agy CLI-managed authentication, GitHub CLI's token, or API keys for OpenRouter, DeepSeek, Z.ai, Moonshot, SiliconFlow, OpenAI Admin and Anthropic Admin from environment variables or local `secrets.json`. JetBrains reads a local quota XML file.
 
-Requests retrieve usage or balances; the collector does not submit prompts or request model completions. It does not scan chat history. Passive panel reads make no network requests; explicit refresh runs the collector. There is no application telemetry or analytics code. Third-party CLIs retain their own networking behavior. Snapshots, observations and pace history stay local and can contain sensitive usage metadata; do not attach raw files to issues. See the [security model](docs/security-model.md) for credential destinations, plaintext key storage, process limits, retention and verification; [provider data boundaries](docs/providers.md) describe adapter support.
+Requests retrieve usage or balances; the collector does not submit prompts or request model completions. Optional Claude history reads local Claude Code JSONL usage records only after explicit permission; conversation text is not retained or sent. Codex history comes from its account usage source. Passive panel reads make no network requests; explicit refresh runs the collector. There is no application telemetry or analytics code. Third-party CLIs retain their own networking behavior. Snapshots, observations and pace history stay local and can contain sensitive usage metadata; do not attach raw files to issues. See the [security model](docs/security-model.md) for credential destinations, plaintext key storage, process limits, retention and verification; [provider data boundaries](docs/providers.md) describe adapter support.
 
 ### Optional daily quote
 
@@ -187,7 +241,7 @@ Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) o
 
 **What happens when credentials expire?** The source reports an authentication error or marked cached data. Sign in again through the provider's tool; the widget does not renew credentials.
 
-**Does it read my prompts?** It does not scan conversation history or submit prompts. Optional status-line hooks extract quota fields from their input; never share raw hook payloads.
+**Does it read my prompts?** It never submits prompts or requests completions. Optional Claude history opens local conversation log files to extract usage metadata; it does not retain or transmit message content. Log access defaults off. Optional status-line hooks extract quota fields from their input; never share raw hook payloads.
 
 **Why won't a corner stick on Wayland?** Fixed placement needs compositor layer-shell support and the GTK3 runtime. GNOME normally uses an ordinary window; choose its panel integration or the documented XWayland option.
 
