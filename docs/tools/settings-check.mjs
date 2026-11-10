@@ -127,9 +127,9 @@ try {
       if(cmd==='get_provider_config')return {initialized:true,providers:Object.fromEntries(['claude','codex','gemini','copilot'].map(id=>[id,{enabled:true}])),disclosures:Object.fromEntries(['claude','codex','gemini','copilot'].map(id=>[id,'Synthetic provider'])),detected:{}};
       if(cmd==='get_autostart')return false;
       if(cmd==='get_desktop_info')return {platform:'linux',layerShell:true,monitors:[]};
-      if(cmd==='get_placement_monitors')return {layerShell:true,monitors:[{name:'Synthetic display',width:1920,height:1080,primary:true}],widgetWidth:340,widgetHeight:600};
+      if(cmd==='get_placement_monitors')return {layerShell:true,monitors:state.disconnected?[]:[{name:'Synthetic display',width:1920,height:1080,primary:true}],widgetWidth:340,widgetHeight:600};
       if(cmd==='get_runtime_diagnostics')return {paths:{python_version:'3.x',runtime_source:'synthetic'}};
-      if(cmd==='preview_settings'){await new Promise(r=>setTimeout(r,5));state.previews.push(structuredClone(args.settings));return;}
+      if(cmd==='preview_settings'){await new Promise(r=>setTimeout(r,5));state.previews.push(structuredClone(args.settings));(state.previewTargets??=[]).push({id:args.widgetId,root:structuredClone(args.rootSettings)});return;}
       if(cmd==='save_settings'){state.saves.push(structuredClone(args.settings));await new Promise(r=>setTimeout(r,state.saveDelay||0));disk=structuredClone(args.settings);disk.taskbar.colorMode=disk.colorMode;disk.taskbar.dotCount=disk.dotCount;if(state.mismatch)delete disk.fineTune;return;}
       if(cmd==='plugin:event|listen'){events.set(args.handler,args.event);return args.handler;}
       if(cmd==='finish_settings'){state.hidden++;return;}
@@ -339,6 +339,76 @@ try {
     $('[data-theme=system]').click();assert($('#fit-screen').getAttribute('aria-pressed')==='true','Theme Fit restoration');
     return 'PASS: Portrait-only Fit hint, effective preset and stored Fit restored across all shapes and Strip';
   })()`));
+  await b.navigate('/?settings','window.__SETTINGS_READY__');
+  console.log(await b.evaluate(`(async()=>{
+    const $=s=>document.querySelector(s),assert=(v,m)=>{if(!v)throw Error(m)},native=window.__FAKE_NATIVE__;
+    const wait=()=>new Promise(r=>setTimeout(r,50));
+    const choose=id=>{$('#widget-select').value=id;$('#widget-select').dispatchEvent(new Event('change'));};
+    const change=(id,value)=>{const el=$('#'+id);el.value=value;el.dispatchEvent(new Event('change'));};
+    choose('+');await wait();
+    assert(!$('#widget-add').hidden,'Add form');
+    assert($('#widget-new-monitor option').textContent==='Synthetic display','Main monitor must be offered');
+    assert($('#widget-new-name').value==='Synthetic display','Suggested name');
+    $('#widget-create').click();await wait();
+    const first=$('#widget-select').value;
+    assert(/^[a-z0-9-]{1,24}$/.test(first)&&first!=='main','Generated ID');
+    assert(native.previewTargets.at(-1).root.widgets[0].overrides&&Object.keys(native.previewTargets.at(-1).root.widgets[0].overrides).length===0,'New widget must inherit Main');
+    change('widget-name','Side display');
+    $('[data-category=appearance]').click();$('[data-theme=terminal]').click();
+    [...document.querySelectorAll('#placement-presets button')].find(b=>b.textContent==='Bottom right').click();await wait();
+    assert(native.previewTargets.at(-1).id===first,'Preview targeted wrong widget');
+    assert(native.previews.at(-1).position==='Bottom right','Effective corner missing');
+    assert($('#category-appearance .widget-reset').hidden===false,'Override reset missing');
+    assert($('#reactor-motion').closest('label').textContent.includes('Shared by all widgets'),'Shared note');
+    assert(!$('#featured-provider').closest('label').textContent.includes('Shared by all widgets'),'Overridable field marked shared');
+    assert($('#disconnected').disabled&&$('#disconnected').value==='hide','Additional widget policy');
+    $('#reactor-motion').click();await wait();
+    choose('main');assert($('#reactor-motion').checked,'Shared setting did not go to root');
+    assert($('#position').value==='Top right'&&$('#theme-picker [data-theme=system]').getAttribute('aria-pressed')==='true','Child changed Main');
+    choose(first);assert($('#position').value==='Bottom right','Switch lost override');
+    $('#category-appearance .widget-reset').click();await wait();
+    assert($('#position').value==='Top right'&&$('#category-appearance .widget-reset').hidden,'Reset to Main');
+    $('[data-theme=terminal]').click();
+    choose('+');await wait();$('#widget-create').click();await wait();
+    const second=$('#widget-select').value;
+    assert(first!==second,'IDs not unique');
+    choose(first);$('[data-category=history]').click();$('#history-cost').click();
+    choose(second);$('[data-category=general]').click();$('#quote-enabled').click();await wait();
+    const before=native.saves.length;
+    assert(parseInt($('#status').textContent)>=3,'Count must cover all widgets');
+    $('#save').click();await wait();
+    assert(native.saves.length===before+1,'Save must write once');
+    const saved=native.saves.at(-1);
+    assert(saved.widgets.length===2&&saved.widgets[0].name==='Side display','Widget records missing');
+    assert(saved.reactorMotion===true&&!('reactorMotion' in saved.widgets[0].overrides),'Shared field saved in override');
+    assert(saved.widgets[0].overrides.theme==='terminal'&&saved.widgets[1].overrides.quoteEnabled===true,'Overrides missing');
+    assert($('#save').disabled,'Honest save remains dirty: '+$('#status').textContent);
+    choose(first);$('[data-category=history]').click();$('#history-models').click();
+    choose(second);$('#history-heatmap').click();
+    assert(parseInt($('#status').textContent)>=2,'Saved-widget changes missing from count');
+    $('#revert').click();await wait();
+    native.disconnected=true;choose('+');await wait();$('#widget-add-cancel').click();choose(first);
+    assert(!$('#widget-monitor-status').hidden&&$('#widget-monitor-status').textContent==='Monitor not connected; hidden until it returns','Missing monitor state');
+    assert($('#widget-select option:checked').classList.contains('widget-disconnected'),'Disconnected option not dimmed');
+    $('[data-category=appearance]').click();$('[data-theme=system]').click();await wait();
+    assert(native.previewTargets.at(-1).id===first,'Disconnected widget cannot be edited');
+    $('#widget-remove').click();assert(!$('#widget-remove-confirm').hidden,'Inline confirmation missing');
+    $('#widget-remove-cancel').click();assert($('#widget-remove-confirm').hidden,'Remove cancel');
+    $('#widget-remove').click();$('#widget-remove-yes').click();
+    assert($('#widget-select').value==='main'&&!$('#widget-select option[value="'+first+'"]'),'Remove failed');
+    $('#revert').click();await wait();
+    assert($('#widget-select option[value="'+first+'"]').textContent.startsWith('Side display'),'Revert did not restore removal');
+    assert($('#save').disabled,'Revert left dirty state');
+    choose(first);assert($('#theme-picker [data-theme=terminal]').getAttribute('aria-pressed')==='true','Revert lost saved child override');
+    $('#widget-remove').click();$('#widget-remove-yes').click();$('#save').click();await wait();
+    assert(native.saves.at(-1).widgets.length===1,'Removal not persisted');
+    choose('main');assert($('#widget-details').hidden,'Main removal must be unavailable');
+    choose('+');await wait();assert($('#widget-create').disabled,'No-monitor Add must be disabled');$('#widget-add-cancel').click();
+    choose(second);$('[data-category=appearance]').click();
+    return 'PASS: widget add/name/monitor/unique ID, targeted previews, shared fields, Reset to Main, cross-widget Save/count, disconnected edit, inline Remove/Cancel, Revert and persisted removal';
+  })()`));
+  const widgetPng=await b.cdp('Page.captureScreenshot',{format:'png'});
+  if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(join(output,'widget-picker.png'),Buffer.from(widgetPng.data,'base64'));
   await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
   console.log(await b.evaluate(`(async()=>{
     const api=window.__AI_USAGE_DEMO__, monitor={name:'Synthetic small display',width:800,height:560,scale:1,primary:true};

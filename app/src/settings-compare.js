@@ -11,7 +11,7 @@ export function canonical(value, path = '') {
           .flatMap(([ key, child ]) => {
             if (!path && key === 'providerPreview')
               return [];
-            if (path === 'placement')
+            if (path === 'placement' || path.endsWith('.placement'))
               key = ({x_ratio : 'xRatio', y_ratio : 'yRatio'})[key] || key;
             const normalized = canonical(child, path ? `${path}.${key}` : key);
             return normalized === undefined ? [] : [ [ key, normalized ] ];

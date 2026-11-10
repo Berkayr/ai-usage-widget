@@ -13,6 +13,8 @@ import {differingKeys, equalSettings} from './settings-compare.js';
 import {layoutControls} from './settings-layout.js';
 import {settingsMarkup} from './settings-markup.js';
 import {settingsCategories, mountNavigation, decorateRows, decorateGroups} from './settings-navigation.js';
+import {effectiveWidget, splitWidget, widgetChangeCount} from './settings-widgets.js';
+import {mountWidgetPicker} from './settings-widget-picker.js';
 import {version} from '../package.json';
 import {
   effectiveSizeMode,
@@ -103,11 +105,12 @@ export const defaults = {
     fallbackMonitor : null
   }
 };
+let rootDraft, selectedWidget = 'main';
 let draft = structuredClone(defaults), saved, providers, savedProviders,
     autostart = false, savedAutostart = false, closing = false, saving = false,
     positionBefore = null;
 const abort = new AbortController(), stops = [];
-let disposed = false, previewRunning = false, previewPending = null;
+let disposed = false, previewRunning = false, previewPending = new Map();
 function errorText(value) {
   return value instanceof Error      ? value.message
          : typeof value === 'object' ? JSON.stringify(value)
@@ -130,22 +133,22 @@ async function settingsInvoke(command, args) {
 }
 
 let previewWork = Promise.resolve();
-function preview() {
+function preview(widgetId = selectedWidget, settings = draft) {
   // One worker drains the latest value; closing/reverting waits for the drain.
-  previewPending = {
-    ...structuredClone(draft),
-    providerPreview : structuredClone(providers ?? [])
-  };
+  previewPending.set(widgetId, {
+    settings: {...structuredClone(settings), providerPreview: structuredClone(providers ?? [])},
+    widgetId, rootSettings: structuredClone(rootDraft)
+  });
   if (previewRunning)
     return previewWork;
   previewRunning = true;
   previewWork = (async () => {
     try {
-      while (previewPending && !disposed) {
-        const value = previewPending;
-        previewPending = null;
+      while (previewPending.size && !disposed) {
+        const [id, value] = previewPending.entries().next().value;
+        previewPending.delete(id);
         if (!sample)
-          await settingsInvoke('preview_settings', {settings : value});
+          await settingsInvoke('preview_settings', value);
       }
     } catch (e) {
       error(e);
@@ -158,12 +161,12 @@ function preview() {
 }
 
 function changed() {
-  return !!saved && (!equalSettings(draft, saved) ||
+  return !!saved && (!equalSettings(rootDraft, saved) ||
                      !equalSettings(providers, savedProviders) ||
                      autostart !== savedAutostart || localHistory !== savedLocalHistory);
 }
 function mark() {
-  const count = saved ? differingKeys(draft, saved).length +
+  const count = saved ? widgetChangeCount(rootDraft, saved) +
       Number(!equalSettings(providers, savedProviders)) +
       Number(autostart !== savedAutostart) + Number(localHistory !== savedLocalHistory) : 0;
   const dirty = count > 0;
@@ -189,11 +192,13 @@ function mark() {
 }
 function normalizeDraft(value) {
   const normalized = normalizeSize(value);
-  normalized.taskbar = {...normalized.taskbar, colorMode:normalized.colorMode, dotCount:normalized.dotCount};
+  if (selectedWidget === 'main') normalized.taskbar = {...normalized.taskbar, colorMode:normalized.colorMode, dotCount:normalized.dotCount};
   return normalized;
 }
 function update() {
   draft = normalizeDraft(draft);
+  rootDraft = splitWidget(rootDraft, selectedWidget, draft);
+  draft = effectiveWidget(rootDraft, selectedWidget);
   renderControls();
   mark();
   preview().catch(() => {});
@@ -635,24 +640,23 @@ function renderControls() {
   document.querySelectorAll('[data-size]').forEach(button => {
     const candidate = normalizeSize(
         {...draft, sizeMode : 'fixed', sizePreset : button.dataset.size});
-    const fit = fittedGeometry(candidate, visibleProviderCount(),
-                               selectedMonitor() || geometry.monitors[0],
-                               desktopPlatform);
+    const monitor = selectedMonitor();
+    const fit = monitor ? fittedGeometry(candidate, visibleProviderCount(), monitor, desktopPlatform) : null;
     button.setAttribute('aria-pressed',
                         String(effectiveSizeMode(draft) !== 'screen' &&
                                button.dataset.size === draft.sizePreset));
-    button.disabled = !fit.fits;
-    button.title = fit.fits ? '' : 'Too big for this screen';
-    button.querySelector('small').textContent =
-        `${Math.round(fit.width)} × ${Math.round(fit.height)} px`;
+    button.disabled = !!fit && !fit.fits;
+    button.title = fit && !fit.fits ? 'Too big for this screen' : '';
+    button.querySelector('small').textContent = fit
+        ? `${Math.round(fit.width)} × ${Math.round(fit.height)} px` : 'Monitor not connected';
     button.querySelector('.size-hint').textContent =
-        fit.fits ? '' : 'Too big for this screen';
+        fit && !fit.fits ? 'Too big for this screen' : '';
   });
-  const screenFit = fittedGeometry(
+  const screenFit = selectedMonitor() ? fittedGeometry(
       {...draft, sizeMode : 'screen'}, visibleProviderCount(),
-      selectedMonitor() || geometry.monitors[0], desktopPlatform);
+      selectedMonitor(), desktopPlatform) : null;
   $('#fit-screen small').textContent =
-      $('#fit-screen').disabled ? 'Portrait only' : `${Math.round(screenFit.width)} × ${Math.round(screenFit.height)} px`;
+      $('#fit-screen').disabled ? 'Portrait only' : screenFit ? `${Math.round(screenFit.width)} × ${Math.round(screenFit.height)} px` : 'Monitor not connected';
 
   const p = themePalette();
   const paper = draft.background || p.bgWidget;
@@ -706,6 +710,7 @@ function renderControls() {
   renderMap();
   decorateRows(panel);
   decorateGroups(panel);
+  widgetPicker.render(geometry.monitors);
 }
 export const bindings = {
   'history-enabled':'historyEnabled', 'history-mode':'historyMode',
@@ -852,8 +857,10 @@ function renderMap() {
   const monitor = detected && workAreaMonitor(detected, draft, desktopPlatform);
   $('#monitor-map').hidden = !monitor;
   $('#size-fit-warning').hidden = true;
-  if (!monitor)
+  if (!monitor) {
+    $('#detected-area').textContent = 'Monitor not connected';
     return;
+  }
   const fit =
       fittedGeometry(draft, visibleProviderCount(), detected, desktopPlatform);
   geometry.widgetWidth = fit.width;
@@ -991,7 +998,11 @@ $('#map-widget').onkeydown = event => {
 };
 async function refreshMonitors() {
   if (!sample)
-    geometry = await settingsInvoke('get_placement_monitors');
+    geometry = await settingsInvoke('get_placement_monitors', {widgetId: saved?.widgets?.some(w => w.id === selectedWidget) ? selectedWidget : 'main'});
+  populateMonitors();
+  renderControls();
+}
+function populateMonitors() {
   for (const id of ['placement-monitor', 'fallback-monitor', 'linux-monitor']) {
     const el = $(`#${id}`), value = get(bindings[id]);
     el.replaceChildren(new Option('Primary / Auto', ''));
@@ -1001,7 +1012,6 @@ async function refreshMonitors() {
       el.add(new Option(`${value} (disconnected)`, value));
     el.value = value ?? '';
   }
-  renderControls();
 }
 async function save() {
   if (saving || !changed())
@@ -1011,9 +1021,11 @@ async function save() {
     return false;
   }
   saving = true;
+  panel.inert = true;
+  document.querySelector('.widget-picker').inert = true;
   saveFailure = '';
   mark();
-  const value = structuredClone(draft), chosen = structuredClone(providers),
+  const value = structuredClone(rootDraft), chosen = structuredClone(providers),
         login = autostart, readLogs = localHistory;
   try {
     await preview();
@@ -1054,6 +1066,8 @@ async function save() {
     return false;
   } finally {
     saving = false;
+    panel.inert = false;
+    document.querySelector('.widget-picker').inert = false;
     mark();
   }
 }
@@ -1061,14 +1075,19 @@ async function save() {
 $('#save').onclick = save;
 $('#revert').onclick = () => {
   saveFailure = '';
-  draft = structuredClone(saved);
+  rootDraft = structuredClone(saved);
+  if (selectedWidget !== 'main' && !rootDraft.widgets?.some(w => w.id === selectedWidget)) selectedWidget = 'main';
+  draft = effectiveWidget(rootDraft, selectedWidget);
   providers = structuredClone(savedProviders);
   autostart = savedAutostart;
   localHistory = savedLocalHistory;
   $('#start-at-login').checked = autostart;
   positionBefore = null;
   renderProviders();
-  update();
+  populateMonitors();
+  renderControls();
+  mark();
+  restorePreviews().catch(error);
 };
 async function close() {
   if (closing)
@@ -1092,9 +1111,9 @@ $('#close-save').onclick = async () => {
 };
 $('#close-discard').onclick = async () => {
   try {
-    draft = structuredClone(saved);
+    rootDraft = structuredClone(saved);
     providers = structuredClone(savedProviders);
-    await preview();
+    await restorePreviews();
     await close();
   } catch (e) {
     error(e);
@@ -1146,8 +1165,11 @@ async function loadSession() {
   const manifest = themes.find(t => t.id === draft.theme);
   if (!paletteChoices(manifest, draft)[draft.palette])
     draft.palette = Object.keys(manifest.palettes)[0];
+  selectedWidget = 'main';
   draft = normalizeDraft(draft);
-  saved = structuredClone(draft);
+  for (const widget of draft.widgets || []) widget.placement = {...defaults.placement, ...normalizePlacement(widget.placement)};
+  rootDraft = structuredClone(draft);
+  saved = structuredClone(rootDraft);
   if (paletteLoadError) error(paletteLoadError);
   if (!sample) {
     snapshotProviders =
@@ -1220,6 +1242,35 @@ async function loadSession() {
   mark();
   panel.inert = false;
   mark();
+}
+function selectWidget(id) {
+  if (saving) return;
+  if (positionBefore) cancelPlacement();
+  selectedWidget = id;
+  positionBefore = null;
+  drag = null;
+  draft = effectiveWidget(rootDraft, id);
+  populateMonitors();
+  renderControls();
+  mark();
+}
+const widgetPicker = mountWidgetPicker({sections, bindings,
+  root: () => rootDraft, selected: () => selectedWidget, select: selectWidget,
+  refresh: refreshMonitors,
+  mutate: work => {
+    work(rootDraft);
+    draft = effectiveWidget(rootDraft, selectedWidget);
+    populateMonitors();
+    renderControls();
+    mark();
+    preview().catch(error);
+  }
+});
+async function restorePreviews() {
+  const root = structuredClone(rootDraft);
+  const work = ['main', ...(root.widgets || []).map(w => w.id)].map(id =>
+    preview(id, effectiveWidget(root, id)));
+  await Promise.all(work);
 }
 try {
   await loadSession();

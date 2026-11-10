@@ -58,7 +58,7 @@ fn shared_edits_go_to_root_and_reset_overrides_to_inheritance() {
     edited.theme = root.theme.clone();
     edited.provider_order = vec!["synthetic".into()];
     edited.hidden_providers = vec!["synthetic".into()];
-    edited.reserved_top = Some(50);
+    edited.reactor_motion = true;
     edited.taskbar.enabled = false;
     let mut json = value(&edited);
     json["linux"]["margin"] = value(&root)["linux"]["margin"].clone();
@@ -68,7 +68,7 @@ fn shared_edits_go_to_root_and_reset_overrides_to_inheritance() {
     let saved = split(&root,"side-2",&edited).unwrap();
     assert_eq!(saved.provider_order,edited.provider_order);
     assert_eq!(saved.hidden_providers,edited.hidden_providers);
-    assert_eq!(saved.reserved_top,Some(50));
+    assert!(saved.reactor_motion);
     assert!(!saved.taskbar.enabled);
     assert!(!saved.widgets[0].overrides.contains_key("theme"));
     assert_eq!(saved.widgets[0].overrides["linux"],json!({"layer":"bottom"}));
@@ -112,8 +112,8 @@ fn only_explicitly_allowed_fields_can_override_root() {
     }]})).unwrap();
     let overrides=&root.widgets[0].overrides;
     for key in ["taskbar","userPalettes","providerOrder","providerColors","hiddenProviders",
-        "reservedTop","reservedBottom","position","lockPosition","reactorMotion",
-        "providerPreview","placementEditing","unknown","historyFutureSharedField"] {
+        "reactorMotion",
+        "providerPreview","unknown","historyFutureSharedField"] {
         assert!(!overrides.contains_key(key),"{key}");
     }
     assert_eq!(overrides["linux"],json!({"layer":"top","margin":9}));
@@ -201,4 +201,29 @@ fn sync_creates_and_removes_only_configured_additional_widgets() {
     assert_eq!(sync_decision(&labels, &[]),(vec![],vec!["widget-side-2".into()]));
     assert_eq!(sync_decision(&[], &root.widgets),(vec!["widget-side-2".into()],vec![]));
     assert_eq!(sync_decision(&[], &[]),(vec![],vec![]));
+}
+
+#[test]
+fn widget_corner_and_position_fields_are_independent() {
+    let root = fixture();
+    let mut edited = effective(&root, "side-2").unwrap();
+    edited.position = "Bottom right".into();
+    edited.lock_position = false;
+    edited.reserved_top = Some(20);
+    edited.reserved_bottom = Some(10);
+    edited.placement.x_ratio = 1.;
+    edited.placement.y_ratio = 1.;
+    edited.placement_editing = true;
+    let result = split(&root, "side-2", &edited).unwrap();
+    let reloaded: Settings = serde_json::from_value(value(&result)).unwrap();
+    let child = effective(&reloaded, "side-2").unwrap();
+    assert_eq!(child.position, "Bottom right");
+    assert!(!child.lock_position);
+    assert!(child.placement_editing);
+    assert_eq!(child.reserved_top, Some(20));
+    assert_eq!(child.reserved_bottom, Some(10));
+    assert_eq!(child.placement.y_ratio, 1.);
+    assert_eq!(reloaded.position, root.position);
+    assert_eq!(reloaded.reserved_top, root.reserved_top);
+    assert_eq!(reloaded.lock_position, root.lock_position);
 }

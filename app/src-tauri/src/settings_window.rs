@@ -40,9 +40,9 @@ fn apply_preview(app: &tauri::AppHandle, mut settings: Settings, label: &str) ->
     Ok(())
 }
 #[tauri::command]
-pub fn preview_settings(app: tauri::AppHandle, settings: Settings, widget_id: Option<String>) -> Result<(), String> {
+pub fn preview_settings(app: tauri::AppHandle, settings: Settings, widget_id: Option<String>, root_settings: Option<Settings>) -> Result<(), String> {
     let label = widgets::label(widget_id.as_deref())?;
-    let root = current();
+    let root = root_settings.unwrap_or_else(current);
     let id = widgets::id_from_label(&label)?;
     widgets::effective(&root, id)?;
     let settings = if id == widgets::MAIN_ID { settings } else {
