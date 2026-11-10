@@ -1,4 +1,5 @@
 //! GTK3 integration. Load layer-shell at runtime so X11/GNOME need no extra library.
+use tauri::Manager;
 use gtk::{glib::translate::ToGlibPtr, prelude::*};
 use libloading::Library;
 use serde::{Deserialize, Serialize};
@@ -12,6 +13,7 @@ thread_local! {
     static MONITOR_WARNING: RefCell<HashMap<String, Option<String>>> = RefCell::new(HashMap::new());
 }
 static SETTINGS_OPEN: LazyLock<Mutex<HashMap<String, bool>>> = LazyLock::new(Mutex::default);
+static CLOSED_LAYER: LazyLock<Mutex<HashMap<String, bool>>> = LazyLock::new(Mutex::default);
 static LAYER: LazyLock<Mutex<HashMap<String, bool>>> = LazyLock::new(Mutex::default);
 fn flag(states: &Mutex<HashMap<String, bool>>, label: &str) -> bool {
     states.lock().unwrap_or_else(|e| e.into_inner()).get(label).copied().unwrap_or(false)
@@ -78,8 +80,9 @@ fn selected_monitor(label: &str, display: &gtk::gdk::Display, selection: &Option
             previous.insert(label.into(), warning);
         }
     });
-    result.and_then(Result::ok).and_then(|index| display.monitor(index))
-        .or_else(||display.primary_monitor()).or_else(||display.monitor(0))
+    let selected = result.and_then(Result::ok).and_then(|index| display.monitor(index));
+    if label != crate::widgets::MAIN_ID { return selected; }
+    selected.or_else(||display.primary_monitor()).or_else(||display.monitor(0))
 }
 impl Default for Options {
     fn default() -> Self { Self { layer: "bottom".into(), margin: 12, monitor: None } }
@@ -88,6 +91,19 @@ pub fn wayland() -> bool {
     std::env::var("GDK_BACKEND").map(|s|s == "wayland").unwrap_or_else(|_| std::env::var("XDG_SESSION_TYPE").as_deref() == Ok("wayland") || std::env::var_os("WAYLAND_DISPLAY").is_some())
 }
 pub fn layered(label: &str) -> bool { flag(&LAYER, label) }
+pub(crate) fn mark_layer_closed(label: &str) {
+    if label != crate::widgets::MAIN_ID && layered(label) {
+        if !CLOSED_LAYER.lock().unwrap_or_else(|e| e.into_inner()).insert(label.into(), true).unwrap_or(false) {
+            eprintln!("Layer surface unmapped/closed: {label}");
+        }
+    }
+}
+pub(crate) fn recreate_layer(label: &str, monitor_available: bool) -> bool {
+    needs_recreation(label != crate::widgets::MAIN_ID, flag(&CLOSED_LAYER, label), monitor_available)
+}
+fn needs_recreation(additional: bool, closed: bool, monitor_available: bool) -> bool {
+    additional && closed && monitor_available
+}
 // All symbol calls are on GTK's main thread; the library stays loaded for the window lifetime.
 unsafe fn call<T: Copy>(lib: &Library, name: &[u8]) -> Option<T> { lib.get::<T>(name).ok().map(|s| *s) }
 static HINT_SHOWN: LazyLock<Mutex<HashMap<String, bool>>> = LazyLock::new(Mutex::default);
@@ -98,7 +114,14 @@ pub fn placement_hint(label: &str) -> Option<&'static str> {
 }
 
 pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
-    // Configure the existing view on GTK's main thread; no second web context.
+    let label = window.label();
+    for states in [&LAYER, &CLOSED_LAYER, &SETTINGS_OPEN, &HINT_SHOWN] {
+        states.lock().unwrap_or_else(|e| e.into_inner()).remove(label);
+    }
+    LAST_PLACEMENT.with(|slot| { slot.borrow_mut().remove(label); });
+    PENDING_RESIZE.with(|slot| { slot.borrow_mut().remove(label); });
+    MONITOR_WARNING.with(|slot| { slot.borrow_mut().remove(label); });
+    // Configure each view on GTK's main thread.
     let _ = window.with_webview(|webview| {
         use webkit2gtk::{SettingsExt, WebContextExt, WebViewExt};
         let view = webview.inner();
@@ -125,8 +148,7 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
         if let Some(context) = view.context() {
             context.set_cache_model(webkit2gtk::CacheModel::DocumentViewer);
         }
-        // Modern WebKit ignores the deprecated process-count limit. The app
-        // creates exactly one view; keep WebKit's sandbox/process isolation.
+        // Keep WebKit's sandbox/process isolation for every widget view.
     });
     let Ok(gtk) = window.gtk_window() else { return };
     crate::linux_blur::watch(window, &gtk);
@@ -158,12 +180,20 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
         gtk.set_type_hint(gtk::gdk::WindowTypeHint::Utility);
         if wayland() { eprintln!("AI Usage: layer-shell unavailable; fixed corners require XWayland or a panel integration."); }
     }
+    if window.label() != crate::widgets::MAIN_ID {
+        let label = window.label().to_owned();
+        let app = window.app_handle().clone();
+        gtk.connect_unmap(move |_| {
+            mark_layer_closed(&label);
+            crate::placement::monitor_changed(app.clone());
+        });
+    }
     apply(window, options, corner);
     // Explicitly clear WebKitGTK's backing surface; opacity belongs to the CSS widget.
     let _ = window.set_background_color(Some(tauri::window::Color(0,0,0,0)));
     // Tao queues the initial visible=false request. A direct GTK show here is
     // undone when that queue drains; enqueue our show through Tao as well.
-    let _ = window.show();
+    if window.label() == crate::widgets::MAIN_ID { let _ = window.show(); }
 }
 pub fn resize_layer(window: &tauri::WebviewWindow, width: Option<i32>, height: Option<f64>) -> Result<(), String> {
     if height.is_some_and(|h| !h.is_finite()) { return Err("Invalid widget height".into()); }
@@ -200,6 +230,7 @@ pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
     let Ok(gtk) = window.gtk_window() else { return };
     let display = gtk.display();
     let monitor = selected_monitor(window.label(), &display, &options.monitor);
+    if window.label() != crate::widgets::MAIN_ID && monitor.is_none() { return; }
     if !layered(window.label()) {
         gtk.set_keep_above(options.layer == "top");
         gtk.set_keep_below(options.layer != "top");
@@ -302,6 +333,13 @@ pub(crate) fn write_autostart(path: &std::path::Path, exe: &std::path::Path, ena
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn closed_layer_recreates_only_an_additional_widget_after_monitor_returns() {
+        assert!(!needs_recreation(true,true,false));
+        assert!(needs_recreation(true,true,true));
+        assert!(!needs_recreation(true,false,true));
+        assert!(!needs_recreation(false,true,true));
+    }
     #[test]
     fn monitor_settings_accept_names_and_legacy_indices() {
         let named: Options = serde_json::from_str(r#"{"monitor":"DP-2"}"#).unwrap();

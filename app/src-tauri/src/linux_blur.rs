@@ -320,6 +320,9 @@ pub fn apply(window: &tauri::WebviewWindow, enabled: bool) {
     });
 }
 pub fn watch(window: &tauri::WebviewWindow, widget: &gtk::ApplicationWindow) {
+    WAYLAND.with(|slot| { slot.borrow_mut().remove(window.label()); });
+    WARNING.with(|slot| { slot.borrow_mut().remove(window.label()); });
+    CORNER_RADIUS_PHYSICAL.lock().unwrap_or_else(|e| e.into_inner()).remove(window.label());
     let target = window.clone();
     widget.connect_map(move |_| crate::shape_region::request(&target));
     // GDK can replace a Wayland surface on hide/show without unrealizing GTK.

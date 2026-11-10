@@ -16,6 +16,10 @@ fn state(label: &str) -> Arc<State> {
     state_for(&mut STATES.lock().unwrap_or_else(|e| e.into_inner()), label)
 }
 
+pub(crate) fn reset(label: &str) {
+    STATES.lock().unwrap_or_else(|e| e.into_inner()).remove(label);
+}
+
 #[cfg(any(windows,test))]
 fn client_region_bounds(width: i32, height: i32, offset_x: i32, offset_y: i32) -> (i32,i32,i32,i32) {
     (offset_x, offset_y, offset_x + width, offset_y + height)

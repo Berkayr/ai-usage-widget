@@ -30,6 +30,89 @@ pub(crate) fn command_window(window: tauri::WebviewWindow, id: Option<&str>) -> 
     window.app_handle().get_webview_window(&label).ok_or_else(|| "Widget window unavailable".into())
 }
 
+// Window construction runs off the event thread (required by WebView2).
+static SYNC: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+pub(crate) fn on_main<T: Send + 'static>(app: &tauri::AppHandle, work: impl FnOnce() -> Result<T, String> + Send + 'static) -> Result<T, String> {
+    let (tx, rx) = std::sync::mpsc::channel();
+    app.run_on_main_thread(move || { let _ = tx.send(work()); }).map_err(|e| e.to_string())?;
+    rx.recv_timeout(std::time::Duration::from_secs(15)).map_err(|e| e.to_string())?
+}
+
+fn sync_decision(existing: &[String], widgets: &[Widget]) -> (Vec<String>, Vec<String>) {
+    let desired: HashSet<_> = widgets.iter().filter_map(|w| label(Some(&w.id)).ok()).collect();
+    let mut create: Vec<_> = desired.iter().filter(|label| !existing.contains(label)).cloned().collect();
+    let mut close: Vec<_> = existing.iter().filter(|label| label.as_str() != MAIN_ID
+        && id_from_label(label).is_ok() && !desired.contains(*label)).cloned().collect();
+    create.sort(); close.sort();
+    (create, close)
+}
+
+pub(crate) fn build(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, String> {
+    let mut config = app.config().app.windows.iter().find(|w| w.label == MAIN_ID)
+        .ok_or("Main window configuration unavailable")?.clone();
+    config.label = label(Some(id))?;
+    if id != MAIN_ID { config.url = tauri::WebviewUrl::App(format!("index.html?widget={id}").into()); }
+    tauri::WebviewWindowBuilder::from_config(app, &config).map_err(|e| e.to_string())?
+        .build().map_err(|e| e.to_string())
+}
+
+fn destroy(window: tauri::WebviewWindow) -> Result<(), String> {
+    use tauri::Manager;
+    let app = window.app_handle().clone();
+    let (tx, rx) = std::sync::mpsc::channel();
+    window.on_window_event(move |event| {
+        if matches!(event, tauri::WindowEvent::Destroyed) { let _ = tx.send(()); }
+    });
+    window.destroy().map_err(|e| e.to_string())?;
+    rx.recv_timeout(std::time::Duration::from_secs(15)).map_err(|e| e.to_string())?;
+    // Let Tauri remove the old label before constructing its replacement.
+    on_main(&app, || Ok(()))
+}
+
+pub(crate) fn sync(app: tauri::AppHandle) {
+    std::thread::spawn(move || {
+        let _guard = SYNC.lock().unwrap_or_else(|e| e.into_inner());
+        if let Err(error) = sync_windows(&app) { eprintln!("Widget sync failed: {error}"); }
+    });
+}
+
+fn sync_windows(app: &tauri::AppHandle) -> Result<(), String> {
+    use tauri::Manager;
+    let root = super::settings_window::current();
+    let existing: Vec<_> = app.webview_windows().into_keys().collect();
+    let (mut create, close) = sync_decision(&existing, &root.widgets);
+    for label in close {
+        if let Some(window) = app.get_webview_window(&label) { destroy(window)?; }
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let target = app.clone();
+        let recreate = on_main(app, move || {
+            let mut labels = Vec::new();
+            for (label, window) in target.webview_windows() {
+                if id_from_label(&label).is_err() || label == MAIN_ID { continue; }
+                let settings = super::settings_window::current_for(&label);
+                let available = super::placement::selected(&super::placement::configured_monitors(&window, &settings), &settings).is_some();
+                if super::linux::recreate_layer(&label, available) { labels.push(label); }
+            }
+            Ok(labels)
+        })?;
+        for label in recreate {
+            if let Some(window) = app.get_webview_window(&label) {
+                eprintln!("Recreating closed layer surface: {label}");
+                destroy(window)?;
+                create.push(label);
+            }
+        }
+    }
+    for label in create {
+        let window = build(app, id_from_label(&label)?)?;
+        on_main(app, move || super::initialize_widget(&window))?;
+    }
+    Ok(())
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct Widget {
     pub id: String,

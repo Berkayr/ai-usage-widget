@@ -52,7 +52,9 @@ let meterObserver;
 let disposed = false;
 const domEvents = new AbortController();
 async function subscribe(name, handler) {
-  const unlisten = await listen(name, handler);
+  const options = ['settings-preview', 'monitor-scale'].includes(name)
+    ? { target: { kind: 'Window', label: getCurrentWindow().label } } : undefined;
+  const unlisten = await listen(name, handler, options);
   if (disposed) unlisten(); else unlisteners.push(unlisten);
 }
 let pollTimer;

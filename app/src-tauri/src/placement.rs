@@ -98,7 +98,9 @@ pub fn apply(window: &tauri::WebviewWindow, settings: &Settings) -> Result<(),St
 fn apply_size(window: &tauri::WebviewWindow, settings: &Settings, #[cfg(windows)] requested: Option<((u32,u32),(u32,u32))>) -> Result<(),String> {
     let list=configured_monitors(window,settings);
     let p=&settings.placement;
-    let Some(monitor)=selected(&list,settings) else { let _=window.hide(); return Ok(()); };
+    let Some(monitor)=selected(&list,settings) else { return window.hide().map_err(|e|e.to_string()); };
+    #[cfg(target_os="linux")]
+    if linux::recreate_layer(window.label(), true) { return Ok(()); }
     #[cfg(not(windows))] let (width,height)=widget_size(window);
     #[cfg(windows)] let ((width,height),frame)=match requested {
         Some((inner,frame))=>((inner.0.saturating_add(frame.0),inner.1.saturating_add(frame.1)),frame),
@@ -123,6 +125,11 @@ fn apply_size(window: &tauri::WebviewWindow, settings: &Settings, #[cfg(windows)
     #[cfg(not(windows))] let x=inset_position(xr,monitor.width,width,margin,&p.snap);
     #[cfg(not(windows))] let y=inset_position(yr,monitor.height,height,margin,&p.snap);
     #[cfg(target_os="linux")] {
+        if !linux::layered(window.label()) {
+            let mut options = settings.linux.clone();
+            if window.label() != widgets::MAIN_ID { options.monitor = p.monitor.clone().map(linux::MonitorSelection::Name); }
+            linux::apply(window, &options, &settings.position);
+        }
         if linux::layered(window.label()) { linux::place(window,&settings.linux,&monitor.name,monitor.x+x,monitor.y+y); if !window.is_visible().unwrap_or(false) { let _=window.show(); } return Ok(()); }
     }
     #[cfg(target_os="linux")] { use gtk::prelude::*; if let Ok(gtk)=window.gtk_window() { let desired=(monitor.x+x,monitor.y+y); if gtk.position()!=desired { gtk.move_(desired.0,desired.1); } if !window.is_visible().unwrap_or(false) {let _=window.show();} return Ok(()); } }
@@ -147,7 +154,7 @@ static PENDING: AtomicBool=AtomicBool::new(false);
 pub fn monitor_changed(app: tauri::AppHandle) {
     if PENDING.swap(true,Ordering::Relaxed) { return; }
     thread::spawn(move || { thread::sleep(Duration::from_millis(400)); let target=app.clone();
-        let _=app.run_on_main_thread(move || { PENDING.store(false,Ordering::Relaxed); if std::env::var_os("AI_USAGE_SETTINGS_SOAK_CYCLES").is_some() {eprintln!("monitor-soak-applied");} #[cfg(target_os="linux")] linux::invalidate_placement(); for (label,w) in target.webview_windows() { if widgets::id_from_label(&label).is_ok() { let _=apply(&w,&settings_window::current_for(&label)); } } let _=target.emit("monitors-changed",()); });
+        let _=app.run_on_main_thread(move || { PENDING.store(false,Ordering::Relaxed); if std::env::var_os("AI_USAGE_SETTINGS_SOAK_CYCLES").is_some() {eprintln!("monitor-soak-applied");} #[cfg(target_os="linux")] linux::invalidate_placement(); for (label,w) in target.webview_windows() { if widgets::id_from_label(&label).and_then(|id| widgets::effective(&settings_window::current(),id)).is_ok() { if let Err(error)=apply(&w,&settings_window::current_for(&label)) { eprintln!("Widget placement failed ({label}): {error}"); } } } widgets::sync(target.clone()); let _=target.emit("monitors-changed",()); });
     });
 }
 pub fn watch(app: tauri::AppHandle) {
@@ -238,6 +245,23 @@ pub fn watch(app: tauri::AppHandle) {
     }
     #[test] fn snapping() {assert_eq!(snap(9,100,"edges"),0);assert_eq!(snap(46,100,"edges"),50);assert_eq!(snap(94,100,"edges"),100);assert_eq!(snap(46,100,"off"),46);assert_eq!(snap(46,100,"grid"),48);assert_eq!(snap(100,99,"grid"),96);}
     #[test] fn missing_monitor_returns_and_falls_back() {let list=vec![monitor("A",true),monitor("B",false)]; let mut p=Placement{monitor:Some("gone".into()),..Default::default()}; assert_eq!(select(&list,&p).unwrap().name,"A");p.disconnected="monitor".into();p.fallback_monitor=Some("B".into());assert_eq!(select(&list,&p).unwrap().name,"B");p.disconnected="hide".into();assert!(select(&list,&p).is_none());p.monitor=Some("B".into());assert_eq!(select(&list,&p).unwrap().name,"B");}
+    #[test]
+    fn additional_widget_hides_until_its_monitor_returns_without_fallback() {
+        let root: Settings = serde_json::from_value(json!({"widgets":[{
+            "id":"side", "name":"Synthetic", "placement":{"monitor":"B","disconnected":"monitor","fallbackMonitor":"A","x_ratio":0.25,"y_ratio":0.75}
+        }]})).unwrap();
+        let settings = widgets::effective(&root, "side").unwrap();
+        let connected = vec![monitor("A",true), monitor("B",false)];
+        let disconnected = vec![monitor("A",true)];
+        for _ in 0..10 {
+            assert_eq!(selected(&connected, &settings).map(|m|m.name.as_str()), Some("B"));
+            assert!(selected(&disconnected, &settings).is_none());
+            assert!(selected(&[], &settings).is_none());
+            assert_eq!(settings.placement.x_ratio,0.25);
+            assert_eq!(settings.placement.y_ratio,0.75);
+        }
+        assert_eq!(selected(&disconnected, &Settings::default()).unwrap().name,"A");
+    }
     #[test] fn position_schema_roundtrip() {let p:Placement=serde_json::from_str(r#"{"monitor":"Synthetic","x_ratio":0.25,"y_ratio":0.75}"#).unwrap();assert_eq!(p.x_ratio,0.25);let value=serde_json::to_value(p).unwrap();assert_eq!(value["y_ratio"],0.75);assert!(value.get("xRatio").is_none());let alias:Placement=serde_json::from_str(r#"{"xRatio":0.5}"#).unwrap();assert_eq!(alias.x_ratio,0.5);}
     #[test] fn old_settings_keep_corner() {let s:Settings=serde_json::from_str(r#"{"position":"Bottom left"}"#).unwrap();assert_eq!(s.position,"Bottom left");assert!(s.lock_position);assert!(s.placement.monitor.is_none());assert_eq!(s.placement.disconnected,"primary");}
 }

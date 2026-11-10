@@ -7,8 +7,9 @@ Theme defaults to System when no choice is stored; an existing explicit theme is
 ## Additional widget records
 
 The root display settings remain the `main` widget. An optional `widgets` array
-stores future additional widgets; an empty array is omitted on save. This data
-model does not create windows or change the current widget UI or placement.
+creates additional `widget-<id>` windows at startup and after settings are saved;
+an empty array is omitted on save. Removing a record closes its window. The
+settings UI still edits Main by default; a widget picker is not available yet.
 
 ```json
 {
@@ -24,7 +25,11 @@ model does not create windows or change the current widget UI or placement.
 IDs must match `[a-z0-9-]{1,24}`, be unique, and cannot be `main`. Additional
 widgets require a nonblank `placement.monitor`; invalid entries are skipped
 with a diagnostic. Their `placement.disconnected` is always normalized to
-`hide`, so the stored policy never moves them to another display.
+`hide`, so the stored policy never moves them to another display. A missing
+monitor hides the window; reconnecting it restores the saved placement. On
+Wayland, an unmapped or compositor-closed layer surface is recreated when its
+monitor is available again. Main retains its existing disconnection policy.
+Only Main owns the Windows taskbar strip.
 
 Overrides accept only `theme`, `shape`, `scale`, `sizePreset`, `fineTune`,
 `sizeMode`, `fitFraction`, `fitFineTune`, `fitHeight`, `matchPhysicalSize`,
@@ -44,7 +49,8 @@ widget merges its overrides into the root settings and uses its own placement.
 Saving it stores differences from the root as overrides, removes overrides
 reset to the root value, and writes changed shared fields to the root. Main
 calls retain the existing behavior. Additional-widget saves preview the root
-main settings; no additional window or preview lifecycle is introduced.
+main settings and update each additional window with its effective settings.
+Settings previews addressed with `widgetId` reach only that widget.
 
 Older application versions discard `widgets` when saving the settings file.
 

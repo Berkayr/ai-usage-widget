@@ -234,7 +234,9 @@ fn save_settings(app: tauri::AppHandle, mut settings: Settings) -> Result<(), St
     settings.taskbar.color_mode=settings.color_mode.clone();
     settings.taskbar.dot_count=settings.dot_count;
     private_write(settings_path(), serde_json::to_vec_pretty(&settings).map_err(|e| e.to_string())?)?;
-    settings_window::set_preview(&app, settings)
+    settings_window::set_preview(&app, settings)?;
+    widgets::sync(app);
+    Ok(())
 }
 
 fn current_monitor(window: &tauri::WebviewWindow) -> Result<tauri::Monitor, String> {
@@ -324,14 +326,57 @@ fn save_window_state(window: tauri::WebviewWindow) -> Result<(), String> {
 }
 fn restore_window(window: &tauri::WebviewWindow) {
     if let Ok(value) = window_path(window.label()).map_err(std::io::Error::other).and_then(fs::read).and_then(|data| serde_json::from_slice::<Value>(&data).map_err(std::io::Error::other)) {
-        if let (Some(x),Some(y))=(value["x"].as_i64(),value["y"].as_i64()) { let _=window.set_position(tauri::PhysicalPosition::new(x as i32,y as i32)); }
+        if let (true,Some(x),Some(y))=(window.label()==widgets::MAIN_ID,value["x"].as_i64(),value["y"].as_i64()) { let _=window.set_position(tauri::PhysicalPosition::new(x as i32,y as i32)); }
         if let (Some(w),Some(h))=(value["width"].as_u64(),value["height"].as_u64()) { let _=window.set_size(tauri::PhysicalSize::new(w as u32,h as u32)); }
-    } else if let Some(monitor)=window.primary_monitor().ok().flatten() {
+    } else if let Some(monitor)= (window.label()==widgets::MAIN_ID).then(|| window.primary_monitor().ok().flatten()).flatten() {
         let size=monitor.size(); let position=monitor.position(); let width=340_u32.min(size.width);
         let _=window.set_size(tauri::PhysicalSize::new(width,size.height));
         let _=window.set_position(tauri::PhysicalPosition::new(position.x+size.width as i32-width as i32,position.y));
     }
 }
+fn initialize_widget(window: &tauri::WebviewWindow) -> Result<(), String> {
+    let main = window.label() == widgets::MAIN_ID;
+    let settings = settings_window::current_for(window.label());
+    shape_region::reset(window.label());
+    REQUESTED_SIZE.lock().unwrap_or_else(|e|e.into_inner()).remove(window.label());
+    #[cfg(not(target_os="linux"))] restore_window(window);
+    #[cfg(target_os="linux")] {
+        let mut options = settings.linux.clone();
+        if !main { options.monitor = settings.placement.monitor.clone().map(linux::MonitorSelection::Name); }
+        linux::initialize(window, &options, &settings.position);
+        if !linux::layered(window.label()) { restore_window(window); }
+        if main {
+            if !linux::wayland() { let _ = snap_window(window.clone(), settings.position.clone()); }
+        }
+    }
+    #[cfg(not(target_os="linux"))] if main { window.show().map_err(|e| e.to_string())?; }
+    #[cfg(windows)] window_effects::apply(window, &settings.theme)?;
+    if !main { placement::apply(window, &settings)?; }
+    shape_region::request(window);
+    let target = window.clone();
+    window.on_window_event(move |event| {
+        if matches!(event, tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }) {
+            shape_region::request(&target);
+        }
+        if matches!(event, tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) {
+            if let Ok(factor) = target.scale_factor() { let _ = target.emit_to(target.label(), "monitor-scale", factor); }
+        }
+        if matches!(event, tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) {
+            let _ = save_window_state(target.clone());
+        }
+        #[cfg(target_os="linux")]
+        if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+            if !main && linux::layered(target.label()) {
+                api.prevent_close();
+                linux::mark_layer_closed(target.label());
+                let _ = target.hide();
+                placement::monitor_changed(target.app_handle().clone());
+            }
+        }
+    });
+    Ok(())
+}
+
 fn start_background(app: tauri::AppHandle) {
     let path = snapshot_path();
     if let Some(parent) = path.parent() { let _ = fs::create_dir_all(parent); }
@@ -399,7 +444,7 @@ async fn get_desktop_info(window: tauri::WebviewWindow, widget_id: Option<String
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_quote,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,set_local_history,widgets::load_settings,widgets::save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint,settings_window::open_settings,settings_window::finish_settings,settings_window::preview_settings,placement::get_placement_monitors,placement::capture_position]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if widgets::id_from_label(webview.label()).is_ok() && payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); settings_window::initialize(); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=settings_window::current(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered(window.label()) { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } #[cfg(target_os="windows")] window_effects::apply(&window, &settings_window::current().theme)?; shape_region::request(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }) { shape_region::request(&close_window); } if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let _=save_window_state(close_window.clone()); } }); } placement::watch(app.handle().clone()); #[cfg(debug_assertions)] settings_window::start_soak(app.handle().clone()); #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_quote,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,set_local_history,widgets::load_settings,widgets::save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint,settings_window::open_settings,settings_window::finish_settings,settings_window::preview_settings,placement::get_placement_monitors,placement::capture_position]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if widgets::id_from_label(webview.label()).is_ok() && payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); settings_window::initialize(); let window=widgets::build(app.handle(), widgets::MAIN_ID)?; initialize_widget(&window)?; widgets::sync(app.handle().clone()); placement::watch(app.handle().clone()); #[cfg(debug_assertions)] settings_window::start_soak(app.handle().clone()); #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
 }
 
 #[cfg(test)]
