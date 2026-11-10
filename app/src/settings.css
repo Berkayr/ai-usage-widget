@@ -228,3 +228,15 @@ summary {cursor:pointer;min-height:32px}
 .theme-picker [data-theme=liquid-glass] .theme-preview{border-radius:22px;box-shadow:inset 2px 2px 6px currentColor}
 .theme-picker [data-theme=pastel] .theme-preview{border-radius:18px;border-bottom-width:5px;letter-spacing:5px}
 .theme-picker [data-theme=pebble] .theme-preview{border-radius:14px;border-width:4px;font-family:system-ui,sans-serif;font-weight:800}
+
+.widget-picker {min-width:0;padding:0 4px 12px;border-bottom:1px solid var(--line);font-size:12px}
+.widget-picker label {display:block;margin:4px 0}
+.widget-picker select,.widget-picker input {width:100%;min-width:0;max-width:100%}
+.widget-picker button {font-size:12px;padding:4px 6px}
+.widget-picker p {overflow-wrap:anywhere;color:var(--muted)}
+.widget-disconnected {color:var(--muted)}
+.widget-shared-note {display:block;color:var(--muted);font-size:11px}
+.widget-reset {margin:0 0 16px}
+@media(max-width:559px) {
+  .widget-picker {flex:0 0 160px;border-bottom:0;border-right:1px solid var(--line);padding:0 8px 0 0}
+}

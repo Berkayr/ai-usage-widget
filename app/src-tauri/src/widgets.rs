@@ -123,7 +123,8 @@ pub(crate) struct Widget {
 }
 
 fn overridable(key: &str) -> bool {
-    matches!(key, "theme" | "shape" | "scale" | "sizePreset" | "fineTune"
+    matches!(key, "position" | "lockPosition" | "placementEditing" | "reservedTop" | "reservedBottom"
+        | "theme" | "shape" | "scale" | "sizePreset" | "fineTune"
         | "sizeMode" | "fitFraction" | "fitFineTune" | "fitHeight" | "matchPhysicalSize"
         | "appearance" | "palette" | "accent" | "background" | "widgetOpacity"
         | "backgroundOpacity" | "colorMode" | "dotCount" | "accentEdge"
@@ -196,13 +197,18 @@ pub(crate) fn split(root: &Settings, id: &str, edited: &Settings) -> Result<Sett
     for (key, field) in after.as_object().expect("Settings object") {
         if matches!(key.as_str(), "widgets" | "placement" | "paletteLoadError") { continue; }
         if overridable(key) {
-            if *field == value[key] { widget.overrides.remove(key); }
-            else { widget.overrides.insert(key.clone(), field.clone()); }
+            if *field != before[key] {
+                if *field == value[key] { widget.overrides.remove(key); }
+                else { widget.overrides.insert(key.clone(), field.clone()); }
+            }
         } else if key == "linux" {
-            let mut overrides = Map::new();
+            let mut overrides = widget.overrides.get("linux").and_then(Value::as_object).cloned().unwrap_or_default();
             for (part, field) in field.as_object().ok_or("Invalid linux settings")? {
                 if matches!(part.as_str(), "layer" | "margin") {
-                    if *field != value[key][part] { overrides.insert(part.clone(), field.clone()); }
+                    if *field != before[key][part] {
+                        if *field == value[key][part] { overrides.remove(part); }
+                        else { overrides.insert(part.clone(), field.clone()); }
+                    }
                 } else if *field != before[key][part] { value[key][part] = field.clone(); }
             }
             if overrides.is_empty() { widget.overrides.remove(key); }

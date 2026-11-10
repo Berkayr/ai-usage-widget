@@ -6,6 +6,7 @@ Notable changes will be recorded here. No release has been published yet.
 
 ### Added
 
+- Settings widget picker with monitor selection, naming, category resets, inline removal, shared-field notes, and Save/Revert across all widgets.
 - Optional per-widget settings records with validated monitor placement, inherited display overrides and widget-aware load/save commands.
 - Additional widget windows synchronized at startup and on settings saves; each hides when its monitor disconnects and returns to its saved position on reconnection, recreating closed Wayland layer surfaces.
 
@@ -22,6 +23,7 @@ Notable changes will be recorded here. No release has been published yet.
 
 ### Fixed
 
+- Additional widgets keep their own corner, position lock and screen reservations on Linux and Windows.
 - Match KDE blur corners to the theme radius for Portrait, Landscape and Square without changing the input mask.
 
 - Prefer the ext background-effect protocol on newer KWin sessions and restrict Wayland/X11 blur to the shared window shape mask.

@@ -9,7 +9,12 @@ Theme defaults to System when no choice is stored; an existing explicit theme is
 The root display settings remain the `main` widget. An optional `widgets` array
 creates additional `widget-<id>` windows at startup and after settings are saved;
 an empty array is omitted on save. Removing a record closes its window. The
-settings UI still edits Main by default; a widget picker is not available yet.
+settings sidebar selects Main or an additional widget by name and monitor.
+Choose Add widget… to select any connected display (including Main's display)
+and name a new widget. New widgets inherit Main until a field is changed.
+Additional widgets can be renamed or removed with an inline confirmation.
+Disconnected widgets remain editable and are marked as hidden until their
+monitor returns.
 
 ```json
 {
@@ -38,9 +43,10 @@ Overrides accept only `theme`, `shape`, `scale`, `sizePreset`, `fineTune`,
 `historyMode`, `historyCost`, `historyModels`, `historyHeatmap`, `historyMachines`,
 `historyPanelOpen`, `showExtraWindows`, `widgetProviders`, `featuredProvider`,
 `featuredPosition`, `quoteEnabled`, `quoteMode`, `quotePosition`, `quoteNavigation`,
+`position`, `lockPosition`, `placementEditing`, `reservedTop`, `reservedBottom`,
 and nested `linux.layer` / `linux.margin`. Other override keys are discarded;
 invalid values reject the entry. `userPalettes`, `providerOrder`, `providerColors`,
-`hiddenProviders`, `taskbar`, `reservedTop`, `reservedBottom`, `linux.monitor`
+`hiddenProviders`, `taskbar`, `linux.monitor`
 and all remaining fields are shared at the root.
 
 The native `load_settings` and `save_settings` commands accept optional
@@ -50,7 +56,12 @@ Saving it stores differences from the root as overrides, removes overrides
 reset to the root value, and writes changed shared fields to the root. Main
 calls retain the existing behavior. Additional-widget saves preview the root
 main settings and update each additional window with its effective settings.
-Settings previews addressed with `widgetId` reach only that widget.
+Settings previews addressed with `widgetId` reach only that widget; optional
+`rootSettings` supplies the unsaved root, including newly added widget records.
+A new window is created on Save. Shared rows are marked Shared by all widgets;
+Reset to Main removes the selected category's overrides. The unsaved count,
+Save and Revert cover Main and all additional widgets together, and Save writes
+the settings file once before synchronizing windows.
 
 Older application versions discard `widgets` when saving the settings file.
 
