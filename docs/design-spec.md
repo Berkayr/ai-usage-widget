@@ -421,10 +421,14 @@ Meter fills do not shrink away at the 50% scale, and monochrome tracks use
 neutral ink instead of the decorative color gradients. Theme-picker previews
 reflect the frame, title-strip, dense-list, boxed-group and pastel treatments.
 
-On Windows only, Clear Glass and Layer declare `windowEffect: "acrylic"` in their
-bundled manifests. Native startup, preview, save and discard apply the declaration
-to the main widget: Windows 11 (build 22000+) uses Acrylic, Windows 10 and unknown
-builds use Blur. Other themes clear the native effect. Linux and macOS do not
+Clear Glass and Layer declare `windowEffect: "acrylic"` in their bundled
+manifests. Native startup, preview, save and discard apply the declaration to the
+main widget: Windows 11 (build 22000+) uses Acrylic; Windows 10 and unknown builds
+use Blur. KDE Plasma requests whole-surface blur through KWin's Wayland protocol
+on the existing GDK surface, or the advertised X11 blur property. Other themes
+clear the native effect. Linux remapping recreates the current request without
+changing layer-shell placement or input masks. GNOME and unsupported compositors
+retain the theme tint. KWin's Blur desktop effect must be enabled. macOS does not
 compile or invoke the bridge. Adding another native-effect theme requires adding
 its bundled manifest to the small Rust allowlist. Native desktop blur still needs
-Windows visual verification; CSS blur alone cannot sample the desktop wallpaper.
+Windows and KDE visual verification; CSS blur alone cannot sample the wallpaper.

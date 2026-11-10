@@ -1,5 +1,7 @@
-//! Theme effects are confined to the widget window on Windows.
+//! Theme effects are confined to the main widget window.
+#[cfg(windows)]
 use tauri::{utils::config::WindowEffectsConfig, window::Effect};
+#[cfg(windows)]
 use windows_sys::Win32::System::Registry::{RegGetValueW, HKEY_LOCAL_MACHINE, RRF_RT_REG_SZ};
 
 fn manifest(theme: &str) -> Option<&'static str> {
@@ -13,9 +15,11 @@ fn requested(theme: &str) -> bool {
     manifest(theme).and_then(|text| serde_json::from_str::<serde_json::Value>(text).ok())
         .is_some_and(|value| value["windowEffect"] == "acrylic")
 }
+#[cfg(windows)]
 fn effect(build: Option<u32>) -> Effect {
     if build.is_some_and(|build| build >= 22000) { Effect::Acrylic } else { Effect::Blur }
 }
+#[cfg(windows)]
 fn windows_build() -> Option<u32> {
     let key: Vec<u16> = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\0".encode_utf16().collect();
     let name: Vec<u16> = "CurrentBuildNumber\0".encode_utf16().collect();
@@ -26,6 +30,7 @@ fn windows_build() -> Option<u32> {
     if status != 0 { return None; }
     String::from_utf16_lossy(&buffer).trim_end_matches('\0').parse().ok()
 }
+#[cfg(windows)]
 pub fn apply(window: &tauri::WebviewWindow, theme: &str) -> Result<(), String> {
     let config = requested(theme).then(|| WindowEffectsConfig {
         effects: vec![effect(windows_build())], ..Default::default()
@@ -43,10 +48,16 @@ mod tests {
         assert!(!requested("system"));
         assert!(!requested("../liquid-glass"));
     }
+    #[cfg(windows)]
     #[test]
     fn windows_10_and_unknown_build_use_blur() {
         assert!(matches!(effect(Some(22000)), Effect::Acrylic));
         assert!(matches!(effect(Some(19045)), Effect::Blur));
         assert!(matches!(effect(None), Effect::Blur));
     }
+}
+
+#[cfg(target_os = "linux")]
+pub fn apply(window: &tauri::WebviewWindow, theme: &str) {
+    crate::linux_blur::apply(window, requested(theme));
 }

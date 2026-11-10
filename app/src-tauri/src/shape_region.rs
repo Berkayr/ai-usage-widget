@@ -13,7 +13,7 @@ fn client_region_bounds(width: i32, height: i32, offset_x: i32, offset_y: i32) -
 
 // Scanline rectangles use pixel centers, so the boundary never captures transparent corners.
 #[cfg(any(target_os="linux",test))]
-fn scanlines(shape: &Shape, width: i32, height: i32) -> Vec<(i32,i32,i32,i32)> {
+pub(crate) fn scanlines(shape: &Shape, width: i32, height: i32) -> Vec<(i32,i32,i32,i32)> {
     if width<=0 || height<=0 {return vec![];}
     if !matches!(shape,Shape::Circle|Shape::Pill) {return vec![(0,0,width,height)];}
     let (w,h)=(width as f64,height as f64);
@@ -24,6 +24,30 @@ fn scanlines(shape: &Shape, width: i32, height: i32) -> Vec<(i32,i32,i32,i32)> {
         let right=(w/2.0+half-0.5).floor().min(w-1.0) as i32;
         (right>=left).then_some((left,y,right-left+1,1))
     }).collect()
+}
+// Blur has its own mask; input and window shaping continue to use scanlines.
+#[cfg(any(target_os="linux",test))]
+pub(crate) fn blur_scanlines(shape: &Shape, width: i32, height: i32, radius: f64) -> Vec<(i32,i32,i32,i32)> {
+    if matches!(shape, Shape::Circle | Shape::Pill) || !radius.is_finite() || radius <= 0.0 {
+        return scanlines(shape, width, height);
+    }
+    if width <= 0 || height <= 0 { return vec![]; }
+    let radius = radius.min(width.min(height) as f64 / 2.0);
+    (0..height).filter_map(|y| {
+        let cy = (y as f64 + 0.5).clamp(radius, height as f64 - radius);
+        let dy = y as f64 + 0.5 - cy;
+        let inset = radius - (radius * radius - dy * dy).max(0.0).sqrt();
+        let left = (inset - 0.5).ceil().max(0.0) as i32;
+        let row_width = width - 2 * left;
+        (row_width > 0).then_some((left, y, row_width, 1))
+    }).collect()
+}
+#[cfg(target_os="linux")]
+pub(crate) fn window_scanlines(window: &tauri::WebviewWindow, radius: f64) -> Result<Vec<(i32,i32,i32,i32)>, String> {
+    use gtk::prelude::*;
+    let widget = window.gtk_window().map_err(|e| e.to_string())?;
+    let shape = effective_shape(crate::settings_window::current().shape, ONBOARDING.load(Ordering::SeqCst));
+    Ok(blur_scanlines(&shape, widget.allocated_width(), widget.allocated_height(), radius))
 }
 fn effective_shape(shape: Shape, onboarding: bool) -> Shape {
     if onboarding { Shape::Portrait } else { shape }
@@ -65,6 +89,8 @@ fn apply(window: &tauri::WebviewWindow) -> Result<(),String> {
     };
     #[cfg(not(windows))]
     let (offset_x,offset_y)=(0,0);
+    #[cfg(target_os="linux")]
+    crate::window_effects::apply(window, &crate::settings_window::current().theme);
     let mut last=LAST.lock().unwrap_or_else(|e|e.into_inner());
     let key=(shape.clone(),width,height,offset_x,offset_y);
     if last.as_ref()==Some(&key) {return Ok(());}
@@ -102,6 +128,32 @@ mod tests {
     fn windows_region_bounds_cover_the_offset_client_rectangle() {
         assert_eq!(client_region_bounds(425,425,9,5),(9,5,434,430));
         assert_eq!(client_region_bounds(600,150,9,5),(9,5,609,155));
+    }
+    #[test]
+    fn rounded_blur_is_clamped_symmetric_and_separate_from_input() {
+        for shape in [Shape::Portrait, Shape::Landscape, Shape::Square] {
+            for (w,h) in [(340,600),(680,340),(340,340),(31,15)] {
+                let rows = blur_scanlines(&shape,w,h,6.0);
+                assert_eq!(rows.len(),h as usize);
+                assert!(rows[0].0 > 0 && rows[0].2 < w);
+                assert_eq!(rows[h as usize/2],(0,h/2,w,1));
+                for (top,bottom) in rows.iter().zip(rows.iter().rev()) {
+                    assert_eq!((top.0,top.2),(bottom.0,bottom.2));
+                    assert_eq!(top.0 * 2 + top.2,w);
+                    assert!(top.0 >= 0 && top.2 > 0);
+                }
+                assert_eq!(blur_scanlines(&shape,w,h,10000.0),blur_scanlines(&shape,w,h,w.min(h) as f64/2.0));
+                for radius in [0.0,-1.0,f64::NAN,f64::INFINITY] {
+                    assert_eq!(blur_scanlines(&shape,w,h,radius),vec![(0,0,w,h)]);
+                }
+                assert_eq!(scanlines(&shape,w,h),vec![(0,0,w,h)]);
+            }
+        }
+        for shape in [Shape::Circle, Shape::Pill] {
+            assert_eq!(blur_scanlines(&shape,480,120,22.0),scanlines(&shape,480,120));
+        }
+        assert!(blur_scanlines(&Shape::Square,0,100,22.0).is_empty());
+        assert!(blur_scanlines(&Shape::Portrait,100,-1,22.0).is_empty());
     }
     #[test]
     fn masks_follow_shape_and_dpi() {

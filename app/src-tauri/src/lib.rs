@@ -17,8 +17,10 @@ mod work_area;
 mod settings_window;
 mod user_palettes;
 mod shape_region;
-#[cfg(target_os = "windows")]
+#[cfg(any(target_os = "windows", target_os = "linux"))]
 mod window_effects;
+#[cfg(target_os = "linux")]
+mod linux_blur;
 use std::io::Write;
 use std::{fs, path::PathBuf, thread, time::Duration};
 use tauri::{Emitter, Manager};
@@ -239,12 +241,16 @@ fn height_cap(current: u32, max_css_px: Option<f64>, factor: f64) -> Option<u32>
 // Last requested (width, height); a zero height means the user owns it.
 static REQUESTED_SIZE: std::sync::Mutex<(u32,u32)> = std::sync::Mutex::new((0,0));
 #[tauri::command]
-fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<f64>, max_height_css_px: Option<f64>, onboarding: Option<bool>) -> Result<(), String> {
+fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<f64>, max_height_css_px: Option<f64>, onboarding: Option<bool>, corner_radius_css_px: Option<f64>) -> Result<(), String> {
     shape_region::set_onboarding(&window, onboarding.unwrap_or(false));
     let scale = normalize_scale(scale) / 100.0;
     // Even with content fitting off, a retained manual height must respect
     // the same fitted box used by the frontend and settings map.
     let factor = window.scale_factor().map_err(|e|e.to_string())?;
+    #[cfg(target_os = "linux")]
+    linux_blur::set_corner_radius(&window, corner_radius_css_px, factor);
+    #[cfg(not(target_os = "linux"))]
+    let _ = corner_radius_css_px;
     let old = window.inner_size().map_err(|e|e.to_string())?;
     let requested_height = REQUESTED_SIZE.lock().map_err(|e|e.to_string())?.1;
     let current_height = if requested_height > 0 { requested_height } else { old.height };

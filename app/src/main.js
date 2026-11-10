@@ -217,7 +217,14 @@ function draw(snapshot, noData = false) {
     $('#widget').style.setProperty('--history-panel-width', `${panelWidth}px`);
     if (isSample && historyOpen) $('#app').style.width = `${width}px`; else $('#app').style.removeProperty('width');
     const maxHeight = parseFloat(document.documentElement.style.getPropertyValue('--portrait-height-limit'));
-    if (!isSample) invoke('resize_widget', {scale:layoutScale,widthCssPx:width,maxHeightCssPx:maxHeight,onboarding:!$('#provider-onboarding').hidden || historyOpen}).catch(error=>showToast(String(error)));
+    if (!isSample) invoke('resize_widget', {scale:layoutScale,widthCssPx:width,maxHeightCssPx:maxHeight,onboarding:!$('#provider-onboarding').hidden || historyOpen,cornerRadiusCssPx:(() => {
+      const widget = $('#widget');
+      const {width,height} = widget.getBoundingClientRect();
+      const radii = getComputedStyle(widget).borderTopLeftRadius.trim().split(/\s+/);
+      const pixels = [radii[0],radii[1] ?? radii[0]].map((value,index) =>
+        value.endsWith('%') ? parseFloat(value) / 100 * (index ? height : width) : parseFloat(value));
+      return Math.max(0,Math.min(width / 2,height / 2,...pixels.map(value => Number.isFinite(value) ? value : 0)));
+    })()}).catch(error=>showToast(String(error)));
     renderQuote($('#quote'),renderSettings(),quoteData,()=>draw(currentSnapshot,currentNoData),repairTextContrast);
     updateQuote();
     repairTextContrast($('#widget'));
