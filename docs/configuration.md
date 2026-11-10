@@ -185,3 +185,24 @@ dropped. Invalid imports reject the entire operation and display an error.
 Invalid palettes on disk are discarded with a Settings warning while other valid
 settings recover. Missing or deleted selected ids fall back to the theme's first
 palette. Built-in ids and their ordering are preserved.
+
+### Widget usage history
+
+The History settings category controls whether supplied token history is shown.
+Choose **Under each card** (14 days), **Click a card** (the default, 30 days),
+or **Side panel** (7 or 30 days, in the same window). Enter or Space expands
+one card at a time. The side arrow opens toward the inside of the screen and
+remembers its open state. Providers without history have no history controls.
+
+**Read Claude Code logs** defaults to off and is saved separately in the
+collector configuration as `providers.claude.local_history`. Turning it off
+stops future reads; refresh replaces the previous snapshot. Previewing or
+reverting settings does not change this permission. The CLI equivalent is
+`python3 -m quotacore local-history on` (or `off`).
+
+API price equivalent, model breakdown, activity heatmap and computer splitting
+are optional. Prices are estimates, not bills. Model and activity aggregates
+cover all available local history, while chart and price totals follow the
+selected range. Computer splitting is available only with two distinct machine
+types. Codex supplies account daily totals without these breakdowns; Gemini
+does not supply history. Settings and permission changes take effect on Save.

@@ -210,6 +210,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("detect")
     sub.add_parser("doctor").add_argument("--live", action="store_true")
     sub.add_parser("init", help="choose providers before first collection")
+    sub.add_parser("local-history", help="allow or stop reading Claude Code logs").add_argument("mode", choices=("on", "off"))
     sub.add_parser("provider-config", help="show consent status without reading credentials")
     consent_parser = sub.add_parser("configure", help="explicitly enable the selected providers")
     consent_parser.add_argument("providers", nargs="*", choices=list(PROVIDERS))
@@ -269,6 +270,10 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps([{"id": key, "detected": detected[key], "auth": module.META["auth"]} for key, module in PROVIDERS.items()], ensure_ascii=False, indent=2))
     elif args.command == "doctor":
         print(json.dumps(doctor(args.live), ensure_ascii=False, indent=2))
+    elif args.command == "local-history":
+        config = load_config()
+        config["providers"]["claude"]["local_history"] = args.mode == "on"
+        atomic_json(config_dir() / "config.json", config)
     elif args.command == "provider-config":
         detected, config = _config()
         disclosures = {key: DISCLOSURES[key] for key in PROVIDERS}

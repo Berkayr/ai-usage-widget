@@ -2,26 +2,908 @@
   "schema": 1,
   "generated_at": "2026-10-31T18:42:00+00:00",
   "providers": [
-    { "id": "claude", "label": "Claude Code", "plan": "Pro", "state": "OK", "stale": false, "category": "subscription", "windows": [
-      { "id": "five_hour", "label": "5 hour", "used_percent": 34, "resets_in_minutes": 160, "kind": "session" },
-      { "id": "seven_day", "label": "7 day", "used_percent": 61, "resets_in_minutes": 2310, "kind": "weekly" },
-      { "id": "provider-extra", "label": "Extra window", "raw_label": "Internal Preview", "used_percent": 21, "resets_in_minutes": 470, "kind": "other", "hidden_by_default": true }
-    ], "meters": [] },
-    { "id": "codex", "label": "OpenAI Codex", "plan": "Plus", "state": "STALE", "stale": true, "category": "subscription", "windows": [
-      { "id": "primary", "label": "5 hour", "used_percent": 8, "resets_in_minutes": 208, "kind": "session" },
-      { "id": "secondary", "label": "7 day", "used_percent": 77, "resets_in_minutes": 3190, "kind": "weekly" },
-      { "id": "credits", "label": "Credits", "used_percent": null, "resets_in_minutes": null, "kind": "other", "hidden_by_default": true }
-    ], "meters": [] },
-    { "id": "gemini", "label": "Google Gemini", "plan": "Advanced", "state": "RATE_LIMITED", "stale": false, "category": "subscription", "windows": [
-      { "id": "gm-weekly", "label": "Gemini Models · weekly", "used_percent": 28, "resets_in_minutes": 2310, "kind": "weekly" },
-      { "id": "gm-5h", "label": "Gemini Models · 5h", "used_percent": 12, "resets_in_minutes": 170, "kind": "session" },
-      { "id": "claude-weekly", "label": "Claude and GPT models · weekly", "used_percent": 53, "resets_in_minutes": 1880, "kind": "weekly", "hidden_by_default": true },
-      { "id": "claude-5h", "label": "Claude and GPT models · 5h", "used_percent": 19, "resets_in_minutes": 100, "kind": "session", "hidden_by_default": true },
-      { "id": "argon-weekly", "label": "Gemini 4 Argon · weekly", "used_percent": 44, "resets_in_minutes": 2700, "kind": "weekly", "hidden_by_default": true }
-    ], "meters": [] },
-    { "id": "copilot", "label": "GitHub Copilot", "plan": null, "state": "NOT_INSTALLED", "stale": false, "category": "credits", "windows": [], "meters": [] },
-    { "id": "openrouter", "label": "OpenRouter", "plan": null, "state": "OK", "stale": false, "category": "api-balance", "windows": [], "meters": [ { "id": "balance", "label": "Credit balance", "unit": "USD", "remaining": 12.48 } ] },
-    { "id": "deepseek", "label": "DeepSeek API", "plan": null, "state": "AUTH_REQUIRED", "stale": false, "category": "api-balance", "windows": [], "meters": [] },
-    { "id": "jetbrains", "label": "JetBrains AI", "plan": null, "state": "SOURCE_UNAVAILABLE", "stale": false, "category": "credits", "windows": [], "meters": [] }
+    {
+      "id": "claude",
+      "label": "Claude Code",
+      "plan": "Pro",
+      "state": "OK",
+      "stale": false,
+      "category": "subscription",
+      "windows": [
+        {
+          "id": "five_hour",
+          "label": "5 hour",
+          "used_percent": 34,
+          "resets_in_minutes": 160,
+          "kind": "session"
+        },
+        {
+          "id": "seven_day",
+          "label": "7 day",
+          "used_percent": 61,
+          "resets_in_minutes": 2310,
+          "kind": "weekly"
+        },
+        {
+          "id": "provider-extra",
+          "label": "Extra window",
+          "raw_label": "Internal Preview",
+          "used_percent": 21,
+          "resets_in_minutes": 470,
+          "kind": "other",
+          "hidden_by_default": true
+        }
+      ],
+      "meters": [],
+      "history": {
+        "scope": "local",
+        "daily": [
+          {
+            "date": "2026-10-12",
+            "tokens": 390000,
+            "input": 78000,
+            "output": 39000,
+            "cache_read": 234000,
+            "cache_write": 39000,
+            "cost": 0.66,
+            "by_machine": {
+              "computer-a": 234000,
+              "computer-b": 156000
+            }
+          },
+          {
+            "date": "2026-10-13",
+            "tokens": 1300000,
+            "input": 260000,
+            "output": 130000,
+            "cache_read": 780000,
+            "cache_write": 130000,
+            "cost": 2.21,
+            "by_machine": {
+              "computer-a": 780000,
+              "computer-b": 520000
+            }
+          },
+          {
+            "date": "2026-10-14",
+            "tokens": 2210000,
+            "input": 442000,
+            "output": 221000,
+            "cache_read": 1326000,
+            "cache_write": 221000,
+            "cost": 3.76,
+            "by_machine": {
+              "computer-a": 1326000,
+              "computer-b": 884000
+            }
+          },
+          {
+            "date": "2026-10-15",
+            "tokens": 650000,
+            "input": 130000,
+            "output": 65000,
+            "cache_read": 390000,
+            "cache_write": 65000,
+            "cost": 1.1,
+            "by_machine": {
+              "computer-a": 390000,
+              "computer-b": 260000
+            }
+          },
+          {
+            "date": "2026-10-16",
+            "tokens": 1560000,
+            "input": 312000,
+            "output": 156000,
+            "cache_read": 936000,
+            "cache_write": 156000,
+            "cost": 2.65,
+            "by_machine": {
+              "computer-a": 936000,
+              "computer-b": 624000
+            }
+          },
+          {
+            "date": "2026-10-17",
+            "tokens": 2470000,
+            "input": 494000,
+            "output": 247000,
+            "cache_read": 1482000,
+            "cache_write": 247000,
+            "cost": 4.2,
+            "by_machine": {
+              "computer-a": 1482000,
+              "computer-b": 988000
+            }
+          },
+          {
+            "date": "2026-10-18",
+            "tokens": 910000,
+            "input": 182000,
+            "output": 91000,
+            "cache_read": 546000,
+            "cache_write": 91000,
+            "cost": 1.55,
+            "by_machine": {
+              "computer-a": 546000,
+              "computer-b": 364000
+            }
+          },
+          {
+            "date": "2026-10-19",
+            "tokens": 1820000,
+            "input": 364000,
+            "output": 182000,
+            "cache_read": 1092000,
+            "cache_write": 182000,
+            "cost": 3.09,
+            "by_machine": {
+              "computer-a": 1092000,
+              "computer-b": 728000
+            }
+          },
+          {
+            "date": "2026-10-20",
+            "tokens": 2730000,
+            "input": 546000,
+            "output": 273000,
+            "cache_read": 1638000,
+            "cache_write": 273000,
+            "cost": 4.64,
+            "by_machine": {
+              "computer-a": 1638000,
+              "computer-b": 1092000
+            }
+          },
+          {
+            "date": "2026-10-21",
+            "tokens": 1170000,
+            "input": 234000,
+            "output": 117000,
+            "cache_read": 702000,
+            "cache_write": 117000,
+            "cost": 1.99,
+            "by_machine": {
+              "computer-a": 702000,
+              "computer-b": 468000
+            }
+          },
+          {
+            "date": "2026-10-22",
+            "tokens": 2080000,
+            "input": 416000,
+            "output": 208000,
+            "cache_read": 1248000,
+            "cache_write": 208000,
+            "cost": 3.54,
+            "by_machine": {
+              "computer-a": 1248000,
+              "computer-b": 832000
+            }
+          },
+          {
+            "date": "2026-10-23",
+            "tokens": 520000,
+            "input": 104000,
+            "output": 52000,
+            "cache_read": 312000,
+            "cache_write": 52000,
+            "cost": 0.88,
+            "by_machine": {
+              "computer-a": 312000,
+              "computer-b": 208000
+            }
+          },
+          {
+            "date": "2026-10-24",
+            "tokens": 1430000,
+            "input": 286000,
+            "output": 143000,
+            "cache_read": 858000,
+            "cache_write": 143000,
+            "cost": 2.43,
+            "by_machine": {
+              "computer-a": 858000,
+              "computer-b": 572000
+            }
+          },
+          {
+            "date": "2026-10-25",
+            "tokens": 2340000,
+            "input": 468000,
+            "output": 234000,
+            "cache_read": 1404000,
+            "cache_write": 234000,
+            "cost": 3.98,
+            "by_machine": {
+              "computer-a": 1404000,
+              "computer-b": 936000
+            }
+          },
+          {
+            "date": "2026-10-26",
+            "tokens": 780000,
+            "input": 156000,
+            "output": 78000,
+            "cache_read": 468000,
+            "cache_write": 78000,
+            "cost": 1.33,
+            "by_machine": {
+              "computer-a": 468000,
+              "computer-b": 312000
+            }
+          },
+          {
+            "date": "2026-10-27",
+            "tokens": 1690000,
+            "input": 338000,
+            "output": 169000,
+            "cache_read": 1014000,
+            "cache_write": 169000,
+            "cost": 2.87,
+            "by_machine": {
+              "computer-a": 1014000,
+              "computer-b": 676000
+            }
+          },
+          {
+            "date": "2026-10-28",
+            "tokens": 2600000,
+            "input": 520000,
+            "output": 260000,
+            "cache_read": 1560000,
+            "cache_write": 260000,
+            "cost": 4.42,
+            "by_machine": {
+              "computer-a": 1560000,
+              "computer-b": 1040000
+            }
+          },
+          {
+            "date": "2026-10-29",
+            "tokens": 1040000,
+            "input": 208000,
+            "output": 104000,
+            "cache_read": 624000,
+            "cache_write": 104000,
+            "cost": 1.77,
+            "by_machine": {
+              "computer-a": 624000,
+              "computer-b": 416000
+            }
+          },
+          {
+            "date": "2026-10-30",
+            "tokens": 1950000,
+            "input": 390000,
+            "output": 195000,
+            "cache_read": 1170000,
+            "cache_write": 195000,
+            "cost": 3.31,
+            "by_machine": {
+              "computer-a": 1170000,
+              "computer-b": 780000
+            }
+          },
+          {
+            "date": "2026-10-31",
+            "tokens": 390000,
+            "input": 78000,
+            "output": 39000,
+            "cache_read": 234000,
+            "cache_write": 39000,
+            "cost": 0.66,
+            "by_machine": {
+              "computer-a": 234000,
+              "computer-b": 156000
+            }
+          },
+          {
+            "date": "2026-11-01",
+            "tokens": 1300000,
+            "input": 260000,
+            "output": 130000,
+            "cache_read": 780000,
+            "cache_write": 130000,
+            "cost": 2.21,
+            "by_machine": {
+              "computer-a": 780000,
+              "computer-b": 520000
+            }
+          },
+          {
+            "date": "2026-11-02",
+            "tokens": 2210000,
+            "input": 442000,
+            "output": 221000,
+            "cache_read": 1326000,
+            "cache_write": 221000,
+            "cost": 3.76,
+            "by_machine": {
+              "computer-a": 1326000,
+              "computer-b": 884000
+            }
+          },
+          {
+            "date": "2026-11-03",
+            "tokens": 650000,
+            "input": 130000,
+            "output": 65000,
+            "cache_read": 390000,
+            "cache_write": 65000,
+            "cost": 1.1,
+            "by_machine": {
+              "computer-a": 390000,
+              "computer-b": 260000
+            }
+          },
+          {
+            "date": "2026-11-04",
+            "tokens": 1560000,
+            "input": 312000,
+            "output": 156000,
+            "cache_read": 936000,
+            "cache_write": 156000,
+            "cost": 2.65,
+            "by_machine": {
+              "computer-a": 936000,
+              "computer-b": 624000
+            }
+          },
+          {
+            "date": "2026-11-05",
+            "tokens": 2470000,
+            "input": 494000,
+            "output": 247000,
+            "cache_read": 1482000,
+            "cache_write": 247000,
+            "cost": 4.2,
+            "by_machine": {
+              "computer-a": 1482000,
+              "computer-b": 988000
+            }
+          },
+          {
+            "date": "2026-11-06",
+            "tokens": 910000,
+            "input": 182000,
+            "output": 91000,
+            "cache_read": 546000,
+            "cache_write": 91000,
+            "cost": 1.55,
+            "by_machine": {
+              "computer-a": 546000,
+              "computer-b": 364000
+            }
+          },
+          {
+            "date": "2026-11-07",
+            "tokens": 1820000,
+            "input": 364000,
+            "output": 182000,
+            "cache_read": 1092000,
+            "cache_write": 182000,
+            "cost": 3.09,
+            "by_machine": {
+              "computer-a": 1092000,
+              "computer-b": 728000
+            }
+          },
+          {
+            "date": "2026-11-08",
+            "tokens": 2730000,
+            "input": 546000,
+            "output": 273000,
+            "cache_read": 1638000,
+            "cache_write": 273000,
+            "cost": 4.64,
+            "by_machine": {
+              "computer-a": 1638000,
+              "computer-b": 1092000
+            }
+          },
+          {
+            "date": "2026-11-09",
+            "tokens": 1170000,
+            "input": 234000,
+            "output": 117000,
+            "cache_read": 702000,
+            "cache_write": 117000,
+            "cost": 1.99,
+            "by_machine": {
+              "computer-a": 702000,
+              "computer-b": 468000
+            }
+          },
+          {
+            "date": "2026-11-10",
+            "tokens": 2080000,
+            "input": 416000,
+            "output": 208000,
+            "cache_read": 1248000,
+            "cache_write": 208000,
+            "cost": 3.54,
+            "by_machine": {
+              "computer-a": 1248000,
+              "computer-b": 832000
+            }
+          }
+        ],
+        "this_machine": "computer-a",
+        "machines": [
+          {
+            "id": "computer-a",
+            "tokens": 28158000,
+            "cost": 46.93
+          },
+          {
+            "id": "computer-b",
+            "tokens": 18772000,
+            "cost": 32.85
+          }
+        ],
+        "models": [
+          {
+            "model": "model-alpha",
+            "tokens": 32851000,
+            "cost": 41.25
+          },
+          {
+            "model": "model-beta",
+            "tokens": 14079000,
+            "cost": 17.35
+          }
+        ],
+        "heatmap": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            165000,
+            55000,
+            132000,
+            22000,
+            99000,
+            176000,
+            66000,
+            143000,
+            33000,
+            110000,
+            0,
+            77000,
+            154000,
+            44000,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            121000,
+            11000,
+            88000,
+            165000,
+            55000,
+            132000,
+            22000,
+            99000,
+            176000,
+            66000,
+            143000,
+            33000,
+            110000,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            77000,
+            154000,
+            44000,
+            121000,
+            11000,
+            88000,
+            165000,
+            55000,
+            132000,
+            22000,
+            99000,
+            176000,
+            66000,
+            143000,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            33000,
+            110000,
+            0,
+            77000,
+            154000,
+            44000,
+            121000,
+            11000,
+            88000,
+            165000,
+            55000,
+            132000,
+            22000,
+            99000,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            176000,
+            66000,
+            143000,
+            33000,
+            110000,
+            0,
+            77000,
+            154000,
+            44000,
+            121000,
+            11000,
+            88000,
+            165000,
+            55000,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            132000,
+            22000,
+            99000,
+            176000,
+            66000,
+            143000,
+            33000,
+            110000,
+            0,
+            77000,
+            154000,
+            44000,
+            121000,
+            11000,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            88000,
+            165000,
+            55000,
+            132000,
+            22000,
+            99000,
+            176000,
+            66000,
+            143000,
+            33000,
+            110000,
+            0,
+            77000,
+            154000,
+            0,
+            0,
+            0
+          ]
+        ],
+        "totals": {
+          "tokens": 46930000,
+          "cost": 79.77
+        },
+        "prices_as_of": "2026-10-06"
+      }
+    },
+    {
+      "id": "codex",
+      "label": "OpenAI Codex",
+      "plan": "Plus",
+      "state": "STALE",
+      "stale": true,
+      "category": "subscription",
+      "windows": [
+        {
+          "id": "primary",
+          "label": "5 hour",
+          "used_percent": 8,
+          "resets_in_minutes": 208,
+          "kind": "session"
+        },
+        {
+          "id": "secondary",
+          "label": "7 day",
+          "used_percent": 77,
+          "resets_in_minutes": 3190,
+          "kind": "weekly"
+        },
+        {
+          "id": "credits",
+          "label": "Credits",
+          "used_percent": null,
+          "resets_in_minutes": null,
+          "kind": "other",
+          "hidden_by_default": true
+        }
+      ],
+      "meters": [],
+      "history": {
+        "scope": "account",
+        "daily": [
+          {
+            "date": "2026-10-12",
+            "tokens": 190000
+          },
+          {
+            "date": "2026-10-13",
+            "tokens": 665000
+          },
+          {
+            "date": "2026-10-14",
+            "tokens": 1140000
+          },
+          {
+            "date": "2026-10-15",
+            "tokens": 380000
+          },
+          {
+            "date": "2026-10-16",
+            "tokens": 855000
+          },
+          {
+            "date": "2026-10-17",
+            "tokens": 1330000
+          },
+          {
+            "date": "2026-10-18",
+            "tokens": 570000
+          },
+          {
+            "date": "2026-10-19",
+            "tokens": 1045000
+          },
+          {
+            "date": "2026-10-20",
+            "tokens": 285000
+          },
+          {
+            "date": "2026-10-21",
+            "tokens": 760000
+          },
+          {
+            "date": "2026-10-22",
+            "tokens": 1235000
+          },
+          {
+            "date": "2026-10-23",
+            "tokens": 475000
+          },
+          {
+            "date": "2026-10-24",
+            "tokens": 950000
+          },
+          {
+            "date": "2026-10-25",
+            "tokens": 190000
+          },
+          {
+            "date": "2026-10-26",
+            "tokens": 665000
+          },
+          {
+            "date": "2026-10-27",
+            "tokens": 1140000
+          },
+          {
+            "date": "2026-10-28",
+            "tokens": 380000
+          },
+          {
+            "date": "2026-10-29",
+            "tokens": 855000
+          },
+          {
+            "date": "2026-10-30",
+            "tokens": 1330000
+          },
+          {
+            "date": "2026-10-31",
+            "tokens": 570000
+          },
+          {
+            "date": "2026-11-01",
+            "tokens": 1045000
+          },
+          {
+            "date": "2026-11-02",
+            "tokens": 285000
+          },
+          {
+            "date": "2026-11-03",
+            "tokens": 760000
+          },
+          {
+            "date": "2026-11-04",
+            "tokens": 1235000
+          },
+          {
+            "date": "2026-11-05",
+            "tokens": 475000
+          },
+          {
+            "date": "2026-11-06",
+            "tokens": 950000
+          },
+          {
+            "date": "2026-11-07",
+            "tokens": 190000
+          },
+          {
+            "date": "2026-11-08",
+            "tokens": 665000
+          },
+          {
+            "date": "2026-11-09",
+            "tokens": 1140000
+          },
+          {
+            "date": "2026-11-10",
+            "tokens": 380000
+          }
+        ],
+        "summary": {
+          "lifetime_tokens": 88540000,
+          "peak_daily_tokens": 1330000,
+          "current_streak_days": 5,
+          "longest_streak_days": 12
+        }
+      }
+    },
+    {
+      "id": "gemini",
+      "label": "Google Gemini",
+      "plan": "Advanced",
+      "state": "RATE_LIMITED",
+      "stale": false,
+      "category": "subscription",
+      "windows": [
+        {
+          "id": "gm-weekly",
+          "label": "Gemini Models \u00b7 weekly",
+          "used_percent": 28,
+          "resets_in_minutes": 2310,
+          "kind": "weekly"
+        },
+        {
+          "id": "gm-5h",
+          "label": "Gemini Models \u00b7 5h",
+          "used_percent": 12,
+          "resets_in_minutes": 170,
+          "kind": "session"
+        },
+        {
+          "id": "claude-weekly",
+          "label": "Claude and GPT models \u00b7 weekly",
+          "used_percent": 53,
+          "resets_in_minutes": 1880,
+          "kind": "weekly",
+          "hidden_by_default": true
+        },
+        {
+          "id": "claude-5h",
+          "label": "Claude and GPT models \u00b7 5h",
+          "used_percent": 19,
+          "resets_in_minutes": 100,
+          "kind": "session",
+          "hidden_by_default": true
+        },
+        {
+          "id": "argon-weekly",
+          "label": "Gemini 4 Argon \u00b7 weekly",
+          "used_percent": 44,
+          "resets_in_minutes": 2700,
+          "kind": "weekly",
+          "hidden_by_default": true
+        }
+      ],
+      "meters": []
+    },
+    {
+      "id": "copilot",
+      "label": "GitHub Copilot",
+      "plan": null,
+      "state": "NOT_INSTALLED",
+      "stale": false,
+      "category": "credits",
+      "windows": [],
+      "meters": []
+    },
+    {
+      "id": "openrouter",
+      "label": "OpenRouter",
+      "plan": null,
+      "state": "OK",
+      "stale": false,
+      "category": "api-balance",
+      "windows": [],
+      "meters": [
+        {
+          "id": "balance",
+          "label": "Credit balance",
+          "unit": "USD",
+          "remaining": 12.48
+        }
+      ]
+    },
+    {
+      "id": "deepseek",
+      "label": "DeepSeek API",
+      "plan": null,
+      "state": "AUTH_REQUIRED",
+      "stale": false,
+      "category": "api-balance",
+      "windows": [],
+      "meters": []
+    },
+    {
+      "id": "jetbrains",
+      "label": "JetBrains AI",
+      "plan": null,
+      "state": "SOURCE_UNAVAILABLE",
+      "stale": false,
+      "category": "credits",
+      "windows": [],
+      "meters": []
+    }
   ]
 }

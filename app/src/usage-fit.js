@@ -88,7 +88,8 @@ function fitNaturalPortrait(root, cards) {
     const style = getComputedStyle(card);
     return Math.max(card.getBoundingClientRect().height, card.scrollHeight + parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth));
   })));
-  root.style.gridAutoRows = `${height}px`;
+  // Expanded history belongs only to its own card.
+  if (!root.querySelector('.usage-history')) root.style.gridAutoRows = `${height}px`;
   const naturalHeight = Math.ceil(widget.getBoundingClientRect().height);
   [widget, root].forEach((el, i) => saved[i] == null ? el.removeAttribute('style') : el.setAttribute('style', saved[i]));
   widget.style.setProperty('--usage-fit-height', `${naturalHeight}px`);

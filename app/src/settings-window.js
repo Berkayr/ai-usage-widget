@@ -1,3 +1,5 @@
+import {historyDefaults, splitMachines} from './history.js';
+import historySample from './sample-providers-a1.json';
 import './settings.css';
 
 import {invoke} from '@tauri-apps/api/core';
@@ -50,6 +52,7 @@ function normalizePlacement(value) {
   return result;
 }
 export const defaults = {
+  ...historyDefaults,
   sizeMode : "fixed",
   fitFraction : 1,
   fitFineTune : 100,
@@ -157,12 +160,12 @@ function preview() {
 function changed() {
   return !!saved && (!equalSettings(draft, saved) ||
                      !equalSettings(providers, savedProviders) ||
-                     autostart !== savedAutostart);
+                     autostart !== savedAutostart || localHistory !== savedLocalHistory);
 }
 function mark() {
   const count = saved ? differingKeys(draft, saved).length +
       Number(!equalSettings(providers, savedProviders)) +
-      Number(autostart !== savedAutostart) : 0;
+      Number(autostart !== savedAutostart) + Number(localHistory !== savedLocalHistory) : 0;
   const dirty = count > 0;
   if (dirty)
     saveMessage = '';
@@ -431,7 +434,9 @@ const themeSymbols = {
   brutalist : '84%',
   'compact-strip' : '━ ━ ━',
   'retro-lcd' : '▮▮▮▯▯',
-  'minimal-pace' : '──┊──'
+  'minimal-pace' : '──┊──',
+  aurora:'▰▰▱', crisp:'▥ 72%', glyph:'⠿ 72', layer:'▱ ▰',
+  'liquid-glass':'◉ ◌', pastel:'● ▬', pebble:'72%'
 };
 for (const theme of themes) {
   const button = document.createElement('button');
@@ -530,7 +535,21 @@ for (const id of ['layout', 'position', 'quote', 'desktop']) {
   sections[id].remove();
   delete sections[id];
 }
-sectionBlock(sections.history, 'Usage history', []);
+const historyControls = sectionBlock(sections.history, 'Usage history', []);
+historyControls.insertAdjacentHTML('beforeend', `
+<label class="toggle-setting">Show usage history<input id="history-enabled" type="checkbox"></label>
+<label class="toggle-setting">Read Claude Code logs<input id="local-history" type="checkbox"></label>
+<p class="setting-note">Counts tokens from this computer's logs. Nothing is stored.</p>
+<label>Show history<select id="history-mode"><option value="under">Under each card</option><option value="card">Click a card</option><option value="panel">Side panel</option></select></label>`);
+const historyExtras = sectionBlock(sections.history, 'Extras', []);
+historyExtras.insertAdjacentHTML('beforeend', `
+<label class="toggle-setting">API price equivalent<input id="history-cost" type="checkbox"></label>
+<label class="toggle-setting">Model breakdown<input id="history-models" type="checkbox"></label>
+<label class="toggle-setting">Activity heatmap<input id="history-heatmap" type="checkbox"></label>
+<label class="toggle-setting">Split by computer<input id="history-machines" type="checkbox" aria-describedby="history-machines-note"></label>
+<p id="history-machines-note" class="setting-note">Shown only when 2+ computers are found</p>`);
+let localHistory = false, savedLocalHistory = false;
+$('#local-history').onchange = () => {localHistory=$('#local-history').checked; mark();};
 const aboutInfo = sectionBlock(sections.about, 'AI Usage', []);
 sections.about.querySelector('h1').after(aboutInfo);
 aboutInfo.insertAdjacentHTML('beforeend', `<p class="setting-note">Version <span id="app-version"></span></p><p class="setting-note" id="data-folder"></p>`);
@@ -538,6 +557,9 @@ $('#app-version').textContent = version;
 const navigation = mountNavigation(sections);
 
 function renderControls() {
+  $('#local-history').checked = localHistory;
+  $('#history-machines').disabled = !snapshotProviders.some(p => splitMachines(p.history,true));
+  $('#history-machines-note').hidden = !$('#history-machines').disabled;
   renderLayout();
   control(effectiveSizeMode(draft)==='screen'?'fit-fine-tune':'scale').after(fineReset);
   document.querySelectorAll('[data-shape]')
@@ -644,7 +666,7 @@ function renderControls() {
     b.setAttribute('aria-pressed', String(b.dataset.theme === draft.theme));
     const colors = themePalette(themes.find(t => t.id === b.dataset.theme));
     b.querySelector('.theme-preview').style.cssText =
-        `background:${colors.bgWidget};color:${
+        `background-color:${colors.bgWidget};color:${
             previewInk(colors.accent,
                        colors.bgWidget)};border-color:${colors.border}`;
   });
@@ -686,6 +708,9 @@ function renderControls() {
   decorateGroups(panel);
 }
 export const bindings = {
+  'history-enabled':'historyEnabled', 'history-mode':'historyMode',
+  'history-cost':'historyCost', 'history-models':'historyModels',
+  'history-heatmap':'historyHeatmap', 'history-machines':'historyMachines',
   'size-mode' : 'sizeMode',
   'fit-fraction' : 'fitFraction',
   'fit-fine-tune' : 'fitFineTune',
@@ -989,12 +1014,18 @@ async function save() {
   saveFailure = '';
   mark();
   const value = structuredClone(draft), chosen = structuredClone(providers),
-        login = autostart;
+        login = autostart, readLogs = localHistory;
   try {
     await preview();
     if (!sample) {
       if (JSON.stringify(chosen) !== JSON.stringify(savedProviders)) {
         await settingsInvoke('configure_providers', {providers : chosen});
+        settingsInvoke('refresh_now').catch(error);
+      }
+      if (readLogs !== savedLocalHistory) {
+        await settingsInvoke('set_local_history', {enabled:readLogs});
+        const config = await settingsInvoke('get_provider_config');
+        if ((config.providers?.claude?.local_history === true) !== readLogs) throw new Error('Local history permission was not saved');
         settingsInvoke('refresh_now').catch(error);
       }
       if (login !== savedAutostart) {
@@ -1010,6 +1041,7 @@ async function save() {
     saved = value;
     savedProviders = chosen;
     savedAutostart = login;
+    savedLocalHistory = readLogs;
     $('#close-prompt').hidden = true;
     saveFailure = '';
     saveMessage =
@@ -1032,6 +1064,7 @@ $('#revert').onclick = () => {
   draft = structuredClone(saved);
   providers = structuredClone(savedProviders);
   autostart = savedAutostart;
+  localHistory = savedLocalHistory;
   $('#start-at-login').checked = autostart;
   positionBefore = null;
   renderProviders();
@@ -1163,6 +1196,9 @@ async function loadSession() {
   providers = Object.entries(providerConfig.providers)
                   .filter(([, p ]) => p.enabled && providerConfig.initialized)
                   .map(([ id ]) => id);
+  localHistory = providerConfig.providers?.claude?.local_history === true;
+  savedLocalHistory = localHistory;
+  if (sample) snapshotProviders = historySample.providers;
   savedProviders = structuredClone(providers);
   savedAutostart = autostart;
   $('#start-at-login').checked = autostart;
