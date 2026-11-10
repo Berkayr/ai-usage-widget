@@ -37,13 +37,13 @@ test('user choices work on every theme; deletion and malformed settings fall bac
   assert.equal(opaqueColor('#abc'),'#aabbcc');
   assert.equal(opaqueColor('#00000080','#ffffff'),'#7f7f7f');
 });
-test('every theme ships twelve palettes with valid dark/light color tokens', async () => {
+test('every theme ships at least two palettes with valid dark/light color tokens', async () => {
   const {readdir,readFile} = await import('node:fs/promises');
   const root = new URL('../app/src/themes/',import.meta.url);
   for (const entry of await readdir(root,{withFileTypes:true})) {
     if (!entry.isDirectory() || entry.name === 'shared') continue;
     const theme = JSON.parse(await readFile(new URL(entry.name+'/theme.json',root),'utf8'));
-    assert.equal(Object.keys(theme.palettes).length,12,theme.id);
+    assert.ok(Object.keys(theme.palettes).length >= 2,theme.id);
     for (const p of Object.values(theme.palettes)) {
       const copy = {id:'user-example',name:p.name,dark:Object.fromEntries(paletteTokens.map(k=>[k,p[k]])),light:{...p,...p.light}};
       assert.equal(validateUserPalettes([copy]).length,1);

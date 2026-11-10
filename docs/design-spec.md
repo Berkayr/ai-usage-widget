@@ -1,7 +1,7 @@
 # Meter and size standard
 
 System uses continuous rounded progress bars, system fonts and 8 px card corners.
-All other themes have 20 marks per quota window by default. Settings → Look → Dot count selects
+Legacy themes other than System have 20 marks per quota window by default. Settings → Look → Dot count selects
 10, 20 or 30. XS (below 220 design pixels) always uses 10. Marks represent used
 quota, rounded to the nearest mark; the percentage remains the precise label.
 Unknown quota has an explicitly unknown appearance and label. Widening a window
@@ -375,3 +375,56 @@ Pill uses identity-colored names, 5h and W values and slim bars without card box
 or plan chips; session reset time appears from Large. Circle includes featured
 Weekly usage and removes card separators and elapsed markers.
 Expired reset times read “Awaiting refresh”. Onboarding uses a plain portrait shell.
+
+
+## Desktop-inspired themes
+
+Seven additional themes use the shared renderer, size tiers, scale and shape geometry.
+Clear Glass, Layer, Aurora, Crisp, Pebble and Pastel draw continuous rounded tracks
+from the renderer's precise `--used` value; their accessible labels and unknown
+states remain intact. Glyph keeps the selected mark count as spaced dots, focuses
+on large DotGothic16 percentages in Portrait and uses white paper in light mode.
+Its signal palettes are neutral with a single muted red hue for threshold warnings.
+All fonts are bundled or native system fonts; no remote assets are requested.
+
+Clear Glass has Silver Current, Blue Tide and Evening Glow palettes, each with
+explicit light/dark tokens. A single 22 px rounded sheet combines directional edge
+highlights, a top specular band, subtle inner shading and a broad soft shadow.
+Sections use hairline dividers without nested glass cards. The default surface
+uses blur(22px) saturate(190%) with a 30% tint in both modes; unsupported CSS backdrop filters
+use a denser 94% tint. Engines that expose backdrop-filter without compositor
+support cannot be detected reliably. Contrast over arbitrary external wallpaper
+cannot be inferred from CSS; the colorful preview is a visual check, not a guarantee.
+Reduced transparency, increased contrast and forced colors replace the glass
+with an opaque surface. Text uses tabular numbers and the shared contrast repair.
+
+Layer is one borderless Mica-tinted surface with 8 px corners, a separate title
+strip, original four-pane app marks, row separators and 4 px accent tracks.
+Aurora has a 7 px translucent cyan frame, 6 px corners, a glossy title strip and
+12 px green tracks with a white upper highlight and fine slanted glints. At the
+shared 80% danger threshold the fill turns orange. Percentages use regular weight.
+Crisp is a dense list with 3 px corners, shaded provider headings and a Portrait
+row grid (label, framed 6 px blue track, percentage, reset). Pebble has a large
+bold app title and 12 px boxed groups with row dividers, percentage pills and
+8 px capsule tracks. Pastel uses borderless 16 px cards with an inner glow,
+provider-name chips and provider-specific orchid/pink/mint gradients. It has no
+beacon decoration. Its base palette tokens and preview favor dark; explicit
+light palettes remain available. The application still resolves automatic
+appearance globally from the OS; a theme-specific dark default would require
+changing the shared appearance/activation contract outside this task's scope.
+
+Clear Glass, Layer, Crisp, Pebble and Pastel omit the shared footer. Aurora
+keeps only a centered italic theme signature; Glyph is unchanged. Each theme
+supplies at least two named palettes with explicit modes. Fixed shapes retain
+shared layout compression, including compact quota rows in Square and Pill.
+Meter fills do not shrink away at the 50% scale, and monochrome tracks use
+neutral ink instead of the decorative color gradients. Theme-picker previews
+reflect the frame, title-strip, dense-list, boxed-group and pastel treatments.
+
+On Windows only, Clear Glass and Layer declare `windowEffect: "acrylic"` in their
+bundled manifests. Native startup, preview, save and discard apply the declaration
+to the main widget: Windows 11 (build 22000+) uses Acrylic, Windows 10 and unknown
+builds use Blur. Other themes clear the native effect. Linux and macOS do not
+compile or invoke the bridge. Adding another native-effect theme requires adding
+its bundled manifest to the small Rust allowlist. Native desktop blur still needs
+Windows visual verification; CSS blur alone cannot sample the desktop wallpaper.
