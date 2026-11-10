@@ -29,19 +29,19 @@ Requires installed app dependencies (`app/node_modules`), Node with built-in `fe
 
 Every run uses a fresh temporary browser profile; locale, timezone and clock are fixed. The process never starts Tauri, quotacore, provider CLIs, or a real desktop session. The only quota input is [fixtures/quotas.json](fixtures/quotas.json), a wholly fictional dataset with `DEMO` plan labels. The fixture hook in `app/src/main.js` is gated on explicit `?sample`; it cannot override native production data without that query flag. Sample mode does not save native settings. Do not pass personal data into fixtures.
 
-Output is `docs/screenshots/*.png`. Scenes use 2× device scale; the large theme, Mono and size sheets use 1× to limit download size. The social card is exactly 1280×640 for GitHub upload. PNG pixel streams are recompressed losslessly at level 9. SVG logos remain vector assets. Change a fixture, palette or frame size in the script and rerun; launch it from any working directory. Generated screenshots are intentional versioned documentation assets, not runtime output.
+Output is `docs/screenshots/*.png` and `docs/screenshots/themes/*.png`. Scenes normally use 2× device scale; README theme sheets and glass use 0.9×, individual themes, history, providers and settings use 1×, and Mono/size sheets use 1× to limit download size. The social card is exactly 1280×640 for GitHub upload. PNG pixel streams are recompressed losslessly at level 9. SVG logos remain vector assets. Change a fixture, palette or frame size in the script and rerun; launch it from any working directory. Generated screenshots are intentional versioned documentation assets, not runtime output.
 
-Hero, size, palette, scale, state and settings scenes embed the **built application UI**. Taskbar, KDE Breeze and Waybar scenes are HTML illustrations, not native desktop captures. `NO_SUBSCRIPTION` is hidden by the actual renderer; the states image shows stale, authentication and rate-limit states in Terminal and Retro LCD. Settings screenshots show the top of a scrollable panel. The current layout contract is documented in [the design specification](../design-spec.md).
+Hero, size, palette, scale, state and settings scenes embed the **built application UI**. Taskbar, KDE Breeze and Waybar scenes are HTML illustrations, not native desktop captures. `NO_SUBSCRIPTION` is an explanatory card for enabled providers; the states image shows stale, authentication and rate-limit states in Terminal and Retro LCD. Settings screenshots show Appearance with the six-category sidebar in the Windows sample preview. The current layout contract is documented in [the design specification](../design-spec.md).
 
 Chrome's sandbox stays enabled by default. Restricted development environments can explicitly opt out with `SCREENSHOT_NO_SANDBOX=1`; only use that override with these trusted local fixtures. It needs loopback socket access. In an environment that denies sockets, rerun with the appropriate local execution permission. It does not need internet access once dependencies are present. Browser profile and servers are cleaned up on completion. Inspect every PNG after changing UI or fixtures; native desktop acceptance and design review remain separate.
 
-Theme captures include `themes.png`, `themes-light.png`, and `themes/<id>-dark.png` / `-light.png`. Hero captures pair the logo with Dot Matrix / Ember in the corresponding appearance; social preview uses Dark. System light/dark stays in `system.png`. Theme galleries mix dark and light designs in three rows, followed by the horizontal strip; size and scale scenes use a different theme for each frame. `checks/<id>-dark.png` / `-light.png` put the 340/200 px × 100/150% scale combinations side by side (80 cases total). Additional state scenes exercise stale/auth/rate-limit and extra/unknown windows. `checks/results.json` records provider counts, horizontal overflow, minimum visible text/number sizes, secondary text contrast and the one-active-theme-style invariant. The same browser then exercises every theme selector, appearance, 50/300% scale and the extra-window toggle, Color mode and all 12 Accent edge/position combinations. Fit frames are measured after font loading.
+Theme captures include `themes.png`, `themes-light.png`, and `themes/<id>-dark.png` / `-light.png`. Hero captures pair the logo with Dot Matrix / Ember in the corresponding appearance; social preview uses Dark. System light/dark stays in `system.png`. The 17-theme galleries use two sheets per appearance (`themes.png` / `themes-new.png` and their `-light` variants), followed by the horizontal strip; size and scale scenes use a different theme for each frame. `checks/<id>-dark.png` / `-light.png` put the 340/200 px × 100/150% scale combinations side by side (80 cases total). Additional state scenes exercise stale/auth/rate-limit and extra/unknown windows. `checks/results.json` records provider counts, horizontal overflow, minimum visible text/number sizes, secondary text contrast and the one-active-theme-style invariant. The same browser then exercises every theme selector, appearance, 50/300% scale and the extra-window toggle, Color mode and all 12 Accent edge/position combinations. Fit frames are measured after font loading.
 
 Marketing scenes use Vivid for palette variety; System and check scenes use Calm unless stated otherwise. The accent edge stays off. `checks/vivid.png` compares Calm and Vivid. Readability checks require quota window labels ≥13 CSS px, secondary chrome ≥11 CSS px and primary numbers ≥15 CSS px at 100% (scaled proportionally at 150%). Constrained viewports and compacted cards with extra windows retain the production fitter’s 11 px floor. Secondary text contrast ≥4.5:1. Contrast is calculated from computed text colors and composited background-color layers against the least favorable black/white desktop polarity; background images and compositor effects require visual review. `checks/` remains ignored.
 
-`SCENE=checks/providers- node docs/tools/screenshots.mjs` captures first-run provider consent in all ten themes in dark/light modes and checks default-off choices, wrapped disclosures and explicit Start behavior. These controls use synthetic detection only.
+`SCENE=checks/providers- node docs/tools/screenshots.mjs` captures first-run provider consent in all original ten themes in dark/light modes and checks default-off choices, wrapped disclosures and explicit Start behavior. These controls use synthetic detection only.
 
-Mono adds `mono.png` (all ten themes), `checks/mono-light.png`,
+Mono adds `mono.png` (all original ten themes), `checks/mono-light.png`,
 `checks/mono-thresholds.png` (0/49/50/79/80/100/unknown), and
 `checks/dots-{200,340,520,700}.png`. Mono uses a neutral gallery background.
 Width checks assert visible per-window mark counts (10 in XS, otherwise 20)
@@ -147,13 +147,13 @@ captures are `settings-preview-light.png` and `settings-preview-dark.png`.
 
 ## Fixed shell, theme identity
 
-`node docs/tools/size-audit.mjs` measures all ten themes × five shapes × five presets ×
+`node docs/tools/size-audit.mjs` measures all original ten themes × five shapes × five presets ×
 0/1/3/6 providers × quote off/on (2,000 cases), writing `size-audit.json` and
 `size-sheet.png`. Portrait ends at intrinsic content within its fit ceiling;
 other shapes keep their fixed dimensions. Compact Strip retains its horizontal
 width contract and scrolling in externally narrowed viewports.
 
-`node docs/tools/theme-identity-check.mjs` checks all ten themes × five shapes × five presets ×
+`node docs/tools/theme-identity-check.mjs` checks all original ten themes × five shapes × five presets ×
 1/2/3/4/5/6 providers × dark/light, including both square pages for five/six
 providers (3,500 cases including endpoint boundary scenarios), and writes
 `theme-identity-results.json`. Synthetic DEMO plans and countdowns exercise real
@@ -242,7 +242,7 @@ are synthetic and the browser cannot contact Wikiquote.
 Provider layout checks also cover explicit / Auto / None featured selection,
 Top / Bottom, hiding, ordering, drag and keyboard controls, and Save / Revert.
 `provider-identity-check.mjs` samples PNG arc pixels to compare Calm and Vivid
-saturation for every theme. `circle-sheet.png` includes all ten themes, with
+saturation for every theme. `circle-sheet.png` includes all original ten themes, with
 Calm / Vivid / Mono rows and dark / light columns. Reactor motion defaults off;
 `theme-identity-check.mjs` checks opt-in and reduced-motion behavior.
 
@@ -353,7 +353,7 @@ already installed Pillow and preserves screenshot resolution.
 
 ### Portrait spacing
 
-`node docs/tools/portrait-gap-check.mjs` measures all ten themes, one to three
+`node docs/tools/portrait-gap-check.mjs` measures all original ten themes, one to three
 providers, featured on/off, quote on/off, all five presets and all four screen
 fractions at synthetic 1536 × 960 (125% KDE scale) and 1920 × 1080 work areas.
 Build first. The existing isolated headless harness is used; nothing reads or
@@ -371,7 +371,7 @@ layout boxes, not raster ink density. Compact Strip keeps its independent
 horizontal fixed mode and is still covered by the portrait matrix.
 
 `node docs/tools/portrait-preview.mjs` captures synthetic Small and Full Fit
-scenes for all ten themes, cropped to the measured surface. `shape-final-check.mjs` also
+scenes for all original ten themes, cropped to the measured surface. `shape-final-check.mjs` also
 writes `geometry.json` for exact comparison of the four non-portrait shapes.
 Screen Fit permits Portrait to end at its content; all other shapes still have
 to fill their fixed boxes. Native WebKitGTK/WebView2 acceptance remains separate.
@@ -456,3 +456,38 @@ WebDriver DOM. Wayland layer-shell remains outside this X11 CI coverage. Native
 jobs are prepared but have not been dispatched or verified locally.
 
 Reference: [Tauri native WebDriver CI](https://v2.tauri.app/develop/tests/webdriver/ci/).
+
+## README refresh captures
+
+```sh
+GALLERY_ONLY=1 SCENE=themes,history,glass,providers,settings-,hero-,social-preview node docs/tools/screenshots.mjs
+python3 docs/tools/check-readme-links.py
+```
+
+`SCENE` accepts comma-separated filename prefixes. `GALLERY_ONLY=1` omits
+the exhaustive `checks/` scenes and post-capture interaction matrix; readiness,
+provider-count, active-style, overflow and gallery empty-space assertions still run.
+Individual theme captures use 1× to keep downloads small. The seven new themes
+use an 11 CSS px quota-label floor in this capture tool; the original designs
+keep their 13 px floor. Gallery Portrait height is bounded at 900 CSS px to
+accommodate the new designs' intrinsic geometry. This is a documentation check,
+not a change to application typography.
+
+History fixtures are generated deterministically in the script. The expanded
+card is opened through its real click handler; the side-panel showcase expands
+the browser widget height to expose its scrollable heatmap and computer totals; side-panel heatmap presence is
+asserted before capture. Invented model names, machine types, token counts and
+price estimates never come from local logs. The documentation server bootstraps fixtures inline so separate Chrome frame
+processes receive them reliably; fixture strings escape script delimiters.
+Encoded history fixture URLs have an explicit 128 KiB local server header limit.
+`glass.png` places the real Clear Glass frontend over a CSS gradient wallpaper;
+it previews browser transparency, not native Windows Acrylic. `providers.png`
+shows logos and a synthetic Gemini `NO_SUBSCRIPTION` card. Hero/social labels
+are refreshed to 17 themes. PNGs are losslessly compressed; the README refresh
+assets are checked against a 600 KiB budget.
+
+The existing exhaustive dot-count, Mono and interaction matrices remain scoped
+to the original ten designs. The seven new designs are covered here by the
+README capture assertions and visual inspection; this task does not claim a
+full 17-theme desktop acceptance audit. Clear Glass uses the internal
+`liquid-glass` id; captures assert the requested theme to reject silent fallback.
