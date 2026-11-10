@@ -8,6 +8,7 @@ import {createRenderer} from './themes/shared/render.js';
 import {arrangeCards} from './provider-layout.js';
 import {fitUsage} from './usage-fit.js';
 import {applyAppearance} from './appearance.js';
+import {widgetWidth} from './sizing.js';
 import snapshot from './sample-providers-a1.json';
 const params=new URLSearchParams(location.search);
 const settings={theme:params.get('theme')||'system',shape:params.get('shape')||'portrait',palette:'default',colorMode:'mono',featuredProvider:'auto',size:'medium',position:'top-right',appearance:'dark',backgroundOpacity:1,widgetOpacity:1};
@@ -17,6 +18,9 @@ Object.assign(document.documentElement.dataset,{theme:settings.theme,shape:setti
 document.documentElement.classList.toggle('fit-height',params.has('fit'));
 applyAppearance(settings,loaded.manifest,false);
 const root=document.querySelector('#providers');
+// A wide desktop browser should show the real widget width; tests size the viewport to the widget.
+const realWidth=widgetWidth(settings,Number(params.get('count'))||5);
+if(!params.has('free') && window.innerWidth>realWidth*1.6) Object.assign(document.querySelector('#app').style,{width:realWidth+'px',margin:'24px auto'});
 const count=Math.min(5,Math.max(2,Number(params.get('count'))||5));
 const providers=snapshot.providers.slice(0,count).map(p=>({...p,windows:(p.windows||[]).map(w=>({...w,resets_at:new Date(Date.now()+(w.resets_in_minutes||60)*60000).toISOString()}))}));
 const widget=root.closest('.widget');
