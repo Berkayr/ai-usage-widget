@@ -1,0 +1,13 @@
+@import '../shared/layout.css';
+ .widget {font-family:system-ui,sans-serif;border-radius:18px;font-variant-numeric:tabular-nums}
+:root[data-theme=glyph] .widget .provider-card {background:transparent;border:0;border-top:1px solid var(--border);border-radius:0}
+:root[data-theme=glyph] .widget .window-top b,:root[data-theme=glyph] .dial-number {font-family:DotGothic16,monospace;font-weight:400}
+:root[data-theme=glyph][data-shape=portrait] .widget .window-top b {font-size:var(--size-font-display)}
+:root[data-theme=glyph] .widget .segments {display:flex;width:100%;height:auto;min-height:4px;flex-wrap:nowrap;justify-content:space-between;gap:var(--size-dot-gap)}
+:root[data-theme=glyph] .widget .segments i {flex:0 1 var(--size-dot);height:auto;aspect-ratio:1;border-radius:50%;background:var(--bgTrackOff)}
+:root[data-theme=glyph] .widget .segments i.on {background:var(--level)}
+:root[data-theme=glyph] .widget .segments.unknown i {background:transparent;border:1px dashed var(--textMuted)}
+:root[data-theme=glyph] .widget .beacon {background:var(--severityDanger)}
+
+/* Keep provider identification neutral; the signal red is reserved for quota status. */
+:root[data-theme=glyph] .widget {--provider-0:var(--textPrimary);--provider-1:var(--textPrimary);--provider-2:var(--textPrimary);--provider-3:var(--textPrimary);--provider-4:var(--textPrimary);--provider-5:var(--textPrimary);--provider-6:var(--textPrimary);--provider-7:var(--textPrimary);--provider-8:var(--textPrimary);--provider-9:var(--textPrimary);--provider-10:var(--textPrimary);--provider-11:var(--textPrimary)}
