@@ -1,0 +1,177 @@
+{
+  "id": "pastel",
+  "name": "Pastel",
+  "sizeTiers": {
+    "xs": 219,
+    "s": 319,
+    "m": 519,
+    "l": 960
+  },
+  "palettes": {
+    "orchid": {
+      "name": "Orchid Mint",
+      "bgWidget": "#252236",
+      "bgCard": "#343047",
+      "bgTrackOff": "#4c5666",
+      "textPrimary": "#f5f6fa",
+      "textSecondary": "#d1d8e4",
+      "textMuted": "#b4bfce",
+      "border": "#515d70",
+      "accent": "#ccbaf0",
+      "severityNormal": "#ccbaf0",
+      "severityWarning": "#e9c18b",
+      "severityDanger": "#efabba",
+      "providerColors": [
+        "#ccbaf0",
+        "#e9c18b",
+        "#e8b0ce"
+      ],
+      "dark": {
+        "bgWidget": "#252236",
+        "bgCard": "#343047",
+        "bgTrackOff": "#4c5666",
+        "textPrimary": "#f5f6fa",
+        "textSecondary": "#d1d8e4",
+        "textMuted": "#b4bfce",
+        "border": "#515d70",
+        "accent": "#ccbaf0",
+        "severityNormal": "#ccbaf0",
+        "severityWarning": "#e9c18b",
+        "severityDanger": "#efabba",
+        "providerColors": [
+          "#ccbaf0",
+          "#e9c18b",
+          "#e8b0ce"
+        ]
+      },
+      "light": {
+        "bgWidget": "#f4effa",
+        "bgCard": "#fdfaff",
+        "bgTrackOff": "#c5ccd5",
+        "textPrimary": "#20232b",
+        "textSecondary": "#3f4755",
+        "textMuted": "#515b6b",
+        "border": "#b6bfcb",
+        "accent": "#69518d",
+        "severityNormal": "#69518d",
+        "severityWarning": "#815521",
+        "severityDanger": "#a43e56",
+        "providerColors": [
+          "#69518d",
+          "#815521",
+          "#884568"
+        ]
+      }
+    },
+    "petal": {
+      "name": "Petal Dew",
+      "bgWidget": "#2d2534",
+      "bgCard": "#403348",
+      "bgTrackOff": "#4c5666",
+      "textPrimary": "#f5f6fa",
+      "textSecondary": "#d1d8e4",
+      "textMuted": "#b4bfce",
+      "border": "#515d70",
+      "accent": "#ecb7d3",
+      "severityNormal": "#ecb7d3",
+      "severityWarning": "#e9c18b",
+      "severityDanger": "#efabba",
+      "providerColors": [
+        "#ecb7d3",
+        "#e9c18b",
+        "#e8b0ce"
+      ],
+      "dark": {
+        "bgWidget": "#2d2534",
+        "bgCard": "#403348",
+        "bgTrackOff": "#4c5666",
+        "textPrimary": "#f5f6fa",
+        "textSecondary": "#d1d8e4",
+        "textMuted": "#b4bfce",
+        "border": "#515d70",
+        "accent": "#ecb7d3",
+        "severityNormal": "#ecb7d3",
+        "severityWarning": "#e9c18b",
+        "severityDanger": "#efabba",
+        "providerColors": [
+          "#ecb7d3",
+          "#e9c18b",
+          "#e8b0ce"
+        ]
+      },
+      "light": {
+        "bgWidget": "#faf0f6",
+        "bgCard": "#fffaff",
+        "bgTrackOff": "#c5ccd5",
+        "textPrimary": "#20232b",
+        "textSecondary": "#3f4755",
+        "textMuted": "#515b6b",
+        "border": "#b6bfcb",
+        "accent": "#87496d",
+        "severityNormal": "#87496d",
+        "severityWarning": "#815521",
+        "severityDanger": "#a43e56",
+        "providerColors": [
+          "#87496d",
+          "#815521",
+          "#884568"
+        ]
+      }
+    },
+    "mint": {
+      "name": "Mint Dusk",
+      "bgWidget": "#202e2e",
+      "bgCard": "#2d4140",
+      "bgTrackOff": "#4c5666",
+      "textPrimary": "#f5f6fa",
+      "textSecondary": "#d1d8e4",
+      "textMuted": "#b4bfce",
+      "border": "#515d70",
+      "accent": "#a8dccc",
+      "severityNormal": "#a8dccc",
+      "severityWarning": "#e9c18b",
+      "severityDanger": "#efabba",
+      "providerColors": [
+        "#a8dccc",
+        "#e9c18b",
+        "#e8b0ce"
+      ],
+      "dark": {
+        "bgWidget": "#202e2e",
+        "bgCard": "#2d4140",
+        "bgTrackOff": "#4c5666",
+        "textPrimary": "#f5f6fa",
+        "textSecondary": "#d1d8e4",
+        "textMuted": "#b4bfce",
+        "border": "#515d70",
+        "accent": "#a8dccc",
+        "severityNormal": "#a8dccc",
+        "severityWarning": "#e9c18b",
+        "severityDanger": "#efabba",
+        "providerColors": [
+          "#a8dccc",
+          "#e9c18b",
+          "#e8b0ce"
+        ]
+      },
+      "light": {
+        "bgWidget": "#eef8f4",
+        "bgCard": "#fafffc",
+        "bgTrackOff": "#c5ccd5",
+        "textPrimary": "#20232b",
+        "textSecondary": "#3f4755",
+        "textMuted": "#515b6b",
+        "border": "#b6bfcb",
+        "accent": "#346d60",
+        "severityNormal": "#346d60",
+        "severityWarning": "#815521",
+        "severityDanger": "#a43e56",
+        "providerColors": [
+          "#346d60",
+          "#815521",
+          "#884568"
+        ]
+      }
+    }
+  }
+}
