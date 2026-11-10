@@ -1,3 +1,4 @@
+import {providerLogo} from './icons/provider-logos.js';
 import {orderedProviders, featuredProvider} from './provider-layout.js';
 import {widgetProviders} from './sizing.js';
 import {hiddenStates, providerNames} from './themes/dot-matrix/render.js';
@@ -6,7 +7,7 @@ export function layoutControls(root, getDraft, getProviders, update, getSnapshot
   const field = document.createElement('fieldset');
   field.innerHTML =
       `<legend>Provider layout</legend>
-<p class="setting-note">Drag to reorder, or use Up / Down. Visibility applies to every shape.</p>
+<p class="setting-note">Drag to reorder, or use the arrow buttons. Visibility applies to every shape.</p>
 <div id="provider-order">
 </div>
 <label>Featured provider<select id="featured-provider">
@@ -49,10 +50,17 @@ export function layoutControls(root, getDraft, getProviders, update, getSnapshot
     el.draggable = true;
     el.dataset.layoutProvider = id;
     const name = document.createElement('span');
-    name.textContent = providerNames[id] || id;
+    name.className = 'setting-copy';
+    const title = document.createElement('strong'), hint = document.createElement('small');
+    title.textContent = providerNames[id] || id;
+    hint.textContent = 'Show in the widget; drag or use arrows to reorder.';
+    name.append(title, hint);
+    const logo = providerLogo(id) || '';
+    el.insertAdjacentHTML('beforeend', logo.replace(/id="([^"]+)"/g, 'id="order-$1"').replace(/url\(#([^)]+)\)/g, 'url(#order-$1)'));
     el.append(name);
     const visible = document.createElement('input');
     visible.type = 'checkbox';
+    visible.setAttribute('role', 'switch');
     visible.checked = !(getDraft().hiddenProviders || []).includes(id);
     visible.setAttribute('aria-label', `Show ${id}`);
     visible.onchange = () =>
@@ -63,7 +71,7 @@ export function layoutControls(root, getDraft, getProviders, update, getSnapshot
     el.append(visible);
     for (const [label, delta] of [[ 'Up', -1 ], [ 'Down', 1 ]]) {
       const button = document.createElement('button');
-      button.textContent = label;
+      button.textContent = delta < 0 ? '↑' : '↓';
       button.disabled = index + delta < 0 || index + delta >= ids.length;
       button.setAttribute('aria-label', `${label} ${id}`);
       button.onclick = () => {

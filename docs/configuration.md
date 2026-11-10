@@ -10,7 +10,7 @@ Theme defaults to System when no choice is stored; an existing explicit theme is
 
 | Field | Default | Meaning |
 | --- | --- | --- |
-| `theme` | `system` | System, Dot Matrix and eight other designs; selected in Settings → Theme. |
+| `theme` | `system` | System, Dot Matrix and eight other designs; selected in Settings → Appearance. |
 | `appearance` | `auto` | `auto`, `light`, `dark`; auto follows OS color preference live. |
 | `colorMode` | `calm` | Neutral or system-accent usage below 50%, soft amber from 50%, muted red from 80%; `vivid` restores theme colors. |
 | `accentEdge` | `off` | `off`, `auto`, `left`, `right`; Auto follows the selected corner, with no edge in Free placement. |
@@ -20,9 +20,9 @@ Theme defaults to System when no choice is stored; an existing explicit theme is
 | `widgetOpacity` | `100` | Surface opacity; text remains opaque. UI range 20–100. |
 | `backgroundOpacity` | `100` | Background opacity, 0–100; this does not enable compositor blur. |
 | `scale` | `100` | Derived text and layout scale, 10–300%; presets 85/100/120/150/200 multiplied by fine-tune. Ctrl +/− changes the active fine-tune by 5; Ctrl+0 resets that fine-tune to 100. Work-area and coverage limits apply. |
-| `sizeMode`, `sizePreset`, `fineTune` | `fixed`, `Medium`, `100` | Fixed preset and independent 50–150% fine-tuning, under Size & Shape. |
+| `sizeMode`, `sizePreset`, `fineTune` | `fixed`, `Medium`, `100` | Fixed preset and independent 50–150% fine-tuning, under Appearance → Size. |
 | `fitFraction`, `fitFineTune` | `1`, `100` | Screen share (1, .75, .5, 1/3) and separate 50–150% fine-tuning for Fit screen. Effective only for Portrait except Compact Strip; other shapes retain the choice but use their preset. Portrait Fit width is capped at 30% of available width. |
-| `reservedTop`, `reservedBottom` | `null` | Auto detected insets; explicit logical pixel overrides under Position → Advanced. |
+| `reservedTop`, `reservedBottom` | `null` | Auto detected insets; explicit logical pixel overrides under Appearance → Position → Advanced. |
 | `fitHeight` | `true` | Resize to content height. Width still controls the responsive layout. |
 | `position` | `Top right` | Top/Bottom + left/right corners, or `Free` where supported. |
 | `showExtraWindows` | `false` | Reveal secondary/model windows that the source marks hidden. |
@@ -91,10 +91,15 @@ System uses a system-ui font stack without bundled theme fonts, 8 px cards and c
 
 ### Settings pages and screen limits
 
-Navigation is Providers, Theme, Size & Shape, Position, Quote, Taskbar strip
-(Windows), Desktop (Linux), and General. Provider order and the featured provider
-are under Providers. Drag and Up / Down reorder the visible list immediately in
-preview; Save persists it. `featuredProvider: "first"` (First in list) is the
+Navigation is General, Appearance, Providers, History, Taskbar (Windows only),
+and About. The last selected category is remembered locally. Up / Down moves
+between categories; below 560 px the menu becomes horizontal tabs, with Left /
+Right also supported. Tab moves from the selected category to its controls.
+History currently has an empty card reserved for a later update.
+
+Provider order and the featured provider are under Providers, alongside the
+unchanged provider detection, consent and logo rows. Drag or use the ↑ / ↓ buttons to reorder
+the list with live preview; Save keeps it. `featuredProvider: "first"` (First in list) is the
 new-install default. `"auto"` (Highest usage) selects the largest quota percentage
 across windows; the hint names the selection and explains that reordering cannot
 change it. A provider ID pins that provider; `"none"` disables the selection.
@@ -109,11 +114,15 @@ Circle uses the featured choice for its center and ignores position. Circle and
 Pill first apply Providers on this widget (up to three) and visibility, then order
 and featured selection.
 
-Theme includes Palette, Mode, Colors and Provider colors;
-theme-specific details appear only when applicable. General contains Start at
-login, Show extra windows and diagnostics.
+Appearance includes Theme, Palette, Mode, Colors, Provider colors, Shape, Size,
+Position and Linux desktop layer controls; theme-specific details appear only
+when applicable. General contains Start at login, Show extra windows and daily
+quote controls, including the existing privacy disclosure. About contains the
+app version, runtime diagnostics and the platform data folder convention
+(including the `QUOTACORE_HOME` override). No new refresh or notification setting
+is introduced.
 
-Size & Shape starts with shape cards and six size choices. Each choice displays
+Shape cards and six size choices are grouped under Appearance. Each choice displays
 the actual fitted pixel dimensions, including DPI and fine-tuning. Oversized fixed
 presets are disabled. Fit screen uses Largest, 3/4, 1/2 or 1/3 with independent
 fine-tuning; the strip uses width as its main axis. Every size, including Ctrl +/-
@@ -123,15 +132,21 @@ saved size mode, preset and fine-tune. Position starts with the monitor map and
 corner presets; manual reserved edges are under Advanced. Existing files remain
 compatible, including named corner positions and Free placement ratios.
 
-Changes preview live. Save and Revert activate for unsaved changes. Save verifies
-the persisted settings by loading them again before displaying a saved time;
-errors remain visible and can be retried.
+Changes preview live on the widget without writing settings. Provider selection
+also previews live; provider consent and autostart persist only on Save. The footer
+counts changed top-level settings, provider selection and autostart; Save and Revert activate only while changes exist. Map placement is
+also a draft: Place widget enables the map, Use position accepts it, and the
+footer Save keeps it. Save verifies the persisted settings by loading them
+again before displaying a saved time; errors remain visible and can be retried.
+Revert restores the saved settings on the widget as well as in the form.
+Closing with changes offers Save, Discard or Cancel. Settings use system fonts and shared chrome colors for legibility in
+light and dark mode, independently of the selected widget theme.
 
 ## User palettes
 
-Settings → Theme shows six palette swatches initially; **Show all** expands the list.
+Settings → Appearance shows six palette swatches initially; **Show all** expands the list.
 **New palette** and **Duplicate** copy the current colors. **Edit palette** edits
-its name and both appearances with live preview. Low contrast produces a warning
+its name and both appearances with palette swatch previews in settings. Low contrast produces a warning
 without blocking edits or Save. Revert restores saved palettes and selection.
 Delete requires an in-page confirmation; deleting the selected palette restores
 the theme's first built-in palette. Export writes all user palettes to the panel's

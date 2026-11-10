@@ -15,6 +15,9 @@ Notable changes will be recorded here. No release has been published yet.
 
 ### Changed
 
+- Group settings into six sidebar categories with remembered selection, keyboard navigation and horizontal tabs below 560 px.
+- Preview settings live, with S1 row cards, accessible switches, a counted changes footer and verified persistence on Save; Revert and Discard restore saved settings.
+
 - Inline provider logos, setup guidance for enabled providers without data, and equal Portrait card heights across themes.
 - OpenRouter reports missing balance values explicitly without inventing a zero balance.
 

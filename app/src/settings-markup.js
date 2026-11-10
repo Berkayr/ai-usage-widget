@@ -26,11 +26,7 @@ export const settingsMarkup = `
           <option value="mono">Mono</option>
         </select>
       </label>
-      <label>Dot count<select id="dot-count">
-          <option>10</option>
-          <option>20</option>
-          <option>30</option>
-        </select>
+      <label>Dot count<output id="dot-count-out"></output><input id="dot-count" type="range" min="10" max="30" step="10">
       </label>
       <label class="toggle-setting">Match physical size across monitors<input id="match-physical-size" type="checkbox">
       </label>
