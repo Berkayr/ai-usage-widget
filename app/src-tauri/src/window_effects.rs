@@ -1,4 +1,4 @@
-//! Theme effects are confined to the main widget window.
+//! Theme effects apply to the supplied widget window.
 #[cfg(windows)]
 use tauri::{utils::config::WindowEffectsConfig, window::Effect};
 #[cfg(windows)]

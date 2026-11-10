@@ -1,16 +1,34 @@
 use super::*;
 use std::sync::{Mutex, OnceLock};
 static CURRENT: OnceLock<Mutex<Settings>> = OnceLock::new();
+static PREVIEWS: std::sync::LazyLock<Mutex<std::collections::HashMap<String, Settings>>> = std::sync::LazyLock::new(Mutex::default);
 static PREVIEWING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 pub fn initialize() { let _ = CURRENT.set(Mutex::new(load_settings())); }
 pub fn current() -> Settings { CURRENT.get_or_init(|| Mutex::new(load_settings())).lock().unwrap_or_else(|e| e.into_inner()).clone() }
+pub fn current_for(label: &str) -> Settings {
+    if let Some(settings) = PREVIEWS.lock().unwrap_or_else(|e| e.into_inner()).get(label) { return settings.clone(); }
+    let root = current();
+    widgets::id_from_label(label).and_then(|id| widgets::effective(&root, id)).unwrap_or(root)
+}
+pub fn set_preview(app: &tauri::AppHandle, settings: Settings) -> Result<(), String> {
+    user_palettes::validate(&settings.user_palettes)?;
+    *CURRENT.get_or_init(|| Mutex::new(load_settings())).lock().unwrap_or_else(|e| e.into_inner()) = settings;
+    PREVIEWS.lock().unwrap_or_else(|e| e.into_inner()).clear();
+    for (label, _) in app.webview_windows() {
+        if widgets::id_from_label(&label).is_ok() { apply_preview(app, current_for(&label), &label)?; }
+    }
+    Ok(())
+}
 pub fn is_previewing() -> bool { PREVIEWING.load(std::sync::atomic::Ordering::Relaxed) }
-pub fn set_preview(app: &tauri::AppHandle, mut settings: Settings) -> Result<(), String> {
+fn apply_preview(app: &tauri::AppHandle, mut settings: Settings, label: &str) -> Result<(), String> {
     user_palettes::validate(&settings.user_palettes)?;
     settings.taskbar.color_mode=settings.color_mode.clone();
     settings.taskbar.dot_count=settings.dot_count;
-    *CURRENT.get_or_init(|| Mutex::new(load_settings())).lock().unwrap_or_else(|e|e.into_inner()) = settings.clone();
-    if let Some(window) = app.get_webview_window("main") {
+    if label == widgets::MAIN_ID {
+        *CURRENT.get_or_init(|| Mutex::new(load_settings())).lock().unwrap_or_else(|e| e.into_inner()) = settings.clone();
+    }
+    PREVIEWS.lock().unwrap_or_else(|e| e.into_inner()).insert(label.into(), settings.clone());
+    if let Some(window) = app.get_webview_window(label) {
         #[cfg(target_os = "windows")]
         window_effects::apply(&window, &settings.theme)?;
         shape_region::request(&window);
@@ -18,11 +36,15 @@ pub fn set_preview(app: &tauri::AppHandle, mut settings: Settings) -> Result<(),
         window.run_on_main_thread(move || { let _ = placement::apply(&target, &value); }).map_err(|e|e.to_string())?;
         window.emit("settings-preview", &settings).map_err(|e| e.to_string())?;
     }
-    #[cfg(windows)] taskbar::update_settings(settings.taskbar);
+    #[cfg(windows)] if label == widgets::MAIN_ID { taskbar::update_settings(settings.taskbar); }
     Ok(())
 }
 #[tauri::command]
-pub fn preview_settings(app: tauri::AppHandle, settings: Settings) -> Result<(), String> { set_preview(&app, settings) }
+pub fn preview_settings(app: tauri::AppHandle, settings: Settings, widget_id: Option<String>) -> Result<(), String> {
+    let label = widgets::label(widget_id.as_deref())?;
+    widgets::effective(&current(), widgets::id_from_label(&label)?)?;
+    apply_preview(&app, settings, &label)
+}
 // Hide only after the frontend has resolved Save / Discard / Cancel.
 #[tauri::command]
 pub fn finish_settings(app: tauri::AppHandle) -> Result<(), String> {

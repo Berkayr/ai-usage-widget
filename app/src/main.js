@@ -19,6 +19,8 @@ import './themes/shared/chrome.css';
 import { loadTheme, allThemes } from './themes/registry.js';
 import defaultSample from './sample-snapshot.json';
 import providerSample from './sample-providers-a1.json';
+const widgetId = new URLSearchParams(location.search).get('widget') || 'main';
+const storageKey = key => widgetId === 'main' ? key : `${key}:${widgetId}`;
 const sample = new URLSearchParams(location.search).get('sample') === 'a1' ? providerSample : defaultSample;
 let quoteData = null;
 let quoteKey = null;
@@ -72,7 +74,7 @@ const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'
 const systemAppearance = matchMedia('(prefers-color-scheme: light)');
 const historyState = {};
 let settings = { ...historyDefaults, quoteEnabled:false, quoteMode:'qotd', quotePosition:'bottom', quoteNavigation:true, theme: 'system', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'default', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
-try { settings.showExtraWindows = localStorage.getItem('showExtraWindows') === 'true'; } catch {}
+try { settings.showExtraWindows = localStorage.getItem(storageKey('showExtraWindows')) === 'true'; } catch {}
 let shapePage = 0;
 let currentSnapshot = null;
 let currentNoData = false;
@@ -100,7 +102,7 @@ function updateLayoutScale(count) {
   updateNarrowViewport();
 }
 async function refreshWorkArea() {
-  const geometry=await invoke('get_placement_monitors');
+  const geometry=await invoke('get_placement_monitors', { widgetId });
   placementMonitors=geometry.monitors;
   applySettings();
 }
@@ -263,7 +265,7 @@ function currentSample() {
   const now = Date.now();
   return { ...sample, generated_at: new Date(now).toISOString(), providers: sample.providers.map(provider => ({ ...provider, windows: (provider.windows || []).map(window => ({ ...window, resets_at: Number.isFinite(window.resets_in_minutes) ? new Date(now + window.resets_in_minutes * 60000).toISOString() : null })) })) };
 }
-async function persist() { if (!isSample) try { localStorage.setItem('widgetTheme', settings.theme); localStorage.setItem('widgetLook', JSON.stringify({ colorMode: settings.colorMode, accentEdge: settings.accentEdge, dotCount: settings.dotCount, matchPhysicalSize: settings.matchPhysicalSize })); } catch {} if (!isSample) try { await invoke('save_settings', { settings }); } catch (error) { showToast(String(error)); } }
+async function persist() { if (!isSample) try { localStorage.setItem(storageKey('widgetTheme'), settings.theme); localStorage.setItem(storageKey('widgetLook'), JSON.stringify({ colorMode: settings.colorMode, accentEdge: settings.accentEdge, dotCount: settings.dotCount, matchPhysicalSize: settings.matchPhysicalSize })); } catch {} if (!isSample) try { await invoke('save_settings', { settings, widgetId }); } catch (error) { showToast(String(error)); } }
 let toastTimer;
 function showToast(message) { clearTimeout(toastTimer); const el = $('#toast'); el.textContent = message; el.hidden = false; toastTimer = setTimeout(() => { el.hidden = true; }, 3200); }
 
@@ -293,7 +295,7 @@ $('#menu-settings').onclick = openSettings;
 
 let initialSettingsError = null;
 if (!isSample) {
-  try { settings = {...settings, ...(await invoke('load_settings'))}; }
+  try { settings = {...settings, ...(await invoke('load_settings', { widgetId }))}; }
   catch (error) { initialSettingsError = error; }
 }
 const initialOverrides = {accent:settings.accent, background:settings.background};

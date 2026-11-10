@@ -89,7 +89,13 @@ fn settings_path() -> PathBuf {
     }
     dirs::config_dir().unwrap_or_else(|| dirs::home_dir().unwrap()).join("ai-usage").join("settings.json")
 }
-fn window_path() -> PathBuf { settings_path().parent().unwrap().join("window.json") }
+fn window_state_filename(label: &str) -> Result<String, String> {
+    let id = widgets::id_from_label(label)?;
+    Ok(if id == widgets::MAIN_ID { "window.json".into() } else { format!("window-{id}.json") })
+}
+fn window_path(label: &str) -> Result<PathBuf, String> {
+    Ok(settings_path().parent().unwrap().join(window_state_filename(label)?))
+}
 fn read_snapshot() -> Option<Value> { fs::read(snapshot_path()).ok().and_then(|bytes| serde_json::from_slice(&bytes).ok()) }
 const COLLECTOR_TIMEOUT: u64 = 120;
 fn collector(operation: &str, extra: &[String]) -> Result<Value, String> {
@@ -108,8 +114,8 @@ fn quote_if_enabled(settings: Settings, collect: impl FnOnce(&str, &[String]) ->
     collect("quote", &["--json".into(),"--mode".into(),mode])
 }
 #[tauri::command]
-async fn get_quote() -> Result<Value, String> {
-    let settings = settings_window::current();
+async fn get_quote(window: tauri::WebviewWindow) -> Result<Value, String> {
+    let settings = settings_window::current_for(window.label());
     tauri::async_runtime::spawn_blocking(move || quote_if_enabled(settings, collector)).await.map_err(|_| "Quote worker unavailable".to_string())?
 }
 fn refresh() -> Result<(), String> { collector("write", &[]).map(|_| ()) }
@@ -161,9 +167,9 @@ fn emit_snapshot(app: &tauri::AppHandle) {
     let _ = app.emit("snapshot", SnapshotEvent { snapshot });
 }
 #[tauri::command]
-fn snapshot_rendered(generated_at: String) {
+fn snapshot_rendered(window: tauri::WebviewWindow, generated_at: String) {
     if std::env::var_os("AI_USAGE_SNAPSHOT_TRACE").is_some() {
-        eprintln!("snapshot-rendered {}", generated_at.chars().filter(|c| !c.is_control()).take(64).collect::<String>());
+        eprintln!("snapshot-rendered {} [{}]", generated_at.chars().filter(|c| !c.is_control()).take(64).collect::<String>(), window.label());
     }
 }
 #[tauri::command]
@@ -233,7 +239,7 @@ fn save_settings(app: tauri::AppHandle, mut settings: Settings) -> Result<(), St
 
 fn current_monitor(window: &tauri::WebviewWindow) -> Result<tauri::Monitor, String> {
     #[cfg(target_os = "linux")]
-    if linux::wayland() { let options=settings_window::current().linux; let monitors=window.available_monitors().map_err(|e|e.to_string())?; return options.monitor.as_ref().and_then(|selection| monitors.iter().enumerate().find(|(i,m)| selection.matches(*i as i32, m.name().map(String::as_str).unwrap_or(""))).map(|(_,m)|m.clone())).or_else(||window.primary_monitor().ok().flatten()).or_else(||monitors.into_iter().next()).ok_or_else(||"No monitor available".into()); }
+    if linux::wayland() { let options=settings_window::current_for(window.label()).linux; let monitors=window.available_monitors().map_err(|e|e.to_string())?; return options.monitor.as_ref().and_then(|selection| monitors.iter().enumerate().find(|(i,m)| selection.matches(*i as i32, m.name().map(String::as_str).unwrap_or(""))).map(|(_,m)|m.clone())).or_else(||window.primary_monitor().ok().flatten()).or_else(||monitors.into_iter().next()).ok_or_else(||"No monitor available".into()); }
     if let Some(monitor)=window.current_monitor().map_err(|e|e.to_string())? { return Ok(monitor); }
     let position = window.outer_position().map_err(|e| e.to_string())?;
     window.available_monitors().map_err(|e| e.to_string())?.into_iter().min_by_key(|monitor| { let area=monitor.work_area(); let cx=position.x+window.outer_size().map(|s|s.width as i32/2).unwrap_or(0); let cy=position.y+window.outer_size().map(|s|s.height as i32/2).unwrap_or(0); let x=(cx-(area.position.x+area.size.width as i32/2)).abs(); let y=(cy-(area.position.y+area.size.height as i32/2)).abs(); x.saturating_add(y) }).ok_or_else(||"No monitor available".into())
@@ -246,7 +252,7 @@ fn height_cap(current: u32, max_css_px: Option<f64>, factor: f64) -> Option<u32>
 }
 // X11 applies a resize later, so inner_size can still report the previous one.
 // Last requested (width, height); a zero height means the user owns it.
-static REQUESTED_SIZE: std::sync::Mutex<(u32,u32)> = std::sync::Mutex::new((0,0));
+static REQUESTED_SIZE: std::sync::LazyLock<std::sync::Mutex<std::collections::HashMap<String, (u32,u32)>>> = std::sync::LazyLock::new(std::sync::Mutex::default);
 #[tauri::command]
 fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<f64>, max_height_css_px: Option<f64>, onboarding: Option<bool>, corner_radius_css_px: Option<f64>) -> Result<(), String> {
     shape_region::set_onboarding(&window, onboarding.unwrap_or(false));
@@ -259,46 +265,47 @@ fn resize_widget(window: tauri::WebviewWindow, scale: f64, width_css_px: Option<
     #[cfg(not(target_os = "linux"))]
     let _ = corner_radius_css_px;
     let old = window.inner_size().map_err(|e|e.to_string())?;
-    let requested_height = REQUESTED_SIZE.lock().map_err(|e|e.to_string())?.1;
+    let requested_height = REQUESTED_SIZE.lock().map_err(|e|e.to_string())?.entry(window.label().into()).or_default().1;
     let current_height = if requested_height > 0 { requested_height } else { old.height };
     let cap = height_cap(current_height, max_height_css_px, factor);
     #[cfg(target_os = "linux")]
-    if linux::layered() { return linux::resize_layer(&window, Some((width_css_px.unwrap_or(340.0 * scale).clamp(1.0, 10000.0)).round() as i32), cap.map(|h| h as f64 / factor)); }
+    if linux::layered(window.label()) { return linux::resize_layer(&window, Some((width_css_px.unwrap_or(340.0 * scale).clamp(1.0, 10000.0)).round() as i32), cap.map(|h| h as f64 / factor)); }
     let height = cap.unwrap_or(current_height);
     let width=(width_css_px.unwrap_or(340.0*scale).clamp(1.0,10000.0)*factor).round() as u32;
-    *REQUESTED_SIZE.lock().map_err(|e|e.to_string())? = (width, if requested_height > 0 || cap.is_some() { height } else { 0 });
-    let settings=settings_window::current(); placement::resize(&window, &settings, width, height)?;
+    REQUESTED_SIZE.lock().map_err(|e|e.to_string())?.insert(window.label().into(), (width, if requested_height > 0 || cap.is_some() { height } else { 0 }));
+    let settings=settings_window::current_for(window.label()); placement::resize(&window, &settings, width, height)?;
     Ok(())
 }
 #[tauri::command]
 fn fit_window_height(window: tauri::WebviewWindow, height_css_px: f64) -> Result<(), String> {
-    let settings = settings_window::current();
+    let settings = settings_window::current_for(window.label());
     if !settings.fit_height && settings.size_mode != "screen" && settings.shape == Shape::Portrait {
-        REQUESTED_SIZE.lock().map_err(|e|e.to_string())?.1 = 0;
+        REQUESTED_SIZE.lock().map_err(|e|e.to_string())?.entry(window.label().into()).or_default().1 = 0;
         return Ok(());
     }
     #[cfg(target_os = "linux")]
-    if linux::layered() { return linux::resize_layer(&window, None, Some(height_css_px)); }
+    if linux::layered(window.label()) { return linux::resize_layer(&window, None, Some(height_css_px)); }
     let factor=window.scale_factor().map_err(|e|e.to_string())?;
     // Shared placement caps the configured work area, including manual overrides.
     let height=(height_css_px.max(1.0)*factor).round() as u32;
     let old_size=window.inner_size().map_err(|e|e.to_string())?;
-    let mut requested=REQUESTED_SIZE.lock().map_err(|e|e.to_string())?;
+    let mut sizes=REQUESTED_SIZE.lock().map_err(|e|e.to_string())?;
+    let requested=sizes.entry(window.label().into()).or_default();
     let current=if requested.1 > 0 { requested.1 } else { old_size.height };
     if (current as i64 - height as i64).abs() <= 1 { return Ok(()); }
     let width=if requested.0 > 0 { requested.0 } else { old_size.width };
     *requested=(width,height);
-    drop(requested);
-    placement::resize(&window, &settings_window::current(), width, height)
+    drop(sizes);
+    placement::resize(&window, &settings_window::current_for(window.label()), width, height)
 }
 #[tauri::command]
 fn snap_window(window: tauri::WebviewWindow, corner: String) -> Result<(), String> {
     #[cfg(target_os = "linux")]
-    if linux::layered() { if corner=="Free" { return Err("Free positioning requires an X11 window; choose a corner on Wayland".into()); } let options=settings_window::current().linux; let target=window.clone(); return window.run_on_main_thread(move ||linux::apply(&target,&options,&corner)).map_err(|e|e.to_string()); }
+    if linux::layered(window.label()) { if corner=="Free" { return Err("Free positioning requires an X11 window; choose a corner on Wayland".into()); } let options=settings_window::current_for(window.label()).linux; let target=window.clone(); return window.run_on_main_thread(move ||linux::apply(&target,&options,&corner)).map_err(|e|e.to_string()); }
     if corner=="Free" { return Ok(()); }
     let monitor=current_monitor(&window)?; let area=monitor.work_area(); let size=window.outer_size().map_err(|e|e.to_string())?;
     let left=corner.ends_with("left"); let top=corner.starts_with("Top");
-    #[cfg(target_os="linux")] let margin=(settings_window::current().linux.margin.clamp(0,64) as f64 * monitor.scale_factor()).round() as i32;
+    #[cfg(target_os="linux")] let margin=(settings_window::current_for(window.label()).linux.margin.clamp(0,64) as f64 * monitor.scale_factor()).round() as i32;
     #[cfg(not(target_os="linux"))] let margin=0;
 
     let x=if left {area.position.x+margin} else {area.position.x+area.size.width as i32-size.width as i32-margin};
@@ -306,18 +313,17 @@ fn snap_window(window: tauri::WebviewWindow, corner: String) -> Result<(), Strin
     window.set_position(tauri::PhysicalPosition::new(x,y)).map_err(|e|e.to_string())
 }
 #[tauri::command]
-fn save_window_state(app: tauri::AppHandle) -> Result<(), String> {
+fn save_window_state(window: tauri::WebviewWindow) -> Result<(), String> {
     if settings_window::is_previewing() { return Ok(()); }
     // Layer geometry belongs to the compositor and settings, not window.json.
     #[cfg(target_os = "linux")]
-    if linux::layered() { return Ok(()); }
-    let window = app.get_webview_window("main").ok_or("Main window unavailable")?;
+    if linux::layered(window.label()) { return Ok(()); }
     let position = window.outer_position().map_err(|e| e.to_string())?; let size = window.outer_size().map_err(|e| e.to_string())?;
-    let path = window_path(); fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?;
+    let path = window_path(window.label())?; fs::create_dir_all(path.parent().unwrap()).map_err(|e| e.to_string())?;
     private_write(path, serde_json::to_vec(&json!({"x":position.x,"y":position.y,"width":size.width,"height":size.height})).map_err(|e| e.to_string())?).map_err(|e| e.to_string())
 }
 fn restore_window(window: &tauri::WebviewWindow) {
-    if let Ok(value) = fs::read(window_path()).and_then(|data| serde_json::from_slice::<Value>(&data).map_err(std::io::Error::other)) {
+    if let Ok(value) = window_path(window.label()).map_err(std::io::Error::other).and_then(fs::read).and_then(|data| serde_json::from_slice::<Value>(&data).map_err(std::io::Error::other)) {
         if let (Some(x),Some(y))=(value["x"].as_i64(),value["y"].as_i64()) { let _=window.set_position(tauri::PhysicalPosition::new(x as i32,y as i32)); }
         if let (Some(w),Some(h))=(value["width"].as_u64(),value["height"].as_u64()) { let _=window.set_size(tauri::PhysicalSize::new(w as u32,h as u32)); }
     } else if let Some(monitor)=window.primary_monitor().ok().flatten() {
@@ -366,7 +372,7 @@ fn start_background(app: tauri::AppHandle) {
     });
 }
 #[tauri::command]
-fn get_linux_hint() -> Option<&'static str> { #[cfg(target_os="linux")] { return linux::placement_hint(); } #[cfg(not(target_os="linux"))] { None } }
+fn get_linux_hint(window: tauri::WebviewWindow) -> Option<&'static str> { #[cfg(target_os="linux")] { return linux::placement_hint(window.label()); } #[cfg(not(target_os="linux"))] { None } }
 #[tauri::command]
 fn set_autostart(enabled: bool) -> Result<(),String> {
     #[cfg(target_os="linux")] { linux::set_autostart(enabled) }
@@ -380,10 +386,12 @@ fn get_autostart() -> Result<bool,String> {
     #[cfg(not(any(target_os="linux", windows)))] { Err("Start at login is unavailable on this platform".into()) }
 }
 #[tauri::command]
-async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> {
+async fn get_desktop_info(window: tauri::WebviewWindow, widget_id: Option<String>) -> Result<Value,String> {
+    let window=widgets::command_window(window, widget_id.as_deref())?;
     #[cfg(target_os="linux")] {
         let (sender, receiver) = std::sync::mpsc::channel();
-        window.run_on_main_thread(move || { let _ = sender.send(linux::desktop_info()); }).map_err(|e|e.to_string())?;
+        let label=window.label().to_owned();
+        window.run_on_main_thread(move || { let _ = sender.send(linux::desktop_info(&label)); }).map_err(|e|e.to_string())?;
         receiver.recv().map_err(|e|e.to_string())
     }
     #[cfg(not(target_os="linux"))] { let _=window; Ok(json!({"platform": std::env::consts::OS, "layerShell": false, "monitors": []})) }
@@ -391,7 +399,7 @@ async fn get_desktop_info(window: tauri::WebviewWindow) -> Result<Value,String> 
 #[tauri::command]
 fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
 pub fn run() {
-    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_quote,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,set_local_history,widgets::load_settings,widgets::save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint,settings_window::open_settings,settings_window::finish_settings,settings_window::preview_settings,placement::get_placement_monitors,placement::capture_position]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if webview.label()=="main" && payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); settings_window::initialize(); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=settings_window::current(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered() { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } #[cfg(target_os="windows")] window_effects::apply(&window, &settings_window::current().theme)?; shape_region::request(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }) { shape_region::request(&close_window); } if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let app=close_window.app_handle().clone(); let _=save_window_state(app); } }); } placement::watch(app.handle().clone()); #[cfg(debug_assertions)] settings_window::start_soak(app.handle().clone()); #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
+    tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_quote,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,set_local_history,widgets::load_settings,widgets::save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint,settings_window::open_settings,settings_window::finish_settings,settings_window::preview_settings,placement::get_placement_monitors,placement::capture_position]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if widgets::id_from_label(webview.label()).is_ok() && payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); settings_window::initialize(); if let Some(window)=app.get_webview_window("main") { #[cfg(not(target_os="linux"))] restore_window(&window); #[cfg(target_os="linux")] { let settings=settings_window::current(); linux::initialize(&window,&settings.linux,&settings.position); if !linux::layered(window.label()) { restore_window(&window); } if !linux::wayland() { let _=snap_window(window.clone(),settings.position); } } #[cfg(not(target_os="linux"))] { let _=window.show(); } #[cfg(target_os="windows")] window_effects::apply(&window, &settings_window::current().theme)?; shape_region::request(&window); let close_window=window.clone(); let _=window.on_window_event(move |event| { if matches!(event,tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }) { shape_region::request(&close_window); } if matches!(event,tauri::WindowEvent::ScaleFactorChanged { .. } | tauri::WindowEvent::Moved(_)) { if let Ok(factor)=close_window.scale_factor() { let _=close_window.emit("monitor-scale",factor); } } if matches!(event,tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) { let _=save_window_state(close_window.clone()); } }); } placement::watch(app.handle().clone()); #[cfg(debug_assertions)] settings_window::start_soak(app.handle().clone()); #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
 }
 
 #[cfg(test)]
@@ -588,3 +596,7 @@ mod settings_recovery_tests {
         assert_eq!(parse_settings(b"broken").scale,100.0);
     }
 }
+
+#[cfg(test)]
+#[path = "../../../tests/window-state-path.rs"]
+mod label_tests;

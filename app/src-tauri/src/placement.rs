@@ -57,15 +57,15 @@ pub(crate) fn configured_monitors(window: &tauri::WebviewWindow, settings: &Sett
     list
 }
 #[tauri::command]
-pub async fn get_placement_monitors(app: tauri::AppHandle) -> Result<Value,String> {
-    let window=app.get_webview_window("main").ok_or("Main window unavailable")?;
+pub async fn get_placement_monitors(window: tauri::WebviewWindow, widget_id: Option<String>) -> Result<Value,String> {
+    let window=widgets::command_window(window, widget_id.as_deref())?;
     let (tx,rx)=std::sync::mpsc::channel(); let target=window.clone();
-    window.run_on_main_thread(move || { let size=widget_size(&target); let _=tx.send(json!({"monitors":monitors(&target),"widgetWidth":size.0,"widgetHeight":size.1,"layerShell":is_layered()})); }).map_err(|e|e.to_string())?;
+    window.run_on_main_thread(move || { let size=widget_size(&target); let _=tx.send(json!({"monitors":monitors(&target),"widgetWidth":size.0,"widgetHeight":size.1,"layerShell":is_layered(target.label())})); }).map_err(|e|e.to_string())?;
     rx.recv().map_err(|e|e.to_string())
 }
-fn is_layered() -> bool { #[cfg(target_os="linux")] {linux::layered()} #[cfg(not(target_os="linux"))] {false} }
+fn is_layered(label: &str) -> bool { #[cfg(target_os="linux")] {linux::layered(label)} #[cfg(not(target_os="linux"))] {false} }
 fn widget_size(window: &tauri::WebviewWindow) -> (u32,u32) {
-    #[cfg(target_os="linux")] { use gtk::prelude::*; if let Ok(gtk)=window.gtk_window() { let (w,h)=gtk.size_request(); return (if linux::layered() {w.max(1)} else {gtk.allocated_width().max(1)} as u32,if linux::layered() {h.max(1)} else {gtk.allocated_height().max(1)} as u32); } }
+    #[cfg(target_os="linux")] { use gtk::prelude::*; if let Ok(gtk)=window.gtk_window() { let (w,h)=gtk.size_request(); return (if linux::layered(window.label()) {w.max(1)} else {gtk.allocated_width().max(1)} as u32,if linux::layered(window.label()) {h.max(1)} else {gtk.allocated_height().max(1)} as u32); } }
     window.outer_size().map(|s|(s.width,s.height)).unwrap_or((340,640))
 }
 pub(crate) fn selected<'a>(list: &'a [Monitor], settings: &Settings) -> Option<&'a Monitor> {
@@ -112,7 +112,7 @@ fn apply_size(window: &tauri::WebviewWindow, settings: &Settings, #[cfg(windows)
     #[cfg(windows)] let (clipped,clipped_inner)=windows_size((width.saturating_sub(frame.0),height.saturating_sub(frame.1)),frame,(monitor.width,monitor.height),margin);
     if clipped!=(width,height) {
         // A size request is a minimum: on X11 it would pin the window at this height for good.
-        #[cfg(target_os="linux")] { use gtk::prelude::*;if let Ok(gtk)=window.gtk_window() {if linux::layered() {gtk.set_size_request(clipped.0 as i32,clipped.1 as i32);} else {gtk.resize(clipped.0 as i32,clipped.1 as i32);}} }
+        #[cfg(target_os="linux")] { use gtk::prelude::*;if let Ok(gtk)=window.gtk_window() {if linux::layered(window.label()) {gtk.set_size_request(clipped.0 as i32,clipped.1 as i32);} else {gtk.resize(clipped.0 as i32,clipped.1 as i32);}} }
         #[cfg(windows)] {window.set_size(tauri::PhysicalSize::new(clipped_inner.0,clipped_inner.1)).map_err(|e|e.to_string())?;}
         #[cfg(not(any(target_os="linux",windows)))] {let _=window.set_size(tauri::PhysicalSize::new(clipped.0,clipped.1));}
     }
@@ -123,7 +123,7 @@ fn apply_size(window: &tauri::WebviewWindow, settings: &Settings, #[cfg(windows)
     #[cfg(not(windows))] let x=inset_position(xr,monitor.width,width,margin,&p.snap);
     #[cfg(not(windows))] let y=inset_position(yr,monitor.height,height,margin,&p.snap);
     #[cfg(target_os="linux")] {
-        if linux::layered() { linux::place(window,&settings.linux,&monitor.name,monitor.x+x,monitor.y+y); if !window.is_visible().unwrap_or(false) { let _=window.show(); } return Ok(()); }
+        if linux::layered(window.label()) { linux::place(window,&settings.linux,&monitor.name,monitor.x+x,monitor.y+y); if !window.is_visible().unwrap_or(false) { let _=window.show(); } return Ok(()); }
     }
     #[cfg(target_os="linux")] { use gtk::prelude::*; if let Ok(gtk)=window.gtk_window() { let desired=(monitor.x+x,monitor.y+y); if gtk.position()!=desired { gtk.move_(desired.0,desired.1); } if !window.is_visible().unwrap_or(false) {let _=window.show();} return Ok(()); } }
     let desired=tauri::PhysicalPosition::new(monitor.x+x,monitor.y+y);
@@ -132,14 +132,14 @@ fn apply_size(window: &tauri::WebviewWindow, settings: &Settings, #[cfg(windows)
     Ok(())
 }
 #[tauri::command]
-pub async fn capture_position(app: tauri::AppHandle) -> Result<Placement,String> {
-    let window=app.get_webview_window("main").ok_or("Main window unavailable")?;
+pub async fn capture_position(window: tauri::WebviewWindow, widget_id: Option<String>) -> Result<Placement,String> {
+    let window=widgets::command_window(window, widget_id.as_deref())?;
     let (tx,rx)=std::sync::mpsc::channel(); let target=window.clone();
     window.run_on_main_thread(move || {
         let result=(|| { #[cfg(not(target_os="linux"))] let position=target.outer_position().map_err(|e|e.to_string())?;
-            #[cfg(target_os="linux")] let position={use gtk::prelude::*;let gtk=target.gtk_window().map_err(|e|e.to_string())?;let (x,y)=gtk.position();tauri::PhysicalPosition::new(x,y)}; let size=widget_size(&target); let list=configured_monitors(&target,&settings_window::current());
+            #[cfg(target_os="linux")] let position={use gtk::prelude::*;let gtk=target.gtk_window().map_err(|e|e.to_string())?;let (x,y)=gtk.position();tauri::PhysicalPosition::new(x,y)}; let size=widget_size(&target); let list=configured_monitors(&target,&settings_window::current_for(target.label()));
             let monitor=list.iter().find(|m|position.x>=m.x && position.x<m.x+m.width as i32 && position.y>=m.y && position.y<m.y+m.height as i32).ok_or("Monitor unavailable")?;
-            Ok(Placement {monitor:Some(monitor.name.clone()),x_ratio:ratio(position.x-monitor.x,monitor.width,size.0),y_ratio:ratio(position.y-monitor.y,monitor.height,size.1),..settings_window::current().placement}) })(); let _=tx.send(result);
+            Ok(Placement {monitor:Some(monitor.name.clone()),x_ratio:ratio(position.x-monitor.x,monitor.width,size.0),y_ratio:ratio(position.y-monitor.y,monitor.height,size.1),..settings_window::current_for(target.label()).placement}) })(); let _=tx.send(result);
     }).map_err(|e|e.to_string())?;
     rx.recv().map_err(|e|e.to_string())?
 }
@@ -147,13 +147,13 @@ static PENDING: AtomicBool=AtomicBool::new(false);
 pub fn monitor_changed(app: tauri::AppHandle) {
     if PENDING.swap(true,Ordering::Relaxed) { return; }
     thread::spawn(move || { thread::sleep(Duration::from_millis(400)); let target=app.clone();
-        let _=app.run_on_main_thread(move || { PENDING.store(false,Ordering::Relaxed); if std::env::var_os("AI_USAGE_SETTINGS_SOAK_CYCLES").is_some() {eprintln!("monitor-soak-applied");} #[cfg(target_os="linux")] linux::invalidate_placement(); if let Some(w)=target.get_webview_window("main") { let _=apply(&w,&settings_window::current()); let _=target.emit("monitors-changed",()); } });
+        let _=app.run_on_main_thread(move || { PENDING.store(false,Ordering::Relaxed); if std::env::var_os("AI_USAGE_SETTINGS_SOAK_CYCLES").is_some() {eprintln!("monitor-soak-applied");} #[cfg(target_os="linux")] linux::invalidate_placement(); for (label,w) in target.webview_windows() { if widgets::id_from_label(&label).is_ok() { let _=apply(&w,&settings_window::current_for(&label)); } } let _=target.emit("monitors-changed",()); });
     });
 }
 pub fn watch(app: tauri::AppHandle) {
     #[cfg(windows)] windows_events::watch(app.clone());
     #[cfg(target_os="linux")] linux::watch_monitors(app.clone());
-    if let Some(w)=app.get_webview_window("main") { let _=apply(&w,&settings_window::current()); }
+    for (label,w) in app.webview_windows() { if widgets::id_from_label(&label).is_ok() { let _=apply(&w,&settings_window::current_for(&label)); } }
 }
 #[cfg(test)] mod tests {
     use super::*;
