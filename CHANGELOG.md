@@ -6,6 +6,8 @@ Notable changes will be recorded here. No release has been published yet.
 
 ### Added
 
+- Optional per-widget settings records with validated monitor placement, inherited display overrides and widget-aware load/save commands; no additional windows are created.
+
 - Usage history below cards, on card activation or in an attached side panel, with optional API price estimates, model shares, activity heatmap and computer splitting.
 - History settings with explicit, saved permission to read local Claude Code logs (off by default).
 
@@ -24,6 +26,8 @@ Notable changes will be recorded here. No release has been published yet.
 - Prefer the ext background-effect protocol on newer KWin sessions and restrict Wayland/X11 blur to the shared window shape mask.
 
 ### Changed
+
+- Older versions discard the optional `widgets` records when saving a newer settings file.
 
 - Group settings into six sidebar categories with remembered selection, keyboard navigation and horizontal tabs below 560 px.
 - Preview settings live, with S1 row cards, accessible switches, a counted changes footer and verified persistence on Save; Revert and Discard restore saved settings.
