@@ -1,8 +1,8 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Main widget window: core events, window drag and size.",
-  "windows": ["main"],
+  "description": "Widget windows: core events, window drag and size.",
+  "windows": ["main", "widget-*"],
   "permissions": [
     "core:default",
     "core:window:allow-start-dragging",

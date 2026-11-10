@@ -190,3 +190,15 @@ fn labels_round_trip_and_reject_path_components() {
         assert!(id_from_label(label).is_err(), "{label}");
     }
 }
+
+#[test]
+fn sync_creates_and_removes_only_configured_additional_widgets() {
+    let root = fixture();
+    let existing = vec!["main".into(),"settings".into(),"widget-old".into(),"widget-".into()];
+    assert_eq!(sync_decision(&existing, &root.widgets), (vec!["widget-side-2".into()],vec!["widget-old".into()]));
+    let labels = vec!["main".into(),"settings".into(),"widget-side-2".into()];
+    assert_eq!(sync_decision(&labels, &root.widgets),(vec![],vec![]));
+    assert_eq!(sync_decision(&labels, &[]),(vec![],vec!["widget-side-2".into()]));
+    assert_eq!(sync_decision(&[], &root.widgets),(vec!["widget-side-2".into()],vec![]));
+    assert_eq!(sync_decision(&[], &[]),(vec![],vec![]));
+}

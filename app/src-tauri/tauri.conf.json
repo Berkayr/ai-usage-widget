@@ -13,6 +13,7 @@
     "windows": [
       {
         "label": "main",
+        "create": false,
         "title": "AI Usage",
         "width": 340,
         "height": 640,

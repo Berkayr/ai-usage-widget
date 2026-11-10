@@ -6,7 +6,8 @@ Notable changes will be recorded here. No release has been published yet.
 
 ### Added
 
-- Optional per-widget settings records with validated monitor placement, inherited display overrides and widget-aware load/save commands; no additional windows are created.
+- Optional per-widget settings records with validated monitor placement, inherited display overrides and widget-aware load/save commands.
+- Additional widget windows synchronized at startup and on settings saves; each hides when its monitor disconnects and returns to its saved position on reconnection, recreating closed Wayland layer surfaces.
 
 - Usage history below cards, on card activation or in an attached side panel, with optional API price estimates, model shares, activity heatmap and computer splitting.
 - History settings with explicit, saved permission to read local Claude Code logs (off by default).
@@ -27,7 +28,7 @@ Notable changes will be recorded here. No release has been published yet.
 
 ### Changed
 
-- Route widget commands, native shape/blur/placement state, window geometry files and frontend preferences by widget identity while retaining the single-window startup and legacy main files.
+- Route widget commands, native shape/blur/placement state, window geometry files and frontend preferences by widget identity while retaining legacy main files and Main taskbar behavior.
 
 - Older versions discard the optional `widgets` records when saving a newer settings file.
 

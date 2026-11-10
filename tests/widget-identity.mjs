@@ -55,3 +55,27 @@ test('sample mode does not read or persist widget settings', async () => {
   assert.deepEqual(await session('?sample=a1&widget=side-2', storage, {}, true), []);
   assert.equal(storage.size, 0);
 });
+
+
+test('preview and scale subscriptions isolate widget targets while snapshots remain shared', async () => {
+  const subscribe = source.slice(source.indexOf('async function subscribe('), source.indexOf('let pollTimer;'));
+  const listeners = [];
+  const received = [];
+  for (const label of ['main','widget-side','widget-other']) {
+    const context = {
+      disposed: false, unlisteners: [], getCurrentWindow: () => ({label}),
+      listen: async (name, handler, options) => { listeners.push({name, handler, target: options?.target}); return () => {}; },
+      receive: name => received.push(`${label}:${name}`),
+    };
+    await runInNewContext(`${subscribe}
+(async () => {
+      for (const name of ['settings-preview','monitor-scale','snapshot']) await subscribe(name, () => receive(name));
+    })()`, context);
+  }
+  for (const name of ['settings-preview','monitor-scale','snapshot']) {
+    for (const listener of listeners.filter(l => l.name === name)) {
+      if (!listener.target || listener.target.label === 'widget-side') listener.handler({payload:{}});
+    }
+  }
+  assert.deepEqual(received, ['widget-side:settings-preview','widget-side:monitor-scale','main:snapshot','widget-side:snapshot','widget-other:snapshot']);
+});
