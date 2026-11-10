@@ -42,13 +42,10 @@ export function fitUsage(root) {
       el.style.fontSize = '11px';
     }
   }
-  if (document.documentElement.dataset.shape === 'portrait') {
-    const columns = getComputedStyle(root).gridTemplateColumns.split(' ').length;
-    const grid = getComputedStyle(root).display === 'grid';
-    const rows = grid ? Math.ceil(cards.length / columns) : 1;
-    root.style.setProperty('--portrait-card-limit', `calc(${grid ? cards.length : 1} * (var(--size-card) + var(--size-gap)) / ${Math.max(1, rows)} - var(--size-gap))`);
-  } else {
-    root.style.removeProperty('--portrait-card-limit');
+  if (document.documentElement.dataset.shape === 'portrait' && document.documentElement.classList.contains('fit-height') && cards.length) {
+    fitNaturalPortrait(root, cards);
+    fitHeader(root.closest('.widget'));
+    return;
   }
   cards.forEach(fitPortraitGraphics);
   cards.forEach(compactCard);
@@ -64,12 +61,43 @@ export function fitUsage(root) {
   }
   if (document.documentElement.dataset.shape === 'portrait' && overflows(root.closest('.widget'))) root.style.flexShrink = '1';
   growPortraitContent(root, cards);
+  // Graphic label reservations can exceed fractional tracks; share that minimum.
+  if (document.documentElement.dataset.shape === 'portrait' && cards.length) {
+    const height = Math.max(...cards.map(card => card.getBoundingClientRect().height));
+    cards.forEach(card => { card.style.minHeight = `${height}px`; });
+  }
   // Fractional rem budgets can round scrollHeight up while clientHeight rounds down.
   // Remove that rounding debt from trailing space, preserving every card's height.
   const debt = root.scrollHeight - root.clientHeight;
   const padding = parseFloat(getComputedStyle(root).paddingBottom);
   if (debt > 0 && debt <= padding) root.style.paddingBottom = `${padding - debt}px`;
   fitHeader(root.closest('.widget'));
+}
+
+// Measure unconstrained tracks before applying the window's available height.
+function fitNaturalPortrait(root, cards) {
+  const widget = root.closest('.widget');
+  const saved = [widget, root].map(el => el.getAttribute('style'));
+  widget.style.height = 'auto';
+  widget.style.maxHeight = 'none';
+  root.style.flex = 'none';
+  root.style.height = 'auto';
+  root.style.gridTemplateRows = 'none';
+  root.style.gridAutoRows = 'max-content';
+  const height = Math.ceil(Math.max(...cards.map(card => {
+    const style = getComputedStyle(card);
+    return Math.max(card.getBoundingClientRect().height, card.scrollHeight + parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth));
+  })));
+  root.style.gridAutoRows = `${height}px`;
+  const naturalHeight = Math.ceil(widget.getBoundingClientRect().height);
+  [widget, root].forEach((el, i) => saved[i] == null ? el.removeAttribute('style') : el.setAttribute('style', saved[i]));
+  widget.style.setProperty('--usage-fit-height', `${naturalHeight}px`);
+  widget.dataset.usageHeight = naturalHeight;
+}
+
+// Native resizing must use the desired content height, even in a short viewport.
+export function fittedUsageHeight(widget, limit = Infinity) {
+  return Math.min(Number(widget.dataset.usageHeight) || widget.getBoundingClientRect().height, limit);
 }
 
 function growPortraitContent(root, cards) {

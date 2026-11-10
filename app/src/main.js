@@ -1,5 +1,5 @@
 import { paletteChoices } from './user-palettes.js';
-import { observeUsageFit } from './usage-fit.js';
+import { observeUsageFit, fittedUsageHeight } from './usage-fit.js';
 import { applyAppearance } from './appearance.js';
 import { orderedProviders, arrangeCards } from './provider-layout.js';
 import { loadQuote, renderQuote, sampleQuote } from './quote.js';
@@ -15,7 +15,9 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { mountProviders } from './themes/shared/providers.js';
 import './themes/shared/chrome.css';
 import { loadTheme, allThemes } from './themes/registry.js';
-import sample from './sample-snapshot.json';
+import defaultSample from './sample-snapshot.json';
+import providerSample from './sample-providers-a1.json';
+const sample = new URLSearchParams(location.search).get('sample') === 'a1' ? providerSample : defaultSample;
 let quoteData = null;
 let quoteKey = null;
 let quoteBusy = false;
@@ -79,10 +81,14 @@ function renderSettings() { return $('#provider-onboarding').hidden ? settings :
 function updateLayoutScale(count) {
   if (!$('#provider-onboarding').hidden) count=3;
   const monitor=selectedWorkArea(placementMonitors,renderSettings());
-  layoutScale=monitor ? fittedGeometry(renderSettings(),count,monitor,desktopInfo?.platform || 'linux').scale : settings.scale;
+  const geometry = monitor ? fittedGeometry(renderSettings(),count,monitor,desktopInfo?.platform || 'linux') : null;
+  layoutScale=geometry ? geometry.scale : settings.scale;
   const effective=layoutScale/(settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
   document.documentElement.style.setProperty('--ui-scale',effective/100);
-  document.documentElement.style.setProperty('--portrait-height-limit', `${widgetHeight(renderSettings(),count)*effective/100}px`);
+  const heightLimit = renderSettings().shape === 'portrait' && (renderSettings().fitHeight || effectiveSizeMode(renderSettings()) === 'screen')
+    ? (geometry ? geometry.availableHeight / (desktopInfo?.platform === 'windows' ? monitorScale : 1) : window.innerHeight)
+    : widgetHeight(renderSettings(),count)*effective/100;
+  document.documentElement.style.setProperty('--portrait-height-limit', `${heightLimit}px`);
   document.documentElement.style.fontSize=`${16*effective/100}px`;
   document.documentElement.dataset.microShape=String(effective<65);
   document.documentElement.dataset.readableSize=String(effective>=84.99);
@@ -198,7 +204,7 @@ function draw(snapshot, noData = false) {
     $('#widget').style.setProperty('--shape-rows', settings.shape === 'square' ? (count > 2 ? 2 : 1) : (count > 3 ? 2 : 1));
     updateLayoutScale(count);
     const width = widgetWidth(renderSettings(),count) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
-    const maxHeight = widgetHeight(renderSettings(),$('#provider-onboarding').hidden ? count : 3) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
+    const maxHeight = parseFloat(document.documentElement.style.getPropertyValue('--portrait-height-limit'));
     if (!isSample) invoke('resize_widget', {scale:layoutScale,widthCssPx:width,maxHeightCssPx:maxHeight,onboarding:!$('#provider-onboarding').hidden}).catch(error=>showToast(String(error)));
     renderQuote($('#quote'),renderSettings(),quoteData,()=>draw(currentSnapshot,currentNoData),repairTextContrast);
     updateQuote();
@@ -224,7 +230,7 @@ async function requestFit() {
   if (disposed) return;
   const count = $('#providers').querySelectorAll('.provider-card').length;
   const height = renderSettings().shape === 'portrait' && $('#provider-onboarding').hidden
-    ? $('#widget').getBoundingClientRect().height
+    ? fittedUsageHeight($('#widget'), parseFloat(document.documentElement.style.getPropertyValue('--portrait-height-limit')))
     : widgetHeight(renderSettings(),$('#provider-onboarding').hidden ? count : 3) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
   if (Math.abs(height - lastFitHeight) < 2) return;
   lastFitHeight = height;

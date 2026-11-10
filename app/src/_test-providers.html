@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="darkreader-lock"><title>Fictional provider layout acceptance</title></head>
+<body style="margin:0;background:#252830"><div id="app"><main id="widget" class="widget"><section id="provider-onboarding" hidden></section><section id="providers" class="provider-list"></section></main></div>
+<script type="module">
+import './themes/shared/chrome.css';
+import {loadTheme} from './themes/registry.js';
+import {createRenderer} from './themes/shared/render.js';
+import {arrangeCards} from './provider-layout.js';
+import {fitUsage} from './usage-fit.js';
+import {applyAppearance} from './appearance.js';
+import snapshot from './sample-providers-a1.json';
+const params=new URLSearchParams(location.search);
+const settings={theme:params.get('theme')||'system',shape:params.get('shape')||'portrait',palette:'default',colorMode:'mono',featuredProvider:'auto',size:'medium',position:'top-right',appearance:'dark',backgroundOpacity:1,widgetOpacity:1};
+const loaded=await loadTheme(settings.theme);
+const style=document.createElement('style');style.textContent=loaded.css;document.head.append(style);
+Object.assign(document.documentElement.dataset,{theme:settings.theme,shape:settings.shape,portraitFit:String(params.has('fit')),readableSize:'true',narrowViewport:String(window.innerWidth<288)});
+document.documentElement.classList.toggle('fit-height',params.has('fit'));
+applyAppearance(settings,loaded.manifest,false);
+const root=document.querySelector('#providers');
+const count=Math.min(5,Math.max(2,Number(params.get('count'))||5));
+const providers=snapshot.providers.slice(0,count).map(p=>({...p,windows:(p.windows||[]).map(w=>({...w,resets_at:new Date(Date.now()+(w.resets_in_minutes||60)*60000).toISOString()}))}));
+const widget=root.closest('.widget');
+widget.style.setProperty('--provider-count',count);
+widget.style.setProperty('--shape-columns',Math.min(3,count));
+widget.style.setProperty('--shape-rows',count>3?2:1);
+createRenderer(settings.theme)(root,{...snapshot,providers},{showExtraWindows:params.has('extra')});
+arrangeCards(root,providers,settings);
+await document.fonts.ready;
+fitUsage(root);
+window.a1Ready=true;
+</script></body></html>

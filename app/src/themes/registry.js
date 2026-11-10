@@ -14,5 +14,5 @@ export async function loadTheme(id) {
   const [renderer, css, manifest] = await Promise.all([renderers[`./${id}/render.js`](), styles[`./${id}/theme.css`](), manifests[`./${id}/theme.json`]()]);
   // Keep authored pixel dimensions in 16px design units. rem makes scale a
   // fresh layout/font rasterization, without zoom or a transformed surface.
-  return { ...renderer, css: (css + '\n' + readability + '\n' + shapes).replace(/(-?(?:\d*\.)?\d+)px\b/g, (_, value) => `${Number(value) / 16}rem`), manifest };
+  return { ...renderer, css: (css + '\n' + readability + '\n' + shapes + `\n:root{--provider-logo-display:${manifest.providerLogos === false ? 'none' : 'inline-flex'}}`).replace(/(-?(?:\d*\.)?\d+)px\b/g, (_, value) => `${Number(value) / 16}rem`), manifest };
 }

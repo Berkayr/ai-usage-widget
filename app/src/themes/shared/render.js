@@ -1,3 +1,5 @@
+import { providerLogo } from '../../icons/provider-logos.js';
+import { providerEmptyState, hasMeterData } from './provider-state.js';
 import { safeState } from './safety.js';
 import { escapeHtml as esc, severity, countdown, pctOf, shortWindowLabel, hiddenStates, providerNames, dotCount, dots } from '../dot-matrix/render.js';
 
@@ -43,8 +45,9 @@ export function createRenderer(type) {
       const windows = (Array.isArray(p.windows) ? p.windows : []).filter(w => showExtraWindows || !w.hidden_by_default);
       const badge = state !== 'OK' || p.stale ? `<span class="status-badge ${p.stale || state === 'STALE' ? 'stale' : state.toLowerCase()}">${esc(p.stale && state === 'OK' ? 'STALE' : state.replaceAll('_',' '))}</span>` : '';
       const name = providerNames[String(p.id).toLowerCase()] || p.label || p.id || 'Provider';
-      const meters = (Array.isArray(p.meters) ? p.meters : []).map(m => `<div class="balance-row"><span>${esc(m.label || 'Balance')}</span><b>${Number.isFinite(m.remaining) ? (m.unit === 'USD' ? '$'+m.remaining.toFixed(2) : `${esc(m.remaining)} ${esc(m.unit)}`) : Number.isFinite(m.used) ? (m.unit === 'USD' ? '$'+m.used.toFixed(2)+' used' : `${esc(m.used)} ${esc(m.unit)} used`) : '—'}</b></div>`).join('');
-      return `<article class="provider-card ${p.stale ? 'is-stale' : ''}"><div class="provider-heading"><div><h2>${esc(name)}</h2>${p.plan ? `<span class="plan">${esc(p.plan)}</span>` : ''}</div>${badge}<small class="heading-reset">${esc(countdown(windows.find(w=>w.kind==='session')?.resets_at))}</small></div>${type === 'circular-rings' ? rings(windows) : ''}<div class="windows">${windows.map(w => row(w,type)).join('')}</div>${meters}${!windows.length && !meters ? '<div class="empty-window">Quota unavailable</div>' : ''}</article>`;
+      const meters = (Array.isArray(p.meters) ? p.meters : []).filter(hasMeterData).map(m => `<div class="balance-row"><span>${esc(m.label || 'Balance')}</span><b>${Number.isFinite(m.remaining) ? (m.unit === 'USD' ? '$'+m.remaining.toFixed(2) : `${esc(m.remaining)} ${esc(m.unit)}`) : Number.isFinite(m.used) ? (m.unit === 'USD' ? '$'+m.used.toFixed(2)+' used' : `${esc(m.used)} ${esc(m.unit)} used`) : Number.isFinite(m.limit) ? (m.unit === 'USD' ? '$'+m.limit.toFixed(2)+' limit' : `${esc(m.limit)} ${esc(m.unit)} limit`) : '—'}</b></div>`).join('');
+      const empty = providerEmptyState(p, windows.length > 0 || Boolean(meters));
+      return `<article class="provider-card ${p.stale ? 'is-stale' : ''}"><div class="provider-heading"><div><h2>${providerLogo(p.id)}${esc(name)}</h2>${p.plan ? `<span class="plan">${esc(p.plan)}</span>` : ''}</div>${badge}<small class="heading-reset">${esc(countdown(windows.find(w=>w.kind==='session')?.resets_at))}</small></div>${type === 'circular-rings' ? rings(windows) : ''}<div class="windows">${windows.map(w => row(w,type)).join('')}</div>${meters}${empty ? `<div class="empty-window" role="status"><strong>${esc(empty.title)}</strong><small>${esc(empty.detail)}</small></div>` : ''}</article>`;
     }).join('') || `<div class="no-data"><strong>${noData ? 'NO DATA YET' : 'NO ACTIVE PROVIDERS'}</strong><small>${noData ? 'Waiting for quotacore snapshot' : 'Enable a provider in quotacore'}</small></div>`;
   };
 }

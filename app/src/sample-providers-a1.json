@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "generated_at": "2026-10-31T18:42:00+00:00",
+  "providers": [
+    {
+      "id": "claude",
+      "label": "Claude Code",
+      "plan": "Pro",
+      "state": "OK",
+      "stale": false,
+      "category": "subscription",
+      "windows": [
+        {
+          "id": "five_hour",
+          "label": "5 hour",
+          "used_percent": 34,
+          "resets_in_minutes": 160,
+          "kind": "session"
+        },
+        {
+          "id": "seven_day",
+          "label": "7 day",
+          "used_percent": 61,
+          "resets_in_minutes": 2310,
+          "kind": "weekly"
+        },
+        {
+          "id": "provider-extra",
+          "label": "Extra window",
+          "raw_label": "Internal Preview",
+          "used_percent": 21,
+          "resets_in_minutes": 470,
+          "kind": "other",
+          "hidden_by_default": true
+        },
+        {
+          "id": "extra-model",
+          "label": "Model window",
+          "raw_label": "Internal Preview",
+          "used_percent": 21,
+          "resets_in_minutes": 470,
+          "kind": "other",
+          "hidden_by_default": true
+        }
+      ],
+      "meters": []
+    },
+    {
+      "id": "codex",
+      "label": "OpenAI Codex",
+      "plan": "Plus",
+      "state": "OK",
+      "stale": false,
+      "category": "subscription",
+      "windows": [
+        {
+          "id": "primary",
+          "label": "5 hour",
+          "used_percent": 8,
+          "resets_in_minutes": 208,
+          "kind": "session"
+        },
+        {
+          "id": "secondary",
+          "label": "7 day",
+          "used_percent": 77,
+          "resets_in_minutes": 3190,
+          "kind": "weekly"
+        }
+      ],
+      "meters": [
+        {
+          "id": "credits",
+          "label": "Credits",
+          "unit": "credits",
+          "remaining": 125
+        }
+      ]
+    },
+    {
+      "id": "gemini",
+      "label": "Google Gemini",
+      "plan": "Advanced",
+      "state": "OK",
+      "stale": false,
+      "category": "subscription",
+      "windows": [
+        {
+          "id": "gm-weekly",
+          "label": "Gemini Models \u00b7 weekly",
+          "used_percent": 28,
+          "resets_in_minutes": 2310,
+          "kind": "weekly"
+        },
+        {
+          "id": "gm-5h",
+          "label": "Gemini Models \u00b7 5h",
+          "used_percent": 12,
+          "resets_in_minutes": 170,
+          "kind": "session"
+        },
+        {
+          "id": "claude-weekly",
+          "label": "Claude and GPT models \u00b7 weekly",
+          "used_percent": 53,
+          "resets_in_minutes": 1880,
+          "kind": "weekly"
+        },
+        {
+          "id": "claude-5h",
+          "label": "Claude and GPT models \u00b7 5h",
+          "used_percent": 19,
+          "resets_in_minutes": 100,
+          "kind": "session"
+        }
+      ],
+      "meters": []
+    },
+    {
+      "id": "copilot",
+      "label": "GitHub Copilot",
+      "state": "NO_SUBSCRIPTION",
+      "windows": [],
+      "meters": []
+    },
+    {
+      "id": "openrouter",
+      "label": "OpenRouter",
+      "state": "OK",
+      "windows": [],
+      "meters": [],
+      "message": "No numeric balance values returned by key usage or account credits endpoints"
+    }
+  ]
+}
