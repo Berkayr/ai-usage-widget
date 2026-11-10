@@ -1,7 +1,11 @@
 import {auditPaletteSettings} from './palette-settings-check.mjs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { browser } from './browser-harness.mjs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 const scaleMatrix=JSON.parse(await readFile(new URL('./fixtures/scale-settings.json',import.meta.url),'utf8'));
+const output=join(tmpdir(),'ai-usage-a2b','check');
+await mkdir(output,{recursive:true});
 const b=await browser();
 try {
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:900,height:680,deviceScaleFactor:1,mobile:false});
@@ -9,10 +13,10 @@ try {
   const check=await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)};
     assert($('#status').dataset.state!=='failure','Initialization: '+$('#status').textContent);
-    assert(document.querySelectorAll('[data-category]').length===8,'Categories');
-    $('[data-category=quote]').click();
+    assert([...document.querySelectorAll('[data-category]')].map(b=>b.dataset.category).join(',')==='general,appearance,providers,history,taskbar,about','Six categories');
+    $('[data-category=general]').click();
     assert(!$('#quote-enabled').checked,'Quote off by default');
-    assert($('#category-quote').textContent.includes('Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.'),'Quote disclosure');
+    assert($('#category-general').textContent.includes('Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.'),'Quote disclosure');
     $('#quote-enabled').click();
     assert($('#quote-position').value==='bottom','Default quote position');
     $('#quote-position').value='top';$('#quote-position').dispatchEvent(new Event('change'));
@@ -23,14 +27,14 @@ try {
     $('[data-category=appearance]').click();
     $('[data-theme="dot-matrix"]').click();
     assert($('#palette-grid .palette-option i'),'Palette colors');
-    assert($('#status').textContent==='Unsaved changes','Dirty theme');
+    assert(/^[1-9][0-9]* unsaved changes$/.test($('#status').textContent),'Dirty theme');
     const palette=$('#palette-grid .palette-option:last-child');palette.click();
     assert(paletteGridSelected(),'Palette selection');
     function paletteGridSelected(){return !!$('#palette-grid [aria-pressed=true]');}
-    assert(document.querySelectorAll('[data-provider-color]').length===7,'Seven provider color pickers');
+    assert(document.querySelectorAll('[data-provider-color]').length===12,'Twelve provider color pickers');
     const color=()=>document.querySelector('[data-provider-color="claude"]');
     color().value='#ffffff';color().dispatchEvent(new Event('input'));
-    assert($('#status').textContent==='Unsaved changes','Dirty provider color');
+    assert(/^[1-9][0-9]* unsaved changes$/.test($('#status').textContent),'Dirty provider color');
     const codex=document.querySelector('[data-provider-color="codex"]');codex.value='#ffffff';codex.dispatchEvent(new Event('input'));
     assert($('#provider-color-warning').textContent.includes('too similar'),'Similar colors warning');
     $('#appearance').value='light';$('#appearance').dispatchEvent(new Event('change'));assert($('#provider-color-warning').textContent.includes('low background contrast'),'Low contrast warning');
@@ -42,7 +46,7 @@ try {
     a.nextElementSibling.click();assert(a.value!=='#123456','Reset palette');
     $('#save').click();await new Promise(r=>setTimeout(r,50));assert($('#save').disabled&&['success','clean'].includes($('#status').dataset.state),'Save');
     $('[data-theme="terminal"]').click();$('#revert').click();assert($('[data-theme="dot-matrix"]').getAttribute('aria-pressed')==='true','Revert theme');
-    $('[data-category=layout]').click();
+    $('[data-category=appearance]').click();
     assert(document.querySelectorAll('[data-shape]').length===5,'Five shapes');
     assert(document.querySelectorAll('.scale-presets button').length===6,'Six visible size choices');
     $('[data-theme=reactor]').click();$('[data-shape=circle]').click();
@@ -105,7 +109,7 @@ try {
     await b.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:scheme}]});
     await new Promise(r=>setTimeout(r,50));
     const png=await b.cdp('Page.captureScreenshot',{format:'png'});
-    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`docs/tools/settings-preview-${scheme}.png`,Buffer.from(png.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`${output}/settings-preview-${scheme}.png`,Buffer.from(png.data,'base64'));
   }
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:640,height:480,deviceScaleFactor:1,mobile:false});
   const small=await b.evaluate(`(()=>{for(const button of document.querySelectorAll('[data-category]')) {button.click();if(document.documentElement.scrollWidth>innerWidth)throw Error('Page overflow: '+button.textContent);const section=document.querySelector('.settings-content');if(section.scrollWidth>section.clientWidth+1)throw Error('Content overflow: '+button.textContent);}return 'PASS: all categories at 640 × 480';})()`);console.log(small);
@@ -118,7 +122,7 @@ try {
     window.__TAURI_EVENT_PLUGIN_INTERNALS__={unregisterListener:(_,id)=>events.delete(id)};
     window.__TAURI_INTERNALS__={metadata:{currentWindow:{label:'settings'},currentWebview:{label:'settings'}},transformCallback:callback=>{const id=++next;callbacks.set(id,callback);return id;},invoke:async(cmd,args={})=>{
       if(state.fail===cmd)throw Error('Synthetic serialization failure: '+cmd);
-      if(cmd==='get_snapshot')return {snapshot:{providers:['claude','codex','gemini','copilot'].map(id=>({id,state:id==='copilot'?'NO_SUBSCRIPTION':'OK'}))}};
+      if(cmd==='get_snapshot')return {snapshot:{providers:['claude','codex','gemini','copilot'].map(id=>({id,state:id==='copilot'?'NOT_INSTALLED':'OK'}))}};
       if(cmd==='load_settings')return structuredClone(disk);
       if(cmd==='get_provider_config')return {initialized:true,providers:Object.fromEntries(['claude','codex','gemini','copilot'].map(id=>[id,{enabled:true}])),disclosures:Object.fromEntries(['claude','codex','gemini','copilot'].map(id=>[id,'Synthetic provider'])),detected:{}};
       if(cmd==='get_autostart')return false;
@@ -139,7 +143,7 @@ try {
   await b.navigate('/?settings','window.__SETTINGS_READY__');
   console.log(await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
-    $('[data-category=layout]').click();
+    $('[data-category=appearance]').click();
     assert($('[data-size=Medium] small').textContent==='340 × 746 px','Fit must exclude unavailable fourth provider');
     let verifiedRows=0;
     for(const row of ${JSON.stringify(scaleMatrix)}) {
@@ -176,13 +180,13 @@ try {
     return 'PASS: '+verifiedRows+' enabled preset/fine-tune drafts match Rust fixtures (oversized choices disabled), fractional save/reopen/revert, three IPC errors visible, fit excludes unavailable provider';
   })()`));
   const errorPng=await b.cdp('Page.captureScreenshot',{format:'png'});
-    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile('docs/tools/settings-error-preview.png',Buffer.from(errorPng.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(join(output,'settings-error-preview.png'),Buffer.from(errorPng.data,'base64'));
   for(const action of ['discard','save']) {
     await b.navigate('/?settings','window.__SETTINGS_READY__');
     console.log(await b.evaluate(`(async()=>{
       const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
       assert($('#status').dataset.state!=='failure','Native bridge initialization: '+$('#status').textContent);
-      $('[data-category=layout]').click();
+      $('[data-category=appearance]').click();
       $('[data-shape=circle]').click();assert(document.querySelectorAll('[data-widget-provider]:checked').length===3,'Default first three');
       assert($('[data-widget-provider=copilot]').disabled,'Fourth selection must be disabled');
       $('[data-widget-provider=claude]').click();$('[data-widget-provider=copilot]').click();
@@ -211,7 +215,7 @@ try {
   }
   console.log(await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
-    await native.reopen();$('[data-category=layout]').click();
+    await native.reopen();$('[data-category=appearance]').click();
     const set=(id,value)=>{const el=$('#'+id);el.value=value;el.dispatchEvent(new Event('change'));};
     assert($('#size-mode').value==='fixed','Existing settings must default to fixed');
     const fixed=native.previews.at(-1)?.scale ?? 150;
@@ -236,15 +240,12 @@ try {
   })()`));
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:900,height:680,deviceScaleFactor:1,mobile:false});
   await b.evaluate("document.querySelector('#size-mode').scrollIntoView({block:'center'})");
-  await mkdir('gorevler/ss-sekil-final',{recursive:true});
   const screenPng=await b.cdp('Page.captureScreenshot',{format:'png'});
-    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile('gorevler/ss-sekil-final/screen-fit-settings.png',Buffer.from(screenPng.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(join(output,'screen-fit-settings.png'),Buffer.from(screenPng.data,'base64'));
   // Verify all Save states against synthetic persisted state, including dropped fields.
-  const finalOutput='gorevler/ss-sekil-final/settings';
-  await mkdir(finalOutput,{recursive:true});
   const screenshot=async name=>{
     const png=await b.cdp('Page.captureScreenshot',{format:'png'});
-    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`${finalOutput}/${name}.png`,Buffer.from(png.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`${output}/${name}.png`,Buffer.from(png.data,'base64'));
   };
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:900,height:900,deviceScaleFactor:1,mobile:false});
   for(const scheme of ['light','dark']) {
@@ -288,7 +289,7 @@ try {
     for(const platform of ['linux','windows']) {
       await b.navigate('/?settings&sample&platform='+platform,'window.__SETTINGS_READY__');
       const categories=await b.evaluate(`[...document.querySelectorAll('[data-category]')].filter(b=>!b.hidden).map(b=>b.dataset.category)`);
-      if(categories.includes(platform==='linux'?'taskbar':'desktop'))throw Error('Inapplicable platform category visible');
+      if(categories.length!==(platform==='windows'?6:5)||categories.includes('taskbar')!==(platform==='windows'))throw Error('Platform category visibility');
       for(const id of categories) {
         await b.evaluate(`document.querySelector('[data-category=${id}]').click();document.querySelector('.settings-content').scrollTop=0`);
         await b.evaluate(`(()=>{
@@ -297,23 +298,23 @@ try {
           if(section.scrollWidth>section.clientWidth+1)throw Error('Page overflow: ${platform}/${id} '+section.scrollWidth+'/'+section.clientWidth);
         })()`);
         await screenshot(`${platform}-${id}-${scheme}`);
-        if(platform==='linux'&&id==='layout') {
+        if(platform==='linux'&&id==='appearance') {
           const png=await b.cdp('Page.captureScreenshot',{format:'png'});
-    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`docs/screenshots/settings-${scheme}.png`,Buffer.from(png.data,'base64'));
+    if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`${output}/settings-${scheme}.png`,Buffer.from(png.data,'base64'));
         }
         if(platform==='linux'&&id==='appearance') {
           await b.evaluate(`document.querySelector('#provider-colors').scrollIntoView({block:'end'})`);
           await screenshot(`theme-colors-${scheme}`);
         }
-        if(platform==='linux'&&id==='layout') {
+        if(platform==='linux'&&id==='appearance') {
           await b.evaluate(`document.querySelector('#fit-screen').click()`);
           await screenshot(`screen-share-${scheme}`);
           await b.evaluate(`document.querySelector('#revert').click()`);
         }
-        if(platform==='linux'&&id==='position') {
-          await b.evaluate(`const details=document.querySelector('#category-position details');details.open=true;details.scrollIntoView({block:'end'})`);
+        if(platform==='linux'&&id==='appearance') {
+          await b.evaluate(`const details=document.querySelector('#category-appearance details');details.open=true;details.scrollIntoView({block:'end'})`);
           await screenshot(`position-advanced-${scheme}`);
-          await b.evaluate(`document.querySelector('#category-position details').open=false`);
+          await b.evaluate(`document.querySelector('#category-appearance details').open=false`);
         }
         if(platform==='linux'&&id==='providers') {
           await b.evaluate(`document.querySelector('#featured-position').scrollIntoView({block:'end'})`);
@@ -322,10 +323,10 @@ try {
       }
     }
   }
-  console.log('PASS: all pages at 900 × 900 in light/dark on both platforms; all five Save states captured');
+  console.log('PASS: all six categories at 900 × 900 in light/dark with platform visibility; all five Save states captured');
   console.log(await b.evaluate(`(()=>{
     const $=s=>document.querySelector(s),assert=(v,m)=>{if(!v)throw Error(m)};
-    $('[data-category=layout]').click();$('[data-theme=system]').click();$('[data-shape=portrait]').click();
+    $('[data-category=appearance]').click();$('[data-theme=system]').click();$('[data-shape=portrait]').click();
     $('#scale').value=100;$('#scale').dispatchEvent(new Event('input'));$('[data-size=Medium]').click();$('#fit-screen').click();
     for(const shape of ['landscape','square','circle','pill']){
       $('[data-shape='+shape+']').click();

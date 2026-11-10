@@ -56,7 +56,7 @@ pub fn open_settings(app: tauri::AppHandle) -> Result<(), String> {
     }
     // Lazy creation: the widget alone never pays for a second webview.
     let builder = tauri::WebviewWindowBuilder::new(&app, "settings", tauri::WebviewUrl::App("index.html?settings".into()))
-        .title("AI Usage · Settings").inner_size(900., 680.).min_inner_size(640., 480.)
+        .title("AI Usage · Settings").inner_size(900., 680.).min_inner_size(400., 480.)
         .decorations(true).resizable(true).skip_taskbar(false).center();
     #[cfg(debug_assertions)]
     let builder = if let Some((x, y)) = test_position() { builder.position(x, y) } else { builder };

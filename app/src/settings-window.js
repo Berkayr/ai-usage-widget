@@ -10,6 +10,8 @@ import {quotePrivacy} from './quote.js';
 import {differingKeys, equalSettings} from './settings-compare.js';
 import {layoutControls} from './settings-layout.js';
 import {settingsMarkup} from './settings-markup.js';
+import {settingsCategories, mountNavigation, decorateRows, decorateGroups} from './settings-navigation.js';
+import {version} from '../package.json';
 import {
   effectiveSizeMode,
   fittedGeometry,
@@ -123,6 +125,7 @@ async function settingsInvoke(command, args) {
     throw failure;
   }
 }
+
 let previewWork = Promise.resolve();
 function preview() {
   // One worker drains the latest value; closing/reverting waits for the drain.
@@ -157,7 +160,10 @@ function changed() {
                      autostart !== savedAutostart);
 }
 function mark() {
-  const dirty = changed();
+  const count = saved ? differingKeys(draft, saved).length +
+      Number(!equalSettings(providers, savedProviders)) +
+      Number(autostart !== savedAutostart) : 0;
+  const dirty = count > 0;
   if (dirty)
     saveMessage = '';
   $('#revert').disabled = saving || !dirty;
@@ -167,7 +173,7 @@ function mark() {
       saving
           ? 'Saving…'
           : saveFailure ||
-                (dirty ? 'Unsaved changes'
+                (dirty ? `${count} unsaved changes`
                        : saveMessage || 'Changes preview live on the widget');
   status.dataset.state = saving        ? 'saving'
                          : saveFailure ? 'failure'
@@ -189,17 +195,11 @@ function update() {
   mark();
   preview().catch(() => {});
 }
-const groups = [
-  [ 'providers', 'Providers' ], [ 'appearance', 'Theme' ],
-  [ 'layout', 'Size & Shape' ], [ 'position', 'Position' ],
-  [ 'quote', 'Quote' ], [ 'taskbar', 'Taskbar strip' ],
-  [ 'desktop', 'Desktop' ], [ 'about', 'General' ]
-];
+const groups = settingsCategories;
 document.querySelector('#app')
-    .innerHTML = `<div class="settings-shell"><nav aria-label="Settings categories">${
+    .innerHTML = `<div class="settings-shell"><nav role="tablist" aria-orientation="vertical" aria-label="Settings categories">${
     groups
-        .map(([ id, label ]) => `<button data-category="${
-                 id}" aria-selected="false">${label}</button>`)
+        .map(([ id, label, icon ]) => `<button id="tab-${id}" role="tab" type="button" data-category="${id}" aria-controls="category-${id}" aria-selected="false" tabindex="-1"><span aria-hidden="true">${icon}</span>${label}</button>`)
         .join('')}</nav><main class="settings-content">${
     settingsMarkup}</main><div id="close-prompt" hidden role="alert"><strong>Save changes?</strong><button id="close-save">Save</button><button id="close-discard">Discard</button><button id="close-cancel">Cancel</button></div><footer class="settings-actions"><span id="status" role="status"></span><button id="revert">Revert</button><button class="primary" id="save">Save</button></footer></div>`;
 const panel = $('#settings');
@@ -212,12 +212,20 @@ const sections = Object.fromEntries(groups.map(([ id, label ]) => {
   const section = document.createElement('section');
   section.id = `category-${id}`;
   section.hidden = true;
+  section.setAttribute('role', 'tabpanel');
+  section.setAttribute('aria-labelledby', `tab-${id}`);
   const h = document.createElement('h1');
   h.textContent = label;
   section.append(h);
   panel.append(section);
   return [ id, section ];
 }));
+// Temporary containers let the existing controls keep their construction order.
+for (const id of ['layout', 'position', 'quote', 'desktop']) {
+  sections[id] = document.createElement('section');
+  if (id === 'layout') sections[id].append(document.createElement('h1'));
+  panel.append(sections[id]);
+}
 const move = (id, category) => {
   const el = $(`#${id}`);
   if (el)
@@ -297,7 +305,7 @@ sections.layout.insertAdjacentHTML(
     `<label class="toggle-setting">Lock position<input id="lock-position" type="checkbox">
 </label>
 <button id="place">Place widget</button>
-<p class="setting-note">Drag the widget on the map, or drag its header on Windows / X11. Ratios use the available work area.</p>
+<p class="setting-note">Drag the widget on the map, then accept the position. Changes preview live; Save keeps them. Ratios use the available work area.</p>
 <label>Monitor<select id="placement-monitor">
 </select>
 </label>
@@ -315,7 +323,7 @@ sections.layout.insertAdjacentHTML(
 <div id="placement-presets">
 </div>
 <div id="placement-actions" hidden>
-<button id="save-position">Save position</button>
+<button id="save-position">Use position</button>
 <button id="cancel-position">Cancel</button>
 </div>
 <label>When monitor is disconnected<select id="disconnected">
@@ -340,7 +348,6 @@ for (const [label, x, y] of [[ 'Top left', 0, 0 ], [ 'Top center', .5, 0 ],
             ? label
             : 'Free';
     Object.assign(draft.placement, {xRatio : x, yRatio : y});
-    mapMoved = true;
     update();
   };
   $('#placement-presets').append(button);
@@ -387,7 +394,7 @@ sections.about.insertBefore(control('start-at-login'),
                             sections.about.children[1]);
 sections.about.insertBefore(control('show-extra-windows'),
                             sections.about.children[2]);
-sections.layout.append(control('scale'), control('fit-height'),
+sizeChoices.append(control('scale'), control('fit-height'),
                        control('match-physical-size'), control('fit-fraction'),
                        control('fit-fine-tune'), widgetChoices);
 const fineReset = document.createElement('button');
@@ -414,16 +421,6 @@ for (const [label, value] of [[ 'Largest', 1 ], [ '3/4', .75 ], [ '1/2', .5 ],
 control('fit-fraction').firstChild.textContent = 'Screen share';
 $('#fit-fraction').hidden = true;
 control('fit-fraction').append(fractions);
-function category(id) {
-  for (const [key, section] of Object.entries(sections))
-    section.hidden = key !== id;
-  document.querySelectorAll('[data-category]')
-      .forEach(b => b.setAttribute('aria-selected',
-                                   String(b.dataset.category === id)));
-}
-document.querySelectorAll('[data-category]')
-    .forEach(b => b.onclick = () => category(b.dataset.category));
-category('providers');
 const themeSymbols = {
   reactor : '◎ ◉ ◎',
   system : '━━━━',
@@ -519,6 +516,27 @@ sectionBlock(sections.appearance, 'Theme details',
              [ control('dot-count'), control('reactor-motion') ]);
 sections.appearance.append(colorControls);
 $('.look-section').remove();
+$('.theme-section legend').classList.remove('sr-only');
+$('.theme-section legend').textContent = 'Theme';
+sectionBlock(sections.general, 'Startup', [control('start-at-login'), $('#autostart-status')]);
+sectionBlock(sections.general, 'Widget content', [control('show-extra-windows')]);
+sectionBlock(sections.general, 'Daily quote', [...sections.quote.children]);
+sections.layout.querySelector('h1').remove();
+sections.appearance.append(...sections.layout.children);
+sectionBlock(sections.appearance, 'Position', [...sections.position.children]);
+sections.appearance.append(...sections.desktop.children);
+sections.providers.append(widgetChoices);
+for (const id of ['layout', 'position', 'quote', 'desktop']) {
+  sections[id].remove();
+  delete sections[id];
+}
+sectionBlock(sections.history, 'Usage history', []);
+const aboutInfo = sectionBlock(sections.about, 'AI Usage', []);
+sections.about.querySelector('h1').after(aboutInfo);
+aboutInfo.insertAdjacentHTML('beforeend', `<p class="setting-note">Version <span id="app-version"></span></p><p class="setting-note" id="data-folder"></p>`);
+$('#app-version').textContent = version;
+const navigation = mountNavigation(sections);
+
 function renderControls() {
   renderLayout();
   control(effectiveSizeMode(draft)==='screen'?'fit-fine-tune':'scale').after(fineReset);
@@ -590,7 +608,7 @@ function renderControls() {
       el.value = value ?? '';
     const output = $(`#${id.replace('-opacity', '')}-out`) || $(`#${id}-out`);
     if (output)
-      output.value = `${value}${id === 'linux-margin' ? ' px' : '%'}`;
+      output.value = `${value}${id === 'linux-margin' ? ' px' : id === 'dot-count' ? '' : '%'}`;
   }
   document.querySelectorAll('[data-size]').forEach(button => {
     const candidate = normalizeSize(
@@ -664,6 +682,8 @@ function renderControls() {
   $('#place').disabled = !!positionBefore;
   $('#map-widget').disabled = !positionBefore;
   renderMap();
+  decorateRows(panel);
+  decorateGroups(panel);
 }
 export const bindings = {
   'size-mode' : 'sizeMode',
@@ -758,15 +778,18 @@ function renderProviders() {
   config.initialized = true;
   mountProviders($('#provider-settings'), config, async () => {});
   $('#provider-settings .provider-consent-actions').hidden = true;
+  for (const row of $('#provider-settings').querySelectorAll('.provider-choice')) {
+    const input = row.querySelector('input');
+    input.setAttribute('role', 'switch');
+    row.append(input);
+  }
   $('#provider-settings').onchange = () => {
     providers = [...$('#provider-settings').querySelectorAll('input') ].flatMap(
         (el, i) => el.checked
                        ? [ Object.keys(config.providers)
                                .filter(id => id in config.disclosures)[i] ]
                        : []);
-    renderControls();
-    mark();
-    preview().catch(() => {});
+    update();
   };
 }
 let snapshotProviders = sample ? sampleSnapshot.providers : null;
@@ -858,7 +881,6 @@ function beginPlacement() {
     }
     draft.placementEditing = true;
     draft.lockPosition = false;
-    mapMoved = false;
   }
   if (!draft.placement.monitor)
     draft.placement.monitor = selectedMonitor()?.name ?? null;
@@ -872,30 +894,17 @@ function cancelPlacement() {
     Object.assign(draft, structuredClone(positionBefore));
   positionBefore = null;
   draft.placementEditing = false;
-  mapMoved = false;
   update();
 }
-async function savePosition() {
-  if (!sample && !mapMoved && !geometry.layerShell) {
-    try {
-      draft.placement =
-          normalizePlacement(await settingsInvoke('capture_position'));
-      draft.position='Free';
-    } catch (e) {
-      error(e);
-      return;
-    }
-  }
+function savePosition() {
   draft.lockPosition = true;
   draft.placementEditing = false;
   positionBefore = null;
-  mapMoved = false;
   update();
-  await save();
 }
 $('#save-position').onclick = savePosition;
 $('#cancel-position').onclick = cancelPlacement;
-let drag = null, mapMoved = false;
+let drag = null;
 $('#map-widget').addEventListener('pointerdown', event => {
   if (!positionBefore)
     return;
@@ -932,10 +941,8 @@ $('#map-widget').addEventListener('pointermove', event => {
                                      ah) /
                                     ah
                               : 0;
-  mapMoved = true;
   mark();
   renderMap();
-  preview().catch(() => {});
 }, {signal : abort.signal});
 for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'])
   $('#map-widget').addEventListener(type, () => drag = null, {
@@ -955,7 +962,6 @@ $('#map-widget').onkeydown = event => {
   draft.position = 'Free';
   draft.placement[key] = Math.max(
       0, Math.min(1, draft.placement[key] + delta / Math.max(1, available)));
-  mapMoved = true;
   update();
 };
 async function refreshMonitors() {
@@ -1089,12 +1095,9 @@ async function loadSession() {
   $('#revert').disabled = true;
   $('#close-prompt').hidden = true;
   positionBefore = null;
-  mapMoved = false;
   drag = null;
-  previewPending = null;
   saveMessage = '';
   error('');
-  await previewWork;
   draft = {
     ...defaults,
     ...(sample ? {} : await settingsInvoke('load_settings'))
@@ -1135,7 +1138,7 @@ async function loadSession() {
       desktopPlatform = desktop.platform;
       $('#desktop-layer').hidden = !desktop.layerShell;
       $('#desktop-layer-unavailable').hidden = desktop.layerShell;
-      sections.desktop.querySelector('#linux-settings').hidden =
+      sections.appearance.querySelector('#linux-settings').hidden =
           desktop.platform !== 'linux';
       sections.taskbar.querySelector('#taskbar-settings').hidden =
           desktop.platform !== 'windows';
@@ -1165,10 +1168,11 @@ async function loadSession() {
   $('#start-at-login').checked = autostart;
   $('#start-at-login').disabled = !autostartAvailable;
   if(sample){ $('#desktop-layer').hidden=false; $('#desktop-layer-unavailable').hidden=true; }
-  for (const id of ['desktop', 'taskbar'])
-    document.querySelector(`[data-category=${id}]`).hidden =
-        id === 'desktop' ? desktopPlatform !== 'linux'
-                         : desktopPlatform !== 'windows';
+  $('#linux-settings').hidden = desktopPlatform !== 'linux';
+  navigation.platform(desktopPlatform);
+  $('#data-folder').textContent = 'Data folder: ' + (desktopPlatform === 'windows'
+      ? '%LOCALAPPDATA%\\quotacore' : '$XDG_STATE_HOME/quotacore (default ~/.local/state/quotacore)') +
+      '. QUOTACORE_HOME overrides this location.';
   renderProviders();
   try {
     await refreshMonitors();
