@@ -2,17 +2,31 @@
 use gtk::{glib::translate::ToGlibPtr, prelude::*};
 use libloading::Library;
 use serde::{Deserialize, Serialize};
-use std::{cell::RefCell, ffi::c_void, fs, sync::atomic::{AtomicBool, Ordering}};
+use std::{cell::RefCell, ffi::c_void, fs, collections::HashMap, sync::{LazyLock, Mutex}};
 
 type Window = *mut gtk::ffi::GtkWindow;
 thread_local! {
     static SHELL: RefCell<Option<Library>> = const { RefCell::new(None) };
-    static LAST_PLACEMENT: RefCell<Option<(String,i32,i32,String)>> = const { RefCell::new(None) };
-    static PENDING_RESIZE: RefCell<Option<(Option<i32>, Option<f64>)>> = const { RefCell::new(None) };
-    static MONITOR_WARNING: RefCell<Option<String>> = const { RefCell::new(None) };
+    static LAST_PLACEMENT: RefCell<HashMap<String, (String,i32,i32,String)>> = RefCell::new(HashMap::new());
+    static PENDING_RESIZE: RefCell<HashMap<String, (Option<i32>, Option<f64>)>> = RefCell::new(HashMap::new());
+    static MONITOR_WARNING: RefCell<HashMap<String, Option<String>>> = RefCell::new(HashMap::new());
 }
-static SETTINGS_OPEN: AtomicBool = AtomicBool::new(false);
-static LAYER: AtomicBool = AtomicBool::new(false);
+static SETTINGS_OPEN: LazyLock<Mutex<HashMap<String, bool>>> = LazyLock::new(Mutex::default);
+static LAYER: LazyLock<Mutex<HashMap<String, bool>>> = LazyLock::new(Mutex::default);
+fn flag(states: &Mutex<HashMap<String, bool>>, label: &str) -> bool {
+    states.lock().unwrap_or_else(|e| e.into_inner()).get(label).copied().unwrap_or(false)
+}
+fn remember_placement(states: &mut HashMap<String, (String,i32,i32,String)>, label: &str, key: (String,i32,i32,String)) -> bool {
+    if states.get(label) == Some(&key) { return false; }
+    states.insert(label.into(), key);
+    true
+}
+fn merge_resize(states: &mut HashMap<String, (Option<i32>, Option<f64>)>, label: &str, width: Option<i32>, height: Option<f64>) -> bool {
+    let pending = states.contains_key(label);
+    let previous = states.entry(label.into()).or_default();
+    *previous = (width.or(previous.0), height.or(previous.1));
+    pending
+}
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
 pub struct Options { pub layer: String, pub margin: i32, pub monitor: Option<MonitorSelection> }
@@ -51,7 +65,7 @@ fn selection_index(selection: &MonitorSelection, available: &[(i32, String)]) ->
             message.chars().map(|c| if c.is_control() { ' ' } else { c }).collect()
         })
 }
-fn selected_monitor(display: &gtk::gdk::Display, selection: &Option<MonitorSelection>) -> Option<gtk::gdk::Monitor> {
+fn selected_monitor(label: &str, display: &gtk::gdk::Display, selection: &Option<MonitorSelection>) -> Option<gtk::gdk::Monitor> {
     let available = (0..display.n_monitors()).filter_map(|index| {
         display.monitor(index).map(|monitor| (index, monitor_name(display, index, &monitor)))
     }).collect::<Vec<_>>();
@@ -59,9 +73,9 @@ fn selected_monitor(display: &gtk::gdk::Display, selection: &Option<MonitorSelec
     let warning = result.as_ref().and_then(|result| result.as_ref().err()).cloned();
     MONITOR_WARNING.with(|slot| {
         let mut previous = slot.borrow_mut();
-        if *previous != warning {
+        if previous.get(label) != Some(&warning) {
             if let Some(message) = &warning { eprintln!("{}", message); }
-            *previous = warning;
+            previous.insert(label.into(), warning);
         }
     });
     result.and_then(Result::ok).and_then(|index| display.monitor(index))
@@ -73,12 +87,12 @@ impl Default for Options {
 pub fn wayland() -> bool {
     std::env::var("GDK_BACKEND").map(|s|s == "wayland").unwrap_or_else(|_| std::env::var("XDG_SESSION_TYPE").as_deref() == Ok("wayland") || std::env::var_os("WAYLAND_DISPLAY").is_some())
 }
-pub fn layered() -> bool { LAYER.load(Ordering::Relaxed) }
+pub fn layered(label: &str) -> bool { flag(&LAYER, label) }
 // All symbol calls are on GTK's main thread; the library stays loaded for the window lifetime.
 unsafe fn call<T: Copy>(lib: &Library, name: &[u8]) -> Option<T> { lib.get::<T>(name).ok().map(|s| *s) }
-static HINT_SHOWN: AtomicBool = AtomicBool::new(false);
-pub fn placement_hint() -> Option<&'static str> {
-    if wayland() && !layered() && !HINT_SHOWN.swap(true,Ordering::Relaxed) {
+static HINT_SHOWN: LazyLock<Mutex<HashMap<String, bool>>> = LazyLock::new(Mutex::default);
+pub fn placement_hint(label: &str) -> Option<&'static str> {
+    if wayland() && !layered(label) && !HINT_SHOWN.lock().unwrap_or_else(|e| e.into_inner()).insert(label.into(), true).unwrap_or(false) {
         Some("This Wayland desktop cannot place the widget at a fixed corner. Use the panel integration, or launch with GDK_BACKEND=x11 when XWayland is available.")
     } else { None }
 }
@@ -135,12 +149,12 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
                     gtk.set_size_request(340, 640);
                     init.unwrap()(gtk.upcast_ref::<gtk::Window>().to_glib_none().0);
                     SHELL.with(|slot| *slot.borrow_mut()=Some(lib));
-                    LAYER.store(true,Ordering::Relaxed);
+                    LAYER.lock().unwrap_or_else(|e| e.into_inner()).insert(window.label().into(), true);
                 }
             }
         }
     }
-    if !layered() {
+    if !layered(window.label()) {
         gtk.set_type_hint(gtk::gdk::WindowTypeHint::Utility);
         if wayland() { eprintln!("AI Usage: layer-shell unavailable; fixed corners require XWayland or a panel integration."); }
     }
@@ -156,18 +170,14 @@ pub fn resize_layer(window: &tauri::WebviewWindow, width: Option<i32>, height: O
     let target = window.clone();
     window.run_on_main_thread(move || {
         let pending = PENDING_RESIZE.with(|slot| {
-            let mut slot = slot.borrow_mut();
-            let pending = slot.is_some();
-            let previous = slot.unwrap_or((None,None));
-            *slot = Some((width.or(previous.0),height.or(previous.1)));
-            pending
+            merge_resize(&mut slot.borrow_mut(), target.label(), width, height)
         });
         if pending { return; }
         // One short-lived source coalesces width/height updates; no polling timer.
         gtk::glib::timeout_add_local_once(std::time::Duration::from_millis(40), move || {
-            let Some((width,height)) = PENDING_RESIZE.with(|slot| slot.borrow_mut().take()) else { return; };
+            let Some((width,height)) = PENDING_RESIZE.with(|slot| slot.borrow_mut().remove(target.label())) else { return; };
             let Ok(gtk) = target.gtk_window() else { return; };
-            let settings = super::settings_window::current();
+            let settings = super::settings_window::current_for(target.label());
             let list = crate::placement::configured_monitors(&target,&settings);
             let Some(monitor) = crate::placement::selected(&list, &settings) else { return; };
             let (old_width,old_height) = gtk.size_request();
@@ -189,8 +199,8 @@ pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
     let corner=if corner=="Free" {"Top right"} else {corner};
     let Ok(gtk) = window.gtk_window() else { return };
     let display = gtk.display();
-    let monitor = selected_monitor(&display, &options.monitor);
-    if !layered() {
+    let monitor = selected_monitor(window.label(), &display, &options.monitor);
+    if !layered(window.label()) {
         gtk.set_keep_above(options.layer == "top");
         gtk.set_keep_below(options.layer != "top");
         return;
@@ -207,14 +217,14 @@ pub fn apply(window: &tauri::WebviewWindow, options: &Options, corner: &str) {
         }
         call::<unsafe extern "C" fn(Window,i32)>(lib,b"gtk_layer_set_exclusive_zone\0").unwrap()(ptr,0);
         if let Some(monitor)=monitor { if std::env::var_os("AI_USAGE_SNAPSHOT_TRACE").is_some() { let g=monitor.geometry(); eprintln!("monitor-selected {} {},{} {}x{}", (0..display.n_monitors()).find_map(|i|display.monitor(i).filter(|m|m==&monitor).map(|m|monitor_name(&display,i,&m))).unwrap_or_default(),g.x(),g.y(),g.width(),g.height()); } call::<unsafe extern "C" fn(Window,*mut gtk::gdk::ffi::GdkMonitor)>(lib,b"gtk_layer_set_monitor\0").unwrap()(ptr,monitor.to_glib_none().0); }
-        call::<unsafe extern "C" fn(Window,u32)>(lib,b"gtk_layer_set_keyboard_mode\0").unwrap()(ptr,if SETTINGS_OPEN.load(Ordering::Relaxed) {2} else {0});
+        call::<unsafe extern "C" fn(Window,u32)>(lib,b"gtk_layer_set_keyboard_mode\0").unwrap()(ptr,if flag(&SETTINGS_OPEN, window.label()) {2} else {0});
     }); }
 }
 pub fn set_linux_focus(window: tauri::WebviewWindow, open: bool) {
-    SETTINGS_OPEN.store(open,Ordering::Relaxed);
+    SETTINGS_OPEN.lock().unwrap_or_else(|e| e.into_inner()).insert(window.label().into(), open);
     let _=window.clone().run_on_main_thread(move || {
         let Ok(gtk)=window.gtk_window() else {return};
-        if layered() { unsafe { SHELL.with(|slot| { if let Some(lib)=slot.borrow().as_ref() {
+        if layered(window.label()) { unsafe { SHELL.with(|slot| { if let Some(lib)=slot.borrow().as_ref() {
             if let Some(f)=call::<unsafe extern "C" fn(Window,u32)>(lib,b"gtk_layer_set_keyboard_mode\0") { f(gtk.upcast_ref::<gtk::Window>().to_glib_none().0,if open {2} else {0}); }
         } }); } } else { gtk.set_accept_focus(open); }
     });
@@ -236,15 +246,15 @@ pub const SCRIPT: &str = r#"(() => {
  new MutationObserver(update).observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['hidden']}); update();
 })()"#;
 
-pub fn desktop_info() -> serde_json::Value {
+pub fn desktop_info(label: &str) -> serde_json::Value {
     let monitors = gtk::gdk::Display::default().map(|display| {
         (0..display.n_monitors()).filter_map(|index| display.monitor(index).map(|monitor| {
             let name = monitor_name(&display,index,&monitor);
             serde_json::json!({"index": index, "name": name})
         })).collect::<Vec<_>>()
     }).unwrap_or_default();
-    serde_json::json!({"platform": "linux", "layerShell": layered(), "monitors": monitors,
-        "monitorWarning": MONITOR_WARNING.with(|slot| slot.borrow().clone())})
+    serde_json::json!({"platform": "linux", "layerShell": layered(label), "monitors": monitors,
+        "monitorWarning": MONITOR_WARNING.with(|slot| slot.borrow().get(label).cloned().flatten())})
 }
 pub fn get_autostart() -> Result<bool,String> {
     let path=dirs::config_dir().ok_or("Config directory unavailable")?.join("autostart/ai-usage.desktop");
@@ -376,10 +386,9 @@ pub fn placement_monitors() -> Vec<crate::placement::Monitor> {
 }
 pub fn place(window: &tauri::WebviewWindow, options: &Options, name: &str, x: i32, y: i32) {
     let key=(name.to_owned(),x,y,options.layer.clone());
-    if LAST_PLACEMENT.with(|last|last.borrow().as_ref()==Some(&key)) {return;}
-    LAST_PLACEMENT.with(|last|*last.borrow_mut()=Some(key));
+    if !LAST_PLACEMENT.with(|last|remember_placement(&mut last.borrow_mut(),window.label(),key)) {return;}
     let Ok(gtk)=window.gtk_window() else {return}; let display=gtk.display();
-    let monitor=selected_monitor(&display,&Some(MonitorSelection::Name(name.into())));
+    let monitor=selected_monitor(window.label(), &display,&Some(MonitorSelection::Name(name.into())));
     // Apply layer and then replace all four anchors/margins. Layer-shell margins
     // are logical pixels; workarea offsets account for desktop panels.
     let mut options=options.clone(); options.monitor=Some(MonitorSelection::Name(name.into())); apply(window,&options,"Top left");
@@ -413,4 +422,8 @@ pub fn watch_monitors(app: tauri::AppHandle) {
 }
 thread_local! {static DESKTOP_WATCHER: std::cell::RefCell<Option<notify::RecommendedWatcher>>=const {std::cell::RefCell::new(None)};}
 
-pub fn invalidate_placement() { LAST_PLACEMENT.with(|last|*last.borrow_mut()=None); }
+pub fn invalidate_placement() { LAST_PLACEMENT.with(|last|last.borrow_mut().clear()); }
+
+#[cfg(test)]
+#[path = "../../../tests/linux-label-state.rs"]
+mod label_tests;

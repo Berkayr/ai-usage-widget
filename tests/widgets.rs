@@ -173,3 +173,20 @@ fn malformed_overrides_are_rejected_and_id_length_boundary_is_accepted() {
     assert_eq!(root.widgets.len(),1);
     assert_eq!(root.widgets[0].id.len(),24);
 }
+
+#[test]
+fn labels_round_trip_and_reject_path_components() {
+    assert_eq!(label(None).unwrap(), MAIN_ID);
+    assert_eq!(label(Some(MAIN_ID)).unwrap(), MAIN_ID);
+    assert_eq!(label(Some("side-2")).unwrap(), "widget-side-2");
+    assert_eq!(id_from_label("widget-side-2").unwrap(), "side-2");
+    assert_eq!(id_from_label(MAIN_ID).unwrap(), MAIN_ID);
+    let boundary = "a".repeat(24);
+    assert_eq!(id_from_label(&label(Some(&boundary)).unwrap()).unwrap(), boundary);
+    for id in ["", "../escape", "a/b", "A", "a\\b", "a.b", "a b", "ü", &"a".repeat(25)] {
+        assert!(label(Some(id)).is_err(), "{id}");
+    }
+    for label in ["settings", "widget-", "widget-main", "widget-../escape"] {
+        assert!(id_from_label(label).is_err(), "{label}");
+    }
+}

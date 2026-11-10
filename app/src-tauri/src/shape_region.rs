@@ -1,10 +1,20 @@
 //! Native input masks. GTK receives logical pixels; Win32 receives physical pixels.
 use crate::Shape;
-use std::sync::{Mutex, atomic::{AtomicBool, AtomicU64, Ordering}};
-static ONBOARDING: AtomicBool = AtomicBool::new(false);
-static RUNNING: AtomicBool = AtomicBool::new(false);
-static REVISION: AtomicU64 = AtomicU64::new(0);
-static LAST: Mutex<Option<(Shape,i32,i32,i32,i32)>> = Mutex::new(None);
+use std::{collections::HashMap, sync::{Arc, LazyLock, Mutex, atomic::{AtomicBool, AtomicU64, Ordering}}};
+#[derive(Default)]
+struct State {
+    onboarding: AtomicBool,
+    running: AtomicBool,
+    revision: AtomicU64,
+    last: Mutex<Option<(Shape,i32,i32,i32,i32)>>,
+}
+static STATES: LazyLock<Mutex<HashMap<String, Arc<State>>>> = LazyLock::new(Mutex::default);
+fn state_for(states: &mut HashMap<String, Arc<State>>, label: &str) -> Arc<State> {
+    states.entry(label.into()).or_default().clone()
+}
+fn state(label: &str) -> Arc<State> {
+    state_for(&mut STATES.lock().unwrap_or_else(|e| e.into_inner()), label)
+}
 
 #[cfg(any(windows,test))]
 fn client_region_bounds(width: i32, height: i32, offset_x: i32, offset_y: i32) -> (i32,i32,i32,i32) {
@@ -46,34 +56,35 @@ pub(crate) fn blur_scanlines(shape: &Shape, width: i32, height: i32, radius: f64
 pub(crate) fn window_scanlines(window: &tauri::WebviewWindow, radius: f64) -> Result<Vec<(i32,i32,i32,i32)>, String> {
     use gtk::prelude::*;
     let widget = window.gtk_window().map_err(|e| e.to_string())?;
-    let shape = effective_shape(crate::settings_window::current().shape, ONBOARDING.load(Ordering::SeqCst));
+    let shape = effective_shape(crate::settings_window::current_for(window.label()).shape, state(window.label()).onboarding.load(Ordering::SeqCst));
     Ok(blur_scanlines(&shape, widget.allocated_width(), widget.allocated_height(), radius))
 }
 fn effective_shape(shape: Shape, onboarding: bool) -> Shape {
     if onboarding { Shape::Portrait } else { shape }
 }
 pub fn set_onboarding(window: &tauri::WebviewWindow, active: bool) {
-    if ONBOARDING.swap(active, Ordering::SeqCst) != active { request(window); }
+    if state(window.label()).onboarding.swap(active, Ordering::SeqCst) != active { request(window); }
 }
 pub fn request(window: &tauri::WebviewWindow) {
-    REVISION.fetch_add(1,Ordering::SeqCst);
-    if RUNNING.swap(true,Ordering::SeqCst) {return;}
+    let state = state(window.label());
+    state.revision.fetch_add(1,Ordering::SeqCst);
+    if state.running.swap(true,Ordering::SeqCst) {return;}
     let window=window.clone();
     std::thread::spawn(move || {
         loop {
-            let revision=REVISION.load(Ordering::SeqCst);
+            let revision=state.revision.load(Ordering::SeqCst);
             std::thread::sleep(std::time::Duration::from_millis(40));
-            if revision!=REVISION.load(Ordering::SeqCst) {continue;}
+            if revision!=state.revision.load(Ordering::SeqCst) {continue;}
             let target=window.clone();
             let _=window.run_on_main_thread(move || { let _=apply(&target); });
-            RUNNING.store(false,Ordering::SeqCst);
-            if revision!=REVISION.load(Ordering::SeqCst) {request(&window);}
+            state.running.store(false,Ordering::SeqCst);
+            if revision!=state.revision.load(Ordering::SeqCst) {request(&window);}
             break;
         }
     });
 }
 fn apply(window: &tauri::WebviewWindow) -> Result<(),String> {
-    let shape=effective_shape(crate::settings_window::current().shape, ONBOARDING.load(Ordering::SeqCst));
+    let shape=effective_shape(crate::settings_window::current_for(window.label()).shape, state(window.label()).onboarding.load(Ordering::SeqCst));
     let size=window.inner_size().map_err(|e|e.to_string())?;
     #[cfg(target_os="linux")]
     let (width,height)={use gtk::prelude::*;let widget=window.gtk_window().map_err(|e|e.to_string())?;(widget.allocated_width(),widget.allocated_height())};
@@ -90,8 +101,9 @@ fn apply(window: &tauri::WebviewWindow) -> Result<(),String> {
     #[cfg(not(windows))]
     let (offset_x,offset_y)=(0,0);
     #[cfg(target_os="linux")]
-    crate::window_effects::apply(window, &crate::settings_window::current().theme);
-    let mut last=LAST.lock().unwrap_or_else(|e|e.into_inner());
+    crate::window_effects::apply(window, &crate::settings_window::current_for(window.label()).theme);
+    let state=state(window.label());
+    let mut last=state.last.lock().unwrap_or_else(|e|e.into_inner());
     let key=(shape.clone(),width,height,offset_x,offset_y);
     if last.as_ref()==Some(&key) {return Ok(());}
     #[cfg(target_os="linux")]
@@ -179,3 +191,7 @@ mod tests {
         assert!(scanlines(&Shape::Circle,0,0).is_empty());
     }
 }
+
+#[cfg(test)]
+#[path = "../../../tests/shape-label-state.rs"]
+mod label_tests;

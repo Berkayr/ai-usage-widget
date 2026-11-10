@@ -27,6 +27,8 @@ Notable changes will be recorded here. No release has been published yet.
 
 ### Changed
 
+- Route widget commands, native shape/blur/placement state, window geometry files and frontend preferences by widget identity while retaining the single-window startup and legacy main files.
+
 - Older versions discard the optional `widgets` records when saving a newer settings file.
 
 - Group settings into six sidebar categories with remembered selection, keyboard navigation and horizontal tabs below 560 px.

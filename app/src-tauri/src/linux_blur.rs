@@ -257,10 +257,10 @@ fn availability(enabled: bool, available: bool) -> Result<(), &'static str> {
     if enabled && !available { Err("KWin blur unavailable; using theme tint") } else { Ok(()) }
 }
 thread_local! {
-    static WAYLAND: RefCell<Option<Wayland>> = const { RefCell::new(None) };
-    static WARNING: RefCell<Option<&'static str>> = const { RefCell::new(None) };
+    static WAYLAND: RefCell<std::collections::HashMap<String, Wayland>> = RefCell::new(std::collections::HashMap::new());
+    static WARNING: RefCell<std::collections::HashMap<String, Option<&'static str>>> = RefCell::new(std::collections::HashMap::new());
 }
-unsafe fn native(gdk: &gtk::gdk::Window, enabled: bool, rectangles: &[(i32,i32,i32,i32)]) -> Result<(), &'static str> {
+unsafe fn native(label: &str, gdk: &gtk::gdk::Window, enabled: bool, rectangles: &[(i32,i32,i32,i32)]) -> Result<(), &'static str> {
     let lib = libloading::Library::new("libgdk-3.so.0").map_err(|_| "GDK native bridge unavailable")?;
     let display = gdk.display();
     let window_ptr: *mut gtk::gdk::ffi::GdkWindow = gdk.to_glib_none().0;
@@ -275,11 +275,11 @@ unsafe fn native(gdk: &gtk::gdk::Window, enabled: bool, rectangles: &[(i32,i32,i
         if display.is_null() || surface.is_null() { return Ok(()); }
         WAYLAND.with(|slot| {
             let mut slot = slot.borrow_mut();
-            if slot.is_none() {
+            if !slot.contains_key(label) {
                 if !enabled { return Ok(()); }
-                *slot = Some(Wayland::new(display)?);
+                slot.insert(label.into(), Wayland::new(display)?);
             }
-            slot.as_mut().unwrap().apply(surface, enabled, rectangles)
+            slot.get_mut(label).unwrap().apply(surface, enabled, rectangles)
         })
     } else if display.type_().name() == "GdkX11Display" {
         let get_display = lib.get::<unsafe extern "C" fn(*mut gtk::gdk::ffi::GdkDisplay) -> Proxy>(b"gdk_x11_display_get_xdisplay\0")
@@ -289,15 +289,14 @@ unsafe fn native(gdk: &gtk::gdk::Window, enabled: bool, rectangles: &[(i32,i32,i
         x11(get_display(display_ptr), get_xid(window_ptr), enabled, rectangles, gdk.scale_factor())
     } else { availability(enabled, false) }
 }
-static CORNER_RADIUS_PHYSICAL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+static CORNER_RADIUS_PHYSICAL: std::sync::LazyLock<std::sync::Mutex<std::collections::HashMap<String, u64>>> = std::sync::LazyLock::new(std::sync::Mutex::default);
 fn physical_radius(radius: Option<f64>, factor: f64) -> f64 {
     radius.filter(|r| r.is_finite() && *r > 0.0)
         .map(|r| r.min(10000.0) * factor).filter(|r| r.is_finite() && *r > 0.0).unwrap_or(0.0)
 }
 pub fn set_corner_radius(window: &tauri::WebviewWindow, radius: Option<f64>, factor: f64) {
-    use std::sync::atomic::Ordering;
     let bits = physical_radius(radius, factor).to_bits();
-    if CORNER_RADIUS_PHYSICAL.swap(bits, Ordering::SeqCst) != bits {
+    if CORNER_RADIUS_PHYSICAL.lock().unwrap_or_else(|e| e.into_inner()).insert(window.label().into(), bits).unwrap_or(0) != bits {
         crate::shape_region::request(window);
     }
 }
@@ -306,17 +305,17 @@ pub fn apply(window: &tauri::WebviewWindow, enabled: bool) {
     let Some(gdk) = widget.window() else { return; };
     // GTK/Wayland regions use logical pixels; X11 converts them to device pixels below.
     let Ok(factor) = window.scale_factor() else { return; };
-    let radius = f64::from_bits(CORNER_RADIUS_PHYSICAL.load(std::sync::atomic::Ordering::SeqCst)) / factor;
+    let radius = f64::from_bits(CORNER_RADIUS_PHYSICAL.lock().unwrap_or_else(|e| e.into_inner()).get(window.label()).copied().unwrap_or(0)) / factor;
     let Ok(rectangles) = crate::shape_region::window_scanlines(window, radius) else { return; };
     if enabled && rectangles.is_empty() { return; }
-    let warning = unsafe { native(&gdk, enabled, &rectangles) }.err();
+    let warning = unsafe { native(window.label(), &gdk, enabled, &rectangles) }.err();
     // Schedule GTK's next surface commit after the blur state changes.
     gdk.invalidate_rect(None, false);
     widget.queue_draw();
     WARNING.with(|slot| {
-        if *slot.borrow() != warning {
+        if slot.borrow().get(window.label()) != Some(&warning) {
             if let Some(message) = warning { eprintln!("AI Usage: {message}"); }
-            *slot.borrow_mut() = warning;
+            slot.borrow_mut().insert(window.label().into(), warning);
         }
     });
 }
@@ -324,10 +323,12 @@ pub fn watch(window: &tauri::WebviewWindow, widget: &gtk::ApplicationWindow) {
     let target = window.clone();
     widget.connect_map(move |_| crate::shape_region::request(&target));
     // GDK can replace a Wayland surface on hide/show without unrealizing GTK.
-    widget.connect_unmap(|_| WAYLAND.with(|slot| {
-        if let Some(state) = slot.borrow_mut().as_mut() { unsafe { state.clear(); } }
+    let label=window.label().to_owned();
+    widget.connect_unmap(move |_| WAYLAND.with(|slot| {
+        if let Some(state) = slot.borrow_mut().get_mut(&label) { unsafe { state.clear(); } }
     }));
-    widget.connect_unrealize(|_| WAYLAND.with(|slot| { slot.borrow_mut().take(); }));
+    let label=window.label().to_owned();
+    widget.connect_unrealize(move |_| WAYLAND.with(|slot| { slot.borrow_mut().remove(&label); }));
 }
 #[cfg(test)]
 mod tests {

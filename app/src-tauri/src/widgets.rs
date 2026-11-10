@@ -3,6 +3,33 @@ use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::{Map, Value};
 use std::collections::HashSet;
 
+pub(crate) const MAIN_ID: &str = "main";
+
+fn valid_id(id: &str) -> bool {
+    !id.is_empty() && id.len() <= 24
+        && id.bytes().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-')
+}
+
+pub(crate) fn label(id: Option<&str>) -> Result<String, String> {
+    let id = id.unwrap_or(MAIN_ID);
+    if id == MAIN_ID { return Ok(MAIN_ID.into()); }
+    if !valid_id(id) { return Err("invalid widget id".into()); }
+    Ok(format!("widget-{id}"))
+}
+
+pub(crate) fn id_from_label(label: &str) -> Result<&str, String> {
+    if label == MAIN_ID { return Ok(MAIN_ID); }
+    label.strip_prefix("widget-").filter(|id| valid_id(id) && *id != MAIN_ID)
+        .ok_or_else(|| "invalid widget label".into())
+}
+
+pub(crate) fn command_window(window: tauri::WebviewWindow, id: Option<&str>) -> Result<tauri::WebviewWindow, String> {
+    use tauri::Manager;
+    if id.is_none() && id_from_label(window.label()).is_ok() { return Ok(window); }
+    let label = label(id)?;
+    window.app_handle().get_webview_window(&label).ok_or_else(|| "Widget window unavailable".into())
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct Widget {
     pub id: String,
@@ -24,8 +51,7 @@ fn overridable(key: &str) -> bool {
 }
 
 fn checked(mut widget: Widget) -> Result<Widget, String> {
-    if widget.id == "main" || widget.id.is_empty() || widget.id.len() > 24
-        || !widget.id.bytes().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-') {
+    if widget.id == MAIN_ID || !valid_id(&widget.id) {
         return Err("invalid widget id".into());
     }
     if widget.placement.monitor.as_ref().is_none_or(|name| name.trim().is_empty()) {
@@ -60,7 +86,7 @@ pub(crate) fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<
 }
 
 pub(crate) fn effective(root: &Settings, id: &str) -> Result<Settings, String> {
-    if id == "main" { return Ok(root.clone()); }
+    if id == MAIN_ID { return Ok(root.clone()); }
     let widget = checked(root.widgets.iter().find(|w| w.id == id)
         .ok_or("Unknown widget id")?.clone())?;
     let mut value = serde_json::to_value(root).map_err(|e| e.to_string())?;
@@ -78,7 +104,7 @@ pub(crate) fn effective(root: &Settings, id: &str) -> Result<Settings, String> {
 }
 
 pub(crate) fn split(root: &Settings, id: &str, edited: &Settings) -> Result<Settings, String> {
-    if id == "main" { return Ok(edited.clone()); }
+    if id == MAIN_ID { return Ok(edited.clone()); }
     let before = serde_json::to_value(effective(root, id)?).map_err(|e| e.to_string())?;
     let after = serde_json::to_value(edited).map_err(|e| e.to_string())?;
     let mut value = serde_json::to_value(root).map_err(|e| e.to_string())?;
@@ -109,12 +135,12 @@ pub(crate) fn split(root: &Settings, id: &str, edited: &Settings) -> Result<Sett
 
 #[tauri::command]
 pub(crate) fn load_settings(widget_id: Option<String>) -> Result<Settings, String> {
-    effective(&super::load_settings(), widget_id.as_deref().unwrap_or("main"))
+    effective(&super::load_settings(), widget_id.as_deref().unwrap_or(MAIN_ID))
 }
 
 #[tauri::command]
 pub(crate) fn save_settings(app: tauri::AppHandle, settings: Settings, widget_id: Option<String>) -> Result<(), String> {
-    let root = split(&super::load_settings(), widget_id.as_deref().unwrap_or("main"), &settings)?;
+    let root = split(&super::load_settings(), widget_id.as_deref().unwrap_or(MAIN_ID), &settings)?;
     super::save_settings(app, root)
 }
 
