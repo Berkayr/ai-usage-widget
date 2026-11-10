@@ -21,6 +21,32 @@ The settings panel exposes layer, margin and monitor when layer-shell is availab
 
 Mutter does not supply this layer-shell path. Use the GNOME panel integration, move the normal window manually, or explicitly try `GDK_BACKEND=x11 ai-usage` if XWayland is installed. The application does not force an X11 fallback. Window managers can override EWMH positioning hints.
 
+## Desktop background blur
+
+Clear Glass and Layer request native background blur on KDE Plasma when their
+bundled manifest declares `windowEffect: "acrylic"`. Enable **Blur** in System
+Settings → Window Management → Desktop Effects. Wayland prefers
+`ext_background_effect_manager_v1` when advertised and requires its blur capability;
+otherwise it uses `org_kde_kwin_blur_manager` on the existing GDK surface,
+including layer-shell surfaces. KWin 6.8.2 was observed advertising only the ext
+interface; older KWin sessions exposing only the KDE interface use the legacy path.
+Selection follows advertised interfaces rather than a KWin version check.
+X11 (including an explicit XWayland launch) uses
+`_KDE_NET_WM_BLUR_BEHIND_REGION` when the window manager advertises support.
+Switching to another theme removes the request; remapping or recreating the
+surface reapplies the current theme. Only the main widget receives this effect.
+
+GNOME and compositors without a supported blur protocol/property keep the theme's
+existing translucent tint as a fallback; they do not gain wallpaper blur from
+CSS. Unsupported blur is reported only in the application log. Blur regions share
+the input mask's scanline rectangles, including logical sizing
+on Wayland, native pixel scaling on X11 and the rectangular onboarding override.
+Curved Circle/Pill corners stay outside the region; shape and size changes refresh it.
+The ext effect object is reused across theme changes, and GTK's next redraw commits
+its pending region without interfering with the layer-shell configure handshake.
+Portrait/Landscape/Square retain their rectangular native masks; CSS corner radii
+are not part of these masks. Native KDE appearance and remapping still require real-session acceptance on both Wayland and X11.
+
 ## Shared panel data
 
 Panel readers are passive: `python3 -m quotacore bar --format waybar` reads the existing snapshot without network requests or credentials. Keep the writer running with `python3 -m quotacore daemon --interval 300`, or use the widget's collector. Configure the same `QUOTACORE_HOME` for both if overriding storage. A packaged deb/rpm launcher also supports `quotacore bar`.

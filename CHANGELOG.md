@@ -10,11 +10,18 @@ Notable changes will be recorded here. No release has been published yet.
 - History settings with explicit, saved permission to read local Claude Code logs (off by default).
 
 - Clear Glass, Layer, Aurora, Crisp, Pebble, Glyph and Pastel themes with light/dark palettes and picker previews.
+- Theme-selected KDE Plasma background blur on Wayland and X11, with a tint fallback on unsupported desktops.
 - Theme-selected Windows desktop Acrylic on Windows 11 and Blur on Windows 10, cleared when switching to an opaque theme.
 
 - Windows and Linux desktop widget with seventeen themes, five shapes and shared local quota snapshots.
 - Provider opt-in, palette editing/import/export, layout and placement settings.
 - Panel integration sources for Plasma, GNOME Shell, Waybar, Polybar and i3blocks.
+
+### Fixed
+
+- Match KDE blur corners to the theme radius for Portrait, Landscape and Square without changing the input mask.
+
+- Prefer the ext background-effect protocol on newer KWin sessions and restrict Wayland/X11 blur to the shared window shape mask.
 
 ### Changed
 

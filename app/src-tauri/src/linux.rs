@@ -115,6 +115,7 @@ pub fn initialize(window: &tauri::WebviewWindow, options: &Options, corner: &str
         // creates exactly one view; keep WebKit's sandbox/process isolation.
     });
     let Ok(gtk) = window.gtk_window() else { return };
+    crate::linux_blur::watch(window, &gtk);
     gtk.set_skip_taskbar_hint(true);
     gtk.set_skip_pager_hint(true);
     gtk.stick();
