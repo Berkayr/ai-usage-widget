@@ -1,21 +1,41 @@
 @import '../shared/layout.css';
 
 :root[data-theme=compact-strip]:not([data-shape=circle]):not([data-shape=pill]) .widget {
-  border-radius: 12px;
+  border-radius: 6px;
 }
 
-:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .provider-card {
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--bgCard);
-  padding: 10px 12px;
+:root[data-theme=compact-strip]:not([data-shape=circle]):not([data-shape=pill]) .widget .header {
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
 }
 
-:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .provider-heading {
-  min-height: 26px;
-  padding-bottom: 5px;
-  margin-bottom: 6px;
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+/* Strip identity: no heavy card box or fill; clean divider lines between providers */
+:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 6px 4px;
+}
+
+:root[data-theme=compact-strip][data-shape=portrait] #widget.widget .provider-card + .provider-card {
+  border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  padding-top: 10px;
+}
+
+:root[data-theme=compact-strip]:is([data-shape=landscape], [data-shape=strip]) #widget.widget .provider-card:nth-child(n) {
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+:root[data-theme=compact-strip]:is([data-shape=landscape], [data-shape=strip]) #widget.widget .provider-card + .provider-card {
+  border-left: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  padding-left: 10px;
+}
+
+:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-heading {
+  min-height: 22px;
+  padding-bottom: 2px;
+  margin-bottom: 4px;
+  border-bottom: 0;
 }
 
 :root[data-theme=compact-strip] .widget .provider-heading h2 {
@@ -25,14 +45,15 @@
 
 :root[data-theme=compact-strip] .widget :is(.plan, .status-badge) {
   font-size: 11px;
-  line-height: 1.3;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--accent) 12%, var(--bgWidget));
+  line-height: 1.25;
+  padding: 1px 5px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--bgWidget));
   border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
 }
 
-:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .provider-card:nth-child(n) .windows {
+/* Vertically center and distribute single-line strips to fill the shared card height */
+:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .windows {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -41,52 +62,78 @@
   min-height: 0;
 }
 
-:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .provider-card:nth-child(n) .quota-window {
+/* Single-row strip: label · thin bar · percentage · reset time on the same row */
+:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .quota-window {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-  padding: 5px 9px;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--bgWidget) 55%, var(--bgCard));
-  border: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
-  border-left: 2px solid color-mix(in srgb, var(--accent) 70%, var(--border));
-}
-
-:root[data-theme=compact-strip] #widget.widget .window-top {
-  display: flex;
-  align-items: baseline;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 2px 6px;
+  min-height: 30px;
+  padding: 4px 6px 4px 8px;
+  border: 0;
+  border-left: 3px solid color-mix(in srgb, var(--provider-identity, var(--accent)) 85%, var(--border));
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 28%, transparent);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--bgCard) 35%, transparent);
 }
 
-:root[data-theme=compact-strip]:not([data-shape=pill]) #widget.widget .window-top > span {
+:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .window-top {
+  display: contents;
+}
+
+:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .window-top > span {
+  order: 1;
+  flex: 0 0 auto;
+  min-width: 46px;
   font-size: 13px;
   font-weight: 500;
+  line-height: 1.2;
   color: var(--textSecondary);
+  white-space: nowrap;
 }
 
-:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .window-top b {
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.15;
-  font-variant-numeric: tabular-nums;
-}
-
-:root[data-theme=compact-strip] #widget.widget .segments {
+:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .segments {
+  order: 2;
   display: flex;
   flex-wrap: nowrap;
   justify-content: stretch;
-  width: 100%;
-  max-width: 100%;
-  margin-left: 0;
-  margin-right: 0;
+  flex: 1 1 36px;
+  width: auto;
+  min-width: 36px;
+  max-width: none;
+  height: 5px;
+  gap: 1px;
+  margin: 0;
 }
 
-:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .segments {
-  height: 7px;
-  gap: 2px;
-  margin-top: 5px;
+:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .window-top > b {
+  order: 3;
+  flex: 0 0 auto;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+}
+
+:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .window-bottom {
+  order: 4;
+  flex: 0 0 auto;
+  margin: 0 0 0 auto;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--textMuted);
+  white-space: nowrap;
+  text-align: right;
+}
+
+:root[data-theme=compact-strip] #widget.widget .window-bottom :is(.pace, .pace-context) {
+  display: none;
 }
 
 :root[data-theme=compact-strip] #widget.widget .segments i {
@@ -96,27 +143,21 @@
   max-width: none;
   height: 100%;
   background: var(--bgTrackOff);
-  border-radius: 2px;
+  border-radius: 1px;
 }
 
 :root[data-theme=compact-strip] #widget.widget .segments i.on {
   background: var(--level, var(--severityNormal));
 }
 
-:root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .window-bottom {
-  margin-top: 4px;
-  font-size: 11px;
-  line-height: 1.25;
-  color: var(--textMuted);
-}
-
 :root[data-theme=compact-strip] #widget.widget .provider-card[data-usage-compact=true] .provider-heading {
-  padding-bottom: 2px;
+  padding-bottom: 1px;
   margin-bottom: 2px;
 }
 
 :root[data-theme=compact-strip] #widget.widget .provider-card[data-usage-compact=true] .quota-window {
-  padding: 2px 6px;
+  min-height: 24px;
+  padding: 2px 4px 2px 6px;
 }
 
 :root[data-theme=compact-strip] #widget.widget .footer {
