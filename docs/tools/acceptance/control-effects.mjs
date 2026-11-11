@@ -622,6 +622,7 @@ try {
     }
 
     // Provider colors
+    await navCategory('providers');
     const claudeColor = $s('input[data-provider-color="claude"]');
     const claudeReset = $s('input[data-provider-color="claude"] + button');
     if (claudeColor && claudeReset) {

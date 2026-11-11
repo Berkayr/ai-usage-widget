@@ -490,7 +490,6 @@ colorWarning.id = 'provider-color-warning';
 colorWarning.className = 'setting-note';
 colorWarning.setAttribute('role', 'status');
 colorControls.append(colorWarning);
-sections.colors.append(colorControls);
 const mode = matchMedia('(prefers-color-scheme:light)');
 function themePalette(t = themes.find(t => t.id === draft.theme) || themes[0],
                       key = draft.palette) {
@@ -524,7 +523,7 @@ sectionBlock(sections.colors, 'Colors', [
   control('accent'), control('background'), control('widget-opacity'),
   control('background-opacity'), control('accent-edge')
 ]);
-sections.colors.append(colorControls);
+sections.providers.append(colorControls);
 sectionBlock(sections.theme, 'Theme details', [control('dot-count'), control('reactor-motion')]);
 $('.look-section').remove();
 $('.theme-section legend').classList.remove('sr-only');
@@ -544,7 +543,6 @@ const historyControls = sectionBlock(sections.history, 'Usage history', []);
 historyControls.insertAdjacentHTML('beforeend', `
 <label class="toggle-setting">Show usage history<input id="history-enabled" type="checkbox"></label>
 <label class="toggle-setting">Read Claude Code logs<input id="local-history" type="checkbox"></label>
-<p class="setting-note">Counts tokens from this computer's logs. Nothing is stored.</p>
 <label>Show history<select id="history-mode"><option value="under">Under each card</option><option value="card">Click a card</option><option value="panel">Side panel</option></select></label>`);
 const historyExtras = sectionBlock(sections.history, 'Extras', []);
 historyExtras.insertAdjacentHTML('beforeend', `

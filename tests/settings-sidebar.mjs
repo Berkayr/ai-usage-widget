@@ -50,6 +50,7 @@ try {
     check(kids('#category-shape-size')[2].id === 'widget-provider-choices', 'Circle/pill provider choices follow Shape');
     check(kids('#category-display')[0].tagName === 'H1' && kids('#category-display')[1].id === 'monitor-map', 'Monitor map is the first Display control');
     check(!$('#category-general').hidden, 'Default category');
+    check($('#category-history').textContent.split("Counts tokens from this computer's logs. Nothing is stored.").length - 1 === 1, 'History privacy explanation appears once');
     $('[data-category=general]').focus();
     document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true}));
     check(document.activeElement.dataset.category === 'theme' && !$('#category-theme').hidden, 'Down selects and focuses');
@@ -132,10 +133,10 @@ try {
   const destinations = {
     general:['start-at-login','show-extra-windows','quote-enabled','quote-position','quote-mode','quote-navigation','autostart-status'],
     theme:['theme-picker','dot-count','reactor-motion'],
-    colors:['palette','palette-grid','palette-tools','appearance','color-mode','accent','background','widget-opacity','background-opacity','accent-edge','provider-colors'],
+    colors:['palette','palette-grid','palette-tools','appearance','color-mode','accent','background','widget-opacity','background-opacity','accent-edge'],
     'shape-size':['scale','size-mode','fit-screen','reset-fine-tune','fit-height','match-physical-size','fit-fraction','fit-fine-tune','widget-provider-choices'],
     display:['reserved-top','reserved-bottom','position','place','lock-position','monitor-map','map-widget','placement-monitor','snap','disconnected','fallback-monitor','save-position','cancel-position','linux-layer','linux-margin','linux-monitor'],
-    providers:['provider-settings','provider-order','featured-provider','featured-position'],
+    providers:['provider-settings','provider-order','featured-provider','featured-position','provider-colors'],
     taskbar:['taskbar-enabled','taskbar-style','taskbar-theme','taskbar-window','taskbar-bars'],
     about:['runtime-diagnostics','app-version','data-folder']
   };
@@ -157,6 +158,14 @@ try {
             tab.click();
             const content = document.querySelector('.settings-content');
             if (content.scrollWidth > content.clientWidth + 1 || document.documentElement.scrollWidth > innerWidth) throw Error('Overflow: ' + tab.dataset.category + ' at ' + innerWidth);
+            const nav = document.querySelector('[role=tablist]'), navRect = nav.getBoundingClientRect(), tabRect = tab.getBoundingClientRect();
+            if (innerWidth < 560 && (tabRect.left < navRect.left || tabRect.right > navRect.right)) throw Error('Active tab is not fully visible: ' + tab.dataset.category);
+            if (tab.scrollWidth > tab.clientWidth + 1) throw Error('Tab label is clipped: ' + tab.dataset.category);
+            if (innerWidth < 560 && tab.dataset.category === 'display' && document.querySelector('#monitor-map').getBoundingClientRect().height > 161) throw Error('Narrow monitor map is too tall');
+            if (innerWidth < 560 && tab.dataset.category === 'providers') {
+              const color = document.querySelector('[data-provider-color=claude]'), reset = color.nextElementSibling;
+              if (Math.abs(color.getBoundingClientRect().top - reset.getBoundingClientRect().top) > 2) throw Error('Provider color controls do not share a row');
+            }
           }
           if (innerWidth < 560 && document.querySelector('[role=tablist]').scrollWidth <= document.querySelector('[role=tablist]').clientWidth) throw Error('Narrow category tabs are not scrollable');
           return document.querySelector('[role=tablist]').getAttribute('aria-orientation');
@@ -169,7 +178,7 @@ try {
             await b.evaluate(`document.querySelector('[data-category=${category}]').click();document.querySelector('.settings-content').scrollTop=0`);
             const png = await b.cdp('Page.captureScreenshot',{format:'png'});
             await writeFile(screenshots + '/' + category + '-' + scheme + '-' + width + '.png',Buffer.from(png.data,'base64'));
-            const details = category === 'colors' ? ['palette-grid','provider-colors'] : category === 'shape-size' ? ['scale'] : category === 'display' ? ['place'] : [];
+            const details = category === 'colors' ? ['palette-grid'] : category === 'providers' ? ['provider-colors'] : category === 'shape-size' ? ['scale'] : category === 'display' ? ['place'] : [];
             for (const id of details) {
                 await b.evaluate(`document.getElementById('${id}').scrollIntoView({block:'center'})`);
                 const detail = await b.cdp('Page.captureScreenshot',{format:'png'});

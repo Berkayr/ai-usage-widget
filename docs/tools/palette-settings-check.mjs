@@ -3,6 +3,8 @@ export async function auditPaletteSettings(b) {
   await b.navigate('/?settings','window.__SETTINGS_READY__');
   console.log(await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,m)=>{if(!v)throw Error(m)};
+    assert($('#provider-colors')?.closest('#category-providers'),'Provider colors belong to Providers');
+    assert(!$('#category-colors').contains($('#provider-colors')),'Colors stays focused on general palette controls');
     const click=text=>[...document.querySelectorAll('#palette-tools button')].find(b=>b.textContent===text).click();
     const settle=()=>new Promise(r=>setTimeout(r,80));
     $('[data-category=colors]').click();click('New palette');
