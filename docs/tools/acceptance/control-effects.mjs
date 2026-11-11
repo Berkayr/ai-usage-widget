@@ -300,7 +300,7 @@ try {
     const expect = (ok, id, expected) => { if (!ok) recordFailure(id, 'browser', 'Control effect missing', expected); };
 
     // 1. Shell navigation buttons
-    const categories = ['general', 'theme', 'colors', 'shape-size', 'display', 'providers', 'history', 'about'];
+    const categories = ['general', 'quote', 'theme', 'colors', 'shape-size', 'display', 'providers', 'history', 'about'];
     for (const cat of categories) {
       const id = 'category:' + cat;
       const btn = $s(\`button[data-category="\${cat}"]\`);
@@ -314,6 +314,8 @@ try {
       if (!sec || sec.hidden) {
         recordFailure(id, 'all', 'Category section did not open or stayed hidden', 'Section shown');
       }
+      if (cat === 'quote' && sec?.querySelector('label input')?.id !== 'quote-enabled')
+        recordFailure(id, 'all', 'Quote enable control is not first', 'Show daily quote is the first Quote control');
       results.testedCount++;
     }
 

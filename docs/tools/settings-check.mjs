@@ -13,10 +13,11 @@ try {
   const check=await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)};
     assert($('#status').dataset.state!=='failure','Initialization: '+$('#status').textContent);
-    assert([...document.querySelectorAll('[data-category]')].map(b=>b.dataset.category).join(',')==='general,theme,colors,shape-size,display,providers,history,taskbar,about','Nine categories');
-    $('[data-category=general]').click();
+    assert([...document.querySelectorAll('[data-category]')].map(b=>b.dataset.category).join(',')==='general,quote,theme,colors,shape-size,display,providers,history,taskbar,about','Ten categories');
+    $('[data-category=quote]').click();
     assert(!$('#quote-enabled').checked,'Quote off by default');
-    assert($('#category-general').textContent.includes('Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.'),'Quote disclosure');
+    assert($('#category-quote').textContent.includes('Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.'),'Quote disclosure');
+    assert($('#category-quote').querySelector('label input').id==='quote-enabled','Quote enable switch first');
     $('#quote-enabled').click();
     assert($('#quote-position').value==='bottom','Default quote position');
     $('#quote-position').value='top';$('#quote-position').dispatchEvent(new Event('change'));
@@ -292,7 +293,7 @@ try {
     for(const platform of ['linux','windows']) {
       await b.navigate('/?settings&sample&platform='+platform,'window.__SETTINGS_READY__');
       const categories=await b.evaluate(`[...document.querySelectorAll('[data-category]')].filter(b=>!b.hidden).map(b=>b.dataset.category)`);
-      if(categories.length!==(platform==='windows'?9:8)||categories.includes('taskbar')!==(platform==='windows'))throw Error('Platform category visibility');
+      if(categories.length!==(platform==='windows'?10:9)||categories.includes('taskbar')!==(platform==='windows'))throw Error('Platform category visibility');
       for(const id of categories) {
         await b.evaluate(`document.querySelector('[data-category=${id}]').click();document.querySelector('.settings-content').scrollTop=0`);
         await b.evaluate(`(()=>{
@@ -324,7 +325,7 @@ try {
       }
     }
   }
-  console.log('PASS: all nine categories at 900 × 900 in light/dark with platform visibility; all five Save states captured');
+  console.log('PASS: all ten categories at 900 × 900 in light/dark with platform visibility; all five Save states captured');
   console.log(await b.evaluate(`(()=>{
     const $=s=>document.querySelector(s),assert=(v,m)=>{if(!v)throw Error(m)};
     $('[data-category=theme]').click();$('[data-category=theme]').click();$('[data-theme=system]').click();$('[data-category=shape-size]').click();$('[data-shape=portrait]').click();
@@ -376,7 +377,7 @@ try {
     const second=$('#widget-select').value;
     assert(first!==second,'IDs not unique');
     choose(first);$('[data-category=history]').click();$('#history-cost').click();
-    choose(second);$('[data-category=general]').click();$('#quote-enabled').click();await wait();
+    choose(second);$('[data-category=quote]').click();$('#quote-enabled').click();await wait();
     const before=native.saves.length;
     assert(parseInt($('#status').textContent)>=3,'Count must cover all widgets');
     $('#save').click();await wait();

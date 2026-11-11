@@ -43,17 +43,18 @@ try {
     const native = window.__FAKE_NATIVE__, wait = () => new Promise(r => setTimeout(r,30));
     const visible = () => [...document.querySelectorAll('[data-category]')].filter(t => !t.hidden);
     check($('#status').dataset.state === 'clean', 'Initialization: ' + $('#status').textContent);
-    check(visible().map(t => t.dataset.category).join() === 'general,theme,colors,shape-size,display,providers,history,about', 'Linux categories');
+    check(visible().map(t => t.dataset.category).join() === 'general,quote,theme,colors,shape-size,display,providers,history,about', 'Linux categories');
     check(!document.querySelector('[data-category=appearance]'), 'Appearance category removed');
     const kids = id => [...$(id).children].filter(el => !el.classList.contains('widget-reset'));
     check(kids('#category-shape-size')[1].classList.contains('shape-picker'), 'Shape is the first Shape & Size control');
     check(kids('#category-shape-size')[2].id === 'widget-provider-choices', 'Circle/pill provider choices follow Shape');
     check(kids('#category-display')[0].tagName === 'H1' && kids('#category-display')[1].id === 'monitor-map', 'Monitor map is the first Display control');
     check(!$('#category-general').hidden, 'Default category');
+    check($('#category-quote label input')?.id === 'quote-enabled', 'Quote tab starts with the enable switch');
     check($('#category-history').textContent.split("Counts tokens from this computer's logs. Nothing is stored.").length - 1 === 1, 'History privacy explanation appears once');
     $('[data-category=general]').focus();
     document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true}));
-    check(document.activeElement.dataset.category === 'theme' && !$('#category-theme').hidden, 'Down selects and focuses');
+    check(document.activeElement.dataset.category === 'quote' && !$('#category-quote').hidden, 'Down selects and focuses Quote');
     document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true}));
     check(document.activeElement.dataset.category === 'general', 'Up selects and focuses');
     document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true}));
@@ -129,9 +130,10 @@ try {
   assert.equal(await b.evaluate(`(${JSON.stringify(bindings)}).every(id => document.getElementById(id))`), true, 'All original binding IDs exist');
   assert.equal(await b.evaluate(`document.querySelector('#category-history').querySelectorAll('input,select').length`), 7);
   assert.equal(await b.evaluate(`/coming soon/i.test(document.querySelector('#category-history').textContent)`), false);
-  assert.equal(await b.evaluate(`document.querySelectorAll('#settings>section').length`), 9);
+  assert.equal(await b.evaluate(`document.querySelectorAll('#settings>section').length`), 10);
   const destinations = {
-    general:['start-at-login','show-extra-windows','quote-enabled','quote-position','quote-mode','quote-navigation','autostart-status'],
+    general:['start-at-login','show-extra-windows','autostart-status'],
+    quote:['quote-enabled','quote-mode','quote-position','quote-navigation'],
     theme:['theme-picker','dot-count','reactor-motion'],
     colors:['palette','palette-grid','palette-tools','appearance','color-mode','accent','background','widget-opacity','background-opacity','accent-edge'],
     'shape-size':['scale','size-mode','fit-screen','reset-fine-tune','fit-height','match-physical-size','fit-fraction','fit-fine-tune','widget-provider-choices'],
@@ -174,7 +176,7 @@ try {
         combinations++;
         if (screenshots && platform === 'windows' && width !== 559) {
           await mkdir(screenshots,{recursive:true});
-          for (const category of ['general','theme','colors','shape-size','display','providers','history','taskbar','about']) {
+          for (const category of ['general','quote','theme','colors','shape-size','display','providers','history','taskbar','about']) {
             await b.evaluate(`document.querySelector('[data-category=${category}]').click();document.querySelector('.settings-content').scrollTop=0`);
             const png = await b.cdp('Page.captureScreenshot',{format:'png'});
             await writeFile(screenshots + '/' + category + '-' + scheme + '-' + width + '.png',Buffer.from(png.data,'base64'));
@@ -201,9 +203,9 @@ try {
     return 'PASS: settings remain available across ' + themes.length + ' themes';
   })()`));
   assert.equal(await b.evaluate(`document.querySelectorAll('input[type=checkbox]:not([role=switch])').length`), 0, 'Every boolean uses a switch');
-  assert.equal(await b.evaluate(`document.querySelectorAll('[data-category] svg').length`), 9, 'Consistent menu SVGs');
+  assert.equal(await b.evaluate(`document.querySelectorAll('[data-category] svg').length`), 10, 'Consistent menu SVGs');
   assert.equal(await b.evaluate(`document.querySelectorAll('fieldset:not(.settings-group)').length`), 0, 'Every group has a separate card');
   const contrast = await auditSettings(b);
   assert.deepEqual(contrast.failures, [], 'Chrome text contrast');
-  console.log('PASS: nine categories, original bindings, platform visibility, History controls, storage, ' + combinations + ' responsive combinations, light/dark contrast');
+  console.log('PASS: ten categories, original bindings, platform visibility, History controls, storage, ' + combinations + ' responsive combinations, light/dark contrast');
 } finally { await b.close(); }

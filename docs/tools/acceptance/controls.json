@@ -9,6 +9,15 @@
     "selector": "button[data-category=\"general\"]"
   },
   {
+    "id": "category:quote",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Quote",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"quote\"]"
+  },
+  {
     "id": "category:theme",
     "where": "shell",
     "setting": null,
