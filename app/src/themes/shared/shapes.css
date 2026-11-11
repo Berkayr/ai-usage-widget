@@ -12,7 +12,7 @@
 /* Remove frame chrome before compressing core usage information. */
 :root[data-dense-shape=true] .widget{padding:.5rem;--size-gap:.375rem}
 :root[data-dense-shape=true] :is(.sync-line,.footer,.plan){display:none}
-:root[data-dense-shape=true] .header{height:2.25rem;padding-bottom:.25rem}
+:root[data-dense-shape=true] .header{height:2.25rem;min-height:0;padding-bottom:.25rem}
 :root[data-dense-shape=true] .provider-heading h2{font-size:max(var(--shape-min-font),.75rem)}
 :root[data-dense-shape=true] .status-badge{font-size:0;width:.5rem;height:.5rem;min-width:.5rem;padding:0;border-radius:50%;background:var(--severityWarning)}
 :root[data-dense-shape=true] .window-top{gap:.25rem}
@@ -185,15 +185,15 @@
 
 /* Theme card chrome can outrank the shared compact tier; keep its frame while
    reclaiming authored padding and row gaps when the measured card is too small. */
-:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true]{padding:2px 4px}
-:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .provider-heading{min-height:0;padding-block:0;margin-bottom:1px;gap:2px}
-:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .windows{gap:1px}
-:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{padding:0;gap:1px}
-:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .window-bottom{margin-top:0;line-height:1}
-:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] :is(.segments,.dot-bar){margin-top:1px}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true]{padding:2px 4px}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .provider-heading{min-height:0;padding-block:0;margin-bottom:1px;gap:2px}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .windows{gap:1px}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{padding:0;gap:1px}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .window-bottom{margin-top:0;line-height:1.4}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] :is(.segments,.dot-bar){margin-top:1px}
 :root[data-theme=circular-rings] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true]{column-gap:4px;row-gap:1px}
-:root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{grid-template-columns:38px minmax(0,1fr) 34px 40px!important;column-gap:2px!important;min-height:0!important}
-:root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .window-bottom>.reset{max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1}
+:root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{grid-template-columns:minmax(0,1fr) minmax(0,1fr) max-content max-content!important;column-gap:2px!important;min-height:0!important}
+:root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .window-bottom>.reset{max-width:100%;min-width:0;white-space:nowrap;line-height:1.4}
 :root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{padding:0!important;row-gap:0!important}
 :root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .window-bottom>:not(.reset){display:none!important}
 :root[data-theme=layer] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true]{height:100%!important;margin:0!important;overflow:hidden!important}
@@ -307,3 +307,42 @@
 :root[data-shape=strip] .widget .windows{flex:1 0 auto;align-content:space-evenly}
 :root[data-shape=strip] .widget .no-data{width:100%;min-height:0}
 :root[data-shape=strip] .widget .quote-section{display:none}
+
+/* Intrinsic text rows cannot shrink below their painted line boxes. */
+:root[data-theme] #widget.widget .provider-card:nth-child(n) .quota-window{flex-shrink:0}
+:root[data-theme] #widget.widget .provider-card:nth-child(n) .window-bottom{line-height:1.4}
+:root[data-theme] #widget.widget .provider-card:nth-child(n) .reset{line-height:1.4}
+:root[data-theme] #widget.widget .provider-card:nth-child(n) .window-top>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:root:is([data-dense-shape=true],[data-shape=pill]) #widget.widget .provider-card .status-badge{font-size:0;width:.5rem;height:.5rem;min-width:.5rem;padding:0;overflow:hidden}
+:root[data-shape=square] #widget.widget .windows{grid-template-columns:repeat(var(--window-count,2),minmax(0,1fr))}
+:root[data-shape=square] #widget.widget .provider-card .window-top b{font-size:max(var(--shape-min-font),1.125rem);line-height:1.4}
+
+:root[data-theme]:not([data-theme=crisp]):not([data-shape=square]) #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .windows:has(.quota-window:nth-child(3)){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:max-content;flex:0 0 auto;align-content:start}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{min-height:min-content}
+
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .windows{flex:1 0 auto;grid-auto-rows:max-content;align-content:space-evenly}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .pace{display:none}
+:root[data-shape=landscape] #widget.widget:has(.quota-window:nth-child(3)) .header{height:2.25rem;min-height:0;padding-bottom:.25rem}
+:root[data-shape=landscape] #widget.widget:has(.quota-window:nth-child(3)) :is(.sync-line,.footer){display:none}
+
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .history-card-hint{display:none}
+:root[data-shape=landscape] #widget.widget:has(.quota-window:nth-child(3)) .quote-section{height:5.5rem}
+:root[data-shape=landscape] #widget.widget:has(.quota-window:nth-child(3)) :is(.quote-label,.quote-reason){display:none}
+/* Measured landscape compaction owns the columns even for custom theme rows. */
+:root[data-shape=landscape][data-quote=true]:not([data-theme=crisp]) #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .windows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:max-content;align-content:space-evenly}
+:root[data-theme] #widget.widget .provider-card:nth-child(n) .window-top{flex-wrap:nowrap}
+:root[data-theme]:not([data-shape=pill]) #widget.widget .provider-card:nth-child(n) .window-top b{line-height:1.4}
+:root[data-shape=landscape] #widget.widget:has(.quota-window:nth-child(3)) #providers{padding-bottom:0}
+/* Extra windows use one heading line before sacrificing quota/reset text. */
+:root[data-theme]:not([data-theme=crisp]):not([data-theme=compact-strip]) #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .windows:has(.quota-window:nth-child(3)) .window-top{display:flex;flex-direction:row;align-items:baseline;gap:.125rem}
+:root[data-theme]:not([data-theme=crisp]):not([data-theme=compact-strip]) #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .windows:has(.quota-window:nth-child(3)) .window-top b{margin-top:0}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .plan{display:none}
+:root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .status-badge{white-space:nowrap;flex-shrink:0}
+
+:root[data-shape=landscape] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .windows:has(.quota-window:nth-child(3)) :is(.meter,.segments,.dot-bar){height:.25rem;margin-top:1px}
+/* The micro tier spends meter height before reducing readable text. */
+:root[data-shape=portrait][data-micro-shape=true] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] :is(.meter,.segments,.dot-bar){height:.25rem;margin-top:1px}
+
+/* Paired capsules keep their authored distribution when compact text leaves room. */
+:root[data-shape=landscape]:is([data-theme=frosted-glass],[data-theme=retro-lcd]) #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .windows{grid-auto-rows:minmax(min-content,1fr)}
+:root[data-shape=landscape]:is([data-theme=frosted-glass],[data-theme=retro-lcd]) #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{justify-content:space-around}

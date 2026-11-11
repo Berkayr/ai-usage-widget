@@ -1,4 +1,6 @@
-const overflows = card => card.scrollHeight > card.clientHeight || card.scrollWidth > card.clientWidth;
+const boxOverflows = el => el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
+// A constrained grid can overlap its own heading without overflowing the card.
+const overflows = el => boxOverflows(el) || (el.classList.contains('provider-card') && [...el.querySelectorAll('.windows,.quota-window')].some(boxOverflows));
 
 // Observe content and font changes; Portrait also grows within existing type tiers.
 export function observeUsageFit(root) {
