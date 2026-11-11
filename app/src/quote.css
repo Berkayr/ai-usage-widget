@@ -65,3 +65,29 @@
 :root[data-shape=circle] .quote-source{min-height:0;line-height:1.4;margin-right:0}
 /* The pill quote icon has no text baseline or inherited theme separator. */
 :root[data-shape=pill] .quote-section{display:flex;align-items:center;border:0}
+
+/* Short silhouettes reserve the majority of the frame for usage. */
+:root[data-quote=true][data-shape=landscape] .widget .header{height:2rem;min-height:2rem;padding-bottom:.25rem}
+:root[data-quote=true][data-shape=landscape] .widget .sync-line{display:none}
+:root[data-shape=landscape] .widget .quote-section{height:3.5rem;padding:.125rem 0}
+:root[data-shape=landscape] .widget .quote-content{display:flex;flex-direction:column;padding-block:0}
+:root[data-shape=landscape] .widget .quote-label{line-height:1.4;margin:0;width:calc(100% - 3rem);padding-right:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root[data-shape=landscape] .widget .quote-text{flex:1;max-height:2.8em;line-height:1.4}
+:root[data-shape=landscape] .widget :is(.quote-author,.quote-reason,.quote-source){display:none}
+:root[data-shape=landscape] .widget .quote-nav{top:0;bottom:auto}
+
+/* The square quote page shares the frame with usage instead of covering it. */
+:root[data-shape=square][data-quote-page=true] .widget .provider-list{visibility:visible}
+:root[data-shape=square][data-quote-page=true] .widget .quote-section{position:relative;inset:auto;height:3.5rem;background:transparent}
+:root[data-shape=square][data-quote-page=true] .widget .quote-content{display:flex;padding:0}
+:root[data-shape=square] .widget .quote-toggle{position:absolute;top:0;right:0}
+:root[data-shape=square][data-quote-page=true] .widget .quote-toggle{right:3rem;z-index:1}
+:root[data-shape=square][data-quote-page=true] .widget .quote-label{margin:0;width:calc(100% - 7rem);padding-right:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root[data-shape=square][data-quote-page=true] .widget .quote-text{font-size:11px;line-height:1.4;max-height:2.8em}
+:root[data-shape=square][data-quote-page=true] .widget :is(.quote-author,.quote-reason,.quote-source){display:none}
+:root[data-shape=square][data-quote-page=true] .widget .quote-nav{top:0;bottom:auto}
+:root[data-shape=square][data-quote-page=true] .widget .header{height:2rem;min-height:2rem}
+:root[data-shape=square][data-quote-page=true] .widget :is(.sync-line,.footer){display:none}
+:root:is([data-shape=landscape],[data-shape=square]) .widget .quote-nav button,:root[data-shape=square] .widget .quote-toggle{height:1.4em;line-height:1;padding:0 .125rem}
+
+:root[data-shape=square][data-small-size=true][data-quote-page=true] #widget.widget:has(.quota-window:nth-child(3)) .quote-text{width:calc(100% - 7rem);padding-right:0}
