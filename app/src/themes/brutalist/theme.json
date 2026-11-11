@@ -35,7 +35,7 @@
         "severityDanger": "#b91c1c",
         "providerColors": [
           "#137a37",
-          "#0072b2",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -66,13 +66,13 @@
         "textSecondary": "#474a36",
         "textMuted": "#60644f",
         "border": "#000000",
-        "accent": "#71850f",
-        "severityNormal": "#71850f",
+        "accent": "#4d5e00",
+        "severityNormal": "#4d5e00",
         "severityWarning": "#925000",
         "severityDanger": "#b91c1c",
         "providerColors": [
-          "#71850f",
-          "#0072b2",
+          "#4d5e00",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -109,7 +109,7 @@
         "severityDanger": "#b91c1c",
         "providerColors": [
           "#85150f",
-          "#0072b2",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -146,7 +146,7 @@
         "severityDanger": "#b91c1c",
         "providerColors": [
           "#0f2c85",
-          "#0072b2",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -177,13 +177,13 @@
         "textSecondary": "#4a4736",
         "textMuted": "#64614f",
         "border": "#000000",
-        "accent": "#85750f",
-        "severityNormal": "#85750f",
+        "accent": "#665800",
+        "severityNormal": "#665800",
         "severityWarning": "#925000",
         "severityDanger": "#b91c1c",
         "providerColors": [
-          "#85750f",
-          "#0072b2",
+          "#665800",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -220,7 +220,7 @@
         "severityDanger": "#b91c1c",
         "providerColors": [
           "#850f4a",
-          "#0072b2",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -257,7 +257,7 @@
         "severityDanger": "#b91c1c",
         "providerColors": [
           "#85400f",
-          "#0072b2",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -288,13 +288,13 @@
         "textSecondary": "#364a3b",
         "textMuted": "#4f6454",
         "border": "#000000",
-        "accent": "#0f852c",
-        "severityNormal": "#0f852c",
+        "accent": "#0b6b22",
+        "severityNormal": "#0b6b22",
         "severityWarning": "#925000",
         "severityDanger": "#b91c1c",
         "providerColors": [
-          "#0f852c",
-          "#0072b2",
+          "#0b6b22",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -331,7 +331,7 @@
         "severityDanger": "#b91c1c",
         "providerColors": [
           "#540f85",
-          "#0072b2",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -362,13 +362,13 @@
         "textSecondary": "#36484a",
         "textMuted": "#4f6264",
         "border": "#000000",
-        "accent": "#0f7b85",
-        "severityNormal": "#0f7b85",
+        "accent": "#0b646e",
+        "severityNormal": "#0b646e",
         "severityWarning": "#925000",
         "severityDanger": "#b91c1c",
         "providerColors": [
-          "#0f7b85",
-          "#0072b2",
+          "#0b646e",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -405,7 +405,7 @@
         "severityDanger": "#b91c1c",
         "providerColors": [
           "#852c0f",
-          "#0072b2",
+          "#005f96",
           "#a33278"
         ]
       },
@@ -442,7 +442,7 @@
         "severityDanger": "#b91c1c",
         "providerColors": [
           "#7b0f85",
-          "#0072b2",
+          "#005f96",
           "#a33278"
         ]
       },

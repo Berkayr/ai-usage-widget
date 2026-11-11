@@ -1,26 +1,227 @@
 @import '../shared/layout.css';
 @import '../shared/grid.css';
-.widget {font-family:Inter,sans-serif;border-radius:22px}
-.provider-card {border-radius:16px;display:grid;grid-template-rows:auto minmax(0,1fr) auto}
-.ring-display {position:relative;width:100%;aspect-ratio:1;align-self:center;margin:0 auto .375rem;pointer-events:none}
-.ring-display svg {display:block;width:100%;height:100%;fill:none;stroke-width:9;stroke-linecap:round}
-.ring-track {stroke:var(--bgTrackOff)}
-.ring-value {stroke:currentColor;color:var(--severityNormal)}
-.ring-center {position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
-.ring-center strong {font-size:var(--size-font-number);line-height:1.2;font-variant-numeric:tabular-nums}
-.ring-center small {font-size:var(--size-font-small);color:var(--textSecondary)}
-.windows {gap:.375rem}
-.quota-window {min-height:0}
-.window-top {gap:.25rem}
-.window-top b {font-size:var(--size-font-base)}
-.window-bottom {margin-top:.125rem}
-/* A single/odd last provider uses the full row, with the same large ring at left. */
-.provider-card.featured-provider:nth-child(n) {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr);column-gap:0}
-.provider-card.featured-provider:nth-child(n) .provider-heading {grid-column:1/-1}
-.provider-card.featured-provider:nth-child(n) .windows {align-self:center;padding-left:.5rem}
-.provider-card.featured-provider:nth-child(n) :is(.balance-row,.empty-window) {grid-column:1/-1}
-.reset,.pace,.plan,.status-badge,.sync-line {font-family:JetBrainsMono,monospace}
-.provider-card.featured-provider:nth-child(n) .ring-display {margin:0}
-.provider-heading {min-height:1.75rem}
-:root[data-narrow-viewport=true] .provider-card.featured-provider:nth-child(n) {display:block}
-:root[data-narrow-viewport=true] .provider-card.featured-provider:nth-child(n) .windows {padding-left:0}
+
+:root[data-theme=circular-rings] .widget {
+  font-family: Inter, sans-serif;
+}
+
+:root[data-theme=circular-rings]:not([data-shape=circle]):not([data-shape=pill]) .widget {
+  border-radius: 18px;
+}
+
+:root[data-theme=circular-rings]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .provider-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bgCard);
+}
+
+:root[data-theme=circular-rings]:is([data-shape=portrait],[data-shape=landscape],[data-shape=strip]):not([data-dense-shape=true]) #widget.widget .provider-card:nth-child(n) {
+  display: grid;
+  grid-template-columns: minmax(84px, 36%) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  column-gap: 12px;
+  row-gap: 6px;
+  align-items: center;
+  padding: 10px 12px;
+}
+
+:root[data-theme=circular-rings]:is([data-shape=portrait],[data-shape=landscape],[data-shape=strip]):not([data-dense-shape=true]) #widget.widget .provider-card:nth-child(n) .provider-heading {
+  grid-column: 1 / -1;
+  min-height: 26px;
+  padding-bottom: 5px;
+  margin-bottom: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+}
+
+:root[data-theme=circular-rings] .widget .provider-heading h2 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+:root[data-theme=circular-rings] .widget :is(.reset, .pace, .plan, .status-badge, .sync-line) {
+  font-family: JetBrainsMono, monospace;
+}
+
+:root[data-theme=circular-rings] .widget :is(.plan, .status-badge) {
+  font-size: 11px;
+  line-height: 1.3;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+:root[data-theme=circular-rings] .widget .ring-display {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  align-self: center;
+  justify-self: center;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+:root[data-theme=circular-rings]:is([data-shape=portrait],[data-shape=landscape],[data-shape=strip]):not([data-dense-shape=true]) #widget.widget .provider-card:nth-child(n) .ring-display {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  max-width: 100px;
+  max-height: 100px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:root[data-theme=circular-rings] #widget.widget .ring-display svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  fill: none;
+  stroke-width: 8.5;
+  stroke-linecap: round;
+}
+
+:root[data-theme=circular-rings] .widget .ring-track {
+  stroke: var(--bgTrackOff);
+}
+
+:root[data-theme=circular-rings] .widget .ring-value {
+  stroke: currentColor;
+  color: var(--severityNormal);
+}
+
+:root[data-theme=circular-rings] .widget .ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 14px;
+}
+
+:root[data-theme=circular-rings]:not([data-dense-shape=true]) #widget.widget .ring-center strong {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--textPrimary);
+}
+
+:root[data-theme=circular-rings]:not([data-dense-shape=true]) #widget.widget .ring-center small {
+  font-size: 11px;
+  line-height: 1.15;
+  color: var(--textSecondary);
+  margin-top: 2px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root[data-theme=circular-rings][data-dense-shape=true] #widget.widget .ring-secondary {
+  display: block;
+  font-size: 11px;
+  line-height: 1.1;
+  color: var(--textSecondary);
+  margin-top: 2px;
+}
+
+:root[data-theme=circular-rings]:is([data-shape=portrait],[data-shape=landscape],[data-shape=strip]):not([data-dense-shape=true]) #widget.widget .provider-card:nth-child(n) .windows {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-self: stretch;
+  gap: 6px;
+  padding-left: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+:root[data-theme=circular-rings]:is([data-shape=portrait],[data-shape=landscape],[data-shape=strip]):not([data-dense-shape=true]) #widget.widget .provider-card:nth-child(n) :is(.balance-row, .empty-window) {
+  grid-column: 1 / -1;
+}
+
+:root[data-theme=circular-rings]:is([data-shape=portrait],[data-shape=landscape],[data-shape=strip]):not([data-dense-shape=true]) #widget.widget .provider-card:nth-child(n) .quota-window {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  min-width: 0;
+}
+
+:root[data-theme=circular-rings] #widget.widget .window-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+:root[data-theme=circular-rings]:not([data-shape=pill]) #widget.widget .window-top > span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--textSecondary);
+}
+
+:root[data-theme=circular-rings]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .window-top b {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+:root[data-theme=circular-rings] #widget.widget .segments {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: stretch;
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+:root[data-theme=circular-rings]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .segments {
+  height: 6px;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+:root[data-theme=circular-rings] #widget.widget .segments i {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  height: 100%;
+  background: var(--bgTrackOff);
+  border-radius: 999px;
+}
+
+:root[data-theme=circular-rings] #widget.widget .segments i.on {
+  background: var(--level, var(--severityNormal));
+}
+
+:root[data-theme=circular-rings]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .window-bottom {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--textMuted);
+}
+
+:root[data-theme=circular-rings] #widget.widget .provider-card[data-usage-compact=true] .ring-display {
+  max-width: 72px;
+  max-height: 72px;
+}
+
+:root[data-theme=circular-rings] #widget.widget .footer {
+  font-size: 11px;
+}
+
+:root[data-theme=circular-rings][data-narrow-viewport=true] #widget.widget .provider-card:nth-child(n) {
+  grid-template-columns: minmax(0, 1fr);
+}

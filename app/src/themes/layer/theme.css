@@ -1,22 +1,23 @@
 @import '../shared/layout.css';
-.widget {font-family:system-ui,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums}
+:root[data-theme=layer] .widget {font-family:system-ui,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums}
 /* Keep shared renderer labels and unknown states while drawing a continuous track. */
-:root[data-theme=layer] .widget .segments {display:block;width:100%;height:var(--size-meter);margin:.375rem 0 0;background:var(--bgTrackOff);border-radius:999px;overflow:hidden}
+:root[data-theme=layer] .widget .segments {display:block;width:100%;height:6px;margin:6px 0 0;background:var(--bgTrackOff);border-radius:999px;overflow:hidden;flex-shrink:0}
 :root[data-theme=layer] .widget .segments>i {display:none}
 :root[data-theme=layer] .widget .segments::before {content:'';display:block;width:var(--used);height:100%;background:var(--level);border-radius:inherit}
 :root[data-theme=layer] .widget .segments.unknown {background:repeating-linear-gradient(135deg,var(--bgTrackOff) 0 3px,transparent 3px 6px);border:1px dashed var(--textMuted)}
 :root[data-theme=layer] .widget .segments.unknown::before {display:none}
 
-:root[data-theme=layer] .widget {border:0;border-radius:8px;box-shadow:0 8px 28px #0002}
-:root[data-theme=layer]:not([data-shape=pill]):not([data-shape=circle]) .widget .header {height:auto;min-height:var(--size-header);margin:calc(-1 * var(--size-pad)) calc(-1 * var(--size-pad)) var(--size-gap);padding:.5rem var(--size-pad);background:color-mix(in srgb,var(--accent) 9%,var(--bgWidget));border-bottom:1px solid var(--border)}
-:root[data-theme=layer] .widget .provider-card {background:transparent;border:0;border-radius:0;box-shadow:none}
-:root[data-theme=layer] .widget .quota-window+.quota-window {border-top:1px solid var(--border);padding-top:.5rem}
-:root[data-theme=layer] .widget .provider-heading h2 {display:flex;align-items:center;gap:.5rem;font-weight:600}
-/* An original four-pane app mark, rather than a copied provider logo. */
-:root[data-theme=layer] .widget .segments {height:4px}
-:root[data-theme=layer] .widget .segments::before {background:var(--accent)}
-:root[data-theme=layer] .widget .window-top b {font-weight:600}
-:root[data-theme=layer] #widget.widget > footer.footer {display:none}
-
-:root[data-theme=layer] .widget .segments {flex-shrink:0}
+:root[data-theme=layer]:not([data-shape=circle]):not([data-shape=pill]) .widget {border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,0.16)}
+:root[data-theme=layer]:not([data-shape=pill]):not([data-shape=circle]) .widget .header {height:auto;min-height:var(--size-header);margin:calc(-1 * var(--size-pad)) calc(-1 * var(--size-pad)) var(--size-gap);padding:8px var(--size-pad);background:color-mix(in srgb,var(--accent) 9%,var(--bgWidget));border-bottom:1px solid var(--border)}
+:root[data-theme=layer]:not([data-shape=pill]) .widget .provider-card {background:var(--bgCard);border:1px solid var(--border);border-radius:8px;box-shadow:inset 2px 0 var(--provider-identity),inset 0 1px 0 color-mix(in srgb,var(--textPrimary) 8%,transparent),0 2px 6px rgba(0,0,0,0.12)}
+:root[data-theme=layer][data-color-mode=mono]:not([data-shape=pill]) .widget .provider-card {box-shadow:inset 2px 0 var(--textPrimary)}
+:root[data-theme=layer]:not([data-shape=pill]):not([data-shape=square]) .widget .provider-heading {padding-bottom:6px;margin-bottom:4px;border-bottom:1px solid color-mix(in srgb,var(--border) 60%,transparent)}
+:root[data-theme=layer]:not([data-shape=pill]):not([data-shape=square]) .widget .provider-heading h2 {display:flex;align-items:center;gap:8px;font-size:max(var(--shape-min-font),15px);font-weight:600}
+:root[data-theme=layer]:not([data-shape=pill]) .widget :is(.plan,.status-badge) {font-size:max(var(--shape-min-font),11px);border-radius:4px;padding:1px 6px;background:color-mix(in srgb,var(--bgWidget) 50%,var(--bgCard))}
+:root[data-theme=layer]:not([data-shape=pill]):not([data-shape=square]) .widget .quota-window {display:flex;flex-direction:column;justify-content:center}
+:root[data-theme=layer]:not([data-shape=pill]):not([data-shape=square]) .widget .quota-window+.quota-window {border-top:1px solid color-mix(in srgb,var(--border) 75%,transparent);padding-top:8px}
+:root[data-theme=layer] .widget .provider-card[data-usage-compact=true] .quota-window+.quota-window {padding-top:4px}
+:root[data-theme=layer]:not([data-shape=pill]) .widget .window-top>span {font-size:max(var(--shape-min-font),13px);font-weight:500;color:var(--textSecondary)}
+:root[data-theme=layer]:not([data-shape=pill]):not([data-shape=square]) .widget .window-top b {font-size:max(var(--shape-min-font),16px);font-weight:600}
+:root[data-theme=layer]:not([data-shape=pill]) .widget .window-bottom {font-size:max(var(--shape-min-font),11px)}
 :root[data-theme=layer][data-color-mode=mono] .widget .segments::before {background:var(--textPrimary);box-shadow:none}
