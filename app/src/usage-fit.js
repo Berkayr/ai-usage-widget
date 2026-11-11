@@ -18,6 +18,9 @@ export function observeUsageFit(root) {
 
 export function fitUsage(root) {
   if (!root.clientHeight) return;
+  const {shape, quote, quotePage} = document.documentElement.dataset;
+  const sharedQuote = quote === 'true' && (shape === 'landscape' || (shape === 'square' && quotePage === 'true'));
+  root.style.minHeight = sharedQuote ? `${root.closest('.widget').getBoundingClientRect().height * .55}px` : '';
   const cards = [...root.querySelectorAll('.provider-card')];
   for (const el of root.closest('.widget').querySelectorAll('[data-usage-font]')) {
     el.style.fontSize = el.dataset.usageFont;
@@ -30,6 +33,10 @@ export function fitUsage(root) {
   root.style.removeProperty('padding-bottom');
   for (const card of cards) {
     delete card.dataset.usageCompact;
+    delete card.dataset.usageStacked;
+    delete card.dataset.usageMetadata;
+    delete card.dataset.usageBadge;
+    delete card.dataset.usageInlineReset;
     card.style.removeProperty('padding-bottom');
     if (document.documentElement.dataset.shape === 'portrait') {
       card.style.removeProperty('min-height');
@@ -45,7 +52,11 @@ export function fitUsage(root) {
     }
   }
   cards.forEach(fitPortraitGraphics);
+  cards.forEach(stackNarrowWindows);
   cards.forEach(compactCard);
+  cards.forEach(stackNarrowWindows);
+  cards.forEach(compactCard);
+  cards.forEach(fitInlineResets);
   // Spend the existing compact tier before scrolling a long Portrait list.
   if (document.documentElement.dataset.shape === 'portrait' && overflows(root.closest('.widget'))) {
     cards.forEach(card => { card.dataset.usageCompact = 'true'; });
@@ -109,6 +120,49 @@ function fitPortraitGraphics(card) {
   ring.style.height = `${Math.max(labels, Math.min(ring.getBoundingClientRect().height, available))}px`;
 }
 
+// Intrinsic text widths catch collisions and ellipsis that scrollWidth misses.
+function stackNarrowWindows(card) {
+  const heading = card.querySelector('.provider-heading>div');
+  if (heading && heading.scrollWidth > heading.clientWidth) card.dataset.usageMetadata = 'hidden';
+  const badge = card.querySelector('.status-badge');
+  const name = heading?.querySelector('.provider-name');
+  const nameRange = document.createRange();
+  if (name) nameRange.selectNodeContents(name);
+  if (heading && badge && (heading.scrollWidth > heading.clientWidth || (name && nameRange.getBoundingClientRect().right > heading.getBoundingClientRect().right - 2))) {
+    badge.title = badge.textContent;
+    card.dataset.usageBadge = 'compact';
+  }
+  if (!['landscape', 'strip'].includes(document.documentElement.dataset.shape)) return;
+  const tooNarrow = [...card.querySelectorAll('.window-top')].some(row => {
+    if (!row.getClientRects().length || getComputedStyle(row).display === 'contents') return false;
+    const texts = [...row.children];
+    const needed = texts.reduce((sum, el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      return sum + range.getBoundingClientRect().width + parseFloat(getComputedStyle(el).fontSize) * .16;
+    }, Math.max(8, parseFloat(getComputedStyle(row).columnGap) || 0) + 8);
+    return needed > row.getBoundingClientRect().width;
+  });
+  if (tooNarrow) card.dataset.usageStacked = 'true';
+}
+
+// A shallow card can keep timing beside usage when all three labels fit whole.
+function fitInlineResets(card) {
+  if (!card.dataset.usageStacked || !overflows(card)) return;
+  const rows = [...card.querySelectorAll('.quota-window')];
+  const fits = rows.every(row => {
+    const texts = [...row.querySelectorAll('.window-top>span,.window-top>b,.reset')];
+    const needed = texts.reduce((sum, el) => {
+      const range = document.createRange();range.selectNodeContents(el);
+      return sum + range.getBoundingClientRect().width + parseFloat(getComputedStyle(el).fontSize)*.16;
+    }, 16);
+    const style = getComputedStyle(card);
+    const available = card.querySelector('.ring-display') ? card.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) : row.clientWidth;
+    return needed <= available;
+  });
+  if (fits) card.dataset.usageInlineReset = 'true';
+}
+
 function compactCard(card) {
   if (!overflows(card)) return;
   card.dataset.usageCompact = 'true';
@@ -116,7 +170,7 @@ function compactCard(card) {
   if (!overflows(card)) return;
   const texts = [...card.querySelectorAll('*')].filter(el => [...el.childNodes].some(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()) && parseFloat(getComputedStyle(el).fontSize) > 0);
   const sizes = texts.map(el => parseFloat(getComputedStyle(el).fontSize));
-  for (const el of texts) el.dataset.usageFont = el.style.fontSize;
+  for (const el of texts) if (!el.hasAttribute('data-usage-font')) el.dataset.usageFont = el.style.fontSize;
   // Existing small labels keep their authored size; newly reduced text stops at 11px.
   for (let reduction = .5; reduction <= Math.max(...sizes); reduction += .5) {
     texts.forEach((el, i) => {el.style.fontSize = `${Math.max(Math.min(11, sizes[i]), sizes[i] - reduction)}px`;});

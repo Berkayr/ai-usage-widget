@@ -33,3 +33,6 @@
 :root[data-theme=layer]:not([data-shape=pill]):not([data-shape=square]) .widget .window-top b {font-size:max(var(--shape-min-font),16px);font-weight:700}
 :root[data-theme=layer]:not([data-shape=pill]) .widget .window-bottom {font-size:max(var(--shape-min-font),11px);margin-top:4px}
 :root[data-theme=layer][data-color-mode=mono] .widget .segments::before {background:var(--textPrimary);box-shadow:none}
+
+/* The compact square uses less frame padding than the full-bleed band. */
+:root[data-theme=layer][data-shape=square][data-small-size=true] #widget.widget:has(.quota-window:nth-child(3)) .header {margin:0;padding-block:0}
