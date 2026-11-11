@@ -225,3 +225,17 @@
 :root[data-theme=circular-rings][data-narrow-viewport=true] #widget.widget .provider-card:nth-child(n) {
   grid-template-columns: minmax(0, 1fr);
 }
+
+/* Two reset labels fit beside the dial vertically, including long countdowns. */
+:root[data-theme=circular-rings][data-shape=landscape][data-quote=true] #widget.widget #providers .provider-card:nth-child(n)[data-usage-compact=true] .windows:not(:has(.quota-window:nth-child(3))) {
+  grid-template-columns: minmax(0, 1fr);
+}
+:root[data-theme=circular-rings][data-shape=landscape] #widget.widget:has(.provider-card[data-usage-compact=true]):not(:has(.quota-window:nth-child(3))) .quote-section {
+  height: 6rem;
+}
+:root[data-theme=circular-rings] #widget.widget #providers .provider-card[data-usage-compact=true] .ring-center {
+  padding: 0;
+}
+:root[data-theme=circular-rings] #widget.widget #providers .provider-card[data-usage-compact=true] .ring-center :is(strong,small) {
+  line-height: 1.4;
+}

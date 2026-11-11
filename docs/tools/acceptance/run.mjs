@@ -49,6 +49,7 @@ const fast = [
 ];
 
 const exhaustive = [
+  ['node', ['docs/tools/text-overlap-check.mjs']],
   ['node', ['docs/tools/size-audit.mjs']],
   ['node', ['docs/tools/theme-identity-check.mjs']],
   ['node', ['docs/tools/contrast-audit.mjs']],
