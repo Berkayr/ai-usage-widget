@@ -1,21 +1,36 @@
 @import '../shared/layout.css';
-:root[data-theme=aurora] .widget {font-family:system-ui,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums}
-/* Keep shared renderer labels and unknown states while drawing a continuous track. */
-:root[data-theme=aurora] .widget .segments {display:block;width:100%;height:8px;margin:6px 0 0;background:var(--bgTrackOff);border-radius:999px;overflow:hidden;flex-shrink:0}
+:root[data-theme=aurora] .widget {font-family:system-ui,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;font-weight:400;letter-spacing:0.2px}
+/* Continuous aurora ribbon track with soft luminescence and preserved severity states. */
+:root[data-theme=aurora] .widget .segments {display:block;width:100%;height:7px;margin:7px 0 0;background:color-mix(in srgb,var(--bgTrackOff) 72%,transparent);border-radius:999px;box-shadow:inset 0 1px 2px rgba(4,8,22,0.35);overflow:visible;flex-shrink:0}
 :root[data-theme=aurora] .widget .segments>i {display:none}
-:root[data-theme=aurora] .widget .segments::before {content:'';display:block;width:var(--used);height:100%;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 70%,#2dd4bf),var(--level));border-radius:inherit}
-:root[data-theme=aurora] .widget .quota-window:has(b[data-severity=warning]) .segments::before,:root[data-theme=aurora] .widget .quota-window:has(b[data-severity=danger]) .segments::before {background:var(--level)}
-:root[data-theme=aurora] .widget .segments.unknown {background:repeating-linear-gradient(135deg,var(--bgTrackOff) 0 3px,transparent 3px 6px);border:1px dashed var(--textMuted)}
+:root[data-theme=aurora] .widget .segments::before {content:'';display:block;width:var(--used);max-width:100%;height:100%;background:linear-gradient(90deg,#2dd4bf 0%,#4ade80 48%,#c084fc 100%);border-radius:999px;box-shadow:0 0 10px color-mix(in srgb,var(--accent) 45%,transparent),0 0 4px rgba(74,222,128,0.35)}
+:root[data-theme=aurora][data-mode=light] .widget .segments::before {background:linear-gradient(90deg,#0d9488 0%,#16a34a 50%,#7c3aed 100%);box-shadow:0 0 6px color-mix(in srgb,var(--accent) 30%,transparent)}
+:root[data-theme=aurora] .widget .quota-window:has(b[data-severity=warning]) .segments::before {background:linear-gradient(90deg,color-mix(in srgb,var(--severityWarning) 78%,#2dd4bf),var(--severityWarning));box-shadow:0 0 8px color-mix(in srgb,var(--severityWarning) 42%,transparent)}
+:root[data-theme=aurora] .widget .quota-window:has(b[data-severity=danger]) .segments::before {background:linear-gradient(90deg,color-mix(in srgb,var(--severityDanger) 80%,#c084fc),var(--severityDanger));box-shadow:0 0 8px color-mix(in srgb,var(--severityDanger) 45%,transparent)}
+:root[data-theme=aurora] .widget .segments.unknown {background:repeating-linear-gradient(135deg,var(--bgTrackOff) 0 3px,transparent 3px 6px);border:1px dashed var(--textMuted);box-shadow:none}
 :root[data-theme=aurora] .widget .segments.unknown::before {display:none}
 
-:root[data-theme=aurora]:not([data-shape=circle]):not([data-shape=pill]) .widget {border:1px solid var(--border);border-radius:14px;background-color:var(--bgWidget);background-image:radial-gradient(circle at 85% 8%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 55%),radial-gradient(circle at 15% 92%,color-mix(in srgb,var(--severityNormal) 12%,transparent),transparent 55%);box-shadow:0 8px 28px rgba(0,0,0,0.28)}
-:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=circle]) .widget .header {border-bottom:1px solid color-mix(in srgb,var(--border) 65%,transparent);padding-bottom:8px;margin-bottom:4px}
-:root[data-theme=aurora]:not([data-shape=pill]) .widget .provider-card {border-radius:10px;background:linear-gradient(155deg,color-mix(in srgb,var(--accent) 7%,var(--bgCard)),var(--bgCard) 65%);border:1px solid var(--border);box-shadow:inset 2px 0 var(--provider-identity),0 2px 8px rgba(0,0,0,0.12)}
-:root[data-theme=aurora][data-color-mode=mono]:not([data-shape=pill]) .widget .provider-card {box-shadow:inset 2px 0 var(--textPrimary)}
-:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=square]) .widget .provider-heading h2 {font-size:max(var(--shape-min-font),15px);font-weight:600}
-:root[data-theme=aurora]:not([data-shape=pill]) .widget :is(.plan,.status-badge) {font-size:max(var(--shape-min-font),11px);border-radius:999px;padding:1px 8px}
+/* Northern lights multi-stop curtain backdrop over deep night-sky surface. */
+:root[data-theme=aurora]:not([data-shape=circle]):not([data-shape=pill]) .widget {border:1px solid color-mix(in srgb,var(--accent) 32%,var(--border));border-radius:16px;background-color:var(--bgWidget);background-image:conic-gradient(from 200deg at 52% -8%,transparent 0deg,rgba(45,212,191,0.16) 42deg,rgba(74,222,128,0.13) 88deg,rgba(192,132,252,0.18) 138deg,transparent 195deg),radial-gradient(115% 60% at 14% 10%,rgba(45,212,191,0.22) 0%,rgba(52,211,153,0.10) 46%,transparent 76%),radial-gradient(110% 62% at 88% 18%,rgba(192,132,252,0.22) 0%,rgba(99,102,241,0.11) 48%,transparent 78%),radial-gradient(95% 50% at 50% 98%,color-mix(in srgb,var(--accent) 15%,transparent),transparent 72%);box-shadow:inset 0 1px 0 rgba(255,255,255,0.14),0 12px 32px rgba(4,7,20,0.42)}
+:root[data-theme=aurora][data-mode=light]:not([data-shape=circle]):not([data-shape=pill]) .widget {background-image:conic-gradient(from 200deg at 52% -8%,transparent 0deg,rgba(13,148,136,0.11) 42deg,rgba(22,163,74,0.09) 88deg,rgba(124,58,237,0.11) 138deg,transparent 195deg),radial-gradient(115% 60% at 14% 10%,rgba(45,212,191,0.18) 0%,transparent 72%),radial-gradient(110% 62% at 88% 18%,rgba(192,132,252,0.18) 0%,transparent 74%);box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 8px 24px rgba(15,23,42,0.10)}
+:root[data-theme=aurora]:is([data-shape=circle],[data-shape=pill]) .widget {background-color:var(--bgWidget);background-image:radial-gradient(circle at 25% 20%,rgba(45,212,191,0.22),transparent 60%),radial-gradient(circle at 80% 75%,rgba(192,132,252,0.22),transparent 62%)}
+
+/* Airy header and translucent 14px glass cards without System's left bar. */
+:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=circle]) .widget .header {border-bottom:1px solid color-mix(in srgb,var(--accent) 24%,transparent);padding-bottom:8px;margin-bottom:4px}
+:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=circle]) .widget .app-title {font-weight:400;letter-spacing:1.6px}
+:root[data-theme=aurora] .widget .beacon {box-shadow:0 0 8px var(--accent)}
+:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=circle]) .widget .gear {border-radius:10px;background:color-mix(in srgb,var(--bgCard) 65%,transparent);border:1px solid color-mix(in srgb,var(--accent) 28%,var(--border));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+:root[data-theme=aurora]:not([data-shape=pill]) #widget.widget .provider-card {border-radius:14px;background:linear-gradient(145deg,color-mix(in srgb,var(--bgCard) 64%,transparent) 0%,color-mix(in srgb,var(--bgWidget) 72%,transparent) 100%);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);border:1px solid color-mix(in srgb,var(--provider-identity,var(--accent)) 36%,color-mix(in srgb,var(--border) 70%,transparent));box-shadow:inset 0 1px 0 rgba(255,255,255,0.18),inset 0 18px 28px -18px color-mix(in srgb,var(--provider-identity,var(--accent)) 22%,transparent),0 6px 18px rgba(4,8,22,0.24)}
+:root[data-theme=aurora][data-mode=light]:not([data-shape=pill]) #widget.widget .provider-card {background:linear-gradient(145deg,color-mix(in srgb,var(--bgCard) 76%,transparent) 0%,color-mix(in srgb,var(--bgWidget) 68%,transparent) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,0.9),inset 0 16px 24px -18px color-mix(in srgb,var(--provider-identity,var(--accent)) 16%,transparent),0 4px 14px rgba(15,23,42,0.06)}
+:root[data-theme=aurora][data-color-mode=mono]:not([data-shape=pill]) #widget.widget .provider-card {border-color:var(--border);box-shadow:inset 0 1px 0 rgba(255,255,255,0.14)}
+
+/* Light, spacious typography and luminous divider inside each card. */
+:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=square]) .widget .provider-heading {padding-bottom:6px;margin-bottom:6px;border-bottom:1px solid color-mix(in srgb,var(--provider-identity,var(--accent)) 28%,transparent)}
+:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=square]) .widget .provider-heading h2 {font-size:max(var(--shape-min-font),15px);font-weight:500;letter-spacing:0.5px}
+:root[data-theme=aurora]:not([data-shape=pill]) .widget :is(.plan,.status-badge) {font-size:max(var(--shape-min-font),11px);font-weight:400;letter-spacing:0.6px;border-radius:999px;padding:1px 9px;background:color-mix(in srgb,var(--provider-identity,var(--accent)) 12%,transparent);border-color:color-mix(in srgb,var(--provider-identity,var(--accent)) 35%,var(--border))}
 :root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=square]) .widget .quota-window {display:flex;flex-direction:column;justify-content:center}
-:root[data-theme=aurora]:not([data-shape=pill]) .widget .window-top>span {font-size:max(var(--shape-min-font),13px);font-weight:500;color:var(--textSecondary)}
-:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=square]) .widget .window-top b {font-size:max(var(--shape-min-font),16px);font-weight:600}
-:root[data-theme=aurora]:not([data-shape=pill]) .widget .window-bottom {font-size:max(var(--shape-min-font),11px)}
+:root[data-theme=aurora]:not([data-shape=pill]) .widget .window-top>span {font-size:max(var(--shape-min-font),13px);font-weight:400;letter-spacing:0.3px;color:var(--textSecondary)}
+:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=square]) .widget .window-top b {font-size:max(var(--shape-min-font),16px);font-weight:500;letter-spacing:0.2px}
+:root[data-theme=aurora]:not([data-shape=pill]) .widget .window-bottom {font-size:max(var(--shape-min-font),11px);margin-top:4px;letter-spacing:0.3px}
+:root[data-theme=aurora]:not([data-shape=pill]):not([data-shape=circle]) .widget .footer {border-top:1px solid color-mix(in srgb,var(--accent) 22%,transparent);letter-spacing:0.8px;font-weight:400}
 :root[data-theme=aurora][data-color-mode=mono] .widget .segments::before {background:var(--textPrimary);box-shadow:none}
