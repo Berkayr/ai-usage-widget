@@ -7,7 +7,7 @@ try {
     const $=s=>document.querySelector(s), assert=(v,m)=>{if(!v)throw Error(m)};
     const click=text=>{const el=[...document.querySelectorAll('#palette-tools button')].find(b=>b.textContent===text);assert(el,'Missing '+text);el.click();};
     const input=(el,value)=>{el.value=value;el.dispatchEvent(new Event('input'));};
-    $('[data-category=appearance]').click();
+    $('[data-category=colors]').click();
     assert($('#palette-grid').children.length===12,'12 built-ins');
     assert([...$('#palette-grid').children].filter(el=>!el.hidden).length===6,'First group');
     click('Show all'); assert([...$('#palette-grid').children].every(el=>!el.hidden),'Expand palettes');

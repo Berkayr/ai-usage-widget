@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {effectiveWidget, splitWidget, widgetChangeCount, newWidgetId, overrideKeys, canOverride} from '../app/src/settings-widgets.js';
+import {effectiveWidget, splitWidget, widgetChangeCount, newWidgetId, overrideKeys, overrideCategories, canOverride} from '../app/src/settings-widgets.js';
 const fixture = () => ({theme:'system', position:'Top right', reservedTop:null,
   taskbar:{enabled:false}, providerOrder:['a'], linux:{layer:'bottom', margin:12, monitor:null},
   placement:{monitor:'Display', xRatio:1, yRatio:0},
@@ -53,4 +53,9 @@ test('frontend override contract matches the native whitelist',async()=>{
   assert.deepEqual([...overrideKeys].sort(),[...body.matchAll(/"([^"]+)"/g)].map(m=>m[1]).sort());
   assert.ok(canOverride('placement.monitor'));assert.ok(canOverride('linux.margin'));
   assert.ok(!canOverride('taskbar.enabled'));assert.ok(!canOverride('linux.monitor'));
+});
+test('every widget override belongs to exactly one reset category',()=>{
+  const assigned=Object.values(overrideCategories).flat();
+  assert.equal(new Set(assigned).size,assigned.length,'Reset categories must not overlap');
+  assert.deepEqual([...assigned].sort(),[...overrideKeys].sort());
 });
