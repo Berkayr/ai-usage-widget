@@ -18,7 +18,8 @@ export async function auditQuotes(b) {
    if(${JSON.stringify(shape)}==='strip'){if(!q.hidden||q.children.length)throw Error('Strip quote must be hidden');return;}
    if(q.hidden)throw Error('Quote hidden');
    if(q.querySelector('img,script'))throw Error('Remote HTML rendered');
-   if(${JSON.stringify(shape)}!=='pill'&&q.querySelector('.quote-label').textContent!==({reactor:'CORE / DAILY QUOTE',terminal:'> quote','retro-lcd':'[ DAILY QUOTE ]','dot-matrix':'•• DAILY QUOTE',brutalist:'DAILY QUOTE','minimal-pace':'Daily reflection','compact-strip':'QUOTE /','circular-rings':'◉ Daily quote','frosted-glass':'Daily inspiration'})[${JSON.stringify(theme)}]&&${JSON.stringify(theme)}!=='system')throw Error('Theme quote signature');
+   const expectedLabel=({reactor:'CORE / DAILY QUOTE',terminal:'> quote','retro-lcd':'[ DAILY QUOTE ]','dot-matrix':'•• DAILY QUOTE',brutalist:'DAILY QUOTE','minimal-pace':'Daily reflection','compact-strip':'QUOTE /','circular-rings':'◉ Daily quote','frosted-glass':'Daily inspiration'})[${JSON.stringify(theme)}]||'Quote of the day';
+   if(${JSON.stringify(shape)}!=='pill'&&q.querySelector('.quote-label').textContent!==expectedLabel)throw Error('Theme quote signature');
    if(${JSON.stringify(theme)}==='reactor'&&${JSON.stringify(shape)}!=='pill'){
     const content=getComputedStyle(q.querySelector('.quote-content')),label=getComputedStyle(q.querySelector('.quote-label'));
     if(!content.backgroundImage.includes('radial-gradient')||!content.boxShadow.includes('inset')||!content.boxShadow.includes('1px'))throw Error('Reactor quote core line/glow signature');
