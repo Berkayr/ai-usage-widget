@@ -129,7 +129,7 @@ operation. Real cable disconnect/reconnect and unsaved close dialogs are separat
 manual desktop checks.
 
 Settings contrast is included in `node docs/tools/contrast-audit.mjs`: light and
-dark schemes, all nine categories (including a synthetic Linux layer-shell panel),
+dark schemes, all ten categories (including a synthetic Linux layer-shell panel),
 clean/dirty/hover states, native fields and disabled controls. Enabled text requires
 4.5:1; disabled text requires 3:1. A second pass replaces CSS system color keywords
 with deliberately incompatible GTK-like values (light ButtonFace and white

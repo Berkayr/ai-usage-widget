@@ -1,6 +1,7 @@
 const icon = paths => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 export const settingsCategories = [
   ['general', 'General', icon('<path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/>')],
+  ['quote', 'Quote', icon('<path d="M7 11h4V5H5v6c0 4 2 6 5 7M17 11h4V5h-6v6c0 4 2 6 5 7"/>')],
   ['theme', 'Theme', icon('<path d="M4 5h16v14H4z"/><path d="M8 9h8M8 12h5M8 15h3"/>')],
   ['colors', 'Colors', icon('<circle cx="12" cy="12" r="9"/><path d="M12 3v18M12 7h6M12 12h9M12 17h6"/>')],
   ['shape-size', 'Shape & Size', icon('<rect x="3" y="6" width="18" height="12" rx="6"/><path d="M8 10v4M12 9v6M16 10v4"/>')],
@@ -69,7 +70,7 @@ const descriptions = {
   'history-machines':'Shown only when 2+ computers are found',
   'start-at-login':'Open the widget when you sign in.',
   'show-extra-windows':'Include additional quota windows in the widget.',
-  'quote-enabled':'Fetch a daily quote when enabled; see the privacy note above.',
+  'quote-enabled':'Fetch a daily quote when enabled; see the privacy note below.',
   'quote-position':'Place the quote above or below usage.',
   'quote-mode':'Choose the source of each daily quote.',
   'quote-navigation':'Show buttons to browse quotes.',

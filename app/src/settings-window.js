@@ -229,7 +229,7 @@ const sections = Object.fromEntries(groups.map(([ id, label ]) => {
   return [ id, section ];
 }));
 // Temporary containers let the existing controls keep their construction order.
-for (const id of ['layout', 'position', 'quote', 'desktop']) {
+for (const id of ['layout', 'position', 'quote-content', 'desktop']) {
   sections[id] = document.createElement('section');
   if (id === 'layout') sections[id].append(document.createElement('h1'));
   panel.append(sections[id]);
@@ -263,8 +263,7 @@ sections.layout.insertAdjacentHTML(
         1 /
         3}">1/3</option></select></label><label>Screen fine-tune <output id="fit-fine-tune-out"></output><input id="fit-fine-tune" type="range" min="50" max="150" step="1"></label><label>Reserved top (px)<input id="reserved-top" type="number" min="0" max="1000" placeholder="Auto"></label><label>Reserved bottom (px)<input id="reserved-bottom" type="number" min="0" max="1000" placeholder="Auto"></label><p id="detected-area" class="setting-note"></p>`);
 
-sections.quote.innerHTML += `<p class="setting-note">${
-    quotePrivacy}</p><label class="toggle-setting">Show daily quote<input id="quote-enabled" type="checkbox"></label><label>Position<select id="quote-position"><option value="bottom">Bottom</option><option value="top">Top</option></select></label><label>Mode<select id="quote-mode"><option value="qotd">Quote of the day</option><option value="born">Born on this day</option><option value="died">Died on this day</option><option value="on-this-day">On this day</option><option value="mixed">Mixed</option></select></label><label class="toggle-setting">Show quote navigation<input id="quote-navigation" type="checkbox"></label>`;
+sections['quote-content'].innerHTML += `<label class="toggle-setting">Show daily quote<input id="quote-enabled" type="checkbox"></label><p class="setting-note">A short quote or 'on this day' note shown on the widget.</p><label>Mode<select id="quote-mode"><option value="qotd">Quote of the day</option><option value="born">Born on this day</option><option value="died">Died on this day</option><option value="on-this-day">On this day</option><option value="mixed">Mixed</option></select></label><label>Position<select id="quote-position"><option value="bottom">Bottom</option><option value="top">Top</option></select></label><label class="toggle-setting">Show quote navigation<input id="quote-navigation" type="checkbox"></label><p class="setting-note">${quotePrivacy}</p>`;
 const shapePicker = document.createElement('fieldset');
 shapePicker.className = 'shape-picker';
 shapePicker.innerHTML =
@@ -530,12 +529,12 @@ $('.theme-section legend').classList.remove('sr-only');
 $('.theme-section legend').textContent = 'Theme';
 sectionBlock(sections.general, 'Startup', [control('start-at-login'), $('#autostart-status')]);
 sectionBlock(sections.general, 'Widget content', [control('show-extra-windows')]);
-sectionBlock(sections.general, 'Daily quote', [...sections.quote.children]);
+sections.quote.append(...sections['quote-content'].children);
 sections.layout.querySelector('h1').remove();
 sections['shape-size'].append(...sections.layout.children);
 sections.display.querySelector('h1').after(...sections.position.children);
 sections.display.append(...sections.desktop.children);
-for (const id of ['layout', 'position', 'quote', 'desktop']) {
+for (const id of ['layout', 'position', 'quote-content', 'desktop']) {
   sections[id].remove();
   delete sections[id];
 }

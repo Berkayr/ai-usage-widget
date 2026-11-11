@@ -11,7 +11,8 @@ export const overrideKeys = new Set([
   'placementEditing', 'reservedTop', 'reservedBottom'
 ]);
 export const overrideCategories = {
-  general: ['showExtraWindows', 'quoteEnabled', 'quoteMode', 'quotePosition', 'quoteNavigation'],
+  general: ['showExtraWindows'],
+  quote: ['quoteEnabled', 'quoteMode', 'quotePosition', 'quoteNavigation'],
   theme: ['theme', 'dotCount'],
   colors: ['appearance', 'palette', 'accent', 'background', 'widgetOpacity', 'backgroundOpacity', 'colorMode', 'accentEdge'],
   'shape-size': ['shape', 'scale', 'sizePreset', 'fineTune', 'sizeMode', 'fitFraction', 'fitFineTune', 'fitHeight', 'matchPhysicalSize'],
