@@ -512,7 +512,7 @@
   },
   {
     "id": "provider-color:*",
-    "where": "colors",
+    "where": "providers",
     "setting": "providerColors",
     "effect": "Overrides identity color for provider across all shapes",
     "modes": "all",
@@ -522,7 +522,7 @@
   },
   {
     "id": "provider-color-reset:*",
-    "where": "colors",
+    "where": "providers",
     "setting": "providerColors",
     "effect": "Clears identity color override for provider and resets to theme default",
     "modes": "all",

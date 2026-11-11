@@ -31,14 +31,17 @@ try {
     const palette=$('#palette-grid .palette-option:last-child');palette.click();
     assert(paletteGridSelected(),'Palette selection');
     function paletteGridSelected(){return !!$('#palette-grid [aria-pressed=true]');}
+    $('[data-category=providers]').click();
     assert(document.querySelectorAll('[data-provider-color]').length===12,'Twelve provider color pickers');
     const color=()=>document.querySelector('[data-provider-color="claude"]');
     color().value='#ffffff';color().dispatchEvent(new Event('input'));
     assert(/^[1-9][0-9]* unsaved changes$/.test($('#status').textContent),'Dirty provider color');
     const codex=document.querySelector('[data-provider-color="codex"]');codex.value='#ffffff';codex.dispatchEvent(new Event('input'));
     assert($('#provider-color-warning').textContent.includes('too similar'),'Similar colors warning');
+    $('[data-category=colors]').click();
     $('#appearance').value='light';$('#appearance').dispatchEvent(new Event('change'));assert($('#provider-color-warning').textContent.includes('low background contrast'),'Low contrast warning');
     $('#appearance').value='auto';$('#appearance').dispatchEvent(new Event('change')); 
+    $('[data-category=providers]').click();
     $('#save').click();await new Promise(r=>setTimeout(r,50));
     color().value='#123456';color().dispatchEvent(new Event('input'));$('#revert').click();assert(color().value==='#ffffff','Revert saved provider color');
     color().nextElementSibling.click();assert(color().value!=='#ffffff','Reset provider color');
@@ -257,7 +260,7 @@ try {
       assert($('#status').textContent==='Changes preview live on the widget','Initial live preview status');
       window.dispatchEvent(new KeyboardEvent('keydown',{key:'s',ctrlKey:true}));
       assert(window.__FAKE_NATIVE__.saves.length===0,'Clean Ctrl+S wrote settings');
-      $('[data-category=colors]').click();
+      $('[data-category=providers]').click();
       const color=$('[data-provider-color=claude]');color.value='#123456';color.dispatchEvent(new Event('input'));
       color.nextElementSibling.click();assert($('#save').disabled&&$('#revert').disabled,'Color reset left an empty-object dirty state');
       return 'PASS: clean buttons, clean Ctrl+S, provider color reset returns clean';
@@ -302,10 +305,6 @@ try {
           const png=await b.cdp('Page.captureScreenshot',{format:'png'});
     if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`${output}/settings-${scheme}.png`,Buffer.from(png.data,'base64'));
         }
-        if(platform==='linux'&&id==='colors') {
-          await b.evaluate(`document.querySelector('#provider-colors').scrollIntoView({block:'end'})`);
-          await screenshot(`theme-colors-${scheme}`);
-        }
         if(platform==='linux'&&id==='shape-size') {
           await b.evaluate(`document.querySelector('#fit-screen').click()`);
           await screenshot(`screen-share-${scheme}`);
@@ -319,6 +318,8 @@ try {
         if(platform==='linux'&&id==='providers') {
           await b.evaluate(`document.querySelector('#featured-position').scrollIntoView({block:'end'})`);
           await screenshot(`providers-order-${scheme}`);
+          await b.evaluate(`document.querySelector('#provider-colors').scrollIntoView({block:'end'})`);
+          await screenshot(`provider-colors-${scheme}`);
         }
       }
     }

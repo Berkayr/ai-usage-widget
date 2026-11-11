@@ -9,6 +9,8 @@
   --border:#bbc2cd;
   --accent:#245bb2;
   --accent-ink:#ffffff;
+  --map-widget-bg:#245bb2;
+  --map-widget-ink:#ffffff;
   --control:#e7ebf0;
   --selected:#dbe8fc;
   --hover:#d9e3f0;
@@ -24,6 +26,8 @@
     --border:#69778c;
     --accent:#9cc2ff;
     --accent-ink:#132b4d;
+    --map-widget-bg:#31496a;
+    --map-widget-ink:#ffffff;
     --control:#303947;
     --selected:#31496a;
     --hover:#3b485c;
@@ -123,6 +127,7 @@ button:disabled {background:var(--control)}
   padding:4px 8px;
   border-radius:8px;
 }
+#disconnected {width:240px;max-width:55%}
 .settings-content input[type=range] {width:120px;max-width:28%;min-width:0;margin:0}
 .settings-content input[type=color] {width:40px;flex:none;padding:4px;border-radius:8px}
 .setting-row output {font-size:12px;white-space:nowrap}
@@ -189,7 +194,7 @@ input,select,option,textarea {background:var(--control);color:var(--ink);border:
 .shape-silhouette.circle {width:40px;height:40px;border-radius:50%}
 .shape-silhouette.pill {width:56px;height:16px;border-radius:8px;margin-block:12px}
 #monitor-map {position:relative;max-height:256px;width:100%;border:1px solid var(--line);background:var(--control);margin:16px 0;overflow:hidden}
-#map-widget {position:absolute;min-height:0;min-width:0;padding:0;background:var(--accent);color:var(--accent-ink);border:1px dashed var(--accent-ink);border-radius:0;touch-action:none;cursor:move;overflow:hidden}
+#map-widget {position:absolute;min-height:0;min-width:0;padding:0;background:var(--map-widget-bg);color:var(--map-widget-ink);-webkit-text-fill-color:var(--map-widget-ink);border:1px dashed var(--map-widget-ink);border-radius:0;touch-action:none;cursor:move;overflow:hidden}
 #placement-actions {display:flex;gap:8px}
 .provider-order-row {display:flex;gap:8px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line);cursor:grab}
 .provider-order-row:last-child {border-bottom:0}
@@ -208,7 +213,8 @@ summary {cursor:pointer;min-height:32px}
 @media(max-width:559px) {
   .settings-shell {grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto}
   .settings-shell > nav {flex-direction:row;border-right:0;border-bottom:1px solid var(--line);padding:8px;gap:8px;overflow-x:auto;overflow-y:hidden}
-  .settings-shell > nav button {white-space:nowrap;flex:none;padding:8px}
+  .settings-shell > nav button {white-space:nowrap;flex:0 0 auto;width:max-content;min-width:max-content;padding:8px}
+  .settings-shell > nav button[aria-selected=true] {scroll-margin-inline:8px}
   .settings-content {padding:16px}
   .settings-actions {grid-row:4;flex-wrap:wrap}
   .settings-actions #status {flex:1 0 100%}
@@ -220,6 +226,11 @@ summary {cursor:pointer;min-height:32px}
   .setting-copy {flex-basis:48%}
   .setting-copy small {font-size:12px}
   .scale-presets {grid-template-columns:repeat(2,minmax(0,1fr))}
+  #monitor-map {max-height:160px}
+  #provider-colors label.setting-row {display:grid;grid-template-columns:minmax(0,1fr) 40px auto;gap:8px;align-items:center}
+  #provider-colors label.setting-row .setting-copy {min-width:0;flex:initial}
+  #provider-colors label.setting-row input[type=color] {width:40px;min-width:40px;height:32px;padding:2px}
+  #provider-colors label.setting-row button {white-space:nowrap;padding:6px 8px}
 }
 .theme-picker [data-theme=aurora] .theme-preview{border-width:5px;border-radius:6px;background-image:linear-gradient(transparent 40%,currentColor 41% 60%,transparent 61%)}
 .theme-picker [data-theme=crisp] .theme-preview{border-radius:2px;font-size:18px;letter-spacing:2px}
