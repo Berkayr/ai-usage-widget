@@ -300,7 +300,7 @@ try {
     const expect = (ok, id, expected) => { if (!ok) recordFailure(id, 'browser', 'Control effect missing', expected); };
 
     // 1. Shell navigation buttons
-    const categories = ['providers', 'appearance', 'layout', 'position', 'quote', 'desktop', 'about'];
+    const categories = ['general', 'theme', 'colors', 'shape-size', 'display', 'providers', 'history', 'about'];
     for (const cat of categories) {
       const id = 'category:' + cat;
       const btn = $s(\`button[data-category="\${cat}"]\`);
@@ -318,7 +318,7 @@ try {
     }
 
     // 2. Shell Actions: Save, Revert, Close Prompt
-    await navCategory('layout');
+    await navCategory('shape-size');
     const scaleInput = $s('#scale');
     if (scaleInput) {
       scaleInput.value = 92;
@@ -418,7 +418,7 @@ try {
 
       // Inapplicable mode test: Landscape and Pill
       // Per spec: "Then in modes where the entry says it does not apply: it must be disabled or hidden with a reason shown. Enabled with no visible effect is a failure."
-      await navCategory('layout');
+      await navCategory('shape-size');
       $s('button[data-shape="landscape"]')?.click();
       await settle();
       await navCategory('providers');
@@ -428,20 +428,20 @@ try {
       if (!featPosSel.disabled && featPosSel.closest('label')?.hidden === false) {
         recordFailure('featured-position', 'landscape', 'Dropdown is enabled and selectable', 'Disabled or hidden with reason explaining it only applies in Portrait');
       }
-      await navCategory('layout');
+      await navCategory('shape-size');
       $s('button[data-shape="portrait"]')?.click();
       await settle();
     }
 
     for (const shape of ['portrait','landscape','square','circle','pill']) {
-      await navCategory('layout'); $s('[data-shape="' + shape + '"]').click(); await settle();
+      await navCategory('shape-size'); $s('[data-shape="' + shape + '"]').click(); await settle();
       await navCategory('providers');
       const expectedProviderDisabled = ['landscape','pill'].includes(shape);
       if (featuredSel.disabled !== expectedProviderDisabled || featPosSel.disabled !== (shape !== 'portrait'))
         recordFailure('featured-position', shape, 'Inapplicable featured controls remain enabled', 'Disabled according to shape and odd count');
       if (!$s('#featured-hint').textContent.trim()) recordFailure('featured-provider', shape, 'No explanation', 'Hint retained');
     }
-    await navCategory('layout'); $s('[data-shape="portrait"]').click(); await settle();
+    await navCategory('shape-size'); $s('[data-shape="portrait"]').click(); await settle();
     await navCategory('providers');
     const visibleCheck = sDoc.querySelector('.provider-order-row input:checked');
     visibleCheck.click(); await settle();
@@ -449,7 +449,7 @@ try {
     visibleCheck.click(); await settle();
 
     // 4. Themes
-    await navCategory('appearance');
+    await navCategory('theme');
     const themeIds = ['reactor', 'system', 'dot-matrix', 'circular-rings', 'terminal', 'frosted-glass', 'brutalist', 'compact-strip', 'retro-lcd', 'minimal-pace'];
     for (const t of themeIds) {
       const btn = $s(\`button[data-theme="\${t}"]\`);
@@ -611,10 +611,10 @@ try {
       // In theme: reactor and shape: circle, reactor-motion must be visible
       $s('button[data-theme="reactor"]')?.click();
       await waitForTheme('reactor');
-      await navCategory('layout');
+      await navCategory('shape-size');
       $s('button[data-shape="circle"]')?.click();
       await settle();
-      await navCategory('appearance');
+      await navCategory('theme');
       if (reactorMotionInput.closest('label')?.hidden) {
         recordFailure('reactor-motion', 'reactor circle', 'reactor-motion checkbox is hidden', 'Visible in reactor circle mode');
       }
@@ -635,7 +635,7 @@ try {
     }
 
     // 7. Shapes & Size Presets
-    await navCategory('layout');
+    await navCategory('shape-size');
     const shapesList = ['portrait', 'landscape', 'square', 'circle', 'pill'];
     for (const sh of shapesList) {
       const btn = $s(\`button[data-shape="\${sh}"]\`);
@@ -719,7 +719,7 @@ try {
     await settle();
 
     // 8. Position controls
-    await navCategory('position');
+    await navCategory('display');
     const placeBtn = $s('button#place');
     const lockPosCheck = $s('input#lock-position');
     const snapSel = $s('select#snap');
@@ -743,7 +743,7 @@ try {
     results.testedCount += 6; // placement-monitor, snap, disconnected, fallback-monitor, reserved-top, reserved-bottom
 
     // 9. Quote controls
-    await navCategory('quote');
+    await navCategory('general');
     const quoteEnabledCheck = $s('input#quote-enabled');
     const quotePosSel = $s('select#quote-position');
     const quoteModeSel = $s('select#quote-mode');
@@ -818,10 +818,10 @@ try {
     results.testedCount++;
 
     // Real widget quote controls: both directions must change text or page.
-    await navCategory('quote');
+    await navCategory('general');
     if(!quoteEnabledCheck.checked)quoteEnabledCheck.click();
     if(!quoteNavCheck.checked)quoteNavCheck.click();await settle();
-    await navCategory('layout');$s('[data-shape="square"]').click();await settle();
+    await navCategory('shape-size');$s('[data-shape="square"]').click();await settle();
     const pageBefore=wDoc.documentElement.dataset.quotePage;
     $w('.quote-toggle').click();await settle();
     expect(wDoc.documentElement.dataset.quotePage!==pageBefore,'widget-quote-toggle','Quote page toggles');
@@ -868,7 +868,7 @@ try {
     return results;
   })()`);
 
-  await b.evaluate(`(async()=>{const d=document.querySelector('#settings-frame').contentDocument;d.querySelector('[data-category=layout]').click();d.querySelector('[data-shape=landscape]').click();d.querySelector('[data-category=providers]').click();d.querySelector('#featured-provider').scrollIntoView({block:'center'});document.querySelector('#widget-frame').contentDocument.querySelector('#context-menu').hidden=true;await new Promise(r=>setTimeout(r,100));})()`);
+  await b.evaluate(`(async()=>{const d=document.querySelector('#settings-frame').contentDocument;d.querySelector('[data-category=shape-size]').click();d.querySelector('[data-shape=landscape]').click();d.querySelector('[data-category=providers]').click();d.querySelector('#featured-provider').scrollIntoView({block:'center'});document.querySelector('#widget-frame').contentDocument.querySelector('#context-menu').hidden=true;await new Promise(r=>setTimeout(r,100));})()`);
   const capture=await b.cdp('Page.captureScreenshot',{format:'png'});
   await writeFile('/tmp/ai-usage-control-effects.png',Buffer.from(capture.data,'base64'));
   console.log('Control Effects Audit Completed:');

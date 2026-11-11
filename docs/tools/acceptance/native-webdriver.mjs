@@ -189,7 +189,7 @@ try {
   let medium, small;
   for(const shape of ['portrait','landscape','square','circle','pill']) for(const preset of ['Small','Medium','Large','X-Large','2X-Large']) {
     await openSettings();
-    await click('[data-category="layout"]');
+    await click('[data-category="shape-size"]');
     await click(`[data-shape="${shape}"]`);
     const unavailable=await execute(`const el=document.querySelector('[data-size="${preset}"]');return {disabled:el.disabled,title:el.title};`);
     if(unavailable.disabled) {
@@ -211,7 +211,7 @@ try {
     if(shape==='portrait' && preset==='Small') small=size;
   }
   assert(medium.width>small.width,'Portrait Medium must be wider than Small');
-  await openSettings();await click('[data-category="layout"]');await click('[data-shape="portrait"]');await click('#fit-screen');
+  await openSettings();await click('[data-category="shape-size"]');await click('[data-shape="portrait"]');await click('#fit-screen');
   assert.equal((await save()).sizeMode,'screen');
   for(const fraction of ['1','0.75','0.5',String(1/3)]) {
     await selectWindow('window.__SETTINGS_READY__');
@@ -219,7 +219,7 @@ try {
     assert.equal((await save()).fitFraction,Number(fraction));
     await geometry(`portrait-fit-${fraction}`);
   }
-  await openSettings();await click('[data-category="appearance"]');
+  await openSettings();await click('[data-category="theme"]');
   await execute("[...document.querySelectorAll('#palette-tools button')].find(button=>button.textContent==='New palette').click()");
   const palettes=(await save()).userPalettes;
   assert.equal(palettes?.length,1,'Custom palette did not reach disk through real IPC');

@@ -70,7 +70,7 @@ try {
     return 'PASS: inward panel, provider selector, account restrictions, 7-day range, close state and disable';
   })()`));
   await b.navigate('/?settings&sample','window.__SETTINGS_READY__');
-  const previews=await b.evaluate(`(()=>{document.querySelector('[data-category=appearance]').click();return ['aurora','crisp','glyph','layer','liquid-glass','pastel','pebble'].map(id=>{const el=document.querySelector('[data-theme='+id+'] .theme-preview');return {id,text:el.textContent,width:el.clientWidth,height:el.clientHeight,gradient:getComputedStyle(el).backgroundImage};});})()`);
+  const previews=await b.evaluate(`(()=>{document.querySelector('[data-category=theme]').click();return ['aurora','crisp','glyph','layer','liquid-glass','pastel','pebble'].map(id=>{const el=document.querySelector('[data-theme='+id+'] .theme-preview');return {id,text:el.textContent,width:el.clientWidth,height:el.clientHeight,gradient:getComputedStyle(el).backgroundImage};});})()`);
   for(const p of previews){assert.ok(p.text.trim() && p.width>0 && p.height>0,p.id);if(p.id==='aurora')assert.notEqual(p.gradient,'none');}
   await capture('theme-previews');console.log('PASS: seven theme previews; Aurora gradient preserved');
 }finally{await b.close();}

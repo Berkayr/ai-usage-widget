@@ -241,10 +241,10 @@ const move = (id, category) => {
 };
 sections.providers.append($('#provider-settings').closest('fieldset'));
 sections.about.append($('#runtime-diagnostics').closest('fieldset'));
-sections.appearance.append($('.theme-section'), $('.look-section'));
+sections.theme.append($('.theme-section'), $('.look-section'));
 for (const id of ['appearance', 'palette', 'accent', 'background',
                   'widget-opacity', 'background-opacity'])
-  move(id, 'appearance');
+  move(id, 'colors');
 for (const id of ['scale', 'position', 'fit-height', 'show-extra-windows'])
   move(id, 'layout');
 sections.layout.append($('.scale-presets'));
@@ -275,8 +275,7 @@ shapePicker.innerHTML =
                  shape}" aria-hidden="true"></i>${
                  shape[0].toUpperCase() + shape.slice(1)}</button>`)
         .join('');
-sections.layout.insertBefore(shapePicker,
-                             sections.layout.querySelector('h1').nextSibling);
+sections['shape-size'].append(shapePicker);
 shapePicker.querySelectorAll('button').forEach(
     button => button.onclick = () => {
       draft.shape = button.dataset.shape;
@@ -284,10 +283,10 @@ shapePicker.querySelectorAll('button').forEach(
     });
 const widgetChoices = document.createElement('fieldset');
 widgetChoices.id = 'widget-provider-choices';
-sections.layout.insertBefore(widgetChoices, shapePicker.nextSibling);
+shapePicker.after(widgetChoices);
 move('start-at-login', 'about');
 move('autostart-status', 'about');
-sections.desktop.append($('#linux-settings'));
+sections.display.append($('#linux-settings'));
 $('#linux-settings').hidden = false;
 sections.taskbar.append($('#taskbar-settings'));
 for (const el of [...panel.children])
@@ -298,7 +297,7 @@ oldPalette.closest('label').hidden = true;
 const paletteGrid = document.createElement('div');
 paletteGrid.id = 'palette-grid';
 paletteGrid.setAttribute('aria-label', 'Palette');
-sections.appearance.append(paletteGrid);
+sections.colors.append(paletteGrid);
 for (const key of ['accent', 'background']) {
   const reset = document.createElement('button');
   reset.textContent = 'Reset to palette';
@@ -369,7 +368,11 @@ function sectionBlock(parent, title, elements) {
   parent.append(block);
   return block;
 }
-const control = id => $(`#${id}`).closest('label');
+const control = id => {
+  const element = $(`#${id}`);
+  if (!element) throw Error(`Missing settings control: ${id}`);
+  return element.closest('label');
+};
 const sizes = $('.scale-presets');
 for (const button of sizes.querySelectorAll('button'))
   button.insertAdjacentHTML('beforeend', '<span class="size-hint"></span>');
@@ -381,10 +384,9 @@ $('#fit-screen').onclick = () => {
   update();
 };
 $('#size-mode').closest('label').hidden = true;
-sections.layout.insertBefore(sizes, shapePicker.nextSibling);
+sections['shape-size'].append(sizes);
 sizes.after($('#size-fit-warning'));
-const sizeChoices = sectionBlock(sections.layout, 'Size', [sizes, $('#size-fit-warning')]);
-shapePicker.after(sizeChoices);
+const sizeChoices = sectionBlock(sections['shape-size'], 'Size', [sizes, $('#size-fit-warning')]);
 const placementNote = [...sections.layout.querySelectorAll('p')].find(p => p.textContent.startsWith('Drag the widget'));
 if (placementNote) sections.position.append(placementNote);
 control('position').hidden = true;
@@ -404,7 +406,7 @@ sections.about.insertBefore(control('show-extra-windows'),
                             sections.about.children[2]);
 sizeChoices.append(control('scale'), control('fit-height'),
                        control('match-physical-size'), control('fit-fraction'),
-                       control('fit-fine-tune'), widgetChoices);
+                       control('fit-fine-tune'));
 const fineReset = document.createElement('button');
 fineReset.id = 'reset-fine-tune';
 fineReset.textContent = 'Reset fine-tune';
@@ -488,7 +490,7 @@ colorWarning.id = 'provider-color-warning';
 colorWarning.className = 'setting-note';
 colorWarning.setAttribute('role', 'status');
 colorControls.append(colorWarning);
-sections.appearance.append(colorControls);
+sections.colors.append(colorControls);
 const mode = matchMedia('(prefers-color-scheme:light)');
 function themePalette(t = themes.find(t => t.id === draft.theme) || themes[0],
                       key = draft.palette) {
@@ -514,17 +516,16 @@ const renderLayout = layoutControls(sections.providers, () => draft,
                                     () => providers || [], update,
                                     () => snapshotProviders || []);
 const paletteTools = paletteEditor(() => draft, () => themes.find(t => t.id === draft.theme), update);
-sectionBlock(sections.appearance, 'Palette', [ paletteGrid, paletteTools.element ]);
-sectionBlock(sections.appearance, 'Mode',
-             [ control('appearance'), control('color-mode') ]);
+sectionBlock(sections.colors, 'Appearance', [ control('appearance') ]);
 control('appearance').firstChild.textContent = 'Appearance';
-sectionBlock(sections.appearance, 'Colors', [
+sectionBlock(sections.colors, 'Palette', [ paletteGrid, paletteTools.element ]);
+sectionBlock(sections.colors, 'Color mode', [ control('color-mode') ]);
+sectionBlock(sections.colors, 'Colors', [
   control('accent'), control('background'), control('widget-opacity'),
   control('background-opacity'), control('accent-edge')
 ]);
-sectionBlock(sections.appearance, 'Theme details',
-             [ control('dot-count'), control('reactor-motion') ]);
-sections.appearance.append(colorControls);
+sections.colors.append(colorControls);
+sectionBlock(sections.theme, 'Theme details', [control('dot-count'), control('reactor-motion')]);
 $('.look-section').remove();
 $('.theme-section legend').classList.remove('sr-only');
 $('.theme-section legend').textContent = 'Theme';
@@ -532,10 +533,9 @@ sectionBlock(sections.general, 'Startup', [control('start-at-login'), $('#autost
 sectionBlock(sections.general, 'Widget content', [control('show-extra-windows')]);
 sectionBlock(sections.general, 'Daily quote', [...sections.quote.children]);
 sections.layout.querySelector('h1').remove();
-sections.appearance.append(...sections.layout.children);
-sectionBlock(sections.appearance, 'Position', [...sections.position.children]);
-sections.appearance.append(...sections.desktop.children);
-sections.providers.append(widgetChoices);
+sections['shape-size'].append(...sections.layout.children);
+sections.display.querySelector('h1').after(...sections.position.children);
+sections.display.append(...sections.desktop.children);
 for (const id of ['layout', 'position', 'quote', 'desktop']) {
   sections[id].remove();
   delete sections[id];
@@ -1193,7 +1193,7 @@ async function loadSession() {
       desktopPlatform = desktop.platform;
       $('#desktop-layer').hidden = !desktop.layerShell;
       $('#desktop-layer-unavailable').hidden = desktop.layerShell;
-      sections.appearance.querySelector('#linux-settings').hidden =
+      sections.display.querySelector('#linux-settings').hidden =
           desktop.platform !== 'linux';
       sections.taskbar.querySelector('#taskbar-settings').hidden =
           desktop.platform !== 'windows';

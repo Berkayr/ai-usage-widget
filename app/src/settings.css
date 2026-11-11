@@ -207,7 +207,7 @@ summary {cursor:pointer;min-height:32px}
 #runtime-diagnostics,#data-folder {overflow-wrap:anywhere}
 @media(max-width:559px) {
   .settings-shell {grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto}
-  .settings-shell > nav {flex-direction:row;border-right:0;border-bottom:1px solid var(--line);padding:8px;gap:8px}
+  .settings-shell > nav {flex-direction:row;border-right:0;border-bottom:1px solid var(--line);padding:8px;gap:8px;overflow-x:auto;overflow-y:hidden}
   .settings-shell > nav button {white-space:nowrap;flex:none;padding:8px}
   .settings-content {padding:16px}
   .settings-actions {grid-row:4;flex-wrap:wrap}
