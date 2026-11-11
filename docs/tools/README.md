@@ -493,3 +493,5 @@ full 17-theme desktop acceptance audit. Clear Glass uses the internal
 `liquid-glass` id; captures assert the requested theme to reject silent fallback.
 
 `node docs/tools/theme-size-strip-check.mjs` checks all 17 themes in Portrait and Strip with fixed/screen sizing, Fit height on/off, quote on/off and extra windows on/off. It checks exact outer dimensions, equal card heights, row/column direction and hidden Strip quotes.
+
+`node docs/tools/text-overlap-check.mjs` checks text Range overlaps and clipping across all 17 themes, six shapes, two sizes, three quote states and both extra-window states (build first).

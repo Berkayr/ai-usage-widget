@@ -23,3 +23,11 @@
 .provider-card .empty-window{flex:1 0 auto;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:.25rem;overflow-wrap:anywhere;min-height:0}
 .provider-card .empty-window small{font:inherit;color:var(--textMuted)}
 .provider-card .windows:empty{display:none}
+
+/* Flex children must surrender width before adjacent metadata can collide. */
+.provider-heading>div{flex:1 1 auto}
+.provider-heading h2{min-width:0;max-width:100%}
+.provider-name,.plan{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.provider-name{flex:1 1 auto}
+.window-top>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reset{min-width:0;white-space:nowrap}
