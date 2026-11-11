@@ -26,6 +26,7 @@ try {
     if(${JSON.stringify(quotePosition)}==='top' ? q.bottom>p.top+1 : p.bottom>q.top+1)fail('Quote order / overlap');
     const t=document.querySelector('.quote-text');if(t.scrollHeight>t.clientHeight||t.scrollWidth>t.clientWidth)fail('Quote overflow');
    }
+   if(${JSON.stringify(shape)}==='strip'&&!document.querySelector('#quote').hidden)fail('Strip quote must be hidden');
    document.querySelector('.quote-source')?.click();
    const dialog=document.querySelector('.quote-dialog');
    if(dialog){if(!dialog.textContent.includes('An Invented Work (1933)')||!dialog.textContent.includes('Fictional writer'))fail('Missing dialog context');dialog.close();}

@@ -2,15 +2,21 @@
 export const maxScreenCoverage = 0.5;
 export const maxPortraitWidthFraction = 0.3;
 export function effectiveSizeMode(settings) {
-  return settings.sizeMode === 'screen' && settings.shape === 'portrait' && settings.theme !== 'compact-strip' ? 'screen' : 'fixed';
+  return settings.sizeMode === 'screen' && ['portrait','strip'].includes(settings.shape) ? 'screen' : 'fixed';
 }
 export function screenCoverage(settings) {
-  return settings.theme === "compact-strip" && settings.shape === "portrait" ? 0.35 : maxScreenCoverage;
+  return maxScreenCoverage;
 }
 export const sizePresets = {Small:85, Medium:100, Large:120, 'X-Large':150, '2X-Large':200};
-export const shapes = ['portrait', 'landscape', 'square', 'circle', 'pill'];
+export const shapes = ['portrait', 'landscape', 'square', 'circle', 'pill', 'strip'];
 export function normalizeShape(shape) { return shapes.includes(shape) ? shape : 'portrait'; }
-export function normalizeSize(value = {}) {
+// Loading migration is separate from live edits so Portrait stays selectable.
+const isLegacyStrip = value => !value.stripLayoutVersion && value.theme === 'compact-strip' && (!value.shape || value.shape === 'portrait');
+export function normalizeSize(value = {}, migrateLegacy = false) {
+  if (migrateLegacy && Array.isArray(value.widgets)) value = {...value, widgets:value.widgets.map(widget => {
+    const effective = {...value, ...widget.overrides};
+    return isLegacyStrip(effective) ? {...widget, overrides:{...widget.overrides, shape:'strip'}} : widget;
+  })};
   const aliases = {Normal:'Medium', Huge:'X-Large'};
   let sizePreset = aliases[value.sizePreset] || value.sizePreset;
   const legacy = Number.isFinite(Number(value.scale)) ? Math.max(50, Math.min(300, Number(value.scale))) : 100;
@@ -21,13 +27,13 @@ export function normalizeSize(value = {}) {
   }
   if (!Number.isFinite(fineTune)) fineTune = 100;
   fineTune = Math.max(50, Math.min(150, fineTune));
-  return {...value, shape:normalizeShape(value.shape), sizePreset, fineTune, scale:Math.max(10, Math.min(300, sizePresets[sizePreset]*fineTune/100))};
+  return {...value, shape:migrateLegacy && isLegacyStrip(value) ? 'strip' : normalizeShape(value.shape), stripLayoutVersion:1, sizePreset, fineTune, scale:Math.max(10, Math.min(300, sizePresets[sizePreset]*fineTune/100))};
 }
 export function widgetWidth(settings, count = 1) {
   if (settings.shape === 'landscape') return 680;
   if (['square','circle'].includes(settings.shape)) return 340;
   if (settings.shape === 'pill') return 480;
-  return settings.theme === 'compact-strip' ? 30 + Math.max(1,count)*310 : 340;
+  return settings.shape === 'strip' ? 30 + Math.max(1,count)*310 : 340;
 }
 
 // Shared with the CSS tokens in layout.css: 28 padding + 2 border +
@@ -35,7 +41,8 @@ export function widgetWidth(settings, count = 1) {
 export function widgetHeight(settings, count = 1) {
   if (['landscape', 'square', 'circle'].includes(settings.shape)) return 340;
   if (settings.shape === 'pill') return 120;
-  return (settings.quoteEnabled === true ? 320 : 0) + 116 + (settings.theme === 'compact-strip' ? 1 : Math.max(1, count)) * (settings.quoteEnabled === true ? 170 : 210);
+  if (settings.shape === 'strip') return 326;
+  return (settings.quoteEnabled === true ? 320 : 0) + 116 + Math.max(1, count) * 210;
 }
 
 export function widgetProviders(providers, selection) {
@@ -53,7 +60,7 @@ export function monitorFit(settings, count, monitor, platform = 'linux') {
   const baseWidth = widgetWidth(settings, count);
   const baseHeight = widgetHeight(settings, count);
   const coverageScale = Math.sqrt(screenCoverage(settings) * availableWidth * availableHeight / (baseWidth * baseHeight));
-  const maxScale = Math.min(availableWidth / baseWidth * (effectiveSizeMode(settings) === 'screen' ? maxPortraitWidthFraction : 1), availableHeight / baseHeight, coverageScale) * 100 / unit;
+  const maxScale = Math.min(availableWidth / baseWidth * (effectiveSizeMode(settings) === 'screen' && settings.shape === 'portrait' ? maxPortraitWidthFraction : 1), availableHeight / baseHeight, coverageScale) * 100 / unit;
   const width = widgetWidth(settings, count) * settings.scale / 100 * unit;
   const height = widgetHeight(settings, count) * settings.scale / 100 * unit;
   return {width, height, maxScale, fits:settings.scale <= maxScale, margin, availableWidth, availableHeight};
@@ -72,7 +79,7 @@ export function fittedGeometry(settings, count, monitor, platform = 'linux') {
   const area = workAreaMonitor(monitor, settings, platform);
   const fit = monitorFit(settings, count, area, platform);
   const unit = (platform === 'windows' ? monitor.scale || 1 : 1) / (settings.matchPhysicalSize && effectiveSizeMode(settings) !== "screen" ? monitor.scale || 1 : 1);
-  const wide = ['landscape','pill'].includes(settings.shape) || (settings.theme === 'compact-strip' && settings.shape === 'portrait');
+  const wide = ['landscape','pill','strip'].includes(settings.shape);
   const target = (wide ? fit.availableWidth / widgetWidth(settings,count) : fit.availableHeight / widgetHeight(settings,count)) * 100 / unit;
   const fraction = [1,.75,.5,1/3].includes(Number(settings.fitFraction)) ? Number(settings.fitFraction) : 1;
   const requestedScale = effectiveSizeMode(settings) === 'screen' ? target*fraction*Math.max(.5,Math.min(1.5,Number(settings.fitFineTune || 100)/100)) : settings.scale;

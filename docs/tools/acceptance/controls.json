@@ -567,6 +567,15 @@
     "selector": "button[data-shape=\"pill\"]"
   },
   {
+    "id": "shape:strip",
+    "where": "layout",
+    "setting": "shape",
+    "effect": "Switches to a horizontal provider row (30 + 310 per provider x 326 px at Medium)",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-shape=\"strip\"]"
+  },
+  {
     "id": "size-preset:Small",
     "where": "layout",
     "setting": "sizePreset",
@@ -616,8 +625,8 @@
     "where": "layout",
     "setting": "sizeMode",
     "effect": "Enables Fit screen sizing mode within work area budget",
-    "modes": "portrait (except compact-strip)",
-    "disabledWhen": "Disabled when shape is not portrait or theme is compact-strip (title: 'Portrait only')",
+    "modes": "portrait and strip",
+    "disabledWhen": "Disabled when shape is neither portrait nor strip (title: 'Portrait and Strip only')",
     "selector": "button#fit-screen"
   },
   {

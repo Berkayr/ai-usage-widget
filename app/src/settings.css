@@ -240,3 +240,5 @@ summary {cursor:pointer;min-height:32px}
 @media(max-width:559px) {
   .widget-picker {flex:0 0 160px;border-bottom:0;border-right:1px solid var(--line);padding:0 8px 0 0}
 }
+
+.shape-silhouette.strip {width:60px;height:12px;border-radius:2px;margin-block:14px}

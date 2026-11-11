@@ -1,7 +1,7 @@
 import {historyDefaults, mountHistory, historyGeometry} from './history.js';
 import './history.css';
 import { paletteChoices } from './user-palettes.js';
-import { observeUsageFit, fittedUsageHeight } from './usage-fit.js';
+import { observeUsageFit } from './usage-fit.js';
 import { applyAppearance } from './appearance.js';
 import { orderedProviders, arrangeCards } from './provider-layout.js';
 import { loadQuote, renderQuote, sampleQuote } from './quote.js';
@@ -84,7 +84,7 @@ let desktopInfo = null;
 let monitorScale = 1;
 let placementMonitors = [];
 let layoutScale = 100;
-function renderSettings() { return $('#provider-onboarding').hidden ? settings : {...settings, shape:'portrait', theme:settings.theme === 'compact-strip' ? 'system' : settings.theme, quoteEnabled:false, sizeMode:'fixed', fitHeight:true}; }
+function renderSettings() { return $('#provider-onboarding').hidden ? settings : {...settings, shape:'portrait', quoteEnabled:false, sizeMode:'fixed', fitHeight:true}; }
 function updateLayoutScale(count) {
   if (!$('#provider-onboarding').hidden) count=3;
   const monitor=selectedWorkArea(placementMonitors,renderSettings());
@@ -92,10 +92,9 @@ function updateLayoutScale(count) {
   layoutScale=geometry ? geometry.scale : settings.scale;
   const effective=layoutScale/(settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
   document.documentElement.style.setProperty('--ui-scale',effective/100);
-  const heightLimit = renderSettings().shape === 'portrait' && (renderSettings().fitHeight || effectiveSizeMode(renderSettings()) === 'screen')
-    ? (geometry ? geometry.availableHeight / (desktopInfo?.platform === 'windows' ? monitorScale : 1) : window.innerHeight)
-    : widgetHeight(renderSettings(),count)*effective/100;
+  const heightLimit = widgetHeight(renderSettings(),count)*effective/100;
   document.documentElement.style.setProperty('--portrait-height-limit', `${heightLimit}px`);
+  document.documentElement.style.setProperty('--widget-height', `${heightLimit}px`);
   document.documentElement.style.fontSize=`${16*effective/100}px`;
   document.documentElement.dataset.microShape=String(effective<65);
   document.documentElement.dataset.readableSize=String(effective>=84.99);
@@ -245,17 +244,14 @@ let fitObserver;
 let lastFitHeight = 0;
 let fitPending = false;
 async function requestFit() {
-  // Portrait follows measured content; other shapes retain their geometry contract.
-  if ((!(renderSettings().fitHeight || effectiveSizeMode(renderSettings()) === 'screen') && renderSettings().shape === 'portrait') || isSample || fitPending || document.hidden) return;
+  // Every native window uses the same theme-independent geometry as its shell.
+  if (isSample || fitPending || document.hidden) return;
   fitPending = true;
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   fitPending = false;
   if (disposed) return;
   const count = $('#providers').querySelectorAll('.provider-card').length;
-  const limit = parseFloat(document.documentElement.style.getPropertyValue('--portrait-height-limit'));
-  const contentHeight = renderSettings().shape === 'portrait' && $('#provider-onboarding').hidden
-    ? fittedUsageHeight($('#widget'), limit)
-    : widgetHeight(renderSettings(),$('#provider-onboarding').hidden ? count : 3) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
+  const contentHeight = widgetHeight(renderSettings(),$('#provider-onboarding').hidden ? count : 3) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
   const monitor = selectedWorkArea(placementMonitors,renderSettings());
   const panelLimit = monitor ? monitor.height / (desktopInfo?.platform === 'windows' ? monitorScale : 1) - 24 : window.screen.availHeight - 24;
   const height = document.querySelector('.history-panel') ? Math.min(panelLimit,Math.max(contentHeight,560)) : contentHeight;
@@ -297,7 +293,7 @@ $('#menu-settings').onclick = openSettings;
 
 let initialSettingsError = null;
 if (!isSample) {
-  try { settings = {...settings, ...(await invoke('load_settings', { widgetId }))}; }
+  try { settings = {...settings, ...normalizeSize(await invoke('load_settings', { widgetId }), true)}; }
   catch (error) { initialSettingsError = error; }
 }
 const initialOverrides = {accent:settings.accent, background:settings.background};

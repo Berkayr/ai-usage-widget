@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalizeSize,sizePresets,widgetWidth,widgetHeight} from '../app/src/sizing.js';
+import {normalizeSize,shapes,sizePresets,widgetWidth,widgetHeight} from '../app/src/sizing.js';
 test('legacy settings preserve effective scale, including migration boundaries',()=>{
  for(const scale of [50,60,75,90,100,125,150,175,200,250,300]) {
   const value=normalizeSize({scale});assert.ok(Math.abs(value.scale-scale)<1e-8);
@@ -16,7 +16,7 @@ test('renamed presets and explicit choices survive theme changes',()=>{
   const settings=normalizeSize({sizePreset,fineTune:100});assert.equal(settings.scale,scale);
   assert.equal(normalizeSize({...settings,theme:'retro-lcd'}).scale,scale);
  }
- assert.equal(widgetWidth({theme:'compact-strip'},3),960);
+ assert.equal(widgetWidth({theme:'compact-strip'},3),340);
  assert.equal(widgetWidth({theme:'system'},6),340);
 });
 
@@ -27,7 +27,7 @@ test('five sizes use proportional boxes, including the independent strip orienta
   const factor=settings.scale/100;
   for(const theme of ['system','brutalist','circular-rings','compact-strip']) {
    const s={...settings,theme};
-   assert.equal(widgetHeight(s,count),theme==='compact-strip'?326:116+210*Math.max(1,count));
+   assert.equal(widgetHeight(s,count),116+210*Math.max(1,count));
    assert.ok(Math.abs(widgetWidth(s,count)*factor/(widgetHeight(s,count)*factor)-widgetWidth(s,count)/widgetHeight(s,count))<1e-12);
   }
  }
@@ -56,19 +56,19 @@ test('round dimensions and per-widget selection',async()=>{
 });
 
 
-test('quote off preserves dimensions; portrait redistributes the provider budget',()=>{
- for(const shape of ['portrait','landscape','square','circle','pill']) for(const theme of ['system','compact-strip','brutalist']) for(const count of [0,1,3,6]) {
+test('quote off preserves dimensions; portrait retains the shared provider budget',()=>{
+ for(const shape of shapes) for(const theme of ['system','compact-strip','brutalist']) for(const count of [0,1,3,6]) {
   const base={shape,theme};
   assert.equal(widgetWidth({...base,quoteEnabled:false},count),widgetWidth(base,count));
   assert.equal(widgetHeight({...base,quoteEnabled:false},count),widgetHeight(base,count));
-  assert.equal(widgetHeight({...base,quoteEnabled:true},count),widgetHeight(base,count)+(shape==='portrait'?320-40*(theme==='compact-strip'?1:Math.max(1,count)):0));
+  assert.equal(widgetHeight({...base,quoteEnabled:true},count),widgetHeight(base,count)+(shape==='portrait'?320:0));
  }
 });
 
 test('monitor fit handles panels, DPI and oversize without changing saved fine-tune',async()=>{
  const {monitorFit}=await import('../app/src/sizing.js');
  const monitor={width:1536,height:926,scale:1};
- for(const shape of ['portrait','landscape','square','circle','pill'])for(const sizePreset of Object.keys(sizePresets)) {
+ for(const shape of shapes)for(const sizePreset of Object.keys(sizePresets)) {
   const value=normalizeSize({shape,sizePreset,fineTune:82,quoteEnabled:true,position:'Top right',linux:{margin:12}});
   const fit=monitorFit(value,3,monitor);
   const actual=Math.min(value.scale,fit.maxScale)/value.scale;
@@ -86,4 +86,34 @@ test('frontend scale matrix matches the fixture deserialized by Rust',async()=>{
  assert.equal(normalizeSize({sizePreset:'Large',fineTune:82}).scale,98.4);
  assert.equal(normalizeSize({sizePreset:'Small',fineTune:82}).scale,69.7);
  assert.equal(normalizeSize({sizePreset:'2X-Large',fineTune:150}).scale,300);
+});
+
+test('strip geometry and one-time legacy loading migration',()=>{
+ assert.deepEqual(shapes,['portrait','landscape','square','circle','pill','strip']);
+ for(const theme of ['system','compact-strip','brutalist'])for(const count of [0,1,3,6]) {
+  assert.equal(widgetWidth({shape:'strip',theme},count),30+310*Math.max(1,count));
+  assert.equal(widgetHeight({shape:'strip',theme,quoteEnabled:true},count),326);
+ }
+ for(const shape of [undefined,'portrait']) {
+  const legacy=normalizeSize({theme:'compact-strip',shape},true);
+  assert.equal(legacy.shape,'strip');
+  assert.equal(normalizeSize({...legacy,shape:'portrait'},true).shape,'portrait');
+ }
+ for(const shape of shapes.filter(s=>s!=='portrait'))assert.equal(normalizeSize({theme:'compact-strip',shape},true).shape,shape);
+ assert.equal(normalizeSize({theme:'system'},true).shape,'portrait');
+ const root=normalizeSize({theme:'system',widgets:[{id:'old',overrides:{theme:'compact-strip'}},{id:'keep',overrides:{theme:'compact-strip',shape:'square'}}]},true);
+ assert.deepEqual(root.widgets,[{id:'old',overrides:{theme:'compact-strip',shape:'strip'}},{id:'keep',overrides:{theme:'compact-strip',shape:'square'}}]);
+ assert.deepEqual(normalizeSize(root,true),root);
+ assert.equal(normalizeSize({theme:'compact-strip',shape:'portrait'}).shape,'portrait');
+});
+
+test('every theme shares geometry and fit scale for identical settings',async()=>{
+ const {readdir}=await import('node:fs/promises');
+ const ids=(await readdir(new URL('../app/src/themes/',import.meta.url),{withFileTypes:true})).filter(e=>e.isDirectory()&&e.name!=='shared').map(e=>e.name);
+ const {fittedGeometry}=await import('../app/src/sizing.js');
+ for(const shape of shapes)for(const count of [0,1,3,6])for(const quoteEnabled of [true,false])for(const sizeMode of ['fixed','screen'])for(const sizePreset of Object.keys(sizePresets)) {
+  const base=normalizeSize({shape,quoteEnabled,sizeMode,sizePreset,fineTune:100,fitHeight:true});
+  const expected=fittedGeometry(base,count,{width:1920,height:1080,scale:1});
+  for(const theme of ids)assert.deepEqual(fittedGeometry({...base,theme},count,{width:1920,height:1080,scale:1}),expected);
+ }
 });

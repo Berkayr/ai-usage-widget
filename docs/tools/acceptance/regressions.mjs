@@ -253,17 +253,17 @@ try {
     const api = window.__AI_USAGE_DEMO__;
     const monitor = { width: 1920, height: 1080, scale: 1, primary: true };
     await api.setWorkArea([monitor]);
-    const maxAllowedArea = 0.35 * (monitor.width - 24) * (monitor.height - 24);
+    const maxAllowedArea = 0.5 * (monitor.width - 24) * (monitor.height - 24);
 
     for (const fraction of [1, 0.75, 0.5, 0.3333333333333333]) {
-      await api.setSettings({ theme: 'compact-strip', shape: 'portrait', sizeMode: 'screen', fitFraction: fraction, fineTune: 100 });
+      await api.setSettings({ theme: 'compact-strip', shape: 'strip', sizeMode: 'screen', fitFraction: fraction, fineTune: 100 });
       const rect = document.querySelector('#widget').getBoundingClientRect();
       const area = rect.width * rect.height;
       if (area > maxAllowedArea) {
         throw new Error(\`Strip exceeded screen budget at fraction \${fraction}: area \${area} > \${maxAllowedArea}\`);
       }
     }
-    return 'PASS: fit-strip (strip area bounded within 35% screen budget)';
+    return 'PASS: fit-strip (strip area bounded within 50% screen budget)';
   })()`);
   executedRegressions.push({ name: 'fit-strip', result: resFitStrip });
 

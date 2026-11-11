@@ -42,11 +42,6 @@ export function fitUsage(root) {
       el.style.fontSize = '11px';
     }
   }
-  if (document.documentElement.dataset.shape === 'portrait' && document.documentElement.classList.contains('fit-height') && cards.length) {
-    fitNaturalPortrait(root, cards);
-    fitHeader(root.closest('.widget'));
-    return;
-  }
   cards.forEach(fitPortraitGraphics);
   cards.forEach(compactCard);
   // Spend the existing compact tier before scrolling a long Portrait list.
@@ -74,31 +69,9 @@ export function fitUsage(root) {
   fitHeader(root.closest('.widget'));
 }
 
-// Measure unconstrained tracks before applying the window's available height.
-function fitNaturalPortrait(root, cards) {
-  const widget = root.closest('.widget');
-  const saved = [widget, root].map(el => el.getAttribute('style'));
-  widget.style.height = 'auto';
-  widget.style.maxHeight = 'none';
-  root.style.flex = 'none';
-  root.style.height = 'auto';
-  root.style.gridTemplateRows = 'none';
-  root.style.gridAutoRows = 'max-content';
-  const height = Math.ceil(Math.max(...cards.map(card => {
-    const style = getComputedStyle(card);
-    return Math.max(card.getBoundingClientRect().height, card.scrollHeight + parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth));
-  })));
-  // Expanded history belongs only to its own card.
-  if (!root.querySelector('.usage-history')) root.style.gridAutoRows = `${height}px`;
-  const naturalHeight = Math.ceil(widget.getBoundingClientRect().height);
-  [widget, root].forEach((el, i) => saved[i] == null ? el.removeAttribute('style') : el.setAttribute('style', saved[i]));
-  widget.style.setProperty('--usage-fit-height', `${naturalHeight}px`);
-  widget.dataset.usageHeight = naturalHeight;
-}
-
-// Native resizing must use the desired content height, even in a short viewport.
+// Native resizing uses the shared geometry even in a short viewport.
 export function fittedUsageHeight(widget, limit = Infinity) {
-  return Math.min(Number(widget.dataset.usageHeight) || widget.getBoundingClientRect().height, limit);
+  return Math.min(parseFloat(getComputedStyle(widget).getPropertyValue('--widget-height')) || widget.getBoundingClientRect().height, limit);
 }
 
 function growPortraitContent(root, cards) {
@@ -128,7 +101,8 @@ function fitPortraitGraphics(card) {
   const reserved = [...card.children].filter(el => el !== ring && (!paired || !el.classList.contains('windows'))).reduce((sum, el) => sum + outerHeight(el), 0);
   const labels = [...ring.querySelector('.ring-center').children].reduce((sum, el) => sum + el.getBoundingClientRect().height, 0);
   const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
-  card.style.minHeight = `${reserved + labels + padding + parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth)}px`;
+  // Keep the shared track height; compactCard handles labels that exceed it.
+  card.style.minHeight = '0';
   const available = card.clientHeight - padding - reserved;
   ring.style.height = `${Math.max(labels, Math.min(ring.getBoundingClientRect().height, available))}px`;
 }
