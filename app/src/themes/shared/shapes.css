@@ -183,6 +183,24 @@
 :root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .segments i{height:100%}
 :root[data-quote=true][data-shape=landscape] .provider-card[data-usage-compact=true] .segments>em{top:0;height:100%}
 
+/* Theme card chrome can outrank the shared compact tier; keep its frame while
+   reclaiming authored padding and row gaps when the measured card is too small. */
+:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true]{padding:2px 4px}
+:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .provider-heading{min-height:0;padding-block:0;margin-bottom:1px;gap:2px}
+:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .windows{gap:1px}
+:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{padding:0;gap:1px}
+:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .window-bottom{margin-top:0;line-height:1}
+:root[data-theme] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] :is(.segments,.dot-bar){margin-top:1px}
+:root[data-theme=circular-rings] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true]{column-gap:4px;row-gap:1px}
+:root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{grid-template-columns:38px minmax(0,1fr) 34px 40px!important;column-gap:2px!important;min-height:0!important}
+:root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .window-bottom>.reset{max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1}
+:root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .quota-window{padding:0!important;row-gap:0!important}
+:root[data-theme=crisp] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .window-bottom>:not(.reset){display:none!important}
+:root[data-theme=layer] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true]{height:100%!important;margin:0!important;overflow:hidden!important}
+:root[data-theme=layer] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true]::before{inset:2px 2px 0 2px!important}
+:root[data-theme=layer] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true]::after{inset:4px 4px 0 4px!important}
+:root[data-theme=layer] #widget.widget .provider-card:nth-child(n)[data-usage-compact=true] .quota-window+.quota-window{padding-top:1px;border-top-width:1px}
+
 /* Full-width square rows retain both windows at every preset. */
 .heading-reset{display:none}
 :root[data-shape=square] .widget .provider-list{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(var(--provider-count),minmax(0,1fr));gap:.375rem;padding-bottom:0}
