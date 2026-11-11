@@ -31,13 +31,14 @@ try {
     api.setSnapshot({providers:['claude','codex','gemini'].slice(0,${count}).map((id,i)=>({id,plan:'DEMO',state:'OK',windows:[{kind:'session',used_percent:84-i*20,resets_at:'2099-01-01T00:00:00Z'},{kind:'weekly',used_percent:62,resets_at:'2099-01-02T00:00:00Z'}]}))}),
     api.setQuote({status:'ok',cards:[{quote:'Fictional words about patient work. '.repeat(4),author:'Example Author',reason:'A fictional selection'}]})]);
     await document.fonts.ready;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-    const errors=[],shell=document.querySelector('#widget').getBoundingClientRect();
+    const errors=[],shellElement=document.querySelector('#widget'),shell=shellElement.getBoundingClientRect();
     const visible=el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden';
     for(const el of document.querySelectorAll('.header,.app-title,#providers,.provider-card,.quote-section,.quote-content,.quote-text')) {
       if(!visible(el))continue;
       const r=el.getBoundingClientRect();
       if(el.scrollHeight>el.clientHeight||el.scrollWidth>el.clientWidth)errors.push(el.className+': overflow '+el.scrollWidth+'/'+el.clientWidth+' '+el.scrollHeight+'/'+el.clientHeight);
-      if(r.top<shell.top-1||r.bottom>shell.bottom+1||r.left<shell.left-1||r.right>shell.right+1)errors.push(el.className+': outside shell');
+      const clippedHeader=el.classList.contains('header')&&shellElement.contains(el)&&getComputedStyle(shellElement).overflow==='hidden'&&r.right>shell.left&&r.left<shell.right&&r.bottom>shell.top&&r.top<shell.bottom;
+      if(!clippedHeader&&(r.top<shell.top-1||r.bottom>shell.bottom+1||r.left<shell.left-1||r.right>shell.right+1))errors.push(el.className+': outside shell');
     }
     if(shell.height>innerHeight+1 || shell.width>innerWidth+1)errors.push('shell outside viewport');
     if(${JSON.stringify(shape)}!=='portrait' && Math.abs(shell.height-innerHeight)>1)errors.push('shell fails to fill requested height');

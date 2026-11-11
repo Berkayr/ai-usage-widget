@@ -246,6 +246,7 @@
 
 /* Fit promotes the existing number/base type tiers before returning spare height. */
 :root[data-shape=portrait][data-portrait-fit=true] .widget .provider-list{--size-font-number:calc(1.25rem + var(--portrait-growth,0) * 1rem);--size-font-base:calc(.9375rem + var(--portrait-growth,0) * .125rem);--size-gap:calc(.625rem + var(--portrait-growth,0) * .25rem)}
+:root[data-shape=portrait][data-portrait-fit=true][data-micro-shape=true] .widget .windows{gap:0}
 
 :root[data-shape=portrait] .widget .quote-section{flex:0 1 auto;min-height:10rem}
 
