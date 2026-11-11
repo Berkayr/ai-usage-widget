@@ -66,12 +66,12 @@ try {
   // Shell controls before navigating categories
   await scanScope('settings-shell');
 
-  const linuxCategories = ['providers', 'appearance', 'layout', 'position', 'quote', 'desktop', 'about'];
+  const linuxCategories = ['general', 'theme', 'colors', 'shape-size', 'display', 'providers', 'history', 'about'];
   for (const cat of linuxCategories) {
     await b.evaluate(`document.querySelector('[data-category="${cat}"]')?.click()`);
     await new Promise(r => setTimeout(r, 40));
 
-    if (cat === 'appearance') {
+    if (cat === 'colors') {
       // Expand palette swatches
       await b.evaluate(`(() => {
         const show = [...document.querySelectorAll('#palette-tools button')].find(b => b.textContent.includes('Show'));
@@ -94,7 +94,7 @@ try {
       })()`);
       await new Promise(r => setTimeout(r, 40));
       await scanScope('settings:appearance-delete-confirm');
-    } else if (cat === 'layout') {
+    } else if (cat === 'shape-size') {
       // Test different shapes to reveal shape-specific controls
       for (const shape of ['circle', 'pill', 'portrait', 'square', 'landscape']) {
         await b.evaluate(`document.querySelector('[data-shape="${shape}"]')?.click()`);
@@ -107,10 +107,10 @@ try {
       await scanScope('settings:layout-screen');
       // Revert to fixed
       await b.evaluate(`document.querySelector('[data-size="Medium"]')?.click()`);
-    } else if (cat === 'position') {
+    } else if (cat === 'display') {
       // Open advanced details
       await b.evaluate(`(() => {
-        const det = document.querySelector('#category-position details');
+        const det = document.querySelector('#category-display details');
         if (det) det.open = true;
       })()`);
       await scanScope('settings:position-advanced');

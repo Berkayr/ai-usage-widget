@@ -1,4 +1,4 @@
-import {canOverride, newWidgetId, overrideKeys} from './settings-widgets.js';
+import {canOverride, newWidgetId, overrideCategories} from './settings-widgets.js';
 
 export function mountWidgetPicker({sections, bindings, root, selected, select, refresh, mutate}) {
   const box = document.createElement('div');
@@ -48,12 +48,7 @@ export function mountWidgetPicker({sections, bindings, root, selected, select, r
     select('main');
     mutate(value => { value.widgets = value.widgets.filter(w => w.id !== id); });
   };
-  const keys = {
-    general:['showExtraWindows', 'quoteEnabled', 'quoteMode', 'quotePosition', 'quoteNavigation'],
-    providers:['widgetProviders', 'featuredProvider', 'featuredPosition'],
-    history:[...overrideKeys].filter(k => k.startsWith('history'))
-  };
-  keys.appearance = [...overrideKeys].filter(k => !Object.values(keys).flat().includes(k));
+  const keys = overrideCategories;
   const resets = {};
   for (const [id, section] of Object.entries(sections)) {
     const button = document.createElement('button');
@@ -62,7 +57,7 @@ export function mountWidgetPicker({sections, bindings, root, selected, select, r
     button.onclick = () => mutate(value => {
       const widget = value.widgets.find(w => w.id === selected());
       for (const key of keys[id] || []) delete widget.overrides[key];
-      if (id === 'appearance') delete widget.overrides.linux;
+      if (id === 'display') delete widget.overrides.linux;
     });
     section.querySelector('h1').after(button);
     resets[id] = button;
@@ -87,7 +82,7 @@ export function mountWidgetPicker({sections, bindings, root, selected, select, r
       $('widget-details').dataset.id = id;
       for (const [category, button] of Object.entries(resets)) {
         button.hidden = !widget || !Object.keys(widget.overrides).some(k =>
-          (keys[category] || []).includes(k) || category === 'appearance' && k === 'linux');
+          (keys[category] || []).includes(k) || category === 'display' && k === 'linux');
       }
       for (const row of document.querySelectorAll('#settings label.setting-row, #settings .provider-choice, #settings .provider-order-row, #palette-tools label')) {
         const input = row.querySelector('input,select');

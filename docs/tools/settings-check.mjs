@@ -13,7 +13,7 @@ try {
   const check=await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)};
     assert($('#status').dataset.state!=='failure','Initialization: '+$('#status').textContent);
-    assert([...document.querySelectorAll('[data-category]')].map(b=>b.dataset.category).join(',')==='general,appearance,providers,history,taskbar,about','Six categories');
+    assert([...document.querySelectorAll('[data-category]')].map(b=>b.dataset.category).join(',')==='general,theme,colors,shape-size,display,providers,history,taskbar,about','Nine categories');
     $('[data-category=general]').click();
     assert(!$('#quote-enabled').checked,'Quote off by default');
     assert($('#category-general').textContent.includes('Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) once a day. No account or identifiers are sent.'),'Quote disclosure');
@@ -24,7 +24,7 @@ try {
     $('#quote-navigation').click();
     $('#save').click();await new Promise(r=>setTimeout(r,50));
     $('#quote-enabled').click();$('#revert').click();assert($('#quote-enabled').checked&&$('#quote-mode').value==='mixed'&&$('#quote-position').value==='top'&&!$('#quote-navigation').checked,'Quote save/revert');
-    $('[data-category=appearance]').click();
+    $('[data-category=colors]').click();
     $('[data-theme="dot-matrix"]').click();
     assert($('#palette-grid .palette-option i'),'Palette colors');
     assert(/^[1-9][0-9]* unsaved changes$/.test($('#status').textContent),'Dirty theme');
@@ -46,14 +46,14 @@ try {
     a.nextElementSibling.click();assert(a.value!=='#123456','Reset palette');
     $('#save').click();await new Promise(r=>setTimeout(r,50));assert($('#save').disabled&&['success','clean'].includes($('#status').dataset.state),'Save');
     $('[data-theme="terminal"]').click();$('#revert').click();assert($('[data-theme="dot-matrix"]').getAttribute('aria-pressed')==='true','Revert theme');
-    $('[data-category=appearance]').click();
-    assert(document.querySelectorAll('[data-shape]').length===6,'Six shapes');
+    $('[data-category=colors]').click();
+    $('[data-category=shape-size]').click();assert(document.querySelectorAll('[data-shape]').length===6,'Six shapes');
     assert(document.querySelectorAll('.scale-presets button').length===6,'Six visible size choices');
-    $('[data-theme=reactor]').click();$('[data-shape=circle]').click();
+    $('[data-category=theme]').click();$('[data-theme=reactor]').click();$('[data-category=shape-size]').click();$('[data-shape=circle]').click();
     assert(!$('#reactor-motion').closest('label').hidden&&$('#dot-count').closest('label').hidden,'Reactor motion applies to circle');
     $('[data-shape=portrait]').click();assert($('#reactor-motion').closest('label').hidden&&!$('#dot-count').closest('label').hidden,'Portrait reactor uses dot count');
-    $('[data-theme=system]').click();assert($('#dot-count').closest('label').hidden,'System does not use dot count');
-    $('[data-theme=dot-matrix]').click();
+    $('[data-category=theme]').click();$('[data-theme=system]').click();assert($('#dot-count').closest('label').hidden,'System does not use dot count');
+    $('[data-category=theme]').click();$('[data-theme=dot-matrix]').click();
 
     const order=()=>[...document.querySelectorAll('[data-layout-provider]')].map(el=>el.dataset.layoutProvider);
     const original=order();
@@ -101,7 +101,7 @@ try {
     assert(parseFloat($('#map-widget').style.left)>30,'Center position');
     $('#cancel-position').click();assert($('#placement-actions').hidden,'Cancel placement');
     const width=document.documentElement.scrollWidth;assert(width<=innerWidth,'Page overflow');
-    $('[data-category=appearance]').click();
+    $('[data-category=colors]').click();
     return 'PASS: categories, palette colors/selection/reset, Save, Revert, five sizes, fine-tune preserved across themes, placement, Center, Cancel';
   })()`);
   console.log(check);
@@ -143,7 +143,7 @@ try {
   await b.navigate('/?settings','window.__SETTINGS_READY__');
   console.log(await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
-    $('[data-category=appearance]').click();
+    $('[data-category=colors]').click();
     assert($('[data-size=Medium] small').textContent==='340 × 746 px','Fit must exclude unavailable fourth provider');
     let verifiedRows=0;
     for(const row of ${JSON.stringify(scaleMatrix)}) {
@@ -186,7 +186,7 @@ try {
     console.log(await b.evaluate(`(async()=>{
       const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
       assert($('#status').dataset.state!=='failure','Native bridge initialization: '+$('#status').textContent);
-      $('[data-category=appearance]').click();
+      $('[data-category=colors]').click();
       $('[data-shape=circle]').click();assert(document.querySelectorAll('[data-widget-provider]:checked').length===3,'Default first three');
       assert($('[data-widget-provider=copilot]').disabled,'Fourth selection must be disabled');
       $('[data-widget-provider=claude]').click();$('[data-widget-provider=copilot]').click();
@@ -215,7 +215,7 @@ try {
   }
   console.log(await b.evaluate(`(async()=>{
     const $=s=>document.querySelector(s),assert=(v,s)=>{if(!v)throw Error(s)},native=window.__FAKE_NATIVE__;
-    await native.reopen();$('[data-category=appearance]').click();
+    await native.reopen();$('[data-category=colors]').click();
     const set=(id,value)=>{const el=$('#'+id);el.value=value;el.dispatchEvent(new Event('change'));};
     assert($('#size-mode').value==='fixed','Existing settings must default to fixed');
     const fixed=native.previews.at(-1)?.scale ?? 150;
@@ -257,7 +257,7 @@ try {
       assert($('#status').textContent==='Changes preview live on the widget','Initial live preview status');
       window.dispatchEvent(new KeyboardEvent('keydown',{key:'s',ctrlKey:true}));
       assert(window.__FAKE_NATIVE__.saves.length===0,'Clean Ctrl+S wrote settings');
-      $('[data-category=appearance]').click();
+      $('[data-category=colors]').click();
       const color=$('[data-provider-color=claude]');color.value='#123456';color.dispatchEvent(new Event('input'));
       color.nextElementSibling.click();assert($('#save').disabled&&$('#revert').disabled,'Color reset left an empty-object dirty state');
       return 'PASS: clean buttons, clean Ctrl+S, provider color reset returns clean';
@@ -289,7 +289,7 @@ try {
     for(const platform of ['linux','windows']) {
       await b.navigate('/?settings&sample&platform='+platform,'window.__SETTINGS_READY__');
       const categories=await b.evaluate(`[...document.querySelectorAll('[data-category]')].filter(b=>!b.hidden).map(b=>b.dataset.category)`);
-      if(categories.length!==(platform==='windows'?6:5)||categories.includes('taskbar')!==(platform==='windows'))throw Error('Platform category visibility');
+      if(categories.length!==(platform==='windows'?9:8)||categories.includes('taskbar')!==(platform==='windows'))throw Error('Platform category visibility');
       for(const id of categories) {
         await b.evaluate(`document.querySelector('[data-category=${id}]').click();document.querySelector('.settings-content').scrollTop=0`);
         await b.evaluate(`(()=>{
@@ -298,23 +298,23 @@ try {
           if(section.scrollWidth>section.clientWidth+1)throw Error('Page overflow: ${platform}/${id} '+section.scrollWidth+'/'+section.clientWidth);
         })()`);
         await screenshot(`${platform}-${id}-${scheme}`);
-        if(platform==='linux'&&id==='appearance') {
+        if(platform==='linux'&&id==='theme') {
           const png=await b.cdp('Page.captureScreenshot',{format:'png'});
     if (!process.env.SKIP_AUDIT_SCREENSHOTS) await writeFile(`${output}/settings-${scheme}.png`,Buffer.from(png.data,'base64'));
         }
-        if(platform==='linux'&&id==='appearance') {
+        if(platform==='linux'&&id==='colors') {
           await b.evaluate(`document.querySelector('#provider-colors').scrollIntoView({block:'end'})`);
           await screenshot(`theme-colors-${scheme}`);
         }
-        if(platform==='linux'&&id==='appearance') {
+        if(platform==='linux'&&id==='shape-size') {
           await b.evaluate(`document.querySelector('#fit-screen').click()`);
           await screenshot(`screen-share-${scheme}`);
           await b.evaluate(`document.querySelector('#revert').click()`);
         }
-        if(platform==='linux'&&id==='appearance') {
-          await b.evaluate(`const details=document.querySelector('#category-appearance details');details.open=true;details.scrollIntoView({block:'end'})`);
+        if(platform==='linux'&&id==='display') {
+          await b.evaluate(`const details=document.querySelector('#category-display details');details.open=true;details.scrollIntoView({block:'end'})`);
           await screenshot(`position-advanced-${scheme}`);
-          await b.evaluate(`document.querySelector('#category-appearance details').open=false`);
+          await b.evaluate(`document.querySelector('#category-display details').open=false`);
         }
         if(platform==='linux'&&id==='providers') {
           await b.evaluate(`document.querySelector('#featured-position').scrollIntoView({block:'end'})`);
@@ -323,10 +323,10 @@ try {
       }
     }
   }
-  console.log('PASS: all six categories at 900 × 900 in light/dark with platform visibility; all five Save states captured');
+  console.log('PASS: all nine categories at 900 × 900 in light/dark with platform visibility; all five Save states captured');
   console.log(await b.evaluate(`(()=>{
     const $=s=>document.querySelector(s),assert=(v,m)=>{if(!v)throw Error(m)};
-    $('[data-category=appearance]').click();$('[data-theme=system]').click();$('[data-shape=portrait]').click();
+    $('[data-category=theme]').click();$('[data-category=theme]').click();$('[data-theme=system]').click();$('[data-category=shape-size]').click();$('[data-shape=portrait]').click();
     $('#scale').value=100;$('#scale').dispatchEvent(new Event('input'));$('[data-size=Medium]').click();$('#fit-screen').click();
     for(const shape of ['landscape','square','circle','pill']){
       $('[data-shape='+shape+']').click();
@@ -356,11 +356,11 @@ try {
     assert(/^[a-z0-9-]{1,24}$/.test(first)&&first!=='main','Generated ID');
     assert(native.previewTargets.at(-1).root.widgets[0].overrides&&Object.keys(native.previewTargets.at(-1).root.widgets[0].overrides).length===0,'New widget must inherit Main');
     change('widget-name','Side display');
-    $('[data-category=appearance]').click();$('[data-theme=terminal]').click();
+    $('[data-category=theme]').click();$('[data-theme=terminal]').click();
     [...document.querySelectorAll('#placement-presets button')].find(b=>b.textContent==='Bottom right').click();await wait();
     assert(native.previewTargets.at(-1).id===first,'Preview targeted wrong widget');
     assert(native.previews.at(-1).position==='Bottom right','Effective corner missing');
-    assert($('#category-appearance .widget-reset').hidden===false,'Override reset missing');
+    assert($('#category-display .widget-reset').hidden===false,'Override reset missing');
     assert($('#reactor-motion').closest('label').textContent.includes('Shared by all widgets'),'Shared note');
     assert(!$('#featured-provider').closest('label').textContent.includes('Shared by all widgets'),'Overridable field marked shared');
     assert($('#disconnected').disabled&&$('#disconnected').value==='hide','Additional widget policy');
@@ -368,8 +368,8 @@ try {
     choose('main');assert($('#reactor-motion').checked,'Shared setting did not go to root');
     assert($('#position').value==='Top right'&&$('#theme-picker [data-theme=system]').getAttribute('aria-pressed')==='true','Child changed Main');
     choose(first);assert($('#position').value==='Bottom right','Switch lost override');
-    $('#category-appearance .widget-reset').click();await wait();
-    assert($('#position').value==='Top right'&&$('#category-appearance .widget-reset').hidden,'Reset to Main');
+    $('#category-display .widget-reset').click();await wait();
+    assert($('#position').value==='Top right'&&$('#category-display .widget-reset').hidden,'Reset to Main');
     $('[data-theme=terminal]').click();
     choose('+');await wait();$('#widget-create').click();await wait();
     const second=$('#widget-select').value;
@@ -392,7 +392,7 @@ try {
     native.disconnected=true;choose('+');await wait();$('#widget-add-cancel').click();choose(first);
     assert(!$('#widget-monitor-status').hidden&&$('#widget-monitor-status').textContent==='Monitor not connected; hidden until it returns','Missing monitor state');
     assert($('#widget-select option:checked').classList.contains('widget-disconnected'),'Disconnected option not dimmed');
-    $('[data-category=appearance]').click();$('[data-theme=system]').click();await wait();
+    $('[data-category=theme]').click();$('[data-theme=system]').click();await wait();
     assert(native.previewTargets.at(-1).id===first,'Disconnected widget cannot be edited');
     $('#widget-remove').click();assert(!$('#widget-remove-confirm').hidden,'Inline confirmation missing');
     $('#widget-remove-cancel').click();assert($('#widget-remove-confirm').hidden,'Remove cancel');
@@ -406,7 +406,7 @@ try {
     assert(native.saves.at(-1).widgets.length===1,'Removal not persisted');
     choose('main');assert($('#widget-details').hidden,'Main removal must be unavailable');
     choose('+');await wait();assert($('#widget-create').disabled,'No-monitor Add must be disabled');$('#widget-add-cancel').click();
-    choose(second);$('[data-category=appearance]').click();
+    choose(second);$('[data-category=colors]').click();
     return 'PASS: widget add/name/monitor/unique ID, targeted previews, shared fields, Reset to Main, cross-widget Save/count, disconnected edit, inline Remove/Cancel, Revert and persisted removal';
   })()`));
   const widgetPng=await b.cdp('Page.captureScreenshot',{format:'png'});

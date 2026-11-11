@@ -5,7 +5,7 @@ export async function auditPaletteSettings(b) {
     const $=s=>document.querySelector(s),assert=(v,m)=>{if(!v)throw Error(m)};
     const click=text=>[...document.querySelectorAll('#palette-tools button')].find(b=>b.textContent===text).click();
     const settle=()=>new Promise(r=>setTimeout(r,80));
-    $('[data-category=appearance]').click();click('New palette');
+    $('[data-category=colors]').click();click('New palette');
     await settle();assert(window.__FAKE_NATIVE__.previews.at(-1).userPalettes.length===1,'User palette live IPC preview');
     $('#save').click();await settle();
     assert($('#save').disabled&&$('#status').dataset.state==='success','User palette honest Save');

@@ -1,5 +1,50 @@
 [
   {
+    "id": "category:general",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to General",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"general\"]"
+  },
+  {
+    "id": "category:theme",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Theme",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"theme\"]"
+  },
+  {
+    "id": "category:colors",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Colors",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"colors\"]"
+  },
+  {
+    "id": "category:shape-size",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Shape & Size",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"shape-size\"]"
+  },
+  {
+    "id": "category:display",
+    "where": "shell",
+    "setting": null,
+    "effect": "Switches active category view to Display",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-category=\"display\"]"
+  },
+  {
     "id": "category:providers",
     "where": "shell",
     "setting": null,
@@ -9,40 +54,13 @@
     "selector": "button[data-category=\"providers\"]"
   },
   {
-    "id": "category:appearance",
+    "id": "category:history",
     "where": "shell",
     "setting": null,
-    "effect": "Switches active category view to Theme",
+    "effect": "Switches active category view to History",
     "modes": "all",
     "disabledWhen": "never",
-    "selector": "button[data-category=\"appearance\"]"
-  },
-  {
-    "id": "category:layout",
-    "where": "shell",
-    "setting": null,
-    "effect": "Switches active category view to Size & Shape",
-    "modes": "all",
-    "disabledWhen": "never",
-    "selector": "button[data-category=\"layout\"]"
-  },
-  {
-    "id": "category:position",
-    "where": "shell",
-    "setting": null,
-    "effect": "Switches active category view to Position",
-    "modes": "all",
-    "disabledWhen": "never",
-    "selector": "button[data-category=\"position\"]"
-  },
-  {
-    "id": "category:quote",
-    "where": "shell",
-    "setting": null,
-    "effect": "Switches active category view to Quote",
-    "modes": "all",
-    "disabledWhen": "never",
-    "selector": "button[data-category=\"quote\"]"
+    "selector": "button[data-category=\"history\"]"
   },
   {
     "id": "category:taskbar",
@@ -54,19 +72,10 @@
     "selector": "button[data-category=\"taskbar\"]"
   },
   {
-    "id": "category:desktop",
-    "where": "shell",
-    "setting": null,
-    "effect": "Switches active category view to Desktop",
-    "modes": "linux",
-    "disabledWhen": "Hidden on Windows (visible only on Linux)",
-    "selector": "button[data-category=\"desktop\"]"
-  },
-  {
     "id": "category:about",
     "where": "shell",
     "setting": null,
-    "effect": "Switches active category view to General",
+    "effect": "Switches active category view to About",
     "modes": "all",
     "disabledWhen": "never",
     "selector": "button[data-category=\"about\"]"
@@ -185,7 +194,7 @@
   },
   {
     "id": "theme:reactor",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to Reactor",
     "modes": "all",
@@ -194,7 +203,7 @@
   },
   {
     "id": "theme:system",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to System",
     "modes": "all",
@@ -203,7 +212,7 @@
   },
   {
     "id": "theme:dot-matrix",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to Dot Matrix",
     "modes": "all",
@@ -212,7 +221,7 @@
   },
   {
     "id": "theme:circular-rings",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to Circular Rings",
     "modes": "all",
@@ -221,7 +230,7 @@
   },
   {
     "id": "theme:terminal",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to Terminal",
     "modes": "all",
@@ -230,7 +239,7 @@
   },
   {
     "id": "theme:frosted-glass",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to Frosted Glass",
     "modes": "all",
@@ -239,7 +248,7 @@
   },
   {
     "id": "theme:brutalist",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to Brutalist",
     "modes": "all",
@@ -248,7 +257,7 @@
   },
   {
     "id": "theme:compact-strip",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to Compact Strip",
     "modes": "all",
@@ -257,7 +266,7 @@
   },
   {
     "id": "theme:retro-lcd",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to Retro LCD",
     "modes": "all",
@@ -266,7 +275,7 @@
   },
   {
     "id": "theme:minimal-pace",
-    "where": "appearance",
+    "where": "theme",
     "setting": "theme",
     "effect": "Switches theme to Minimal Pace",
     "modes": "all",
@@ -275,7 +284,7 @@
   },
   {
     "id": "palette-option:*",
-    "where": "appearance",
+    "where": "colors",
     "setting": "palette",
     "effect": "Selects palette swatch for current theme",
     "modes": "all",
@@ -285,7 +294,7 @@
   },
   {
     "id": "palette-show-all",
-    "where": "appearance",
+    "where": "colors",
     "setting": null,
     "effect": "Toggles showing all built-in and user palette swatches versus first 6",
     "modes": "all",
@@ -294,7 +303,7 @@
   },
   {
     "id": "palette-new",
-    "where": "appearance",
+    "where": "colors",
     "setting": "userPalettes",
     "effect": "Creates a new custom user palette cloned from current colors and opens editor",
     "modes": "all",
@@ -303,7 +312,7 @@
   },
   {
     "id": "palette-duplicate",
-    "where": "appearance",
+    "where": "colors",
     "setting": "userPalettes",
     "effect": "Duplicates currently selected palette as a new editable user palette",
     "modes": "all",
@@ -312,7 +321,7 @@
   },
   {
     "id": "palette-edit",
-    "where": "appearance",
+    "where": "colors",
     "setting": null,
     "effect": "Toggles user palette editor panel to customize colors and name",
     "modes": "all",
@@ -321,7 +330,7 @@
   },
   {
     "id": "palette-delete",
-    "where": "appearance",
+    "where": "colors",
     "setting": null,
     "effect": "Shows inline confirmation prompt to delete selected user palette",
     "modes": "all",
@@ -330,7 +339,7 @@
   },
   {
     "id": "palette-delete-confirm",
-    "where": "appearance",
+    "where": "colors",
     "setting": "userPalettes",
     "effect": "Confirms deletion of user palette and reverts selection to first built-in palette",
     "modes": "all",
@@ -339,7 +348,7 @@
   },
   {
     "id": "palette-delete-cancel",
-    "where": "appearance",
+    "where": "colors",
     "setting": null,
     "effect": "Cancels user palette deletion and hides confirmation prompt",
     "modes": "all",
@@ -348,7 +357,7 @@
   },
   {
     "id": "palette-export",
-    "where": "appearance",
+    "where": "colors",
     "setting": null,
     "effect": "Serializes all user palettes to JSON and places them in the transfer textarea",
     "modes": "all",
@@ -357,7 +366,7 @@
   },
   {
     "id": "palette-import",
-    "where": "appearance",
+    "where": "colors",
     "setting": "userPalettes",
     "effect": "Parses user palettes JSON from transfer textarea, merges by ID, and selects first imported",
     "modes": "all",
@@ -366,7 +375,7 @@
   },
   {
     "id": "palette-transfer",
-    "where": "appearance",
+    "where": "colors",
     "setting": null,
     "effect": "Textarea for pasting or copying user palettes JSON data",
     "modes": "all",
@@ -375,7 +384,7 @@
   },
   {
     "id": "palette-name",
-    "where": "appearance",
+    "where": "colors",
     "setting": "userPalettes.name",
     "effect": "Edits the display name of the selected user palette (up to 40 characters)",
     "modes": "all",
@@ -384,7 +393,7 @@
   },
   {
     "id": "user-palette-token-color:*",
-    "where": "appearance",
+    "where": "colors",
     "setting": "userPalettes",
     "effect": "Color picker for user palette token in dark or light mode",
     "modes": "all",
@@ -394,7 +403,7 @@
   },
   {
     "id": "user-palette-token-hex:*",
-    "where": "appearance",
+    "where": "colors",
     "setting": "userPalettes",
     "effect": "Text input for user palette token color hex value in dark or light mode",
     "modes": "all",
@@ -404,7 +413,7 @@
   },
   {
     "id": "appearance",
-    "where": "appearance",
+    "where": "colors",
     "setting": "appearance",
     "effect": "Selects desktop appearance mode: auto (follows system), light, or dark",
     "modes": "all",
@@ -413,7 +422,7 @@
   },
   {
     "id": "color-mode",
-    "where": "appearance",
+    "where": "colors",
     "setting": "colorMode",
     "effect": "Selects color mode: calm (neutral ink below 50%), vivid (theme hues), mono (pure B&W with hatched warning marks)",
     "modes": "all",
@@ -422,7 +431,7 @@
   },
   {
     "id": "accent",
-    "where": "appearance",
+    "where": "colors",
     "setting": "accent",
     "effect": "Sets custom accent color override; clears on palette selection",
     "modes": "all",
@@ -431,7 +440,7 @@
   },
   {
     "id": "accent-reset",
-    "where": "appearance",
+    "where": "colors",
     "setting": "accent",
     "effect": "Clears custom accent override and resets to active palette accent color",
     "modes": "all",
@@ -440,7 +449,7 @@
   },
   {
     "id": "background",
-    "where": "appearance",
+    "where": "colors",
     "setting": "background",
     "effect": "Sets custom widget background color override; clears on palette selection",
     "modes": "all",
@@ -449,7 +458,7 @@
   },
   {
     "id": "background-reset",
-    "where": "appearance",
+    "where": "colors",
     "setting": "background",
     "effect": "Clears custom background override and resets to active palette background color",
     "modes": "all",
@@ -458,7 +467,7 @@
   },
   {
     "id": "widget-opacity",
-    "where": "appearance",
+    "where": "colors",
     "setting": "widgetOpacity",
     "effect": "Adjusts widget surface opacity from 20% to 100% while keeping text opaque",
     "modes": "all",
@@ -467,7 +476,7 @@
   },
   {
     "id": "background-opacity",
-    "where": "appearance",
+    "where": "colors",
     "setting": "backgroundOpacity",
     "effect": "Adjusts widget background opacity from 0% to 100%",
     "modes": "all",
@@ -476,7 +485,7 @@
   },
   {
     "id": "accent-edge",
-    "where": "appearance",
+    "where": "colors",
     "setting": "accentEdge",
     "effect": "Configures colored accent edge indicator: off, auto (corner-following), left, or right",
     "modes": "all",
@@ -485,7 +494,7 @@
   },
   {
     "id": "dot-count",
-    "where": "appearance",
+    "where": "theme",
     "setting": "dotCount",
     "effect": "Selects number of meter marks per quota window (10, 20, or 30)",
     "modes": "all except theme: system and shape: circle",
@@ -494,7 +503,7 @@
   },
   {
     "id": "reactor-motion",
-    "where": "appearance",
+    "where": "theme",
     "setting": "reactorMotion",
     "effect": "Toggles core breathing glow animation in Reactor theme",
     "modes": "theme: reactor, shape: circle",
@@ -503,7 +512,7 @@
   },
   {
     "id": "provider-color:*",
-    "where": "appearance",
+    "where": "colors",
     "setting": "providerColors",
     "effect": "Overrides identity color for provider across all shapes",
     "modes": "all",
@@ -513,7 +522,7 @@
   },
   {
     "id": "provider-color-reset:*",
-    "where": "appearance",
+    "where": "colors",
     "setting": "providerColors",
     "effect": "Clears identity color override for provider and resets to theme default",
     "modes": "all",
@@ -986,7 +995,7 @@
     "id": "linux-margin",
     "where": "desktop",
     "setting": "linux.margin",
-    "effect": "Sets screen margin in logical pixels (0–64 px) for layer-shell anchor",
+    "effect": "Sets screen margin in logical pixels (0\u201364 px) for layer-shell anchor",
     "modes": "linux",
     "disabledWhen": "Hidden on Windows or when layer-shell is unavailable on Linux",
     "selector": "input#linux-margin"
@@ -1029,7 +1038,7 @@
   },
   {
     "id": "palette-select",
-    "where": "appearance",
+    "where": "colors",
     "setting": "palette",
     "effect": "Selects active palette by ID",
     "modes": "all",

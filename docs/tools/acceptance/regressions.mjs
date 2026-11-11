@@ -173,7 +173,7 @@ try {
   const resScaleDecimal = await evaluate('ScaleDecimal', `(async () => {
     const $ = s => document.querySelector(s);
     const native = window.__FAKE_NATIVE__;
-    $('[data-category="layout"]').click();
+    $('[data-category="shape-size"]').click();
     $('#scale').value = 82;
     $('#scale').dispatchEvent(new Event('input'));
     $('[data-size="Large"]').click();
@@ -432,7 +432,7 @@ try {
   const resSaveHonest = await evaluate('SaveHonest', `(async () => {
     const $ = s => document.querySelector(s);
     const native = window.__FAKE_NATIVE__;
-    $('[data-category="layout"]').click();
+    $('[data-category="shape-size"]').click();
     $('#scale').value = 95;
     $('#scale').dispatchEvent(new Event('input'));
     native.fail = 'save_settings';
@@ -489,7 +489,7 @@ try {
     const native = window.__FAKE_NATIVE__;
     const settle = () => new Promise(r => setTimeout(r, 50));
 
-    $('[data-category="appearance"]').click();
+    $('[data-category="theme"]').click();
     const newBtn = [...document.querySelectorAll('#palette-tools button')].find(b => b.textContent === 'New palette');
     newBtn.click();
     await settle();

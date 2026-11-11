@@ -10,6 +10,15 @@ export const overrideKeys = new Set([
   'quoteMode', 'quotePosition', 'quoteNavigation', 'position', 'lockPosition',
   'placementEditing', 'reservedTop', 'reservedBottom'
 ]);
+export const overrideCategories = {
+  general: ['showExtraWindows', 'quoteEnabled', 'quoteMode', 'quotePosition', 'quoteNavigation'],
+  theme: ['theme', 'dotCount'],
+  colors: ['appearance', 'palette', 'accent', 'background', 'widgetOpacity', 'backgroundOpacity', 'colorMode', 'accentEdge'],
+  'shape-size': ['shape', 'scale', 'sizePreset', 'fineTune', 'sizeMode', 'fitFraction', 'fitFineTune', 'fitHeight', 'matchPhysicalSize'],
+  display: ['position', 'lockPosition', 'placementEditing', 'reservedTop', 'reservedBottom'],
+  providers: ['widgetProviders', 'featuredProvider', 'featuredPosition'],
+  history: [...overrideKeys].filter(key => key.startsWith('history'))
+};
 export const canOverride = path => overrideKeys.has(path.split('.')[0]) ||
     path.startsWith('placement.') || ['linux.layer', 'linux.margin'].includes(path);
 
