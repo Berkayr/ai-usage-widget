@@ -47,7 +47,7 @@ try {
     $('#save').click();await new Promise(r=>setTimeout(r,50));assert($('#save').disabled&&['success','clean'].includes($('#status').dataset.state),'Save');
     $('[data-theme="terminal"]').click();$('#revert').click();assert($('[data-theme="dot-matrix"]').getAttribute('aria-pressed')==='true','Revert theme');
     $('[data-category=appearance]').click();
-    assert(document.querySelectorAll('[data-shape]').length===5,'Five shapes');
+    assert(document.querySelectorAll('[data-shape]').length===6,'Six shapes');
     assert(document.querySelectorAll('.scale-presets button').length===6,'Six visible size choices');
     $('[data-theme=reactor]').click();$('[data-shape=circle]').click();
     assert(!$('#reactor-motion').closest('label').hidden&&$('#dot-count').closest('label').hidden,'Reactor motion applies to circle');
@@ -330,14 +330,16 @@ try {
     $('#scale').value=100;$('#scale').dispatchEvent(new Event('input'));$('[data-size=Medium]').click();$('#fit-screen').click();
     for(const shape of ['landscape','square','circle','pill']){
       $('[data-shape='+shape+']').click();
-      assert($('#fit-screen').disabled&&$('#fit-screen small').textContent==='Portrait only','Fit hint '+shape);
+      assert($('#fit-screen').disabled&&$('#fit-screen small').textContent==='Portrait and Strip only','Fit hint '+shape);
       assert($('#size-mode').value==='screen','Stored Fit lost '+shape);
       assert($('[data-size=Medium]').getAttribute('aria-pressed')==='true','Effective preset '+shape);
       $('[data-shape=portrait]').click();assert(!$('#fit-screen').disabled&&$('#fit-screen').getAttribute('aria-pressed')==='true','Fit restoration');
     }
-    $('[data-theme=compact-strip]').click();assert($('#fit-screen').disabled,'Strip Fit disabled');
+    $('[data-shape=strip]').click();assert(!$('#fit-screen').disabled&&$('#fit-screen').getAttribute('aria-pressed')==='true','Strip supports Fit');
+    $('[data-shape=portrait]').click();
+    $('[data-theme=compact-strip]').click();assert(!$('#fit-screen').disabled,'Compact theme keeps Portrait Fit enabled');
     $('[data-theme=system]').click();assert($('#fit-screen').getAttribute('aria-pressed')==='true','Theme Fit restoration');
-    return 'PASS: Portrait-only Fit hint, effective preset and stored Fit restored across all shapes and Strip';
+    return 'PASS: Portrait/Strip Fit hint, effective preset and stored Fit restored across all shapes and themes';
   })()`));
   await b.navigate('/?settings','window.__SETTINGS_READY__');
   console.log(await b.evaluate(`(async()=>{
@@ -415,18 +417,18 @@ try {
     await api.setWorkArea([monitor]);
     await api.setSnapshot({providers:['claude','codex','gemini'].map(id=>({id,state:'OK',windows:[]}))});
     for(const sizeMode of ['fixed','screen']) {
-      await api.setSettings({sizeMode,theme:'compact-strip',shape:'portrait',sizePreset:'2X-Large',fineTune:100,fitFineTune:100,fitFraction:1,quoteEnabled:true,linux:{margin:12}});
+      await api.setSettings({sizeMode,theme:'compact-strip',shape:'strip',sizePreset:'2X-Large',fineTune:100,fitFineTune:100,fitFraction:1,quoteEnabled:true,linux:{margin:12}});
       for(const key of ['+','-','0']) {
         for(let i=0;i<22;i++)window.dispatchEvent(new KeyboardEvent('keydown',{key,ctrlKey:true}));
         await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
         const scale=parseFloat(getComputedStyle(document.documentElement).fontSize)/16;
-        const s=api.getSettings(), height=320+116+170, width=960;
-        if(width*height*scale*scale>.35*(800-24)*(560-24)+1)throw Error('Keyboard size escaped screen coverage');
+        const s=api.getSettings(), height=326, width=960;
+        if(width*height*scale*scale>.5*(800-24)*(560-24)+1)throw Error('Keyboard size escaped screen coverage');
         const before=[s.sizeMode,s.sizePreset,s.fineTune,s.fitFineTune];
         await api.setSettings({theme:'system',shape:'landscape'});
         const after=api.getSettings();
         if(JSON.stringify(before)!==JSON.stringify([after.sizeMode,after.sizePreset,after.fineTune,after.fitFineTune]))throw Error('Theme/shape rewrote stored size');
-        await api.setSettings({theme:'compact-strip',shape:'portrait'});
+        await api.setSettings({theme:'compact-strip',shape:'strip'});
       }
     }
     return 'PASS: runtime Ctrl +/−/0 coverage and stored sizing across theme/shape changes';

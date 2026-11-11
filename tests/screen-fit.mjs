@@ -13,7 +13,7 @@ test('screen fractions fit every work area and preserve aspect and saved fixed s
   if(effectiveSizeMode(settings)==='screen' && fitFraction===1 && fitFineTune===100) assert.ok(Math.abs(fit.width-fit.availableWidth)<1e-6 || Math.abs(fit.height-fit.availableHeight)<1e-6 || Math.abs(fit.scale-fit.maxScale)<1e-6);
   assert.equal(settings.scale,100);cases++;
  }
- assert.equal(cases,25200);
+ assert.equal(cases,30240);
 });
 test('manual reservations replace auto insets and handle zero and physical Windows units',()=>{
  const monitor={width:1536,height:926,y:34,detectedTop:34,scale:1.25};
@@ -60,16 +60,17 @@ test('coverage and dimensions across all themes, shapes, modes, providers and wo
  console.log(`${cases} coverage cases`);
 });
 
-test('screen mode is portrait-only and preserves the stored choice',()=>{
+test('screen mode supports portrait and strip and preserves the stored choice',()=>{
  assert.equal(maxPortraitWidthFraction,.3);
  const monitor={width:1536,height:926,scale:1};
  for(const theme of ['system','compact-strip'])for(const shape of shapes)for(const count of [1,2,3]) {
   const settings=normalizeSize({theme,shape,sizeMode:'screen',sizePreset:'Small'});
   const fit=fittedGeometry(settings,count,monitor);
   assert.equal(settings.sizeMode,'screen');
-  if(shape==='portrait' && theme!=='compact-strip') {
+  if(['portrait','strip'].includes(shape)) {
    assert.equal(effectiveSizeMode(settings),'screen');
-   assert.ok(fit.width<=fit.availableWidth*maxPortraitWidthFraction+1e-8);
+   assert.ok(fit.width<=fit.availableWidth*(shape==='portrait'?maxPortraitWidthFraction:1)+1e-8);
+   if(shape==='strip')assert.ok(Math.abs(fit.width-fit.availableWidth)<1e-6 || Math.abs(fit.scale-fit.maxScale)<1e-6);
   } else {
    assert.equal(effectiveSizeMode(settings),'fixed');
    assert.equal(fit.scale,fittedGeometry({...settings,sizeMode:'fixed'},count,monitor).scale);

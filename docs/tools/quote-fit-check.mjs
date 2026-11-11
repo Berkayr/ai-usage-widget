@@ -33,6 +33,10 @@ try {
         if (['square','circle'].includes(${JSON.stringify(shape)}) && document.documentElement.dataset.quotePage !== 'true') {
           document.querySelector('.quote-toggle').click(); await frame();
         }
+        if (${JSON.stringify(shape)} === 'strip') {
+          if (!document.querySelector('#quote').hidden || document.querySelector('#quote').children.length) throw Error('Strip quote must be hidden');
+          count++; continue;
+        }
         const shell = rect(document.querySelector('#widget'));
         const fail = message => {throw Error(${JSON.stringify(`${theme}/${shape}/${sizePreset}`)}+'/'+appearance+'/'+length+': '+message)};
         if (${JSON.stringify(shape)} === 'pill') {

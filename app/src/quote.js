@@ -44,10 +44,10 @@ function observeQuote(content, text, shape) {
 
 export function renderQuote(root, settings, data, redraw, repairContrast = () => {}) {
   fitObserver?.disconnect();
-  root.replaceChildren();root.hidden=settings.quoteEnabled!==true;
+  root.replaceChildren();root.hidden=settings.quoteEnabled!==true || settings.shape==='strip';
   document.documentElement.dataset.quotePosition=settings.quotePosition === 'top' ? 'top' : 'bottom';
-  document.documentElement.dataset.quote=String(settings.quoteEnabled===true);
-  document.documentElement.dataset.quotePage=String(page&&settings.quoteEnabled===true);
+  document.documentElement.dataset.quote=String(settings.quoteEnabled===true && settings.shape!=='strip');
+  document.documentElement.dataset.quotePage=String(page&&settings.quoteEnabled===true && settings.shape!=='strip');
   if(root.hidden)return;
   const cards=data?.cards||[],card=cards[index%Math.max(1,cards.length)];
   const compact=['circle','pill','square'].includes(settings.shape);

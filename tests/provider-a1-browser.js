@@ -1,7 +1,7 @@
 // Run with Playwright's code runner; the app Vite server must be on port 5173.
 async (page) => {
   const themes = ['system', 'dot-matrix', 'brutalist', 'circular-rings', 'compact-strip', 'reactor', 'retro-lcd', 'frosted-glass', 'terminal', 'minimal-pace'];
-  const shapes = {portrait:[519,1800], landscape:[1200,450], square:[700,700], pill:[1600,300]};
+  const shapes = {portrait:[519,1800], landscape:[1200,450], square:[700,700], pill:[1600,300], strip:[1600,400]};
   const failures = [];
   let checks = 0;
   for (const theme of themes) for (const [shape, [width,height]] of Object.entries(shapes)) {

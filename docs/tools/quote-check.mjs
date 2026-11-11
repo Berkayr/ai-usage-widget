@@ -5,7 +5,7 @@ export async function auditQuotes(b) {
  await b.navigate('/?sample','window.__AI_USAGE_DEMO__');
  const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
  let count=0;
- for(const theme of themes)for(const shape of ['portrait','landscape','square','circle','pill'])for(const appearance of ['dark','light']) for(const sizePreset of ['Small','Medium','X-Large']) {
+ for(const theme of themes)for(const shape of ['portrait','landscape','square','circle','pill','strip'])for(const appearance of ['dark','light']) for(const sizePreset of ['Small','Medium','X-Large']) {
   const settings={theme,shape,appearance,quoteEnabled:true,sizePreset,fineTune:100};
   const scale=({Small:.75,Medium:1,'X-Large':2})[sizePreset];
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:Math.round(widgetWidth(settings,3)*scale),height:Math.ceil(widgetHeight(settings,3)*scale)+10,deviceScaleFactor:1,mobile:false});
@@ -15,6 +15,7 @@ export async function auditQuotes(b) {
    await api.setQuote({status:'offline',cards:[{quote:'<img src=x onerror=alert(1)> '+ 'A long fictional quote about patience and perseverance. '.repeat(40),author:'Example author',reason:'Born on this day, 1769',source_url:'javascript:alert(1)',license:'CC BY-SA 4.0'},{quote:'Second fictional quote.',author:'Another author',reason:'Daily pick',source_url:'https://en.wikiquote.org/wiki/Example',license:'CC BY-SA 4.0'}]});
    const q=document.querySelector('#quote'),toggle=q.querySelector('.quote-toggle');
    if(['square','circle'].includes(${JSON.stringify(shape)})&&document.documentElement.dataset.quotePage!=='true'){toggle.click();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}
+   if(${JSON.stringify(shape)}==='strip'){if(!q.hidden||q.children.length)throw Error('Strip quote must be hidden');return;}
    if(q.hidden)throw Error('Quote hidden');
    if(q.querySelector('img,script'))throw Error('Remote HTML rendered');
    if(${JSON.stringify(shape)}!=='pill'&&q.querySelector('.quote-label').textContent!==({reactor:'CORE / DAILY QUOTE',terminal:'> quote','retro-lcd':'[ DAILY QUOTE ]','dot-matrix':'•• DAILY QUOTE',brutalist:'DAILY QUOTE','minimal-pace':'Daily reflection','compact-strip':'QUOTE /','circular-rings':'◉ Daily quote','frosted-glass':'Daily inspiration'})[${JSON.stringify(theme)}]&&${JSON.stringify(theme)}!=='system')throw Error('Theme quote signature');

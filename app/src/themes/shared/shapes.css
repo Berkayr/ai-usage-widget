@@ -237,8 +237,7 @@
 :root #provider-onboarding .provider-consent-actions{flex:none}
 :root[data-shape=circle] .widget .quote-section{border:0;box-shadow:none}
 
-/* Equal intrinsic grid tracks share the tallest card, including featured rows. */
-:root[data-shape=portrait] #widget.widget:has(#provider-onboarding[hidden]){height:auto;max-height:var(--portrait-height-limit,100%)}
+/* Portrait cards share the shape budget, including featured rows. */
 :root[data-shape=portrait] .widget .provider-list{height:auto;flex:0 0 auto;grid-auto-rows:minmax(0,1fr);align-items:stretch;align-content:start;overflow:auto}
 :root[data-shape=portrait] .widget .provider-card:nth-child(n){height:auto;min-height:0;max-height:none;align-self:stretch;overflow:auto}
 :root[data-shape=portrait] .widget .provider-heading{min-height:0}
@@ -255,7 +254,7 @@
 :root .widget .window-top>span {font-size:max(var(--shape-min-font),.8125rem)}
 :root[data-shape=portrait] .widget .ring-center small {font-size:max(var(--shape-min-font),.8125rem)}
 /* Externally narrowed strips retain access to providers beyond the viewport. */
-:root[data-shape=portrait][data-theme=compact-strip] .widget .provider-list {overflow-x:auto}
+:root[data-shape=strip] .widget .provider-list {overflow-x:auto}
 /* At tiny Fit fractions, readable quota rows borrow space from the quote. */
 :root[data-shape=portrait][data-quote=true][data-readable-size=false] .widget .provider-card:nth-child(n) {max-height:none}
 
@@ -276,6 +275,16 @@
 :root[data-shape=pill] .widget .provider-list{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
 :root[data-shape=pill] .widget .provider-card{flex:1 0 7rem}
 
-/* Fit measures max-content rows; only a full work area constrains their share. */
-:root[data-shape=portrait].fit-height #widget.widget:has(#providers){height:var(--usage-fit-height,var(--contract-height));max-height:min(100%,var(--portrait-height-limit,100%))}
-:root[data-shape=portrait].fit-height .widget .provider-list{flex:1 1 auto;grid-auto-rows:minmax(0,1fr);overflow:hidden}
+
+/* Outer geometry belongs to the shape, never to theme content metrics. */
+:root[data-shape=portrait] #widget.widget:has(#providers){height:var(--widget-height,var(--contract-height));max-height:none}
+:root[data-shape=portrait] #widget.widget .provider-list{flex:1 1 0;height:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(var(--provider-count),minmax(0,1fr));grid-auto-rows:minmax(0,1fr);align-content:stretch;overflow:auto}
+:root[data-shape=portrait] #widget.widget .provider-card:nth-child(n){min-height:0;height:100%;grid-column:1/-1}
+:root[data-shape=portrait] #widget.widget .provider-card:nth-child(n) .windows{flex:1 0 auto;align-content:space-evenly}
+:root[data-shape=portrait] #widget.widget .provider-card:nth-child(n) .quota-window{justify-content:center}
+:root[data-shape=strip] #widget.widget{height:var(--widget-height,20.375rem);max-height:none}
+:root[data-shape=strip] .widget .provider-list{display:flex;flex-direction:row;flex:1 1 0;height:auto;align-items:stretch;overflow:auto}
+:root[data-shape=strip] .widget .provider-card:nth-child(n){flex:1 1 0;display:flex;flex-direction:column;height:auto;min-height:0;min-width:0;max-height:none;grid-column:auto}
+:root[data-shape=strip] .widget .windows{flex:1 0 auto;align-content:space-evenly}
+:root[data-shape=strip] .widget .no-data{width:100%;min-height:0}
+:root[data-shape=strip] .widget .quote-section{display:none}

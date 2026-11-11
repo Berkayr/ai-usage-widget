@@ -52,7 +52,6 @@
 :root[data-theme=reactor] .quote-label{color:var(--accent);letter-spacing:.1em;text-transform:uppercase}
 
 /* Only opt-in portrait usage cards donate space to the reading area. */
-:root[data-quote=true][data-shape=portrait] .widget{--size-card:10rem}
 :root[data-quote=true][data-shape=portrait] .windows{align-content:center;gap:.375rem}
 :root[data-quote=true][data-shape=portrait][data-theme=brutalist] .featured-provider:nth-child(n) .quota-window{justify-content:center;gap:.375rem}
 :root[data-theme=brutalist] .quote-label{font-weight:900;text-transform:uppercase}

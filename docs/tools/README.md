@@ -367,14 +367,14 @@ unoccupied run; each card also records the total unoccupied vertical share.
 Card limits are max(2.5rem, 12% of card height), with a 1px rounding tolerance.
 The check also rejects card text collisions, text outside cards, container
 scroll overflow, and usage/quote content outside the surface. This measures
-layout boxes, not raster ink density. Compact Strip keeps its independent
-horizontal fixed mode and is still covered by the portrait matrix.
+layout boxes, not raster ink density. Compact Strip follows the selected shape;
+the independent Strip shape supplies the horizontal provider row.
 
 `node docs/tools/portrait-preview.mjs` captures synthetic Small and Full Fit
 scenes for all original ten themes, cropped to the measured surface. `shape-final-check.mjs` also
 writes `geometry.json` for exact comparison of the four non-portrait shapes.
-Screen Fit permits Portrait to end at its content; all other shapes still have
-to fill their fixed boxes. Native WebKitGTK/WebView2 acceptance remains separate.
+Screen Fit uses the same formula for every theme: Portrait scales by height
+and Strip scales by width, within the shared screen coverage limits. Native WebKitGTK/WebView2 acceptance remains separate.
 
 `node docs/tools/portrait-resize-check.mjs` emulates fitting the native viewport
 to one provider, adds three providers without first growing the viewport, then
@@ -426,7 +426,7 @@ Every published gallery (themes, sizes, scale, palettes, states, system, Mono an
 
 `GALLERY_ONLY=1 node docs/tools/screenshots.mjs` regenerates the published images without the supplemental check captures. The default command runs both. Hero dark/light use the actual corresponding Ember appearance; palette examples include a fictional user-created Studio palette. Settings captures navigate to Appearance / Theme and reveal the palette controls.
 
-Portrait size audits now treat `widgetHeight` as a ceiling and check exact width; fixed-height shapes retain the ±2 px equality check. `portrait-gap-check.mjs` independently checks intrinsic content spacing, clipping and overlaps.
+All six shapes, including Portrait and Strip, use `widgetHeight` as their exact outer height. Size audits check width and height equality across themes within ±2 px. `portrait-gap-check.mjs` independently checks content spacing, clipping and overlaps. Strip uses a single horizontal provider row and hides the daily quote; Compact Strip is a theme that can use any shape.
 
 Circle endpoint collision checks compare actual center text ranges, rather than the larger `.dial-safe` layout wrapper. Square featured ordering is checked independently of the Portrait-only featured card class.
 
@@ -491,3 +491,5 @@ to the original ten designs. The seven new designs are covered here by the
 README capture assertions and visual inspection; this task does not claim a
 full 17-theme desktop acceptance audit. Clear Glass uses the internal
 `liquid-glass` id; captures assert the requested theme to reject silent fallback.
+
+`node docs/tools/theme-size-strip-check.mjs` checks all 17 themes in Portrait and Strip with fixed/screen sizing, Fit height on/off, quote on/off and extra windows on/off. It checks exact outer dimensions, equal card heights, row/column direction and hidden Strip quotes.

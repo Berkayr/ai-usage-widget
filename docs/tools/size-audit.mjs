@@ -3,7 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import {pairwise} from './pairwise.mjs';
 import { browser } from './browser-harness.mjs';
 import { shapes, sizePresets, normalizeSize, widgetWidth, widgetHeight } from '../../app/src/sizing.js';
-if(shapes.join(',')!=='portrait,landscape,square,circle,pill')throw Error('Five-shape audit contract');
+if(shapes.join(',')!=='portrait,landscape,square,circle,pill,strip')throw Error('Six-shape audit contract');
 const b = await browser();
 try {
   await b.navigate('/?sample', 'window.__AI_USAGE_DEMO__');
@@ -25,12 +25,16 @@ try {
       if(style.fontFamily!==getComputedStyle(document.querySelector('.widget')).fontFamily)throw Error('Title/body family mismatch');
       return {width:rect.width,height:rect.height,cards:[...document.querySelectorAll('.provider-card,.no-data')].map(el=>el.getBoundingClientRect().height),rowHeights:[...new Map([...document.querySelectorAll('.provider-card,.no-data')].map(el=>{const r=el.getBoundingClientRect();return [r.top,r.height]})).values()]};
     })()`);
-    // Portrait now ends at intrinsic content; widgetHeight is its fit ceiling.
-    const heightError=shape==='portrait'?Math.max(0,measured.height-height):Math.abs(height-measured.height);
+    // Every shape has exact theme-independent outer geometry.
+    const heightError=Math.abs(height-measured.height);
     const error=Math.max(Math.abs(width-measured.width),heightError,measured.height>0?0:Infinity);
     rows.push({quoteEnabled,shape,theme,sizePreset,providers:count,width:measured.width,height:measured.height,providerHeight:measured.cards[0],expectedWidth:width,expectedHeight:height,error});
   }
-  console.table(rows);
+  for(const row of rows) {
+    const peers=rows.filter(r=>r.shape===row.shape && r.sizePreset===row.sizePreset && r.providers===row.providers && r.quoteEnabled===row.quoteEnabled);
+    row.error=Math.max(row.error,...peers.map(r=>Math.max(Math.abs(r.width-row.width),Math.abs(r.height-row.height))));
+  }
+  console.log(`${rows.length} shape/theme dimension checks`);
   const failures=rows.filter(r=>r.error>2);
   await writeFile('docs/tools/size-audit.json',JSON.stringify({tolerancePx:2,rows,failures},null,2)+'\n');
   await b.cdp('Emulation.setDeviceMetricsOverride',{width:2100,height:1950,deviceScaleFactor:1,mobile:false});

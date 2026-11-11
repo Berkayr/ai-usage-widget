@@ -147,7 +147,7 @@ try {
         if(theme==='system')check(card.querySelectorAll('.meter').length===2,'Continuous meters');
         if(theme==='dot-matrix')check(card.querySelectorAll('.dot-bar').length===2,'Dot meters');
         if(theme==='minimal-pace')check(card.querySelectorAll('.pace').length===2,'Pace labels');
-        if(shape==='portrait'&&theme==='compact-strip')check(getComputedStyle(list).flexDirection==='row','Horizontal strip');
+        if(shape==='strip')check(getComputedStyle(list).flexDirection==='row','Horizontal strip');
       }
       if(shape!=='portrait') for(const el of document.querySelectorAll('.widget *')) {
         if(![...el.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())||!el.getClientRects().length)continue;

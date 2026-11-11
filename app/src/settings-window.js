@@ -607,8 +607,8 @@ function renderControls() {
   for (const id of ['scale', 'fit-height'])
     $(`#${id}`).closest('label').hidden = effectiveSizeMode(draft) === 'screen';
   $('.scale-presets').hidden = false;
-  $('#fit-screen').disabled = draft.shape !== 'portrait' || draft.theme === 'compact-strip';
-  $('#fit-screen').title = $('#fit-screen').disabled ? 'Portrait only' : '';
+  $('#fit-screen').disabled = !['portrait','strip'].includes(draft.shape);
+  $('#fit-screen').title = $('#fit-screen').disabled ? 'Portrait and Strip only' : '';
   $('#fit-screen')
       .setAttribute('aria-pressed', String(effectiveSizeMode(draft) === 'screen'));
   document.querySelectorAll('[data-fraction]')
@@ -656,7 +656,7 @@ function renderControls() {
       {...draft, sizeMode : 'screen'}, visibleProviderCount(),
       selectedMonitor(), desktopPlatform) : null;
   $('#fit-screen small').textContent =
-      $('#fit-screen').disabled ? 'Portrait only' : screenFit ? `${Math.round(screenFit.width)} × ${Math.round(screenFit.height)} px` : 'Monitor not connected';
+      $('#fit-screen').disabled ? 'Portrait and Strip only' : screenFit ? `${Math.round(screenFit.width)} × ${Math.round(screenFit.height)} px` : 'Monitor not connected';
 
   const p = themePalette();
   const paper = draft.background || p.bgWidget;
@@ -1152,7 +1152,7 @@ async function loadSession() {
   error('');
   draft = {
     ...defaults,
-    ...(sample ? {} : await settingsInvoke('load_settings'))
+    ...(sample ? {} : normalizeSize(await settingsInvoke('load_settings'), true))
   };
   const paletteLoadError = draft.paletteLoadError;
   delete draft.paletteLoadError;

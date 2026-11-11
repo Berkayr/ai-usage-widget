@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {normalizeSize} from '../app/src/sizing.js';
 import {runInNewContext} from 'node:vm';
 
 const source = readFileSync(new URL('../app/src/main.js', import.meta.url), 'utf8');
@@ -11,7 +12,7 @@ const startup = source.slice(source.indexOf('let initialSettingsError = null;'),
 async function session(search, storage, settings, isSample = false) {
   const calls = [];
   const context = {
-    URLSearchParams, location: {search}, settings, isSample,
+    normalizeSize, URLSearchParams, location: {search}, settings, isSample,
     localStorage: {setItem: (key, value) => storage.set(key, value)},
     invoke: async (command, args) => {
       calls.push({command, args: structuredClone(args)});

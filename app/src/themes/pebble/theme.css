@@ -8,7 +8,7 @@
 :root[data-theme=pebble] .widget .segments.unknown::before {display:none}
 
 :root[data-theme=pebble] .widget {border-radius:16px;border:0;box-shadow:0 8px 24px #0002}
-:root[data-theme=pebble] .widget .app-title {font-size:calc(var(--size-font-title) * 1.35);font-weight:800;letter-spacing:-.03em}
+:root[data-theme=pebble] .widget .app-title {font-size:calc(var(--size-font-title) * 1.35);font-weight:800;letter-spacing:0}
 :root[data-theme=pebble] .widget .provider-card {border-radius:12px;border:1px solid var(--border);box-shadow:none;padding:0}
 :root[data-theme=pebble] .widget .provider-heading {padding:.75rem .75rem 0;font-weight:750}
 :root[data-theme=pebble] .widget .windows {gap:0}
