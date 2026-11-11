@@ -1,7 +1,10 @@
 const icon = paths => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 export const settingsCategories = [
   ['general', 'General', icon('<path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/>')],
-  ['appearance', 'Appearance', icon('<circle cx="12" cy="12" r="9"/><path d="M12 3v18M12 7h6M12 12h9M12 17h6"/>')],
+  ['theme', 'Theme', icon('<path d="M4 5h16v14H4z"/><path d="M8 9h8M8 12h5M8 15h3"/>')],
+  ['colors', 'Colors', icon('<circle cx="12" cy="12" r="9"/><path d="M12 3v18M12 7h6M12 12h9M12 17h6"/>')],
+  ['shape-size', 'Shape & Size', icon('<rect x="3" y="6" width="18" height="12" rx="6"/><path d="M8 10v4M12 9v6M16 10v4"/>')],
+  ['display', 'Display', icon('<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/>')],
   ['providers', 'Providers', icon('<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>')],
   ['history', 'History', icon('<path d="M3 11a9 9 0 1 1 3 8M3 4v7h7M12 7v5l3 2"/>')],
   ['taskbar', 'Taskbar', icon('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15h18M7 18h2M12 18h2"/>')],
@@ -47,7 +50,7 @@ export function mountNavigation(sections) {
   let remembered;
   try { remembered = localStorage.getItem('settings-category'); }
   catch { /* Use General when storage is unavailable. */ }
-  select(remembered);
+  select(remembered === 'appearance' ? 'theme' : remembered);
   return {
     platform(value) {
       nav.querySelector('[data-category=taskbar]').hidden = value !== 'windows';

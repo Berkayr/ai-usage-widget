@@ -31,7 +31,7 @@ Every run uses a fresh temporary browser profile; locale, timezone and clock are
 
 Output is `docs/screenshots/*.png` and `docs/screenshots/themes/*.png`. Scenes normally use 2× device scale; README theme sheets and glass use 0.9×, individual themes, history, providers and settings use 1×, and Mono/size sheets use 1× to limit download size. The social card is exactly 1280×640 for GitHub upload. PNG pixel streams are recompressed losslessly at level 9. SVG logos remain vector assets. Change a fixture, palette or frame size in the script and rerun; launch it from any working directory. Generated screenshots are intentional versioned documentation assets, not runtime output.
 
-Hero, size, palette, scale, state and settings scenes embed the **built application UI**. Taskbar, KDE Breeze and Waybar scenes are HTML illustrations, not native desktop captures. `NO_SUBSCRIPTION` is an explanatory card for enabled providers; the states image shows stale, authentication and rate-limit states in Terminal and Retro LCD. Settings screenshots show Appearance with the six-category sidebar in the Windows sample preview. The current layout contract is documented in [the design specification](../design-spec.md).
+Hero, size, palette, scale, state and settings scenes embed the **built application UI**. Taskbar, KDE Breeze and Waybar scenes are HTML illustrations, not native desktop captures. `NO_SUBSCRIPTION` is an explanatory card for enabled providers; the states image shows stale, authentication and rate-limit states in Terminal and Retro LCD. Settings screenshots show Theme with the nine-category sidebar in the Windows sample preview. The current layout contract is documented in [the design specification](../design-spec.md).
 
 Chrome's sandbox stays enabled by default. Restricted development environments can explicitly opt out with `SCREENSHOT_NO_SANDBOX=1`; only use that override with these trusted local fixtures. It needs loopback socket access. In an environment that denies sockets, rerun with the appropriate local execution permission. It does not need internet access once dependencies are present. Browser profile and servers are cleaned up on completion. Inspect every PNG after changing UI or fixtures; native desktop acceptance and design review remain separate.
 
@@ -129,7 +129,7 @@ operation. Real cable disconnect/reconnect and unsaved close dialogs are separat
 manual desktop checks.
 
 Settings contrast is included in `node docs/tools/contrast-audit.mjs`: light and
-dark schemes, all six categories (including a synthetic Linux layer-shell panel),
+dark schemes, all nine categories (including a synthetic Linux layer-shell panel),
 clean/dirty/hover states, native fields and disabled controls. Enabled text requires
 4.5:1; disabled text requires 3:1. A second pass replaces CSS system color keywords
 with deliberately incompatible GTK-like values (light ButtonFace and white
