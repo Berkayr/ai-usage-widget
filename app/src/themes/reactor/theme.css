@@ -1,16 +1,240 @@
 @import '../shared/layout.css';
-@import '../shared/grid.css';
-.widget{font-family:JetBrainsMono,monospace;background-color:var(--bgWidget);background-image:radial-gradient(ellipse at center,color-mix(in srgb,var(--accent) 12%,var(--bgWidget)),var(--bgWidget) 70%);box-shadow:inset 0 0 0 1px var(--border)}
-.provider-card{border:1px solid var(--border);border-radius:12px;background:var(--bgCard)}
-.header{border-bottom:1px solid var(--accent)}
-.segments{display:flex;gap:3px;height:8px}.segments i{flex:1;background:var(--bgTrackOff);border-radius:1px}.segments i.on{background:var(--accent);box-shadow:0 0 5px var(--accent)}
-.window-top b{font-weight:600}.dial-rings{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--accent) 65%,transparent))}
-.dial-safe .dial-number{font-weight:600;text-shadow:0 0 12px var(--accent)}
-.dial-name{text-transform:uppercase;letter-spacing:.08em}.dial-arc-label{border-radius:2px}
-.reactor-core{position:absolute;inset:30%;border:1px solid var(--accent);border-radius:50%;box-shadow:0 0 12px color-mix(in srgb,var(--accent) 35%,transparent),inset 0 0 18px color-mix(in srgb,var(--accent) 25%,transparent);pointer-events:none}
-.reactor-core::before{content:'';position:absolute;inset:-12%;border-radius:50%;border:2px dashed var(--accent);opacity:.4}
-:root[data-reactor-motion=true] .reactor-core{animation:reactor-breathe 5s ease-in-out infinite}
-@keyframes reactor-breathe{50%{opacity:.45}}
-@media(prefers-reduced-motion:reduce){.reactor-core{animation:none!important}}
 
-.dial-track{stroke:var(--accent);opacity:.2}
+:root[data-theme=reactor] .widget {
+  font-family: JetBrainsMono, monospace;
+  background-color: var(--bgWidget);
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 4%, transparent) 0px,
+      color-mix(in srgb, var(--accent) 4%, transparent) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    radial-gradient(
+      ellipse at 50% 0%,
+      color-mix(in srgb, var(--accent) 14%, var(--bgWidget)),
+      var(--bgWidget) 72%
+    );
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow:
+    inset 0 0 18px color-mix(in srgb, var(--accent) 10%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+:root[data-theme=reactor]:not([data-shape=circle]):not([data-shape=pill]) .widget {
+  border-radius: 4px;
+}
+
+:root[data-theme=reactor]:not([data-shape=circle]):not([data-shape=pill]) .widget .header {
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 50%, var(--border));
+}
+
+:root[data-theme=reactor] .widget .app-title {
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* Sci-fi HUD card: 4 L-shaped corner brackets, scanline texture, no continuous border */
+:root[data-theme=reactor]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card {
+  --hud-bracket: color-mix(in srgb, var(--accent) 90%, var(--border));
+  border: 0;
+  border-radius: 0;
+  padding: 9px 12px;
+  box-shadow: inset 0 0 14px color-mix(in srgb, var(--accent) 8%, transparent);
+  background:
+    linear-gradient(var(--hud-bracket), var(--hud-bracket)) 0 0 / 12px 2px no-repeat,
+    linear-gradient(var(--hud-bracket), var(--hud-bracket)) 0 0 / 2px 12px no-repeat,
+    linear-gradient(var(--hud-bracket), var(--hud-bracket)) 100% 0 / 12px 2px no-repeat,
+    linear-gradient(var(--hud-bracket), var(--hud-bracket)) 100% 0 / 2px 12px no-repeat,
+    linear-gradient(var(--hud-bracket), var(--hud-bracket)) 0 100% / 12px 2px no-repeat,
+    linear-gradient(var(--hud-bracket), var(--hud-bracket)) 0 100% / 2px 12px no-repeat,
+    linear-gradient(var(--hud-bracket), var(--hud-bracket)) 100% 100% / 12px 2px no-repeat,
+    linear-gradient(var(--hud-bracket), var(--hud-bracket)) 100% 100% / 2px 12px no-repeat,
+    repeating-linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 4%, transparent) 0px,
+      color-mix(in srgb, var(--accent) 4%, transparent) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 7%, var(--bgCard)),
+      color-mix(in srgb, var(--bgWidget) 35%, var(--bgCard))
+    );
+}
+
+:root[data-theme=reactor]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-heading {
+  min-height: 24px;
+  padding: 0 0 4px 7px;
+  margin-bottom: 5px;
+  border-left: 3px solid var(--provider-identity, var(--accent));
+  border-bottom: 1px dashed color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+
+:root[data-theme=reactor] .widget .provider-heading h2 {
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+:root[data-theme=reactor] .widget :is(.plan, .status-badge) {
+  font-size: 11px;
+  line-height: 1.3;
+  padding: 1px 6px;
+  border-radius: 0;
+  letter-spacing: 0.05em;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bgWidget));
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+:root[data-theme=reactor]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .windows {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  flex: 1 1 auto;
+  gap: 5px;
+  min-height: 0;
+}
+
+:root[data-theme=reactor]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .quota-window {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  padding: 4px 8px;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--bgWidget) 55%, transparent);
+  border: 0;
+  border-left: 2px solid color-mix(in srgb, var(--accent) 60%, var(--border));
+}
+
+:root[data-theme=reactor] #widget.widget .window-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+:root[data-theme=reactor]:not([data-shape=pill]) #widget.widget .window-top > span {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--textSecondary);
+}
+
+:root[data-theme=reactor]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .window-top b {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 9px color-mix(in srgb, currentColor 48%, transparent);
+}
+
+:root[data-theme=reactor] #widget.widget .segments {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: stretch;
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+:root[data-theme=reactor]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .segments {
+  height: 7px;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+:root[data-theme=reactor] #widget.widget .segments i {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  height: 100%;
+  background: color-mix(in srgb, var(--bgTrackOff) 85%, transparent);
+  border-radius: 0;
+}
+
+:root[data-theme=reactor] #widget.widget .segments i.on {
+  background: var(--level, var(--severityNormal));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--level, var(--severityNormal)) 50%, transparent);
+}
+
+:root[data-theme=reactor]:not([data-shape=pill]):not([data-shape=square]) #widget.widget .window-bottom {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--textMuted);
+}
+
+:root[data-theme=reactor][data-mode="light"] #widget.widget .window-top b {
+  text-shadow: none;
+}
+
+:root[data-theme=reactor][data-mode="light"] #widget.widget .segments i.on {
+  box-shadow: none;
+}
+
+:root[data-theme=reactor] #widget.widget .provider-card[data-usage-compact=true] .provider-heading {
+  padding-bottom: 2px;
+  margin-bottom: 2px;
+}
+
+:root[data-theme=reactor] #widget.widget .provider-card[data-usage-compact=true] .quota-window {
+  padding: 2px 6px;
+}
+
+:root[data-theme=reactor] #widget.widget .footer {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+:root[data-theme=reactor] .dial-rings {
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 55%, transparent));
+}
+
+:root[data-theme=reactor] .dial-safe .dial-number {
+  font-weight: 700;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+:root[data-theme=reactor] .dial-name {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+:root[data-theme=reactor] .dial-arc-label {
+  border-radius: 0;
+}
+
+:root[data-theme=reactor] .dial-track {
+  stroke: var(--accent);
+  opacity: 0.22;
+}
+
+:root[data-theme=reactor] .reactor-core {
+  position: absolute;
+  inset: 30%;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--accent) 35%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--accent) 25%, transparent);
+  pointer-events: none;
+}
+
+:root[data-theme=reactor] .reactor-core::before {
+  content: '';
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  border: 2px dashed var(--accent);
+  opacity: 0.4;
+}
