@@ -18,6 +18,7 @@ function setupSource(mode, snapshot) {
     const mode = ${JSON.stringify(mode)};
     const snapshot = ${JSON.stringify(snapshot)};
     window.__TAURI_INTERNALS__ = {
+      metadata: {currentWindow:{label:'main'},currentWebview:{label:'main'}},
       transformCallback(callback) { window.__browserCallbacks ??= {}; const id = Object.keys(window.__browserCallbacks).length + 1; window.__browserCallbacks[id] = callback; return id; },
       unregisterCallback(id) { delete window.__browserCallbacks[id]; },
       invoke(command) {

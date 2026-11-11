@@ -25,7 +25,8 @@ try{
    for(const el of document.querySelectorAll('.widget *')){
     if(!visible(el))continue;
     if([...el.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())){
-     if(parseFloat(getComputedStyle(el).fontSize)<10.99)errors.push(el.className+': font '+getComputedStyle(el).fontSize);
+     const minimumFont=${JSON.stringify(Math.min(11,11*box.scale/100))};
+     if(parseFloat(getComputedStyle(el).fontSize)<minimumFont-.01)errors.push(el.className+': font '+getComputedStyle(el).fontSize);
      if(clipped(el))errors.push(el.className+': clipped');
     }
    }

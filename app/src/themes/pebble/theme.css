@@ -14,6 +14,7 @@
 :root[data-theme=pebble] .widget .windows {gap:0}
 :root[data-theme=pebble][data-shape=portrait] .widget .quota-window {padding:.625rem .75rem}
 :root[data-theme=pebble] .widget .quota-window+.quota-window {border-top:1px solid var(--border)}
+:root[data-theme=pebble][data-shape=portrait][data-micro-shape=true] .widget .quota-window {padding-block:.25rem}
 :root[data-theme=pebble] .widget .window-top b {border-radius:999px;background:var(--bgWidget);padding:.125rem .5rem;font-weight:700}
 :root[data-theme=pebble] .widget .segments {height:8px}
 :root[data-theme=pebble] .widget .balance-row {padding:.5rem .75rem}
