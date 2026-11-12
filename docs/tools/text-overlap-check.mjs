@@ -17,7 +17,7 @@ function inspectText() {
     return true;
   };
   const leaves=[], issues=[];
-  const required = '.window-top>span,.window-top b,.provider-name,.provider-heading h2,.reset,.dial-name,.dial-number,.dial-reset,.heading-reset,.ring-center strong,.ring-center small';
+  const required = '.window-top>span,.window-top b,.provider-name,.provider-heading h2,.plan,.reset,.dial-name,.dial-number,.dial-reset,.heading-reset,.ring-center strong,.ring-center small';
   const walker=document.createTreeWalker(widget,NodeFilter.SHOW_TEXT);
   for(let node;node=walker.nextNode();) {
     const e=node.parentElement;
@@ -82,6 +82,8 @@ try {
       fixture.querySelector('#layered').dataset.overlapOk='test-decoration';
       fixture.querySelector('#clipped').style.textOverflow='ellipsis';
       fixture.querySelector('#clipped').className='plan';
+      if(!inspect().some(i=>i.startsWith('truncated required text:')&&i.includes('(plan)'))) throw Error('Detector accepted an ellipsized plan badge');
+      fixture.querySelector('#clipped').hidden=true;
       fixture.querySelector('#outside').hidden=true;
       if(inspect().length) throw Error('Detector rejected explicit decoration or ellipsis: '+inspect().join('; '));
       fixture.innerHTML='<span class="app-title">AI USAGE</span><div id="same" style="position:absolute;top:60px"></div>';

@@ -1,6 +1,7 @@
 const boxOverflows = el => el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
 // A constrained grid can overlap its own heading without overflowing the card.
-const overflows = el => boxOverflows(el) || (el.classList.contains('provider-card') && [...el.querySelectorAll('.windows,.quota-window')].some(boxOverflows));
+const truncatedPlan = el => [...el.querySelectorAll('.plan')].some(plan => plan.scrollWidth > plan.clientWidth);
+const overflows = el => boxOverflows(el) || (el.classList.contains('provider-card') && (truncatedPlan(el) || [...el.querySelectorAll('.windows,.quota-window')].some(boxOverflows)));
 
 // Observe content and font changes; Portrait also grows within existing type tiers.
 export function observeUsageFit(root) {
@@ -38,6 +39,7 @@ export function fitUsage(root) {
     delete card.dataset.usageBadge;
     delete card.dataset.usageInlineReset;
     card.style.removeProperty('padding-bottom');
+    for (const plan of card.querySelectorAll('.plan')) plan.style.removeProperty('visibility');
     if (document.documentElement.dataset.shape === 'portrait') {
       card.style.removeProperty('min-height');
       card.style.removeProperty('max-height');
@@ -165,6 +167,10 @@ function fitInlineResets(card) {
 
 function compactCard(card) {
   if (!overflows(card)) return;
+  if (truncatedPlan(card)) {
+    for (const plan of card.querySelectorAll('.plan')) if (plan.scrollWidth > plan.clientWidth) plan.style.visibility = 'hidden';
+    if (!boxOverflows(card) && ![...card.querySelectorAll('.windows,.quota-window')].some(boxOverflows)) return;
+  }
   card.dataset.usageCompact = 'true';
   settleCardRounding(card);
   if (!overflows(card)) return;
