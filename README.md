@@ -83,7 +83,7 @@ Scale text and spacing together from 50% to 300%, with presets or Ctrl +/− and
 
 ### Find your signal
 
-Every theme includes 12 palettes. In **Appearance → Palette**, choose **New palette** or **Duplicate**, name it and edit its Dark and Light colors, then **Save**. **Export** copies palette JSON into the transfer field; paste an exported array there and choose **Import** to reuse it. Contrast warnings help flag unreadable combinations.
+Every theme includes 12 palettes. In **Colors**, choose **New palette** or **Duplicate**, name it and edit its Dark and Light colors, then **Save**. **Export** copies palette JSON into the transfer field; paste an exported array there and choose **Import** to reuse it. Contrast warnings help flag unreadable combinations.
 
 Choose a quiet Calm look, colorful Vivid palettes or pure black and white Mono. Seventeen themes change the layout as well as the colors. Theme cards in Settings switch designs immediately; every theme supports Auto, Light and Dark appearance.
 
@@ -99,7 +99,7 @@ Cached data stays marked, sign-in failures ask for attention, and unavailable qu
 
 ### Your desktop, your settings
 
-Settings open in a separate, resizable window with six sidebar categories: **General**, **Appearance**, **Providers**, **History**, **Taskbar** and **About**. The sidebar becomes horizontal tabs in narrow windows. Changes preview live; **Save** keeps them, while **Revert** or **Discard** restores saved settings. Change layout and placement in General, themes and palettes in Appearance, collection and card order in Providers, and optional log access in History. Calm uses neutral usage ink below 50%, soft amber from 50% and muted red from 80%. Mono adds hollow warning marks and inverse percentage labels. Choose 10, 20 or 30 meter marks; XS uses 10. Optional monitor scale compensation and the fixed type scale are explained in the [design standard](docs/design-spec.md).
+Settings open in a separate, resizable window with ten sidebar categories: **General**, **Quote**, **Theme**, **Colors**, **Shape & Size**, **Display**, **Providers**, **History**, **Taskbar** and **About**. The sidebar becomes horizontal tabs in narrow windows. Changes preview live; **Save** keeps them, while **Revert** or **Discard** restores saved settings. Change layout in General, the daily quote in Quote, themes in Theme, palettes and colors in Colors, card shape and size in Shape & Size, placement in Display, collection and card order in Providers, and optional log access in History. Calm uses neutral usage ink below 50%, soft amber from 50% and muted red from 80%. Mono adds hollow warning marks and inverse percentage labels. Choose 10, 20 or 30 meter marks; XS uses 10. Optional monitor scale compensation and the fixed type scale are explained in the [design standard](docs/design-spec.md).
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/settings-light.png">
@@ -142,7 +142,7 @@ Prefer the familiar? System uses your desktop font, light/dark appearance and sy
 | Crisp | Clean borders and compact, structured readouts. |
 | Pebble | Rounded, tactile surfaces and soft tones. |
 | Glyph | Expressive typography and graphic quota marks. |
-| Pastel | Gentle colors and softly rounded cards. |
+| Pastel Pink | Rose, Blush and Bubblegum palettes with softly rounded cards. |
 
 [Individual light and dark captures](docs/screenshots/themes/) · [Alternate gallery](docs/screenshots/themes-light.png) · [Mono gallery](docs/screenshots/mono.png) (the original ten designs)
 
