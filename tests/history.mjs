@@ -13,18 +13,23 @@ test('only records with history and two distinct computers qualify',()=>{
   assert.equal(splitMachines({machines:[{id:'a'},{id:'b'}]},false),false);
   assert.equal(splitMachines({machines:[{id:'a'},{id:'b'}]},true),true);
 });
-test('calendar fills gaps across month boundaries and excludes future days',()=>{
-  const h={daily:[{date:'2026-10-31',tokens:100},{date:'2026-11-02',tokens:900}]};
+test('account gaps stay unknown while local log gaps are zero',()=>{
+  const h={scope:'account',daily:[{date:'2026-10-31',tokens:100},{date:'2026-11-02',tokens:900}]};
   const rows=dailySeries(h,3,new Date(2026,10,1));
   assert.deepEqual(rows.map(r=>r.date),['2026-10-30','2026-10-31','2026-11-01']);
-  assert.deepEqual(rows.map(r=>r.tokens),[0,100,0]);
-  const html=bars(h,3,false,new Date(2026,10,1)); assert.match(html,/height:100%/); assert.doesNotMatch(html,/NaN|Infinity/);
+  assert.deepEqual(rows.map(r=>r.tokens),[null,100,null]);
+  const html=bars(h,3,false,new Date(2026,10,1)); assert.match(html,/No data/); assert.match(html,/height:100%/); assert.doesNotMatch(html,/NaN|Infinity/);
+  const local=dailySeries({scope:'local',daily:[{date:'2026-10-31',tokens:0}]},3,new Date(2026,10,1));
+  assert.deepEqual(local.map(r=>r.tokens),[0,0,0]);
+  const mixed=dailySeries({scope:'account',daily:[{date:'2026-10-30',tokens:0},{date:'2026-10-31',tokens:null},{date:'2026-11-01',tokens:12}]},3,new Date(2026,10,1));
+  assert.deepEqual(mixed.map(r=>r.tokens),[0,null,12]);
+  assert.match(bars({scope:'account',daily:[]},7),/No data/);
 });
 test('stacked chart preserves totals and escapes labels',()=>{
   const h={machines:[{id:'a'},{id:'b'}],daily:[{date:'2026-11-01',tokens:100,by_machine:{a:20,b:60}}]};
   assert.match(bars(h,1,true,new Date(2026,10,1)),/flex:20/);
   assert.match(bars(h,1,true,new Date(2026,10,1)),/flex:60/);
-  assert.match(bars({daily:[]},7),/height:0%/);
+  assert.match(bars({scope:'local',daily:[]},7),/height:0%/);
 });
 test('panel opens inward at either edge and follows free placement',()=>{
   assert.equal(panelOnLeft({position:'Top right'}),true);assert.equal(panelOnLeft({position:'Bottom left'}),false);

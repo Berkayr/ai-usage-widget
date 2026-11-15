@@ -8,9 +8,8 @@ const b = await browser();
 try {
   await b.cdp('Page.addScriptToEvaluateOnNewDocument', {source:`(() => {
     const callbacks = new Map(), events = new Map();
-    let readLogs = false;
     let next = 0, disk = {theme:'system', palette:'default'};
-    const state = window.__FAKE_NATIVE__ = {calls:[], previews:[], saves:[], hidden:0, fail:null, mismatch:false};
+    const state = window.__FAKE_NATIVE__ = {calls:[], previews:[], saves:[], hidden:0, fail:null, mismatch:false, historyPermission:false};
     state.emit = async event => {for (const [id, name] of events) if (name === event) await callbacks.get(id)({event, id, payload:{}});};
     window.__TAURI_EVENT_PLUGIN_INTERNALS__ = {unregisterListener:(_, id) => events.delete(id)};
     window.__TAURI_INTERNALS__ = {
@@ -21,8 +20,8 @@ try {
         if (cmd === state.fail) throw Error('Synthetic failure: ' + cmd);
         if (cmd === 'load_settings') {const value = structuredClone(disk); if (state.mismatch) delete value.fineTune; return value;}
         if (cmd === 'get_snapshot') return {snapshot:{providers:['claude','codex'].map(id => ({id,state:'OK'}))}};
-        if (cmd === 'get_provider_config') return {initialized:true,providers:{claude:{enabled:true,local_history:readLogs},codex:{enabled:true}},disclosures:{claude:'Synthetic quota metadata',codex:'Synthetic quota metadata'},detected:{}};
-        if (cmd === 'set_local_history') {readLogs=args.enabled;return;}
+        if (cmd === 'get_provider_config') return {initialized:true,providers:{claude:{enabled:true,local_history:state.historyPermission},codex:{enabled:true}},disclosures:{claude:'Synthetic quota metadata',codex:'Synthetic quota metadata'},detected:{}};
+        if (cmd === 'set_local_history') {state.historyPermission=args.enabled;return;}
         if (cmd === 'get_autostart') return false;
         if (cmd === 'get_desktop_info') return {platform:'linux',layerShell:true};
         if (cmd === 'get_placement_monitors') return {layerShell:true,monitors:[{name:'Synthetic display',width:1920,height:1080,primary:true}],widgetWidth:340,widgetHeight:600};
@@ -70,6 +69,15 @@ try {
     check($('#save').disabled && $('#local-history').checked,'Verified log permission Save');
     $('#local-history').click();$('#save').click();await wait();
     check($('#save').disabled && !$('#local-history').checked,'Disable log permission');
+    $('#local-history').click();$('#quote-enabled').click();native.fail='save_settings';$('#save').click();await wait();
+    check(native.historyPermission && $('#status').textContent.includes('History permission saved'),'Permission remains enabled after later Save failure');
+    $('#revert').click();await wait();
+    check($('#local-history').checked === native.historyPermission && !$('#quote-enabled').checked,'Revert reflects persisted enabled permission');
+    $('#local-history').click();$('#quote-enabled').click();$('#save').click();await wait();
+    check(!native.historyPermission && $('#status').textContent.includes('History permission saved'),'Permission remains disabled after later Save failure');
+    $('#revert').click();await wait();
+    check($('#local-history').checked === native.historyPermission,'Revert reflects persisted disabled permission');
+    native.fail=null;
     native.saves.length=0;
     $('[data-category=theme]').click();
     native.calls.length = 0;
