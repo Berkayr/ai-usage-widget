@@ -15,19 +15,22 @@ export function dailySeries(history, days = 30, now = new Date()) {
   return Array.from({length:days}, (_,i)=>{
     const date = new Date(end); date.setDate(date.getDate() - days + i + 1);
     const key = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
-    return {date:key, tokens:0, ...entries.get(key)};
+    const entry = entries.get(key);
+    // Account history can omit delayed server buckets; local logs cover every day.
+    return {date:key, tokens:history?.scope === 'account' ? null : 0, ...entry};
   });
 }
 const sum = rows => rows.reduce((total,row)=>total + number(row.tokens),0);
+const partial = rows => rows.some(row=>row.tokens == null);
 const color = i => `var(--provider-${i % 12}, var(--accent))`;
 export function bars(history, days, machines = false, now) {
   const rows = dailySeries(history,days,now), max = Math.max(1,...rows.map(r=>number(r.tokens)));
   const ids = splitMachines(history,machines) ? history.machines.map(m=>m.id) : [];
-  return `<div class="history-bars" role="img" aria-label="Daily tokens for the last ${days} days">${rows.map(row=>{
+  return `<div class="history-bars" role="img" aria-label="Daily tokens for the last ${days} days${rows.some(row=>row.tokens == null) ? '; No data: '+rows.filter(row=>row.tokens == null).map(row=>row.date).join(', ') : ''}">${rows.map(row=>{
     const values = ids.length ? ids.map(id=>number(row.by_machine?.[id])) : [number(row.tokens)];
     const rest = Math.max(0,number(row.tokens)-values.reduce((a,b)=>a+b,0));
     if (ids.length && rest) values.push(rest);
-    return `<div class="history-bar" title="${esc(row.date)} · ${formatTokens(row.tokens)}" style="height:${100*number(row.tokens)/max}%">${values.map((v,i)=>`<i style="flex:${v};background:${ids.length ? color(i) : 'var(--provider-identity, var(--accent))'}"></i>`).join('')}</div>`;
+    return `<div class="history-bar" title="${esc(row.date)} · ${row.tokens == null ? 'No data' : formatTokens(row.tokens)}" aria-label="${esc(row.date)} · ${row.tokens == null ? 'No data' : formatTokens(row.tokens)}" style="height:${100*number(row.tokens)/max}%">${values.map((v,i)=>`<i style="flex:${v};background:${ids.length ? color(i) : 'var(--provider-identity, var(--accent))'}"></i>`).join('')}</div>`;
   }).join('')}</div><div class="history-axis"><span>${rows[0].date.slice(5)}</span><span>${rows.at(-1).date.slice(5)}</span></div>`;
 }
 function price(value, history) {
@@ -35,7 +38,7 @@ function price(value, history) {
 }
 function details(history, settings, days, panel, now) {
   const rows = dailySeries(history,30,now);
-  let html = `<div class="history-scope">${history.scope === 'local' ? 'Claude Code logs · LOCAL' : 'All devices · ACCOUNT'}</div><div class="history-kpis">${[['Today',rows.slice(-1)],['7d',rows.slice(-7)],['30d',rows]].map(([label,data])=>`<span>${label}<b>${formatTokens(sum(data))}</b></span>`).join('')}</div>${bars(history,days,settings.historyMachines,now)}`;
+  let html = `<div class="history-scope">${history.scope === 'local' ? 'Claude Code logs · LOCAL' : 'All devices · ACCOUNT'}</div><div class="history-kpis">${[['Today',rows.slice(-1)],['7d',rows.slice(-7)],['30d',rows]].map(([label,data])=>`<span>${label}<b>${formatTokens(sum(data))}${history.scope === 'account' && partial(data) ? ' · partial' : ''}</b></span>`).join('')}</div>${bars(history,days,settings.historyMachines,now)}`;
   if (settings.historyCost && history.scope === 'local' && rows.some(d=>Number.isFinite(d.cost))) html += price(rows.slice(-days).reduce((s,d)=>s+number(d.cost),0),history);
   if (splitMachines(history,settings.historyMachines)) html += `<div class="history-legend">${history.machines.map((m,i)=>`<span style="--series:${color(i)}">${esc(m.id)} · ${formatTokens(m.tokens)}</span>`).join('')}</div>`;
   if (settings.historyModels && history.models?.length) {
@@ -77,7 +80,7 @@ export function mountHistory(widget, root, providers, value, state, redraw, save
       if (settings.historyMode === 'under') {
         const rows = dailySeries(provider.history,14,now);
         section.classList.add('history-mini');
-        section.innerHTML = `${bars(provider.history,14,false,now)}<div class="history-mini-label">Today ${formatTokens(sum(rows.slice(-1)))} · 7d ${formatTokens(sum(rows.slice(-7)))} <b>${esc(provider.history.scope.toUpperCase())}</b></div>`;
+        section.innerHTML = `${bars(provider.history,14,false,now)}<div class="history-mini-label">Today ${formatTokens(sum(rows.slice(-1)))}${provider.history.scope === 'account' && partial(rows.slice(-1)) ? ' · partial' : ''} · 7d ${formatTokens(sum(rows.slice(-7)))}${provider.history.scope === 'account' && partial(rows.slice(-7)) ? ' · partial' : ''} <b>${esc(provider.history.scope.toUpperCase())}</b></div>`;
       } else {
         const open = state.open === provider.id;
         card.tabIndex=0; card.setAttribute('role','button'); card.setAttribute('aria-expanded',String(open));

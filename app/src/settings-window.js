@@ -551,6 +551,7 @@ historyExtras.insertAdjacentHTML('beforeend', `
 <label class="toggle-setting">Split by computer<input id="history-machines" type="checkbox" aria-describedby="history-machines-note"></label>
 <p id="history-machines-note" class="setting-note">Shown only when 2+ computers are found</p>`);
 let localHistory = false, savedLocalHistory = false;
+let localHistoryStatusUnknown = false;
 $('#local-history').onchange = () => {localHistory=$('#local-history').checked; mark();};
 const aboutInfo = sectionBlock(sections.about, 'AI Usage', []);
 sections.about.querySelector('h1').after(aboutInfo);
@@ -1024,6 +1025,7 @@ async function save() {
   mark();
   const value = structuredClone(rootDraft), chosen = structuredClone(providers),
         login = autostart, readLogs = localHistory;
+  let historyPermissionApplied = false;
   try {
     await preview();
     if (!sample) {
@@ -1031,10 +1033,15 @@ async function save() {
         await settingsInvoke('configure_providers', {providers : chosen});
         settingsInvoke('refresh_now').catch(error);
       }
-      if (readLogs !== savedLocalHistory) {
+      if (readLogs !== savedLocalHistory || localHistoryStatusUnknown) {
         await settingsInvoke('set_local_history', {enabled:readLogs});
+        historyPermissionApplied = true;
         const config = await settingsInvoke('get_provider_config');
-        if ((config.providers?.claude?.local_history === true) !== readLogs) throw new Error('Local history permission was not saved');
+        const actual = config.providers?.claude?.local_history;
+        if (typeof actual !== 'boolean') throw new Error('Local history permission status was not returned');
+        savedLocalHistory = actual;
+        localHistoryStatusUnknown = false;
+        if (savedLocalHistory !== readLogs) throw new Error('Local history permission was not saved');
         settingsInvoke('refresh_now').catch(error);
       }
       if (login !== savedAutostart) {
@@ -1058,7 +1065,22 @@ async function save() {
                             [], {hour : '2-digit', minute : '2-digit'});
     return true;
   } catch (e) {
-    error(`Unable to save: ${e}`);
+    let message = `Unable to save: ${e}`;
+    if (historyPermissionApplied) {
+      try {
+        const config = await settingsInvoke('get_provider_config');
+        const actual = config.providers?.claude?.local_history;
+        if (typeof actual !== 'boolean') throw new Error('Local history permission status was not returned');
+        savedLocalHistory = actual;
+        localHistoryStatusUnknown = false;
+        message = `History permission saved; other settings failed: ${e}`;
+      } catch (readError) {
+        localHistoryStatusUnknown = true;
+        $('#local-history').indeterminate = true;
+        message = `History permission status could not be verified; other settings failed: ${e}; ${readError}`;
+      }
+    }
+    error(message);
     mark();
     return false;
   } finally {
@@ -1070,14 +1092,27 @@ async function save() {
 }
 
 $('#save').onclick = save;
-$('#revert').onclick = () => {
+$('#revert').onclick = async () => {
   saveFailure = '';
+  if (localHistoryStatusUnknown) {
+    try {
+      const config = await settingsInvoke('get_provider_config');
+      const actual = config.providers?.claude?.local_history;
+      if (typeof actual !== 'boolean') throw new Error('Local history permission status was not returned');
+      savedLocalHistory = actual;
+      localHistoryStatusUnknown = false;
+    } catch (e) {
+      error(`History permission status could not be verified: ${e}`);
+      return;
+    }
+  }
   rootDraft = structuredClone(saved);
   if (selectedWidget !== 'main' && !rootDraft.widgets?.some(w => w.id === selectedWidget)) selectedWidget = 'main';
   draft = effectiveWidget(rootDraft, selectedWidget);
   providers = structuredClone(savedProviders);
   autostart = savedAutostart;
   localHistory = savedLocalHistory;
+  $('#local-history').indeterminate = false;
   $('#start-at-login').checked = autostart;
   positionBefore = null;
   renderProviders();
