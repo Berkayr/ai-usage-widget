@@ -77,3 +77,16 @@ test('screen mode supports portrait and strip and preserves the stored choice',(
   }
  }
 });
+
+test('history height caps every mode at the actual reserved work area and margins',async()=>{
+ const {historyHeight,monitorFit}=await import('../app/src/sizing.js');
+ const settings=normalizeSize({position:'Top right',reservedTop:36,linux:{margin:18},quoteEnabled:true});
+ const monitor=workAreaMonitor({width:1229,height:768,y:0,scale:1},settings);
+ const fit=monitorFit(settings,3,monitor);
+ assert.equal(fit.availableHeight,696);
+ for(const extra of [0,160,200,560]) {
+   const result=historyHeight(600,extra,fit.availableHeight);
+   assert.ok(result.height<=696);assert.equal(result.history,result.height-600);
+ }
+ assert.deepEqual(historyHeight(900,200,696),{height:696,history:0});
+});

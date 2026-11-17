@@ -9,7 +9,7 @@ import './quote.css';
 import { providerIndex } from './themes/shared/identity.js';
 import { createRenderer } from './themes/shared/render.js';
 import { renderRound } from './themes/shared/round.js';
-import { effectiveSizeMode, normalizeSize, widgetWidth, widgetHeight, widgetProviders, fittedGeometry, selectedWorkArea } from './sizing.js';
+import { effectiveSizeMode, normalizeSize, widgetWidth, widgetHeight, widgetProviders, fittedGeometry, selectedWorkArea, monitorFit, workAreaMonitor, historyHeight } from './sizing.js';
 import { hiddenStates } from './themes/dot-matrix/render.js';
 import { repairTextContrast } from './text-contrast.js';
 import { startupFailure } from './live-startup.js';
@@ -85,14 +85,36 @@ let monitorScale = 1;
 let placementMonitors = [];
 let layoutScale = 100;
 function renderSettings() { return $('#provider-onboarding').hidden ? settings : {...settings, shape:'portrait', quoteEnabled:false, sizeMode:'fixed', fitHeight:true}; }
+function layoutMonitor() {
+  return selectedWorkArea(placementMonitors,renderSettings()) || {width:window.screen.availWidth,height:window.screen.availHeight,scale:1};
+}
+function availableLayout() {
+  const platform=desktopInfo?.platform || 'linux';
+  const monitor=layoutMonitor();
+  const fit=monitorFit(renderSettings(),1,workAreaMonitor(monitor,renderSettings(),platform),platform);
+  const unit=platform==='windows' ? monitor.scale || 1 : 1;
+  return {width:fit.availableWidth/unit,height:fit.availableHeight/unit};
+}
+function inlineHistoryExtra() {
+  if (!settings.historyEnabled || !document.querySelector('.usage-history')) return 0;
+  return settings.historyMode==='under' ? 160 : 200;
+}
 function updateLayoutScale(count) {
   if (!$('#provider-onboarding').hidden) count=3;
-  const monitor=selectedWorkArea(placementMonitors,renderSettings());
-  const geometry = monitor ? fittedGeometry(renderSettings(),count,monitor,desktopInfo?.platform || 'linux') : null;
+  const monitor=layoutMonitor();
+  const unit=desktopInfo?.platform==='windows' ? monitor.scale || 1 : 1;
+  const extra=inlineHistoryExtra();
+  const geometry = placementMonitors.length ? fittedGeometry(renderSettings(),count,{...monitor,height:Math.max(1,monitor.height-extra*unit)},desktopInfo?.platform || 'linux') : null;
   layoutScale=geometry ? geometry.scale : settings.scale;
   const effective=layoutScale/(settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
   document.documentElement.style.setProperty('--ui-scale',effective/100);
-  const heightLimit = widgetHeight(renderSettings(),count)*effective/100;
+  const baseHeight = widgetHeight(renderSettings(),count)*effective/100;
+  const fitted=historyHeight(baseHeight,extra,availableLayout().height);
+  const heightLimit=document.querySelector('.history-panel') ? historyHeight(baseHeight,Math.max(0,560-baseHeight),availableLayout().height).height : fitted.height;
+  $('#widget').style.setProperty('--history-extra-height', `${fitted.history}px`);
+  $('#widget').classList.toggle('has-inline-history',extra>0);
+  const cards=[...$('#providers').querySelectorAll('.provider-card')];
+  $('#widget').style.setProperty('--history-rows',cards.map(card=>`minmax(0,${card.querySelector('.usage-history') ? (settings.historyMode==='under'?1.35:2) : 1}fr)`).join(' '));
   document.documentElement.style.setProperty('--portrait-height-limit', `${heightLimit}px`);
   document.documentElement.style.setProperty('--widget-height', `${heightLimit}px`);
   document.documentElement.style.fontSize=`${16*effective/100}px`;
@@ -212,13 +234,12 @@ function draw(snapshot, noData = false) {
     $('#widget').style.setProperty('--shape-rows', settings.shape === 'square' ? (count > 2 ? 2 : 1) : (count > 3 ? 2 : 1));
     updateLayoutScale(count);
     const baseWidth = widgetWidth(renderSettings(),count) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
-    const monitor = selectedWorkArea(placementMonitors, renderSettings());
-    const availableWidth = monitor ? monitor.width / (desktopInfo?.platform === 'windows' ? monitorScale : 1) - 24 : window.screen.availWidth - 24;
+    const availableWidth = availableLayout().width;
     const geometry = historyOpen ? historyGeometry(baseWidth,availableWidth,layoutScale) : {panel:0,width:baseWidth};
     const panelWidth = geometry.panel;
     const width = geometry.width;
     $('#widget').style.setProperty('--history-panel-width', `${panelWidth}px`);
-    if (isSample && historyOpen) $('#app').style.width = `${width}px`; else $('#app').style.removeProperty('width');
+    if (isSample && (historyOpen || placementMonitors.length)) $('#app').style.width = `${width}px`; else $('#app').style.removeProperty('width');
     const maxHeight = parseFloat(document.documentElement.style.getPropertyValue('--portrait-height-limit'));
     if (!isSample) invoke('resize_widget', {scale:layoutScale,widthCssPx:width,maxHeightCssPx:maxHeight,onboarding:!$('#provider-onboarding').hidden || historyOpen,cornerRadiusCssPx:(() => {
       const widget = $('#widget');
@@ -245,16 +266,19 @@ let lastFitHeight = 0;
 let fitPending = false;
 async function requestFit() {
   // Every native window uses the same theme-independent geometry as its shell.
-  if (isSample || fitPending || document.hidden) return;
+  if (fitPending || document.hidden) return;
   fitPending = true;
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   fitPending = false;
   if (disposed) return;
   const count = $('#providers').querySelectorAll('.provider-card').length;
   const contentHeight = widgetHeight(renderSettings(),$('#provider-onboarding').hidden ? count : 3) * layoutScale / 100 / (settings.matchPhysicalSize && effectiveSizeMode(renderSettings())!=='screen' ? monitorScale : 1);
-  const monitor = selectedWorkArea(placementMonitors,renderSettings());
-  const panelLimit = monitor ? monitor.height / (desktopInfo?.platform === 'windows' ? monitorScale : 1) - 24 : window.screen.availHeight - 24;
-  const height = document.querySelector('.history-panel') ? Math.min(panelLimit,Math.max(contentHeight,560)) : contentHeight;
+  const extra=inlineHistoryExtra();
+  const height = historyHeight(contentHeight,document.querySelector('.history-panel') ? Math.max(0,560-contentHeight) : extra,availableLayout().height).height;
+  document.documentElement.style.setProperty('--widget-height', `${height}px`);
+  document.documentElement.style.setProperty('--portrait-height-limit', `${height}px`);
+  $('#widget').style.maxHeight=`${availableLayout().height}px`;
+  if (isSample) return;
   if (Math.abs(height - lastFitHeight) < 2) return;
   lastFitHeight = height;
   invoke('fit_window_height', { heightCssPx: height }).catch(() => {});

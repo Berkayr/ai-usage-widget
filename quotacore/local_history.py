@@ -102,11 +102,14 @@ def claude_history(now: datetime | None = None, root: Path | str | None = None) 
     daily, models = defaultdict(lambda: [0, 0, 0, 0, 0, 0, False, defaultdict(int)]), defaultdict(lambda: [0, 0, False])
     machines = defaultdict(lambda: [0, 0.0, False])
     heatmap = [[0] * 24 for _ in range(7)]
+    today_hourly = [0] * 24
     total_cost = 0.0
     unpriced = 0
     for stamp, model, machine, inp, out, read, write, five, hour, fast in messages.values():
         tokens = inp + out + read + write
         key = stamp.date().isoformat()
+        if stamp.date() == now.date():
+            today_hourly[stamp.hour] += tokens
         cost = None
         prices = _price(model)
         if prices:
@@ -141,6 +144,6 @@ def claude_history(now: datetime | None = None, root: Path | str | None = None) 
                   for day, v in sorted(daily.items())],
         "models": [{"model": name, "tokens": v[0], "cost": round(v[1], 2) if v[2] else None}
                    for name, v in sorted(models.items(), key=lambda pair: (-pair[1][0], pair[0]))],
-        "heatmap": heatmap,
+        "heatmap": heatmap, "today_hourly": today_hourly,
         "totals": {"tokens": sum(v[0] for v in daily.values()), "cost": round(total_cost, 2), "unpriced_tokens": unpriced},
     }

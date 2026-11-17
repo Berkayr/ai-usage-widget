@@ -1,3 +1,4 @@
+import {providerIndex} from './themes/shared/identity.js';
 import {escapeHtml as esc} from './themes/dot-matrix/render.js';
 
 export const historyDefaults = {historyEnabled:true, historyMode:'card', historyCost:true, historyModels:true, historyHeatmap:true, historyMachines:false, historyPanelOpen:false};
@@ -21,16 +22,52 @@ export function dailySeries(history, days = 30, now = new Date()) {
   });
 }
 const sum = rows => rows.reduce((total,row)=>total + number(row.tokens),0);
-const partial = rows => rows.some(row=>row.tokens == null);
+const partial = rows => rows.some(row=>row.tokens == null || row.partial);
+const totalLabel = rows => `${formatTokens(sum(rows))}${partial(rows) ? ' · partial' : ''}`;
+
+export function aggregateHistory(providers, days = 30, now = new Date()) {
+  const tools = providers.filter(hasHistory);
+  const series = tools.map(p=>dailySeries(p.history,days,now));
+  const combined={scope:'all', tools, daily:dailySeries({scope:'local'},days,now).map((row,i)=>({
+    ...row, tokens:series.reduce((n,rows)=>n+number(rows[i].tokens),0),
+    partial:series.some(rows=>rows[i].tokens == null),
+    by_provider:Object.fromEntries(tools.map((p,j)=>[p.id,number(series[j][i].tokens)]))
+  }))};
+  if (tools.some(p=>Array.isArray(p.history.today_hourly))) {
+    combined.today_hourly=Array.from({length:24},(_,hour)=>tools.reduce((total,p)=>
+      total+(Array.isArray(p.history.today_hourly) ? number(p.history.today_hourly[hour]) : 0),0));
+  }
+  return combined;
+}
+
+export function hourlyBars(history, now = new Date()) {
+  if (!Array.isArray(history.today_hourly)) return '<p class="history-note">Hourly data unavailable</p>';
+  const rows=history.today_hourly.slice(0,now.getHours()+1), max=Math.max(1,...rows.map(number));
+  return `<div class="history-bars" role="img" aria-label="Today by local hour">${rows.map((v,h)=>`<div class="history-bar" title="${String(h).padStart(2,'0')}:00 · ${formatTokens(v)}" style="height:${100*number(v)/max}%"><i style="flex:1;background:var(--provider-identity,var(--accent))"></i></div>`).join('')}</div><div class="history-axis"><span>00:00</span><span>${String(now.getHours()).padStart(2,'0')}:00</span></div>`;
+}
+export function allHourlyBars(history, now = new Date()) {
+  const tools=history.tools.filter(p=>Array.isArray(p.history.today_hourly));
+  const hours=Array.from({length:now.getHours()+1},(_,hour)=>tools.map(p=>number(p.history.today_hourly[hour])));
+  const max=Math.max(1,...hours.map(values=>values.reduce((a,b)=>a+b,0)));
+  return `<div class="history-bars" role="img" aria-label="Today by local hour">${hours.map((values,hour)=>{
+    const total=values.reduce((a,b)=>a+b,0);
+    return `<div class="history-bar" title="${String(hour).padStart(2,'0')}:00 · ${formatTokens(total)}" style="height:${100*total/max}%">${values.map((value,i)=>`<i style="flex:${value};background:${color(providerIndex(tools[i],i))}"></i>`).join('')}</div>`;
+  }).join('')}</div><div class="history-axis"><span>00:00</span><span>${String(now.getHours()).padStart(2,'0')}:00</span></div>`;
+}
+function combinedLine(history, now = new Date()) {
+  const rows=dailySeries(history,7,now);
+  return `All tools · Today ${totalLabel(rows.slice(-1))} · 7d ${totalLabel(rows)}`;
+}
 const color = i => `var(--provider-${i % 12}, var(--accent))`;
 export function bars(history, days, machines = false, now) {
   const rows = dailySeries(history,days,now), max = Math.max(1,...rows.map(r=>number(r.tokens)));
-  const ids = splitMachines(history,machines) ? history.machines.map(m=>m.id) : [];
+  const tools=history.tools || [];
+  const ids = tools.length ? tools.map(p=>p.id) : splitMachines(history,machines) ? history.machines.map(m=>m.id) : [];
   return `<div class="history-bars" role="img" aria-label="Daily tokens for the last ${days} days${rows.some(row=>row.tokens == null) ? '; No data: '+rows.filter(row=>row.tokens == null).map(row=>row.date).join(', ') : ''}">${rows.map(row=>{
-    const values = ids.length ? ids.map(id=>number(row.by_machine?.[id])) : [number(row.tokens)];
+    const values = ids.length ? ids.map(id=>number((tools.length ? row.by_provider : row.by_machine)?.[id])) : [number(row.tokens)];
     const rest = Math.max(0,number(row.tokens)-values.reduce((a,b)=>a+b,0));
     if (ids.length && rest) values.push(rest);
-    return `<div class="history-bar" title="${esc(row.date)} · ${row.tokens == null ? 'No data' : formatTokens(row.tokens)}" aria-label="${esc(row.date)} · ${row.tokens == null ? 'No data' : formatTokens(row.tokens)}" style="height:${100*number(row.tokens)/max}%">${values.map((v,i)=>`<i style="flex:${v};background:${ids.length ? color(i) : 'var(--provider-identity, var(--accent))'}"></i>`).join('')}</div>`;
+    return `<div class="history-bar" title="${esc(row.date)} · ${row.tokens == null ? 'No data' : formatTokens(row.tokens)+(row.partial ? ' · partial' : '')}" aria-label="${esc(row.date)} · ${row.tokens == null ? 'No data' : formatTokens(row.tokens)+(row.partial ? ' · partial' : '')}" style="height:${100*number(row.tokens)/max}%">${values.map((v,i)=>`<i style="flex:${v};background:${ids.length ? color(tools.length ? providerIndex(tools[i],i) : i) : 'var(--provider-identity, var(--accent))'}"></i>`).join('')}</div>`;
   }).join('')}</div><div class="history-axis"><span>${rows[0].date.slice(5)}</span><span>${rows.at(-1).date.slice(5)}</span></div>`;
 }
 function price(value, history) {
@@ -38,7 +75,16 @@ function price(value, history) {
 }
 function details(history, settings, days, panel, now) {
   const rows = dailySeries(history,30,now);
-  let html = `<div class="history-scope">${history.scope === 'local' ? 'Claude Code logs · LOCAL' : 'All devices · ACCOUNT'}</div><div class="history-kpis">${[['Today',rows.slice(-1)],['7d',rows.slice(-7)],['30d',rows]].map(([label,data])=>`<span>${label}<b>${formatTokens(sum(data))}${history.scope === 'account' && partial(data) ? ' · partial' : ''}</b></span>`).join('')}</div>${bars(history,days,settings.historyMachines,now)}`;
+  const today=rows.slice(-1);
+  const chart=days === 1 && history.scope === 'local' ? hourlyBars(history,now) : days === 1 && history.scope === 'account' ? `<p class="history-today">${partial(today) ? 'No data yet today' : formatTokens(sum(today))+' tokens today'}</p>` : days === 1 && history.scope === 'all' && Array.isArray(history.today_hourly) ? allHourlyBars(history,now) : bars(history,days,settings.historyMachines,now);
+  let html = `<div class="history-scope">${history.scope === 'all' ? 'All tools · local + account' : history.scope === 'local' ? 'Claude Code logs · LOCAL' : 'All devices · ACCOUNT'}</div><div class="history-kpis">${[['Today',today],['7d',rows.slice(-7)],['30d',rows]].map(([label,data])=>`<span>${label}<b>${history.scope === 'account' && label === 'Today' && partial(data) ? 'No data yet today' : totalLabel(data)}</b></span>`).join('')}</div>${chart}`;
+  if (history.tools) html += `<div class="history-legend">${history.tools.map((p,i)=>{
+    const label=esc(p.label || p.id), providerRows=dailySeries(p.history,days,now);
+    const value=days===1 && history.scope==='all' && Array.isArray(history.today_hourly) && !Array.isArray(p.history.today_hourly)
+      ? partial(providerRows.slice(-1)) ? 'No data yet today' : `${formatTokens(sum(providerRows.slice(-1)))} · partial`
+      : totalLabel(providerRows);
+    return `<span style="--series:${color(providerIndex(p,i))}">${label} · ${value}</span>`;
+  }).join('')}</div>`;
   if (settings.historyCost && history.scope === 'local' && rows.some(d=>Number.isFinite(d.cost))) html += price(rows.slice(-days).reduce((s,d)=>s+number(d.cost),0),history);
   if (splitMachines(history,settings.historyMachines)) html += `<div class="history-legend">${history.machines.map((m,i)=>`<span style="--series:${color(i)}">${esc(m.id)} · ${formatTokens(m.tokens)}</span>`).join('')}</div>`;
   if (settings.historyModels && history.models?.length) {
@@ -67,13 +113,17 @@ export function panelOnLeft(settings) {
 }
 export function mountHistory(widget, root, providers, value, state, redraw, saveOpen, now) {
   const settings = {...historyDefaults,...value};
-  widget.querySelectorAll(':scope > .history-panel, :scope > .history-toggle').forEach(el=>el.remove());
+  widget.querySelectorAll(':scope > .history-panel, :scope > .history-toggle, :scope > .history-total').forEach(el=>el.remove());
   const available = providers.filter(hasHistory);
   const enabled = settings.historyEnabled && available.length > 0;
   widget.classList.toggle('has-history-panel',Boolean(enabled && settings.historyMode === 'panel' && settings.historyPanelOpen));
   widget.classList.toggle('history-left',panelOnLeft(settings));
   if (!enabled) return false;
+  const combined=available.length >= 2 ? aggregateHistory(available,30,now) : null;
   if (settings.historyMode !== 'panel') {
+    if (combined && (settings.historyMode === 'under' || state.open)) {
+      const line=document.createElement('div');line.innerHTML=combinedLine(combined,now);line.className='history-total';widget.insertBefore(line,root);
+    }
     root.querySelectorAll('.provider-card').forEach((card,i)=>{
       const provider = providers[i]; if (!hasHistory(provider)) return;
       const section = document.createElement('section'); section.className='usage-history';
@@ -103,10 +153,11 @@ export function mountHistory(widget, root, providers, value, state, redraw, save
   const panel=document.createElement('aside'); panel.className='history-panel'; panel.setAttribute('aria-label','Usage history');
   const controls=document.createElement('div'); controls.className='history-controls';
   const select=document.createElement('select'); select.setAttribute('aria-label','History provider');
+  if (combined) select.add(new Option('All tools','all'));
   available.forEach(p=>select.add(new Option(p.label || p.id,p.id)));
-  const provider=available.find(p=>p.id===state.provider) || available[0]; select.value=provider.id;
+  const provider=available.find(p=>p.id===state.provider) || (combined ? {id:'all',history:combined} : available[0]); select.value=provider.id;
   select.onchange=()=>{state.provider=select.value;redraw();}; controls.append(select);
-  for(const days of [7,30]) {const b=document.createElement('button');b.textContent=`${days} days`;b.setAttribute('aria-pressed',String((state.days || 30)===days));b.onclick=()=>{state.days=days;redraw();};controls.append(b);}
-  panel.append(controls); const body=document.createElement('div'); body.innerHTML=details(provider.history,settings,state.days || 30,true,now); panel.append(body); widget.append(panel);
+  for(const days of [1,7,30]) {const b=document.createElement('button');b.textContent=days===1?'Today':`${days} days`;b.setAttribute('aria-pressed',String((state.days || 30)===days));b.onclick=()=>{state.days=days;redraw();};controls.append(b);}
+  panel.append(controls); const body=document.createElement('div'); body.className='history-body'; body.innerHTML=details(provider.history,settings,state.days || 30,true,now); panel.append(body); widget.append(panel);
   return true;
 }
