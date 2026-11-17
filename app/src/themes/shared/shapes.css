@@ -291,7 +291,7 @@
 /* Outer geometry belongs to the shape, never to theme content metrics. */
 :root[data-shape=portrait] #widget.widget:has(#providers){height:var(--widget-height,var(--contract-height));max-height:none}
 :root[data-shape=portrait] #widget.widget .provider-list{flex:1 1 0;height:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(var(--provider-count),minmax(0,1fr));grid-auto-rows:minmax(0,1fr);align-content:stretch;overflow:auto}
-:root[data-shape=portrait] #widget.widget .provider-card:nth-child(n){min-height:0;height:100%;grid-column:1/-1}
+:root[data-shape=portrait] #widget.widget .provider-card:nth-child(n){min-height:0;height:100%;width:100%;grid-column:1/-1}
 :root[data-shape=portrait] #widget.widget .provider-card:nth-child(n) .windows{flex:1 0 auto;align-content:space-evenly}
 :root[data-shape=portrait] #widget.widget .provider-card:nth-child(n) .quota-window{justify-content:center}
 :root[data-shape=strip] #widget.widget{height:var(--widget-height,20.375rem);max-height:none}

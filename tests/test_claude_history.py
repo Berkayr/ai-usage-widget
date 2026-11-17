@@ -80,6 +80,23 @@ class ClaudeHistoryTests(unittest.TestCase):
         self.assertNotIn(str(self.root), json.dumps(result))
         self.assertNotIn("cwd", json.dumps(result))
 
+    def test_today_hourly_uses_local_date_deduplicates_and_excludes_future(self):
+        old_tz = os.environ.get("TZ")
+        os.environ["TZ"] = "Europe/Warsaw"
+        time.tzset()
+        self.addCleanup(self._restore_tz, old_tz)
+        today = self.row("today", "today", stamp="2026-11-08T23:30:00Z")
+        self.add("hours.jsonl", [today, today,
+                 self.row("prior", "prior", stamp="2026-11-08T22:30:00Z"),
+                 self.row("later", "later", stamp="2026-11-09T12:01:00Z")])
+        result = claude_history(datetime(2026, 11, 9, 12, tzinfo=timezone.utc), self.root)
+        self.assertEqual(len(result["today_hourly"]), 24)
+        self.assertEqual(result["today_hourly"][0], 160)
+        self.assertEqual(sum(result["today_hourly"]), 160)
+        self.assertEqual(result["totals"]["tokens"], 320)
+        previous = claude_history(datetime(2026, 11, 10, 12, tzinfo=timezone.utc), self.root)
+        self.assertEqual(previous["today_hourly"], [0] * 24)
+
     def test_machine_breakdown_and_private_cwd(self):
         rows = [
             {**self.row("w", "w"), "cwd": r"C:\\Users\\example\\project"},

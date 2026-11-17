@@ -72,7 +72,7 @@ export function fitUsage(root) {
   if (document.documentElement.dataset.shape === 'portrait' && overflows(root.closest('.widget'))) root.style.flexShrink = '1';
   growPortraitContent(root, cards);
   // Graphic label reservations can exceed fractional tracks; share that minimum.
-  if (document.documentElement.dataset.shape === 'portrait' && cards.length) {
+  if (document.documentElement.dataset.shape === 'portrait' && cards.length && !root.closest('.has-inline-history')) {
     const height = Math.max(...cards.map(card => card.getBoundingClientRect().height));
     cards.forEach(card => { card.style.minHeight = `${height}px`; });
   }

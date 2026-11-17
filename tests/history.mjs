@@ -41,3 +41,41 @@ test('panel reserves visible space even when a strip exceeds the screen',()=>{
   assert.deepEqual(historyGeometry(1580,776),{panel:360,width:776});
   const small=historyGeometry(340,300);assert.equal(small.width,300);assert.equal(small.panel,150);
 });
+
+test('all tools align dates, preserve local zero and mark delayed account buckets partial',async()=>{
+  const {aggregateHistory}=await import('../app/src/history.js');
+  const providers=[{id:'claude',history:{scope:'local',daily:[{date:'2026-11-01',tokens:10}]}},
+    {id:'codex',history:{scope:'account',daily:[{date:'2026-10-31',tokens:20},{date:'2026-11-01',tokens:30}]}},{id:'gemini'}];
+  const history=aggregateHistory(providers,3,new Date(2026,10,2));
+  assert.deepEqual(history.daily.map(r=>[r.date,r.tokens,r.partial]),[
+    ['2026-10-31',20,false],['2026-11-01',40,false],['2026-11-02',0,true]]);
+  assert.deepEqual(history.daily[1].by_provider,{claude:10,codex:30});
+  assert.equal(history.tools.length,2);
+  assert.match(bars(history,3,false,new Date(2026,10,2)),/partial/);
+  assert.match(bars(history,3,false,new Date(2026,10,2)),/flex:30/);
+});
+test('all tools combines local hourly providers by matching hour and omits account data',async()=>{
+  const {aggregateHistory}=await import('../app/src/history.js');
+  const history=aggregateHistory([
+    {id:'claude',history:{scope:'local',daily:[],today_hourly:[10,20,30]}},
+    {id:'copilot',history:{scope:'local',daily:[],today_hourly:[1,2]}},
+    {id:'codex',history:{scope:'account',daily:[],today_hourly:undefined}}
+  ],1,new Date(2026,10,2,2));
+  assert.deepEqual(history.today_hourly.slice(0,4),[11,22,30,0]);
+  assert.equal(history.tools.filter(p=>Array.isArray(p.history.today_hourly)).length,2);
+});
+test('local Today shows only elapsed local hours including zeros',async()=>{
+  const {hourlyBars}=await import('../app/src/history.js');
+  const html=hourlyBars({today_hourly:[0,10,20,...Array(21).fill(0)]},new Date(2026,10,2,2));
+  assert.equal((html.match(/class="history-bar"/g)||[]).length,3);
+  assert.match(html,/02:00 · 20/);assert.match(html,/height:0%/);
+  assert.doesNotMatch(html,/NaN|Infinity/);
+  assert.match(hourlyBars({}),/unavailable/);
+});
+test('all tools Today renders hourly HTML without an explicit now',async()=>{
+  const {allHourlyBars}=await import('../app/src/history.js');
+  const html=allHourlyBars({tools:[{id:'claude',history:{today_hourly:[0,12]}}]});
+  assert.match(html,/Today by local hour/);
+  assert.equal((html.match(/class="history-bar"/g)||[]).length,new Date().getHours()+1);
+  assert.match(html,new RegExp(`${String(new Date().getHours()).padStart(2,'0')}:00`));
+});

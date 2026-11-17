@@ -94,3 +94,9 @@ export function selectedWorkArea(monitors, settings) {
   if (typeof selection==='string' && settings.placement?.disconnected==='hide') return null;
   return (settings.placement?.disconnected==='monitor' && monitors.find(m=>m.name===settings.placement?.fallbackMonitor)) || monitors.find(m=>m.primary) || monitors[0];
 }
+
+// Native monitor dimensions become CSS pixels only at the window boundary.
+export function historyHeight(baseHeight, extraHeight, availableHeight) {
+  const height = Math.min(availableHeight, baseHeight + extraHeight);
+  return {height, history:Math.max(0,height-baseHeight)};
+}
