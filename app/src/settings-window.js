@@ -540,9 +540,12 @@ for (const id of ['layout', 'position', 'quote-content', 'desktop']) {
 }
 const historyControls = sectionBlock(sections.history, 'Usage history', []);
 historyControls.insertAdjacentHTML('beforeend', `
+<p class="setting-note" id="history-explanation">Usage history shows daily token usage from Claude Code local logs and Codex account data. History data stays on this computer. Enable Read Claude Code logs to let AI Usage read this computer's Claude Code session logs and count tokens.</p>
 <label class="toggle-setting">Show usage history<input id="history-enabled" type="checkbox"></label>
 <label class="toggle-setting">Read Claude Code logs<input id="local-history" type="checkbox"></label>
-<label>Show history<select id="history-mode"><option value="under">Under each card</option><option value="card">Click a card</option><option value="panel">Side panel</option></select></label>`);
+<label>Show history<select id="history-mode"><option value="under">Under each card</option><option value="card">Click a card</option><option value="panel">Side panel</option></select></label>
+<label>Panel layout<select id="history-panel-layout"><option value="stacked">Stacked</option><option value="single">One at a time</option></select></label>
+<figure id="history-preview" aria-label="Usage history preview"></figure>`);
 const historyExtras = sectionBlock(sections.history, 'Extras', []);
 historyExtras.insertAdjacentHTML('beforeend', `
 <label class="toggle-setting">API price equivalent<input id="history-cost" type="checkbox"></label>
@@ -559,7 +562,19 @@ aboutInfo.insertAdjacentHTML('beforeend', `<p class="setting-note">Version <span
 $('#app-version').textContent = version;
 const navigation = mountNavigation(sections);
 
+function renderHistoryPreview() {
+  const mode=draft.historyMode, stacked=draft.historyPanelLayout !== 'single';
+  const chart='<div class="history-preview-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>';
+  const card=label=>`<div class="history-preview-card"><b>${label}</b><small>Today 12K · 7d 84K</small>${chart}</div>`;
+  const preview=$('#history-preview');
+  preview.dataset.mode=mode;
+  preview.dataset.layout=draft.historyPanelLayout || 'stacked';
+  preview.innerHTML=`<figcaption>Example preview · fictional data${draft.historyEnabled ? '' : ' · history hidden'}</figcaption><div class="history-preview-scene">${mode === 'panel' ? `<div class="history-preview-widget"><b>AI Usage　‹ ⚙</b><p>Claude Code</p><p>OpenAI Codex</p></div><div class="history-preview-panel"><small>Today / 7 / 30 days</small>${stacked ? ['All tools','Claude Code','OpenAI Codex'].map(card).join('') : '<small>All tools ▾</small>'+card('All tools')}</div>` : mode === 'under' ? ['Claude Code','OpenAI Codex'].map(card).join('') : `<div class="history-preview-widget"><b>Click a card to expand</b>${card('Claude Code ▴')}<p>OpenAI Codex ▾</p></div>`}</div>`;
+}
+
 function renderControls() {
+  renderHistoryPreview();
+  $('#history-panel-layout').disabled = draft.historyMode !== 'panel';
   $('#local-history').checked = localHistory;
   $('#history-machines').disabled = !snapshotProviders.some(p => splitMachines(p.history,true));
   $('#history-machines-note').hidden = !$('#history-machines').disabled;
@@ -711,7 +726,7 @@ function renderControls() {
   widgetPicker.render(geometry.monitors);
 }
 export const bindings = {
-  'history-enabled':'historyEnabled', 'history-mode':'historyMode',
+  'history-enabled':'historyEnabled', 'history-mode':'historyMode', 'history-panel-layout':'historyPanelLayout',
   'history-cost':'historyCost', 'history-models':'historyModels',
   'history-heatmap':'historyHeatmap', 'history-machines':'historyMachines',
   'size-mode' : 'sizeMode',

@@ -65,8 +65,8 @@ fn deserialize_scale<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Resul
 
 #[derive(Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
-struct HistorySettings { history_enabled: bool, history_mode: String, history_cost: bool, history_models: bool, history_heatmap: bool, history_machines: bool, history_panel_open: bool }
-impl Default for HistorySettings { fn default() -> Self { Self { history_enabled:true, history_mode:"card".into(), history_cost:true, history_models:true, history_heatmap:true, history_machines:false, history_panel_open:false } } }
+struct HistorySettings { history_enabled: bool, history_mode: String, history_cost: bool, history_models: bool, history_heatmap: bool, history_machines: bool, history_panel_open: bool, history_panel_layout: String }
+impl Default for HistorySettings { fn default() -> Self { Self { history_enabled:true, history_mode:"card".into(), history_cost:true, history_models:true, history_heatmap:true, history_machines:false, history_panel_open:false, history_panel_layout:"stacked".into() } } }
 impl Default for Settings { fn default() -> Self { Self { widgets: vec![], strip_layout_version: 0, history: HistorySettings::default(), user_palettes: vec![], palette_load_error: None, size_mode: "fixed".into(), fit_fraction: 1., fit_fine_tune: 100., reserved_top: None, reserved_bottom: None, provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), #[cfg(not(target_os = "linux"))] linux: default_linux_options(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
@@ -450,9 +450,10 @@ mod settings_tests {
     fn history_settings_round_trip() {
         assert_eq!(Settings::default().history.history_mode, "card");
         assert!(!Settings::default().history.history_panel_open);
+        assert_eq!(Settings::default().history.history_panel_layout, "stacked");
         let value = serde_json::json!({"historyEnabled":false,"historyMode":"panel",
             "historyCost":false,"historyModels":false,"historyHeatmap":false,
-            "historyMachines":true,"historyPanelOpen":true});
+            "historyMachines":true,"historyPanelOpen":true,"historyPanelLayout":"single"});
         let settings: Settings = serde_json::from_value(value.clone()).unwrap();
         let written = serde_json::to_value(settings).unwrap();
         for (key, expected) in value.as_object().unwrap() {

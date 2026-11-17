@@ -64,6 +64,7 @@ const descriptions = {
   'history-enabled':'Show token history when a provider supplies it.',
   'local-history':"Counts tokens from this computer's logs. Nothing is stored.",
   'history-mode':'Choose where usage history appears in the widget.',
+  'history-panel-layout':'Show all tools together or choose one at a time in the side panel.',
   'history-cost':'Estimated API prices, not your actual bill.',
   'history-models':'Show token shares for models reported by local logs.',
   'history-heatmap':'Show activity by weekday and hour for Claude.',

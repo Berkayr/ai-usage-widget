@@ -5,7 +5,7 @@ export const overrideKeys = new Set([
   'fitFineTune', 'fitHeight', 'matchPhysicalSize', 'appearance', 'palette', 'accent',
   'background', 'widgetOpacity', 'backgroundOpacity', 'colorMode', 'dotCount',
   'accentEdge', 'historyEnabled', 'historyMode', 'historyCost', 'historyModels',
-  'historyHeatmap', 'historyMachines', 'historyPanelOpen', 'showExtraWindows',
+  'historyHeatmap', 'historyMachines', 'historyPanelLayout', 'historyPanelOpen', 'showExtraWindows',
   'widgetProviders', 'featuredProvider', 'featuredPosition', 'quoteEnabled',
   'quoteMode', 'quotePosition', 'quoteNavigation', 'position', 'lockPosition',
   'placementEditing', 'reservedTop', 'reservedBottom'
