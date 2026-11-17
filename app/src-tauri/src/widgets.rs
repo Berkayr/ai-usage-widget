@@ -129,7 +129,7 @@ fn overridable(key: &str) -> bool {
         | "appearance" | "palette" | "accent" | "background" | "widgetOpacity"
         | "backgroundOpacity" | "colorMode" | "dotCount" | "accentEdge"
         | "historyEnabled" | "historyMode" | "historyCost" | "historyModels"
-        | "historyHeatmap" | "historyMachines" | "historyPanelOpen" | "showExtraWindows"
+        | "historyHeatmap" | "historyMachines" | "historyPanelLayout" | "historyPanelOpen" | "showExtraWindows"
         | "widgetProviders" | "featuredProvider" | "featuredPosition"
         | "quoteEnabled" | "quoteMode" | "quotePosition" | "quoteNavigation")
 }

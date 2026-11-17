@@ -15,14 +15,17 @@ fn fixture() -> Settings {
 fn value(settings: &Settings) -> Value { serde_json::to_value(settings).unwrap() }
 
 #[test]
-fn legacy_fixture_round_trips_byte_for_byte_and_omits_empty_widgets() {
+fn legacy_fixture_adds_layout_default_and_preserves_other_bytes_and_omits_empty_widgets() {
     let bytes = include_bytes!("fixtures/widget-settings.json");
     let settings = parse_settings(bytes);
-    assert_eq!(serde_json::to_vec_pretty(&settings).unwrap(), bytes);
+    assert_eq!(settings.history.history_panel_layout, "stacked");
+    let expected = std::str::from_utf8(bytes).unwrap().replace(
+        "\"historyPanelOpen\": false,", "\"historyPanelOpen\": false,\n  \"historyPanelLayout\": \"stacked\",");
+    assert_eq!(serde_json::to_vec_pretty(&settings).unwrap(), expected.as_bytes());
     let mut with_empty: Value = serde_json::from_slice(bytes).unwrap();
     with_empty["widgets"] = json!([]);
     let restored: Settings = serde_json::from_value(with_empty).unwrap();
-    assert_eq!(serde_json::to_vec_pretty(&restored).unwrap(), bytes);
+    assert_eq!(serde_json::to_vec_pretty(&restored).unwrap(), expected.as_bytes());
 }
 
 #[test]
@@ -39,6 +42,7 @@ fn effective_and_split_round_trip_without_mutating_root() {
     let mut changed = edited.clone();
     changed.theme = "system".into();
     changed.history.history_cost = false;
+    changed.history.history_panel_layout = "single".into();
     let saved = split(&root,"side-2",&changed).unwrap();
     let mut actual = value(&effective(&saved,"side-2").unwrap());
     let mut expected = value(&changed);

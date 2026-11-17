@@ -60,6 +60,16 @@ try {
     check(document.activeElement.dataset.category === 'about', 'End skips hidden Taskbar');
     check(visible().filter(t => t.tabIndex === 0).length === 1, 'Roving tab stop');
     $('[data-category=history]').click();
+    const layout=$('#history-panel-layout'),historyMode=$('#history-mode');
+    check(layout.disabled,'Panel layout disabled outside side panel');
+    historyMode.value='panel';historyMode.dispatchEvent(new Event('change'));await wait();
+    layout.value='single';layout.dispatchEvent(new Event('change'));await wait();
+    check(!layout.disabled && $('#history-preview').dataset.layout==='single','Panel layout draft and preview');
+    $('#revert').click();await wait();
+    check(historyMode.value==='card' && layout.value==='stacked' && layout.disabled,'Panel layout Revert');
+    historyMode.value='panel';historyMode.dispatchEvent(new Event('change'));
+    layout.value='single';layout.dispatchEvent(new Event('change'));$('#save').click();await wait();
+    check(native.saves.at(-1).historyPanelLayout==='single' && $('#save').disabled,'Panel layout verified Save');
     $('#local-history').click();await wait();
     check(!native.calls.includes('set_local_history'), 'Log permission stays draft');
     $('#revert').click();check(!$('#local-history').checked,'Revert log permission');
@@ -136,7 +146,7 @@ try {
   assert.equal(await b.evaluate(`document.querySelector('[aria-selected=true]').dataset.category`), 'theme', 'Legacy appearance category maps to Theme');
   const bindings = Object.keys(Function('return (' + (await readFile(new URL('../app/src/settings-window.js',import.meta.url),'utf8')).match(/export const bindings = ([\s\S]*?);/)[1] + ')')());
   assert.equal(await b.evaluate(`(${JSON.stringify(bindings)}).every(id => document.getElementById(id))`), true, 'All original binding IDs exist');
-  assert.equal(await b.evaluate(`document.querySelector('#category-history').querySelectorAll('input,select').length`), 7);
+  assert.equal(await b.evaluate(`document.querySelector('#category-history').querySelectorAll('input,select').length`), 8);
   assert.equal(await b.evaluate(`/coming soon/i.test(document.querySelector('#category-history').textContent)`), false);
   assert.equal(await b.evaluate(`document.querySelectorAll('#settings>section').length`), 10);
   const destinations = {

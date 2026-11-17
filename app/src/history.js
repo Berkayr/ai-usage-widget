@@ -1,7 +1,7 @@
 import {providerIndex} from './themes/shared/identity.js';
 import {escapeHtml as esc} from './themes/dot-matrix/render.js';
 
-export const historyDefaults = {historyEnabled:true, historyMode:'card', historyCost:true, historyModels:true, historyHeatmap:true, historyMachines:false, historyPanelOpen:false};
+export const historyDefaults = {historyEnabled:true, historyMode:'card', historyCost:true, historyModels:true, historyHeatmap:true, historyMachines:false, historyPanelOpen:false, historyPanelLayout:'stacked'};
 const number = value => Number.isFinite(value) && value > 0 ? value : 0;
 export function formatTokens(value) {
   const n = number(value);
@@ -113,7 +113,7 @@ export function panelOnLeft(settings) {
 }
 export function mountHistory(widget, root, providers, value, state, redraw, saveOpen, now) {
   const settings = {...historyDefaults,...value};
-  widget.querySelectorAll(':scope > .history-panel, :scope > .history-toggle, :scope > .history-total').forEach(el=>el.remove());
+  widget.querySelectorAll('.history-panel, .history-toggle, :scope > .history-total').forEach(el=>el.remove());
   const available = providers.filter(hasHistory);
   const enabled = settings.historyEnabled && available.length > 0;
   widget.classList.toggle('has-history-panel',Boolean(enabled && settings.historyMode === 'panel' && settings.historyPanelOpen));
@@ -148,16 +148,23 @@ export function mountHistory(widget, root, providers, value, state, redraw, save
     return false;
   }
   const left=panelOnLeft(settings), open=settings.historyPanelOpen;
-  const button=document.createElement('button'); button.className='history-toggle'; button.textContent=(left !== open)?'‹':'›'; button.setAttribute('aria-label',open?'Close usage history':'Open usage history'); button.setAttribute('aria-expanded',String(open)); button.onclick=()=>saveOpen(!open); widget.append(button);
+  const button=document.createElement('button'); button.className='history-toggle'; button.textContent=(left !== open)?'‹':'›'; button.setAttribute('aria-label',open?'Close usage history':'Open usage history'); button.setAttribute('aria-expanded',String(open)); button.onclick=()=>{saveOpen(!open);requestAnimationFrame(()=>widget.querySelector('.history-toggle')?.focus());}; widget.querySelector('#gear').before(button);
   if (!open) return false;
   const panel=document.createElement('aside'); panel.className='history-panel'; panel.setAttribute('aria-label','Usage history');
   const controls=document.createElement('div'); controls.className='history-controls';
+  const stacked=settings.historyPanelLayout !== 'single';
   const select=document.createElement('select'); select.setAttribute('aria-label','History provider');
   if (combined) select.add(new Option('All tools','all'));
   available.forEach(p=>select.add(new Option(p.label || p.id,p.id)));
   const provider=available.find(p=>p.id===state.provider) || (combined ? {id:'all',history:combined} : available[0]); select.value=provider.id;
-  select.onchange=()=>{state.provider=select.value;redraw();}; controls.append(select);
+  select.onchange=()=>{state.provider=select.value;redraw();}; if (!stacked) controls.append(select);
   for(const days of [1,7,30]) {const b=document.createElement('button');b.textContent=days===1?'Today':`${days} days`;b.setAttribute('aria-pressed',String((state.days || 30)===days));b.onclick=()=>{state.days=days;redraw();};controls.append(b);}
-  panel.append(controls); const body=document.createElement('div'); body.className='history-body'; body.innerHTML=details(provider.history,settings,state.days || 30,true,now); panel.append(body); widget.append(panel);
+  panel.append(controls);
+  const body=document.createElement('div'); body.className='history-body';
+  if (stacked) {
+    const sections=[{id:'all',label:'All tools',history:combined || aggregateHistory(available,30,now)},...available];
+    body.innerHTML=sections.map((p,i)=>`<section class="history-section" data-history-provider="${esc(p.id)}" style="--provider-identity:${color(providerIndex(p,Math.max(0,i-1)))}"><h2>${esc(p.label || p.id)}</h2>${details(p.history,settings,state.days || 30,true,now)}</section>`).join('');
+  } else body.innerHTML=details(provider.history,settings,state.days || 30,true,now);
+  panel.append(body); widget.append(panel);
   return true;
 }
