@@ -92,7 +92,7 @@ def claude_history(now: datetime | None = None, root: Path | str | None = None) 
                                              five, hour, usage.get("speed") == "fast")
                         except (ValueError, TypeError, AttributeError, OverflowError):
                             continue
-            except OSError:
+            except (OSError, UnicodeDecodeError):
                 continue
     except OSError:
         return None
