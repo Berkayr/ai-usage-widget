@@ -80,6 +80,14 @@ class ClaudeHistoryTests(unittest.TestCase):
         self.assertNotIn(str(self.root), json.dumps(result))
         self.assertNotIn("cwd", json.dumps(result))
 
+    def test_streaming_repeat_keeps_final_output_in_any_order(self):
+        partial = self.row(usage={"input_tokens": 100, "output_tokens": 3, "cache_read_input_tokens": 10, "cache_creation_input_tokens": 30})
+        final = self.row(usage={"input_tokens": 100, "output_tokens": 400, "cache_read_input_tokens": 10, "cache_creation_input_tokens": 30})
+        for rows in ([partial, final, partial], [final, partial]):
+            self.add("a.jsonl", rows)
+            result = claude_history(datetime(2026, 11, 9, 12, tzinfo=timezone.utc), self.root)
+            self.assertEqual(result["totals"]["tokens"], 540)
+
     def test_undecodable_file_does_not_hide_other_files(self):
         self.add("a.jsonl", [self.row()])
         (self.root / "b.jsonl").write_bytes(b'\xff\xfe"usage" \xff\n')

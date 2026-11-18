@@ -70,8 +70,6 @@ def claude_history(now: datetime | None = None, root: Path | str | None = None) 
                                 continue
                             machine = _machine(entry.get("cwd"))
                             key = (machine, mid, rid)
-                            if key in messages:
-                                continue
                             parsed = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
                             if parsed.tzinfo is None:
                                 parsed = parsed.replace(tzinfo=timezone.utc)
@@ -80,6 +78,9 @@ def claude_history(now: datetime | None = None, root: Path | str | None = None) 
                                 continue
                             input_tokens = max(0, int(usage.get("input_tokens", 0)))
                             output = max(0, int(usage.get("output_tokens", 0)))
+                            # Streaming repeats share the key; only the final row has the full output count.
+                            if key in messages and messages[key][4] >= output:
+                                continue
                             cache_read = max(0, int(usage.get("cache_read_input_tokens", 0)))
                             cache_write = max(0, int(usage.get("cache_creation_input_tokens", 0)))
                             creation = usage.get("cache_creation")
