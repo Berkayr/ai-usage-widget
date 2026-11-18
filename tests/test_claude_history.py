@@ -80,6 +80,13 @@ class ClaudeHistoryTests(unittest.TestCase):
         self.assertNotIn(str(self.root), json.dumps(result))
         self.assertNotIn("cwd", json.dumps(result))
 
+    def test_undecodable_file_does_not_hide_other_files(self):
+        self.add("a.jsonl", [self.row()])
+        (self.root / "b.jsonl").write_bytes(b'\xff\xfe"usage" \xff\n')
+        result = claude_history(datetime(2026, 11, 9, 12, tzinfo=timezone.utc), self.root)
+        self.assertIsNotNone(result)
+        self.assertEqual(result["totals"]["tokens"], 160)
+
     def test_today_hourly_uses_local_date_deduplicates_and_excludes_future(self):
         old_tz = os.environ.get("TZ")
         os.environ["TZ"] = "Europe/Warsaw"
