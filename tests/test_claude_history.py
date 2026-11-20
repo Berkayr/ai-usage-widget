@@ -4,7 +4,7 @@ import sys
 import tempfile
 import time
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 
@@ -159,6 +159,53 @@ class ClaudeHistoryTests(unittest.TestCase):
             with mock.patch.object(claude, "detect", return_value=False):
                 result = claude.read(prior)
             self.assertIs(result["history"], prior["history"])
+
+    def _enable_history(self, config_root):
+        config_root.mkdir()
+        cfg = load_config()
+        cfg["providers"]["claude"]["local_history"] = True
+        (config_root / "config.json").write_text(json.dumps(cfg), encoding="utf-8")
+
+    def test_recent_history_from_previous_local_day_is_recomputed(self):
+        config_root = Path(self.temp.name) / "config"
+        with mock.patch.dict(os.environ, QUOTACORE_HOME=str(config_root)):
+            self._enable_history(config_root)
+            old_tz = os.environ.get("TZ")
+            os.environ["TZ"] = "Europe/Warsaw"
+            time.tzset()
+            self.addCleanup(self._restore_tz, old_tz)
+            now = datetime(2026, 11, 18, 23, 5, tzinfo=timezone.utc)  # 00:05 local
+
+            class Clock(datetime):
+                @classmethod
+                def now(cls, tz=None):
+                    return now if tz else now.astimezone().replace(tzinfo=None)
+
+            prior = {"history": {"computed_at": "2026-11-18T22:55:00+00:00", "daily": [],
+                                 "today_hourly": [5] + [0] * 23}}
+            fresh = {"computed_at": "now", "daily": [], "today_hourly": [0] * 24}
+            with (mock.patch.object(claude, "datetime", Clock),
+                  mock.patch.object(claude, "detect", return_value=False),
+                  mock.patch("quotacore.local_history.claude_history", return_value=fresh)):
+                result = claude.read(prior)
+            self.assertIs(result["history"], fresh)
+
+    def test_failed_recompute_drops_stale_history_on_quota_fallback(self):
+        config_root = Path(self.temp.name) / "config"
+        with mock.patch.dict(os.environ, QUOTACORE_HOME=str(config_root)):
+            self._enable_history(config_root)
+            old = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+            prior = {"windows": [{"id": "five_hour"}], "history": {"computed_at": old, "daily": []}}
+            for failure in ({"return_value": None}, {"side_effect": OSError("disk")}):
+                with (mock.patch.object(claude, "detect", return_value=True),
+                      mock.patch.object(claude, "_oauth", return_value={}),
+                      mock.patch.object(claude, "_live", return_value=(None, "SOURCE_UNAVAILABLE", None)),
+                      mock.patch.object(claude, "_read_observation", return_value=(None, None)),
+                      mock.patch.object(claude, "_read_cache", return_value=(None, None)),
+                      mock.patch("quotacore.local_history.claude_history", **failure)):
+                    result = claude.read(prior)
+                self.assertNotIn("history", result)
+                self.assertEqual(result["windows"], prior["windows"])
 
 
 class HistoryConsentCommandTests(unittest.TestCase):

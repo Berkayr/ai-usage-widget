@@ -9,6 +9,9 @@ export function formatTokens(value) {
 }
 export const formatMoney = value => `$${number(value).toFixed(number(value) >= 100 ? 0 : 2)}`;
 export const hasHistory = provider => ['local','account'].includes(provider?.history?.scope) && Array.isArray(provider.history.daily);
+const dayKey = d => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+// A cached snapshot computed yesterday must not show its hours under today.
+const todayHourly = (history, now = new Date()) => Array.isArray(history?.today_hourly) && !(history.computed_at && dayKey(new Date(history.computed_at)) !== dayKey(now)) ? history.today_hourly : null;
 export const splitMachines = (history, enabled) => enabled === true && new Set((history?.machines || []).map(m=>m.id)).size >= 2;
 export function dailySeries(history, days = 30, now = new Date()) {
   const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
@@ -33,21 +36,22 @@ export function aggregateHistory(providers, days = 30, now = new Date()) {
     partial:series.some(rows=>rows[i].tokens == null),
     by_provider:Object.fromEntries(tools.map((p,j)=>[p.id,number(series[j][i].tokens)]))
   }))};
-  if (tools.some(p=>Array.isArray(p.history.today_hourly))) {
+  if (tools.some(p=>todayHourly(p.history,now))) {
     combined.today_hourly=Array.from({length:24},(_,hour)=>tools.reduce((total,p)=>
-      total+(Array.isArray(p.history.today_hourly) ? number(p.history.today_hourly[hour]) : 0),0));
+      total+number(todayHourly(p.history,now)?.[hour]),0));
   }
   return combined;
 }
 
 export function hourlyBars(history, now = new Date()) {
-  if (!Array.isArray(history.today_hourly)) return '<p class="history-note">Hourly data unavailable</p>';
-  const rows=history.today_hourly.slice(0,now.getHours()+1), max=Math.max(1,...rows.map(number));
+  const hourly=todayHourly(history,now);
+  if (!hourly) return '<p class="history-note">Hourly data unavailable</p>';
+  const rows=hourly.slice(0,now.getHours()+1), max=Math.max(1,...rows.map(number));
   return `<div class="history-bars" role="img" aria-label="Today by local hour">${rows.map((v,h)=>`<div class="history-bar" title="${String(h).padStart(2,'0')}:00 · ${formatTokens(v)}" style="height:${100*number(v)/max}%"><i style="flex:1;background:var(--provider-identity,var(--accent))"></i></div>`).join('')}</div><div class="history-axis"><span>00:00</span><span>${String(now.getHours()).padStart(2,'0')}:00</span></div>`;
 }
 export function allHourlyBars(history, now = new Date()) {
-  const tools=history.tools.filter(p=>Array.isArray(p.history.today_hourly));
-  const hours=Array.from({length:now.getHours()+1},(_,hour)=>tools.map(p=>number(p.history.today_hourly[hour])));
+  const tools=history.tools.filter(p=>todayHourly(p.history,now));
+  const hours=Array.from({length:now.getHours()+1},(_,hour)=>tools.map(p=>number(todayHourly(p.history,now)[hour])));
   const max=Math.max(1,...hours.map(values=>values.reduce((a,b)=>a+b,0)));
   return `<div class="history-bars" role="img" aria-label="Today by local hour">${hours.map((values,hour)=>{
     const total=values.reduce((a,b)=>a+b,0);
@@ -80,7 +84,7 @@ function details(history, settings, days, panel, now) {
   let html = `<div class="history-scope">${history.scope === 'all' ? 'All tools · local + account' : history.scope === 'local' ? 'Claude Code logs · LOCAL' : 'All devices · ACCOUNT'}</div><div class="history-kpis">${[['Today',today],['7d',rows.slice(-7)],['30d',rows]].map(([label,data])=>`<span>${label}<b>${history.scope === 'account' && label === 'Today' && partial(data) ? 'No data yet today' : totalLabel(data)}</b></span>`).join('')}</div>${chart}`;
   if (history.tools) html += `<div class="history-legend">${history.tools.map((p,i)=>{
     const label=esc(p.label || p.id), providerRows=dailySeries(p.history,days,now);
-    const value=days===1 && history.scope==='all' && Array.isArray(history.today_hourly) && !Array.isArray(p.history.today_hourly)
+    const value=days===1 && history.scope==='all' && Array.isArray(history.today_hourly) && !todayHourly(p.history,now)
       ? partial(providerRows.slice(-1)) ? 'No data yet today' : `${formatTokens(sum(providerRows.slice(-1)))} · partial`
       : totalLabel(providerRows);
     return `<span style="--series:${color(providerIndex(p,i))}">${label} · ${value}</span>`;

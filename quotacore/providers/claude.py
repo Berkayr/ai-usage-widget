@@ -160,11 +160,15 @@ def read(prev: dict[str, Any] | None = None) -> dict[str, Any]:
         if isinstance(previous, dict):
             try:
                 computed = datetime.fromisoformat(previous["computed_at"].replace("Z", "+00:00"))
-                if (datetime.now(timezone.utc) - computed.astimezone(timezone.utc)).total_seconds() < 1800:
+                fresh = (datetime.now(timezone.utc) - computed.astimezone(timezone.utc)).total_seconds() < 1800
+                # Hourly data belongs to one local day; recompute after midnight.
+                if fresh and computed.astimezone().date() == datetime.now().astimezone().date():
                     record["history"] = previous
                     return record
             except (KeyError, ValueError, TypeError):
                 pass
+        # A stale summary copied from prev must not survive a failed recompute.
+        record.pop("history", None)
         try:
             from ..local_history import claude_history
             history = claude_history()
