@@ -79,3 +79,11 @@ test('all tools Today renders hourly HTML without an explicit now',async()=>{
   assert.equal((html.match(/class="history-bar"/g)||[]).length,new Date().getHours()+1);
   assert.match(html,new RegExp(`${String(new Date().getHours()).padStart(2,'0')}:00`));
 });
+test('Today hides hourly data computed on a previous local day',async()=>{
+  const {hourlyBars,aggregateHistory}=await import('../app/src/history.js');
+  const now=new Date(2026,10,19,0,5), yesterday=new Date(2026,10,18,23,55).toISOString();
+  const history={scope:'local',daily:[],computed_at:yesterday,today_hourly:[9,...Array(23).fill(0)]};
+  assert.match(hourlyBars(history,now),/unavailable/);
+  assert.equal(aggregateHistory([{id:'claude',history}],1,now).today_hourly,undefined);
+  assert.doesNotMatch(hourlyBars({...history,computed_at:now.toISOString()},now),/unavailable/);
+});
