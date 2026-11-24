@@ -27,7 +27,10 @@ try {
     const r=container.getBoundingClientRect(),runs=[];
     for(const el of container.querySelectorAll('*'))if(visible(el)){
      for(const n of el.childNodes)if(n.nodeType===3&&n.textContent.trim()){const range=document.createRange();range.selectNodeContents(n);for(const t of range.getClientRects())runs.push([t.top,t.bottom]);}
-     if(el.matches('.meter,.segments,.dot-bar,.ring-display')){const t=el.getBoundingClientRect();runs.push([t.top,t.bottom]);}
+     if(el.matches('.meter,.segments,.dot-bar,.ring-display') ||
+        (el.matches('.quota-window') && getComputedStyle(el).backgroundColor!=='rgba(0, 0, 0, 0)')) {
+      const t=el.getBoundingClientRect();runs.push([t.top,t.bottom]);
+     }
     }
     let end=r.top,gap=0,used=0;for(const [top,bottom] of runs.sort((a,b)=>a[0]-b[0])){const a=Math.max(r.top,top),z=Math.min(r.bottom,bottom);if(z<=a)continue;gap=Math.max(gap,a-end);used+=Math.max(0,z-Math.max(a,end));end=Math.max(end,z);}gap=Math.max(gap,r.bottom-end);
     return {height:r.height,gap,unused:1-used/r.height,limit:Math.max(2.5*parseFloat(getComputedStyle(document.documentElement).fontSize),r.height*.12)};

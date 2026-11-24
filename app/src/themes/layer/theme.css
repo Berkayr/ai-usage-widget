@@ -27,6 +27,8 @@
 :root[data-theme=layer]:not([data-shape=pill]):not([data-shape=square]) .widget .provider-heading h2 {display:flex;align-items:center;gap:8px;font-size:max(var(--shape-min-font),15px);font-weight:700}
 :root[data-theme=layer]:not([data-shape=pill]) .widget :is(.plan,.status-badge) {font-size:max(var(--shape-min-font),11px);font-weight:600;border-radius:5px;padding:1px 7px;background:color-mix(in srgb,var(--bgWidget) 60%,var(--bgCard));border:1px solid var(--border);box-shadow:1px 1px 0 rgba(0,0,0,0.14)}
 :root[data-theme=layer]:not([data-shape=pill]):not([data-shape=square]) .widget .quota-window {display:flex;flex-direction:column;justify-content:center}
+:root[data-theme=layer][data-shape=landscape][data-dense-shape=true] #widget.widget #providers .provider-card:nth-child(n) .windows {grid-auto-rows:minmax(min-content,1fr)}
+:root[data-theme=layer][data-shape=landscape][data-dense-shape=true] #widget.widget #providers .provider-card .quota-window {justify-content:space-evenly}
 :root[data-theme=layer]:not([data-shape=pill]):not([data-shape=square]) .widget .quota-window+.quota-window {border-top:1px solid color-mix(in srgb,var(--border) 75%,transparent);padding-top:6px;margin-top:2px}
 :root[data-theme=layer] .widget .provider-card[data-usage-compact=true] .quota-window+.quota-window {padding-top:4px;margin-top:0}
 :root[data-theme=layer]:not([data-shape=pill]) .widget .window-top>span {font-size:max(var(--shape-min-font),13px);font-weight:600;color:var(--textSecondary)}

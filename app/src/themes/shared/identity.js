@@ -18,7 +18,7 @@ export function colorDistance(a,b) {
  const x=lab(a),y=lab(b);return Math.hypot(...x.map((v,i)=>v-y[i]));
 }
 export function defaultProviderColors(background) {
- const seeds=lum(background)>.179?['#a44325','#00745c','#245acb','#8a309d','#725600','#006b82','#ac245e','#8a4b00','#276a3d','#7540a0','#b03c58','#006d70']:['#f09a75','#56d6ac','#78aaff','#dd96eb','#dac04d','#57d6ee','#ff85af','#ffc36e','#8cdda1','#cf9aff','#ff9a9a','#75ded4'];
+ const seeds=lum(background)>.179?['#a44325','#00745c','#245acb','#8a309d','#725600','#006b82','#ac245e','#694b2d','#1e5a1e','#3c1e87','#960f2d','#2d3c3c']:['#f09a75','#56d6ac','#78aaff','#dd96eb','#dac04d','#57d6ee','#ff85af','#ffc378','#96e196','#a596ff','#f0a5a5','#96f0e1'];
  return seeds.map(seed=>{const target=lum(background)>.179?0:255;for(let i=0;i<=100;i++){const c=hex(rgb(seed).map(v=>v+(target-v)*i/100));if(colorContrast(c,background)>=4.7)return c;}return seed;});
 }
 export function providerColors(settings,background) {

@@ -36,9 +36,9 @@ export async function portraitManyProviders(b) {
       if (list.scrollHeight > list.clientHeight + 1 && !/auto|scroll/.test(getComputedStyle(list).overflowY)) errors.push('list overflow inaccessible');
       for (const card of list.querySelectorAll('.provider-card')) {
         if (card.scrollHeight > card.clientHeight + 1 || card.scrollWidth > card.clientWidth + 1) errors.push('card content clipped');
-        list.scrollTop = card.offsetTop - list.offsetTop;
+        list.scrollTop += card.getBoundingClientRect().top - bounds.top;
         const r = card.getBoundingClientRect();
-        if (r.height > bounds.height + 1 || r.bottom < bounds.top || r.top > bounds.bottom) errors.push('card inaccessible');
+        if (r.top < bounds.top - 1 || r.bottom > bounds.bottom + 1) errors.push('card inaccessible');
       }
       list.scrollTop = list.scrollHeight;
       if (list.lastElementChild.getBoundingClientRect().bottom > bounds.bottom + 1) errors.push('last card inaccessible');

@@ -36,11 +36,13 @@ function rings(windows, separateCard = false) {
   if (!shown.length) return '';
   const primary = shown.find(w => w.kind === 'session') || shown[0];
   const pct = pctOf(primary);
-  // Keep every remaining window in the text summary even when >4 windows exceed ring capacity.
+  const summary = [shortWindowLabel(primary, separateCard), ...ordered.filter(w => w !== primary).map(w =>
+    `${shortWindowLabel(w, separateCard)} ${pctOf(w) === null ? '—' : Math.round(pctOf(w)) + '%'}`
+  )].join(' · ');
   return `<div class="ring-display"><svg viewBox="0 0 160 160" aria-label="Concentric usage rings" role="img">${shown.map((window,i) => {
     const p = pctOf(window), r = 67 - i * 13;
     return `<circle class="ring-track" cx="80" cy="80" r="${r}"/><circle class="ring-value" data-severity="${p === null ? 'unknown' : severity(p)}" cx="80" cy="80" r="${r}" pathLength="100" stroke-dasharray="${p ?? 0} 100" transform="rotate(-90 80 80)"/>`;
-  }).join('')}</svg><div class="ring-center"><strong data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : Math.round(pct)+'%'}</strong><small>${esc(shortWindowLabel(primary, separateCard))}</small><small class="ring-secondary">${ordered.filter(w=>w!==primary).map(w=>`${esc(shortWindowLabel(w, separateCard))} ${pctOf(w) === null ? "—" : Math.round(pctOf(w))+"%"}`).join(" · ")}</small></div></div>`;
+  }).join('')}</svg><div class="ring-center"><strong data-severity="${pct === null ? 'unknown' : severity(pct)}">${pct === null ? '—' : Math.round(pct)+'%'}</strong></div></div><small class="ring-secondary" title="${esc(summary)}">${esc(summary)}</small>`;
 }
 export function createRenderer(type) {
   return (root, snapshot, { noData = false, showExtraWindows = false } = {}) => {

@@ -72,11 +72,17 @@ try {
             if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>1 && Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1) fail(boxes[i].el.className+' overlaps '+boxes[j].el.className);
           }
           const q=rect(document.querySelector('#quote'));
+          const list=document.querySelector('#providers'), listBox=rect(list);
+          const scrolling=document.documentElement.dataset.shape==='portrait'&&list.scrollHeight>list.clientHeight+1;
+          if(scrolling && !/auto|scroll/.test(getComputedStyle(list).overflowY)) fail('provider overflow is inaccessible');
           for(const provider of document.querySelectorAll('.provider-card')) {
             if(getComputedStyle(provider).visibility==='hidden') continue;
+            if(scrolling)list.scrollTop+=rect(provider).top-listBox.top;
             const p=rect(provider);
+            if(scrolling&&(p.top<listBox.top-1||p.bottom>listBox.bottom+1)) fail('provider cannot be scrolled into view');
             if(Math.min(p.right,q.right)-Math.max(p.left,q.left)>1 && Math.min(p.bottom,q.bottom)-Math.max(p.top,q.top)>1) fail('provider overlap');
           }
+          if(scrolling)list.scrollTop=0;
           text.click();
         }
         const dialog=document.querySelector('.quote-dialog');

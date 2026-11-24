@@ -38,6 +38,13 @@ try {
   }
   check(colors.length===3,'Three identity marks',context);
   if(colorMode==='mono')check(new Set(patterns).size===3,'Three monochrome patterns',context);
+  // Glyph reserves signal red for status and paints identities in the foreground color (d097972).
+  else if(theme.id==='glyph') {
+   const ink=getComputedStyle(document.querySelector('.widget')).getPropertyValue('--textPrimary').trim();
+   const sample=document.createElement('span');sample.style.color=ink;document.body.append(sample);
+   check(colors.every(color=>color===getComputedStyle(sample).color),'Glyph neutral identity marks',context);
+   sample.remove();
+  }
   else for(let i=0;i<colors.length;i++)for(let j=i+1;j<colors.length;j++) {
    const a=lab(colors[i]),c=lab(colors[j]),delta=Math.hypot(...a.map((v,k)=>v-c[k]));minDelta=Math.min(minDelta,delta);
    check(delta>=20,'Identity ΔE '+delta.toFixed(2)+' < 20',context);
@@ -45,14 +52,14 @@ try {
  }
  return {combinations,minDelta,failures};
  })()`);
- result.combinations+=batch.combinations;result.minDelta=Math.min(result.minDelta,batch.minDelta);result.failures.push(...batch.failures);
+ result.combinations+=batch.combinations;result.minDelta=Math.min(result.minDelta,batch.minDelta??Infinity);result.failures.push(...batch.failures);
  result.batches.push({theme:theme.id,cases:batch.combinations,seconds:(performance.now()-started)/1000});
  console.log(JSON.stringify(result.batches.at(-1)));
  }
  const stable=await b.evaluate(`(async()=>{
  const api=window.__AI_USAGE_DEMO__,failures=[];const check=(ok,message,context)=>{if(!ok)failures.push({message,...context})};
  // Known providers must retain colors when reordered/subselected.
- await api.setSettings({shape:'circle',colorMode:'vivid',widgetProviders:['gemini','claude']});
+ await api.setSettings({theme:'system',shape:'circle',colorMode:'vivid',widgetProviders:['gemini','claude']});
  await api.setSnapshot({providers:['gemini','claude'].map(id=>({id,state:'OK',windows:[{kind:'session',used_percent:20}]}))});
  check([...document.querySelectorAll('.dial-value')].map(el=>el.dataset.identity).join(',')==='2,0','Stable provider identity',{});
  await api.setSettings({shape:'circle',colorMode:'vivid',providerColors:{claude:'#b85d40'}});
