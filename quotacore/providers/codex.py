@@ -77,26 +77,28 @@ def _exchange(timeout: float = 20.0) -> tuple[dict[str, Any], Any | None]:
         ]
         process.stdin.write("".join(json.dumps(item) + "\n" for item in messages))
         process.stdin.flush()
-        response = None
-        while response is None:
-            response = responses.get(timeout=timeout)
-        if response.get("id") != 2:
-            raise RuntimeError("Codex rate limits unavailable")
+        # app-server may answer the two reads in either order.
+        received: dict[int, dict[str, Any]] = {}
+        while 2 not in received:
+            message = responses.get(timeout=timeout)
+            if message is None:
+                raise RuntimeError("Codex rate limits unavailable")
+            received[message["id"]] = message
+        response = received[2]
         if "error" in response:
             raise RuntimeError("Codex rate limits unavailable")
         result = response.get("result")
         if not isinstance(result, dict):
             raise ValueError("Invalid Codex response")
-        history_response = None
         try:
-            while history_response is None:
-                next_response = responses.get(timeout=5)
-                if next_response is None:
+            while 3 not in received:
+                message = responses.get(timeout=5)
+                if message is None:
                     break
-                if next_response.get("id") == 3:
-                    history_response = next_response
+                received[message["id"]] = message
         except queue.Empty:
             pass
+        history_response = received.get(3)
         history_payload = history_response.get("result") if history_response and "error" not in history_response else None
         return result, history_payload
     finally:
