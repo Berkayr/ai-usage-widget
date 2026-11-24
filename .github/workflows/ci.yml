@@ -126,7 +126,9 @@ jobs:
         shell: pwsh
         run: |
           cargo install tauri-driver --version 2.1.0 --locked
-          $edge = (Get-Item "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe").VersionInfo.ProductVersion
+          # The app runs on the WebView2 runtime, which can be a different version than Edge.
+          $edge = (Get-ItemProperty 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}').pv
+          Write-Host "WebView2 runtime $edge"
           $driverDir = Join-Path $env:RUNNER_TEMP 'edge-driver'
           $zip = Join-Path $env:RUNNER_TEMP 'edge-driver.zip'
           Invoke-WebRequest "https://msedgedriver.microsoft.com/$edge/edgedriver_win64.zip" -OutFile $zip
