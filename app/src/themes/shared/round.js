@@ -37,30 +37,23 @@ function formatPct(w) {
   const v = usage(w);
   return v === null ? '—' : `${w?.estimated ? '~' : ''}${Math.round(v)}%`;
 }
-function secondaryRowsText(hero, providers) {
+function secondaryRowsText(hero) {
   const wins = hero.p.windows || [];
   const others = wins.filter(w => w !== hero.w);
-  const spill = providers.length > 1
-    ? providers.filter(p => p !== hero.p && !p.baseId).flatMap(p => {
-        const primary = providerWindow(p);
-        const rest = (p.windows || []).filter(w => w !== primary);
-        const hasExtra = rest.length > 1 || rest.some(w => w.kind !== 'weekly' || (w.pool?.id && w.pool.id !== 'main'));
-        return hasExtra ? rest.map(w => `${esc(label(p))} ${esc(shortWindowLabel(w, false))} ${formatPct(w)}`) : [];
-      })
-    : [];
-  const standardOnly = others.length <= 1 && !spill.length
+  const standardOnly = others.length <= 1
     && (!others[0] || (others[0].kind === 'weekly' && (!others[0].pool?.id || others[0].pool.id === 'main')));
   if (standardOnly) {
     const weeklyWin = wins.find(w => w.kind === 'weekly');
     return `Weekly ${formatPct(weeklyWin)}`;
   }
   const separateCard = Boolean(hero.p.baseId);
-  return [...others.map(w => `${esc(shortWindowLabel(w, separateCard))} ${formatPct(w)}`), ...spill].join(' · ');
+  // The center fits one line; the rings carry the remaining windows.
+  return others.slice(0, 1).map(w => `${esc(shortWindowLabel(w, separateCard))} ${formatPct(w)}`).join('');
 }
 function center(hero, count, providers) {
   if (!hero) return `<div class="dial-safe"><strong class="dial-number">—</strong><div class="dial-name">${count?'ALL PROVIDERS':'NO ACTIVE PROVIDERS'}</div><small class="dial-reset">${count?'Select a featured provider':'Choose providers in Settings'}</small></div>`;
   const value = usage(hero.w);
-  return `<div class="dial-safe"><strong class="dial-number">${value === null?'—':`${hero.w?.estimated?'~':''}${Math.round(value)}%`}</strong><div class="dial-name">${esc(label(hero.p))}</div><small class="dial-weekly">${secondaryRowsText(hero, providers)}</small><small class="dial-reset">${esc(countdown(hero.w?.resets_at))}</small></div>`;
+  return `<div class="dial-safe"><strong class="dial-number">${value === null?'—':`${hero.w?.estimated?'~':''}${Math.round(value)}%`}</strong><div class="dial-name">${esc(label(hero.p))}</div><small class="dial-weekly">${secondaryRowsText(hero)}</small><small class="dial-reset">${esc(countdown(hero.w?.resets_at))}</small></div>`;
 }
 function quotaTracks(providers, items) {
   if (providers.length !== 1) return items;

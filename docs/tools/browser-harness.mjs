@@ -24,7 +24,7 @@ export async function browser() {
     if(!page)throw Error('Browser page target timeout');
     ws=new WebSocket(page.webSocketDebuggerUrl);await once(ws,'open');
     ws.addEventListener('message',e=>{const m=JSON.parse(e.data),p=pending.get(m.id);if(p){pending.delete(m.id);clearTimeout(p.timer);if(m.error)p.reject(Error(m.error.message));else p.resolve(m.result);}});
-    const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence;const timer=setTimeout(()=>{pending.delete(id);reject(Error(`Timeout: ${method}`));},60000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params}));});
+    const cdp=(method,params={})=>new Promise((resolve,reject)=>{if(method==='Emulation.setDeviceMetricsOverride')params={screenWidth:1920,screenHeight:1080,...params};/* headless Chrome reports an 800x600 screen unless overridden; widget fitting reads screen.availHeight */const id=++sequence;const timer=setTimeout(()=>{pending.delete(id);reject(Error(`Timeout: ${method}`));},60000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params}));});
     await cdp('Page.enable');await cdp('Runtime.enable');await cdp('Emulation.setDeviceMetricsOverride',{width:900,height:900,deviceScaleFactor:1,mobile:false});
     async function evaluate(expression) {const r=await cdp('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;}
     async function navigate(path,ready) {await cdp('Page.navigate',{url:base+path});for(let i=0;i<150;i++){if(await evaluate(`Boolean(${ready})`))return;await new Promise(r=>setTimeout(r,50));}throw Error('Preview readiness timed out');}

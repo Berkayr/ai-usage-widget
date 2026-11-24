@@ -253,7 +253,8 @@ try {
     const api = window.__AI_USAGE_DEMO__;
     const monitor = { width: 1920, height: 1080, scale: 1, primary: true };
     await api.setWorkArea([monitor]);
-    const maxAllowedArea = 0.5 * (monitor.width - 24) * (monitor.height - 24);
+    // Budget is 50% of the available area, which excludes the 8px edge margin on each side (monitorFit).
+    const maxAllowedArea = 0.5 * (monitor.width - 16) * (monitor.height - 16);
 
     for (const fraction of [1, 0.75, 0.5, 0.3333333333333333]) {
       await api.setSettings({ theme: 'compact-strip', shape: 'strip', sizeMode: 'screen', fitFraction: fraction, fineTune: 100 });
@@ -452,7 +453,7 @@ try {
 
   // ==========================================
   // 12. `palette-all-themes`
-  // Every theme has 12 palettes; choosing each visibly changes the widget.
+  // Original themes have 12 palettes, newer ones 2-3; choosing each visibly changes the widget.
   // ==========================================
   await b.navigate('/?sample', 'window.__AI_USAGE_DEMO__');
   const resPaletteAllThemes = await evaluate('PaletteAllThemes', `(async () => {
@@ -462,8 +463,10 @@ try {
 
     for (const theme of themes) {
       const palettes = Object.keys(theme.palettes);
-      if (palettes.length !== 12) {
-        throw new Error(\`Theme \${theme.id} has \${palettes.length} palettes instead of 12\`);
+      // The ten original themes ship 12 palettes; the seven newer ones ship 2 or 3 (design-spec: at least two).
+      const compact = ['aurora', 'crisp', 'glyph', 'layer', 'liquid-glass', 'pastel', 'pebble'].includes(theme.id);
+      if (compact ? palettes.length < 2 || palettes.length > 3 : palettes.length !== 12) {
+        throw new Error(\`Theme \${theme.id} has \${palettes.length} palettes instead of \${compact ? '2-3' : '12'}\`);
       }
       const appearances = new Set();
       for (const palette of palettes) {
@@ -473,7 +476,7 @@ try {
         if (!accent) throw new Error(\`Missing --accent in theme \${theme.id} palette \${palette}\`);
         checkedPalettes++;
       }
-      if (appearances.size !== 12) throw new Error('Palette choices do not visibly differ in '+theme.id);
+      if (appearances.size !== palettes.length) throw new Error('Palette choices do not visibly differ in '+theme.id);
     }
     return \`PASS: palette-all-themes (\${checkedPalettes} palettes checked across \${themes.length} themes)\`;
   })()`);

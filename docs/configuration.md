@@ -76,7 +76,7 @@ Older application versions discard `widgets` when saving the settings file.
 | `appearance` | `auto` | `auto`, `light`, `dark`; auto follows OS color preference live. |
 | `colorMode` | `calm` | Neutral or system-accent usage below 50%, soft amber from 50%, muted red from 80%; `vivid` restores theme colors. |
 | `accentEdge` | `off` | `off`, `auto`, `left`, `right`; Auto follows the selected corner, with no edge in Free placement. |
-| `palette` | Theme dependent | Twelve built-in choices per theme, including theme-specific defaults. Dot Matrix includes `slate`, `ember`, `sakura-pink`, `nord` and `mono-paper`; custom palettes are shared across themes. |
+| `palette` | Theme dependent | Twelve built-in choices per original theme (two or three for Clear Glass, Layer, Aurora, Crisp, Pebble, Glyph and Pastel Pink), including theme-specific defaults. Dot Matrix includes `slate`, `ember`, `sakura-pink`, `nord` and `mono-paper`; custom palettes are shared across themes. |
 | `userPalettes` | absent | Up to 50 custom palettes, available on every theme; format below. |
 | `accent`, `background` | `null` | Optional CSS color overrides; choosing a palette clears these overrides. |
 | `widgetOpacity` | `100` | Surface opacity; text remains opaque. UI range 20–100. |
@@ -181,6 +181,8 @@ windows and clears explicit Hide overrides; **Reset to automatic** clears all po
 overrides and turns Show extra windows off. **Separate box for each pool** (`separatePools`) places each visible
 non-main pool in its own card (`<provider>~<pool>`) right after its base provider,
 sharing its logo and identity color while keeping token history on the base provider.
+Pill cards show the first two rows and the circle center one secondary limit; turn on
+separate boxes to see every pool in those shapes.
 
 Portrait features one card only with an odd visible count, whether quotes are on
 or off; `featuredPosition: "top" | "bottom"` places that card. Even counts use
@@ -204,7 +206,7 @@ the actual fitted pixel dimensions, including DPI and fine-tuning. Oversized fix
 presets are disabled. Fit screen uses Largest, 3/4, 1/2 or 1/3 with independent
 fine-tuning; the strip uses width as its main axis. Every size, including Ctrl +/-
 shortcuts, stays inside the work area and covers at most 50% of its available
-area (35% for the portrait compact strip). Theme and shape changes preserve the
+area. Theme and shape changes preserve the
 saved size mode, preset and fine-tune. Position starts with the monitor map and
 corner presets; manual reserved edges are under Advanced. Existing files remain
 compatible, including named corner positions and Free placement ratios.

@@ -235,5 +235,5 @@ test('normalizeLimitVisibility ignores non-booleans and ring/round renderers lis
   const circleRoot = { innerHTML: '' };
   renderRound(circleRoot, { providers: fiveWindows }, { shape: 'circle', theme: 'circular-rings', featuredProvider: 'gemini', colorMode: 'calm' });
   assert.equal((circleRoot.innerHTML.match(/class="dial-track"/g) || []).length, 4);
-  assert.match(circleRoot.innerHTML, /Pool B · Weekly 52%/);
+  assert.match(circleRoot.innerHTML, /class="dial-weekly">Weekly 20%</);
 });
