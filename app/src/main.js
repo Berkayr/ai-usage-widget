@@ -287,7 +287,9 @@ function currentSample() {
   const now = Date.now();
   return { ...sample, generated_at: new Date(now).toISOString(), providers: sample.providers.map(provider => ({ ...provider, windows: (provider.windows || []).map(window => ({ ...window, resets_at: Number.isFinite(window.resets_in_minutes) ? new Date(now + window.resets_in_minutes * 60000).toISOString() : null })) })) };
 }
-async function persist() { if (!isSample) try { localStorage.setItem(storageKey('widgetTheme'), settings.theme); localStorage.setItem(storageKey('widgetLook'), JSON.stringify({ colorMode: settings.colorMode, accentEdge: settings.accentEdge, dotCount: settings.dotCount, matchPhysicalSize: settings.matchPhysicalSize })); } catch {} if (!isSample) try { await invoke('save_settings', { settings, widgetId }); } catch (error) { showToast(String(error)); } }
+// While settings are open, `settings` may hold an unsaved preview.
+async function settingsOpen() { return !isSample && await invoke('settings_open').catch(() => false) === true; }
+async function persist() { if (await settingsOpen()) return; if (!isSample) try { localStorage.setItem(storageKey('widgetTheme'), settings.theme); localStorage.setItem(storageKey('widgetLook'), JSON.stringify({ colorMode: settings.colorMode, accentEdge: settings.accentEdge, dotCount: settings.dotCount, matchPhysicalSize: settings.matchPhysicalSize })); } catch {} if (!isSample) try { await invoke('save_settings', { settings, widgetId }); } catch (error) { showToast(String(error)); } }
 let toastTimer;
 function showToast(message) { clearTimeout(toastTimer); const el = $('#toast'); el.textContent = message; el.hidden = false; toastTimer = setTimeout(() => { el.hidden = true; }, 3200); }
 
@@ -327,7 +329,7 @@ $('#widget').addEventListener('pointerdown', event => { if (event.button === 0 &
 let lastTier;
 meterObserver = new ResizeObserver(() => { updateNarrowViewport(); const tier = $('#app').clientWidth < 220 * parseFloat(getComputedStyle(document.documentElement).fontSize) / 16; if (tier !== lastTier) { lastTier = tier; if (currentSnapshot || currentNoData) draw(currentSnapshot,currentNoData); } });
 meterObserver.observe($('#app'));
-fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === ',') {event.preventDefault();openSettings();return;} const key=effectiveSizeMode(settings)==='screen'?'fitFineTune':'fineTune',value=Number(settings[key] ?? 100); if (event.key === '+' || event.key === '=') settings[key] = Math.min(150, value + 5); else if (event.key === '-') settings[key] = Math.max(50, value - 5); else if (event.key === '0') settings[key] = 100; else return; event.preventDefault(); applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
+fitObserver = new ResizeObserver(requestFit); fitObserver.observe($('#widget')); window.addEventListener('keydown', async event => { if (!event.ctrlKey || event.altKey || event.metaKey) return; if (event.key === ',') {event.preventDefault();openSettings();return;} if (!['+','=','-','0'].includes(event.key)) return; event.preventDefault(); if (await settingsOpen()) { showToast('Save or discard settings first'); return; } const key=effectiveSizeMode(settings)==='screen'?'fitFineTune':'fineTune',value=Number(settings[key] ?? 100); if (event.key === '+' || event.key === '=') settings[key] = Math.min(150, value + 5); else if (event.key === '-') settings[key] = Math.max(50, value - 5); else if (event.key === '0') settings[key] = 100; applySettings(); requestFit(); await persist(); }, { signal: domEvents.signal });
 if (isSample) draw(currentSample());
 else {
   try {
