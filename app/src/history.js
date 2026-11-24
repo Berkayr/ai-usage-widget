@@ -115,10 +115,11 @@ export function historyGeometry(baseWidth, availableWidth, scale = 100) {
 export function panelOnLeft(settings) {
   return settings.position === 'Free' ? (settings.placement?.xRatio ?? settings.placement?.x_ratio ?? 1) >= .5 : !settings.position?.endsWith('left');
 }
-export function mountHistory(widget, root, providers, value, state, redraw, saveOpen, now) {
+export function mountHistory(widget, root, providers, value, state, redraw, saveOpen, now, scopeProviders = providers) {
   const settings = {...historyDefaults,...value};
   widget.querySelectorAll('.history-panel, .history-toggle, :scope > .history-total').forEach(el=>el.remove());
-  const available = providers.filter(hasHistory);
+  // Panel and aggregate totals use the unpaged list while card mapping uses the current page.
+  const available = (scopeProviders ?? providers).filter(hasHistory);
   const enabled = settings.historyEnabled && available.length > 0;
   widget.classList.toggle('has-history-panel',Boolean(enabled && settings.historyMode === 'panel' && settings.historyPanelOpen));
   widget.classList.toggle('history-left',panelOnLeft(settings));

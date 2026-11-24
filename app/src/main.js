@@ -223,7 +223,7 @@ function draw(snapshot, noData = false) {
       card.style.setProperty('--provider-identity',`var(--provider-${index})`);
       card.dataset.identity=index;
     });
-    const historyOpen = mountHistory($('#widget'), $('#providers'), paged.providers || [], settings, historyState, () => draw(currentSnapshot,currentNoData), open => { settings.historyPanelOpen=open; persist(); draw(currentSnapshot,currentNoData); });
+    const historyOpen = mountHistory($('#widget'), $('#providers'), paged.providers || [], settings, historyState, () => draw(currentSnapshot,currentNoData), open => { settings.historyPanelOpen=open; persist(); draw(currentSnapshot,currentNoData); }, undefined, selectedProviders);
     document.documentElement.dataset.historyOpen = String(historyOpen);
     arrangeCards($('#providers'), paged.providers || [], settings);
     $('#updated').textContent = snapshot?.generated_at ? `SYNC ${new Date(snapshot.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'NO DATA YET';
