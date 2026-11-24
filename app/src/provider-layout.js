@@ -2,16 +2,22 @@ import { pctOf } from './themes/dot-matrix/render.js';
 
 export function orderedProviders(providers, settings) {
   const order = settings.providerOrder || [];
-  const rank = id => { const index = order.indexOf(id); return index < 0 ? order.length : index; };
-  return providers.filter(p => !(settings.hiddenProviders || []).includes(p.id))
-    .sort((a, b) => rank(a.id) - rank(b.id));
+  const hidden = settings.hiddenProviders || [];
+  const rank = p => {
+    const direct = order.indexOf(p.id);
+    if (direct >= 0) return direct;
+    const base = p.baseId ? order.indexOf(p.baseId) : -1;
+    return base < 0 ? order.length : base;
+  };
+  return providers.filter(p => !(hidden.includes(p.id) || (p.baseId && hidden.includes(p.baseId))))
+    .sort((a, b) => rank(a) - rank(b));
 }
 export function featuredProvider(providers, settings, legacyLast = false) {
   const choice = settings.featuredProvider;
   if (choice === 'none') return null;
   if (choice === 'first') return providers[0] || null;
   if (!choice && legacyLast) return providers.at(-1);
-  if (choice && choice !== 'auto') return providers.find(p => p.id === choice) || null;
+  if (choice && choice !== 'auto') return providers.find(p => p.id === choice) || providers.find(p => p.baseId === choice) || null;
   const usage = p => Math.max(-1, ...(p.windows || []).map(w => pctOf(w) ?? -1));
   return providers.reduce((best, p) => !best || usage(p) > usage(best) ? p : best, null);
 }

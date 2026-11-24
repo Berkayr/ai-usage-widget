@@ -7,6 +7,7 @@ import {listen} from '@tauri-apps/api/event';
 import {getCurrentWindow} from '@tauri-apps/api/window';
 
 import sampleSnapshot from './sample-snapshot.json';
+import {applyLimits, normalizeLimitVisibility, providerPools} from './limits.js';
 import {orderedProviders} from './provider-layout.js';
 import {quotePrivacy} from './quote.js';
 import {differingKeys, equalSettings} from './settings-compare.js';
@@ -28,7 +29,7 @@ import {
   workAreaMonitor
 } from './sizing.js';
 import {contrast, luminance, rgba} from './text-contrast.js';
-import {hiddenStates, providerNames} from './themes/dot-matrix/render.js';
+import {hiddenStates, pctOf, providerNames, shortWindowLabel} from './themes/dot-matrix/render.js';
 import {allThemes} from './themes/registry.js';
 import {paletteChoices, selectedPalette, userPalettes, appearancePalette} from './user-palettes.js';
 import {paletteEditor} from './palette-editor.js';
@@ -86,6 +87,8 @@ export const defaults = {
   placementEditing : false,
   lockPosition : true,
   showExtraWindows : false,
+  limitVisibility : {},
+  separatePools : false,
   taskbar : {
     colorMode : 'calm', dotCount : 20, offsetX : 0,
     enabled : false,
@@ -192,6 +195,8 @@ function mark() {
 }
 function normalizeDraft(value) {
   const normalized = normalizeSize(value);
+  normalized.limitVisibility = normalizeLimitVisibility(normalized.limitVisibility);
+  normalized.separatePools = normalized.separatePools === true;
   if (selectedWidget === 'main') normalized.taskbar = {...normalized.taskbar, colorMode:normalized.colorMode, dotCount:normalized.dotCount};
   return normalized;
 }
@@ -513,6 +518,32 @@ function previewInk(ink, paper) {
 const renderLayout = layoutControls(sections.providers, () => draft,
                                     () => providers || [], update,
                                     () => snapshotProviders || []);
+const limitsControls = document.createElement('fieldset');
+limitsControls.id = 'limits-and-pools';
+limitsControls.innerHTML =
+    `<legend>Limits and pools</legend>
+<p class="setting-note">Choose Automatic, Show or Hide for any quota pool. Stored choices for absent pools are kept.</p>
+<div id="limit-pool-list"></div>
+<div class="palette-actions" style="padding-block:12px">
+  <button id="limits-show-all" type="button">Show everything</button>
+  <button id="limits-reset-auto" type="button">Reset to automatic</button>
+</div>
+<label class="toggle-setting">Separate box for each pool<input id="separate-pools" type="checkbox"></label>`;
+sections.providers.append(limitsControls);
+$('#limits-show-all').onclick = () => {
+  const next = {...normalizeLimitVisibility(draft.limitVisibility)};
+  for (const [key, value] of Object.entries(next)) {
+    if (value === false) delete next[key];
+  }
+  draft.limitVisibility = next;
+  draft.showExtraWindows = true;
+  update();
+};
+$('#limits-reset-auto').onclick = () => {
+  draft.limitVisibility = {};
+  draft.showExtraWindows = false;
+  update();
+};
 const paletteTools = paletteEditor(() => draft, () => themes.find(t => t.id === draft.theme), update);
 sectionBlock(sections.colors, 'Appearance', [ control('appearance') ]);
 control('appearance').firstChild.textContent = 'Appearance';
@@ -572,6 +603,59 @@ function renderHistoryPreview() {
   preview.innerHTML=`<figcaption>Example preview · fictional data${draft.historyEnabled ? '' : ' · history hidden'}</figcaption><div class="history-preview-scene">${mode === 'panel' ? `<div class="history-preview-widget"><b>AI Usage　‹ ⚙</b><p>Claude Code</p><p>OpenAI Codex</p></div><div class="history-preview-panel"><small>Today / 7 / 30 days</small>${stacked ? ['All tools','Claude Code','OpenAI Codex'].map(card).join('') : '<small>All tools ▾</small>'+card('All tools')}</div>` : mode === 'under' ? ['Claude Code','OpenAI Codex'].map(card).join('') : `<div class="history-preview-widget"><b>Click a card to expand</b>${card('Claude Code ▴')}<p>OpenAI Codex ▾</p></div>`}</div>`;
 }
 
+function renderLimitPools() {
+  const list = $('#limit-pool-list');
+  list.replaceChildren();
+  const enabledIds = providers || [];
+  const visibility = normalizeLimitVisibility(draft.limitVisibility);
+  let count = 0;
+  for (const provider of snapshotProviders || []) {
+    if (!enabledIds.includes(provider.id)) continue;
+    const pools = providerPools(provider);
+    const provName = providerNames[provider.id] || provider.label || provider.id;
+    for (const pool of pools) {
+      count++;
+      const row = document.createElement('label');
+      row.className = 'setting-row';
+      const copy = document.createElement('span');
+      copy.className = 'setting-copy';
+      const title = document.createElement('strong');
+      const poolTitle = pool.id === 'main' ? `${provName} · Main` : `${provName} · ${pool.label}`;
+      title.textContent = poolTitle;
+      const summary = document.createElement('small');
+      const percents = pool.windows
+          .filter(w => pctOf(w) !== null)
+          .map(w => `${shortWindowLabel(w, true)} ${Math.round(pctOf(w))}%`);
+      summary.textContent = percents.length ? percents.join(' · ') : 'Usage unknown';
+      copy.append(title, summary);
+      const select = document.createElement('select');
+      select.dataset.limitPool = pool.key;
+      select.setAttribute('aria-label', `${poolTitle} visibility`);
+      for (const [val, text] of [['auto', 'Automatic'], ['show', 'Show'], ['hide', 'Hide']]) {
+        select.add(new Option(text, val));
+      }
+      const current = visibility[pool.key];
+      select.value = current === true ? 'show' : current === false ? 'hide' : 'auto';
+      select.onchange = () => {
+        const next = {...normalizeLimitVisibility(draft.limitVisibility)};
+        if (select.value === 'show') next[pool.key] = true;
+        else if (select.value === 'hide') next[pool.key] = false;
+        else delete next[pool.key];
+        draft.limitVisibility = next;
+        update();
+      };
+      row.append(copy, select);
+      list.append(row);
+    }
+  }
+  if (!count) {
+    const empty = document.createElement('p');
+    empty.className = 'setting-note';
+    empty.textContent = 'Quota pools appear here once enabled providers report usage windows.';
+    list.append(empty);
+  }
+}
+
 function renderControls() {
   renderHistoryPreview();
   $('#history-panel-layout').disabled = draft.historyMode !== 'panel';
@@ -579,6 +663,7 @@ function renderControls() {
   $('#history-machines').disabled = !snapshotProviders.some(p => splitMachines(p.history,true));
   $('#history-machines-note').hidden = !$('#history-machines').disabled;
   renderLayout();
+  renderLimitPools();
   control(effectiveSizeMode(draft)==='screen'?'fit-fine-tune':'scale').after(fineReset);
   document.querySelectorAll('[data-shape]')
       .forEach(b => b.setAttribute('aria-pressed',
@@ -593,21 +678,29 @@ function renderControls() {
   note.textContent =
       'Choose up to 3. By default the first 3 enabled providers are shown.';
   widgetChoices.append(note);
+  const activeSnap = (snapshotProviders || []).filter(p => (providers || []).includes(p.id) && !hiddenStates.has(String(p.state).toUpperCase()));
+  const derivedChoices = draft.separatePools
+      ? orderedProviders(applyLimits(activeSnap, draft), draft).map(p => [p.id, providerNames[p.id] || p.label || p.id])
+      : [];
+  const roundChoices = derivedChoices.length
+      ? [...derivedChoices, ...(providers || []).filter(id => !derivedChoices.some(([cid]) => cid === id || cid.startsWith(`${id}~`))).map(id => [id, providerNames[id] || id])]
+      : (providers || []).map(id => [id, providerNames[id] || id]);
+  const choiceIds = roundChoices.map(([id]) => id);
   const selected = Array.isArray(draft.widgetProviders) ? draft.widgetProviders
-                                                        : providers.slice(0, 3);
-  for (const id of providers) {
+                                                        : choiceIds.slice(0, 3);
+  for (const [id, choiceLabel] of roundChoices) {
     const label = document.createElement('label'),
           input = document.createElement('input');
     input.type = 'checkbox';
     input.dataset.widgetProvider = id;
     input.checked = selected.includes(id);
-    input.disabled = !input.checked && selected.length >= 3;
-    label.textContent = providerNames[id] || id;
+    input.disabled = !input.checked && selected.filter(k => choiceIds.includes(k)).length >= 3;
+    label.textContent = choiceLabel;
     label.append(input);
     widgetChoices.append(label);
     input.onchange = () => {
       draft.widgetProviders =
-          providers
+          choiceIds
               .filter(key =>
                           key === id ? input.checked : selected.includes(key))
               .slice(0, 3);
@@ -751,6 +844,7 @@ export const bindings = {
   position : 'position',
   'fit-height' : 'fitHeight',
   'show-extra-windows' : 'showExtraWindows',
+  'separate-pools' : 'separatePools',
   'taskbar-enabled' : 'taskbar.enabled',
   'taskbar-style' : 'taskbar.style',
   'taskbar-theme' : 'taskbar.theme',
@@ -852,10 +946,9 @@ let geometry = {
 };
 function visibleProviderCount() {
   const available = snapshotProviders ?? (providers || []).map(id => ({id}));
-  const visible = orderedProviders(
-      available.filter(p => (providers || []).includes(p.id) &&
-                            !hiddenStates.has(String(p.state).toUpperCase())),
-      draft);
+  const active = available.filter(p => (providers || []).includes(p.id) &&
+                                       !hiddenStates.has(String(p.state).toUpperCase()));
+  const visible = orderedProviders(applyLimits(active, draft), draft);
   const selected = [ 'circle', 'pill' ].includes(draft.shape)
                        ? widgetProviders(visible, draft.widgetProviders)
                        : visible;
@@ -1214,7 +1307,11 @@ async function loadSession() {
     draft.palette = Object.keys(manifest.palettes)[0];
   selectedWidget = 'main';
   draft = normalizeDraft(draft);
-  for (const widget of draft.widgets || []) widget.placement = {...defaults.placement, ...normalizePlacement(widget.placement)};
+  for (const widget of draft.widgets || []) {
+    widget.placement = {...defaults.placement, ...normalizePlacement(widget.placement)};
+    if (widget.overrides && 'limitVisibility' in widget.overrides) widget.overrides.limitVisibility = normalizeLimitVisibility(widget.overrides.limitVisibility);
+    if (widget.overrides && 'separatePools' in widget.overrides) widget.overrides.separatePools = widget.overrides.separatePools === true;
+  }
   rootDraft = structuredClone(draft);
   saved = structuredClone(rootDraft);
   if (paletteLoadError) error(paletteLoadError);

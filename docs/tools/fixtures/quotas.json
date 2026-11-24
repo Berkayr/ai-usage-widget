@@ -25,6 +25,19 @@
           "resets_in_minutes": 2310,
           "kind": "weekly",
           "resets_at": "2026-11-03T02:30:00+00:00"
+        },
+        {
+          "id": "research-weekly",
+          "label": "Research preview \u00b7 weekly",
+          "used_percent": 29,
+          "resets_in_minutes": 2880,
+          "kind": "weekly",
+          "resets_at": "2026-11-03T12:00:00+00:00",
+          "hidden_by_default": true,
+          "pool": {
+            "id": "research-preview",
+            "label": "Research preview"
+          }
         }
       ],
       "meters": []

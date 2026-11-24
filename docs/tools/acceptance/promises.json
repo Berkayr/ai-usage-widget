@@ -176,6 +176,14 @@
     "reason": null
   },
   {
+    "id": "p-readme-23",
+    "source": "README.md:72",
+    "claim": "In Providers → Limits and pools, choose Automatic, Show or Hide per pool, split pools into separate cards, or Show everything so new limits appear automatically.",
+    "verify": "unit",
+    "test": "tests/limits.mjs",
+    "reason": null
+  },
+  {
     "id": "p-changelog-01",
     "source": "CHANGELOG.md:9",
     "claim": "Windows and Linux desktop widget with ten themes, five shapes and shared local quota snapshots.",
@@ -325,6 +333,22 @@
     "claim": "Invalid imports reject entire operation and display error. Invalid palettes on disk discarded with warning.",
     "verify": "headless",
     "test": "docs/tools/palette-settings-check.mjs",
+    "reason": null
+  },
+  {
+    "id": "p-config-16",
+    "source": "docs/configuration.md:90",
+    "claim": "limitVisibility stores per-pool booleans (<provider>/<pool>), ignoring non-boolean values; explicit choices override automatic and Show extra windows.",
+    "verify": "unit",
+    "test": "tests/limits.mjs and app/src-tauri/src/lib.rs:settings_tests::limit_visibility_and_separate_pools_round_trip",
+    "reason": null
+  },
+  {
+    "id": "p-config-17",
+    "source": "docs/configuration.md:91",
+    "claim": "separatePools places each visible non-main pool into its own card (<provider>~<pool>) after its base provider while preserving history totals.",
+    "verify": "unit",
+    "test": "tests/limits.mjs",
     "reason": null
   },
   {

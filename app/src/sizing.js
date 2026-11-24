@@ -47,7 +47,8 @@ export function widgetHeight(settings, count = 1) {
 
 export function widgetProviders(providers, selection) {
   if (!Array.isArray(selection)) return providers.slice(0,3);
-  return providers.filter(p=>selection.includes(p.id)).slice(0,3);
+  const hasDerived = selection.some(id => String(id).includes('~'));
+  return providers.filter(p => selection.includes(p.id) || (!hasDerived && p.baseId && selection.includes(p.baseId))).slice(0,3);
 }
 
 // Work-area dimensions use the same units as the native placement API.

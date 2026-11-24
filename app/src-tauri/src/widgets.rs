@@ -130,6 +130,7 @@ fn overridable(key: &str) -> bool {
         | "backgroundOpacity" | "colorMode" | "dotCount" | "accentEdge"
         | "historyEnabled" | "historyMode" | "historyCost" | "historyModels"
         | "historyHeatmap" | "historyMachines" | "historyPanelLayout" | "historyPanelOpen" | "showExtraWindows"
+        | "limitVisibility" | "separatePools"
         | "widgetProviders" | "featuredProvider" | "featuredPosition"
         | "quoteEnabled" | "quoteMode" | "quotePosition" | "quoteNavigation")
 }

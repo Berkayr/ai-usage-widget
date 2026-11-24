@@ -6,6 +6,7 @@ export const overrideKeys = new Set([
   'background', 'widgetOpacity', 'backgroundOpacity', 'colorMode', 'dotCount',
   'accentEdge', 'historyEnabled', 'historyMode', 'historyCost', 'historyModels',
   'historyHeatmap', 'historyMachines', 'historyPanelLayout', 'historyPanelOpen', 'showExtraWindows',
+  'limitVisibility', 'separatePools',
   'widgetProviders', 'featuredProvider', 'featuredPosition', 'quoteEnabled',
   'quoteMode', 'quotePosition', 'quoteNavigation', 'position', 'lockPosition',
   'placementEditing', 'reservedTop', 'reservedBottom'
@@ -17,7 +18,7 @@ export const overrideCategories = {
   colors: ['appearance', 'palette', 'accent', 'background', 'widgetOpacity', 'backgroundOpacity', 'colorMode', 'accentEdge'],
   'shape-size': ['shape', 'scale', 'sizePreset', 'fineTune', 'sizeMode', 'fitFraction', 'fitFineTune', 'fitHeight', 'matchPhysicalSize'],
   display: ['position', 'lockPosition', 'placementEditing', 'reservedTop', 'reservedBottom'],
-  providers: ['widgetProviders', 'featuredProvider', 'featuredPosition'],
+  providers: ['widgetProviders', 'featuredProvider', 'featuredPosition', 'limitVisibility', 'separatePools'],
   history: [...overrideKeys].filter(key => key.startsWith('history'))
 };
 export const canOverride = path => overrideKeys.has(path.split('.')[0]) ||

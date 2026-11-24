@@ -42,9 +42,10 @@ const fast = [
   ['node', ['tests/shapes-content.mjs']],
   ['node', ['tests/quote-privacy.mjs']],
   ['node', ['tests/live-startup.mjs']],
+  ['node', ['tests/limits.mjs']],
   ['node', ['docs/tools/acceptance/live-startup.mjs']],
   ['node', ['tests/documentation.mjs']],
-  ['node', ['--test', 'tests/screen-fit.mjs', 'tests/user-palettes.mjs', 'tests/pairwise.mjs']],
+  ['node', ['--test', 'tests/screen-fit.mjs', 'tests/user-palettes.mjs', 'tests/pairwise.mjs', 'tests/provider-layout.mjs', 'tests/limits.mjs']],
   ['python3', ['-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_install_script.py']],
   ['python3', ['-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_footprint.py']],
 ];

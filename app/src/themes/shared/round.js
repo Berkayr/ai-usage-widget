@@ -1,6 +1,6 @@
 import { featuredProvider } from '../../provider-layout.js';
 import { providerIndex, identityColor, identityPatterns } from './identity.js';
-import { escapeHtml as esc, pctOf, countdown, severity, providerNames } from '../dot-matrix/render.js';
+import { escapeHtml as esc, pctOf, countdown, severity, shortWindowLabel, providerNames } from '../dot-matrix/render.js';
 import { createRenderer } from './render.js';
 const renderers = new Map();
 // Width, cap and segmentation form a stable signature for each dial theme.
@@ -33,18 +33,47 @@ function dialTrack(item, i, context) {
   const dash = pattern ? `stroke-dasharray="${pattern}"` : '';
   return `<defs><mask id="dial-mask-${i}"><circle class="dial-pattern" cx="170" cy="170" r="${r}" pathLength="100" fill="none" stroke="white" stroke-width="${style.width*(settings.colorMode==='vivid'?1.12:1)}" stroke-linecap="${style.cap}" ${dash}/></mask></defs><g transform="rotate(-90 170 170)"><circle mask="url(#dial-mask-${i})" class="dial-track" cx="170" cy="170" r="${r}"/><circle mask="url(#dial-mask-${i})" class="dial-value" style="stroke:${color(provider,w,i)}" data-identity="${index}" data-severity="${severity(p??0)}" cx="170" cy="170" r="${r}" pathLength="100" stroke-dasharray="${p??0} 100"/></g>${endpoint(w,r)}`;
 }
-function center(hero, count) {
+function formatPct(w) {
+  const v = usage(w);
+  return v === null ? '—' : `${w?.estimated ? '~' : ''}${Math.round(v)}%`;
+}
+function secondaryRowsText(hero, providers) {
+  const wins = hero.p.windows || [];
+  const others = wins.filter(w => w !== hero.w);
+  const spill = providers.length > 1
+    ? providers.filter(p => p !== hero.p && !p.baseId).flatMap(p => {
+        const primary = providerWindow(p);
+        const rest = (p.windows || []).filter(w => w !== primary);
+        const hasExtra = rest.length > 1 || rest.some(w => w.kind !== 'weekly' || (w.pool?.id && w.pool.id !== 'main'));
+        return hasExtra ? rest.map(w => `${esc(label(p))} ${esc(shortWindowLabel(w, false))} ${formatPct(w)}`) : [];
+      })
+    : [];
+  const standardOnly = others.length <= 1 && !spill.length
+    && (!others[0] || (others[0].kind === 'weekly' && (!others[0].pool?.id || others[0].pool.id === 'main')));
+  if (standardOnly) {
+    const weeklyWin = wins.find(w => w.kind === 'weekly');
+    return `Weekly ${formatPct(weeklyWin)}`;
+  }
+  const separateCard = Boolean(hero.p.baseId);
+  return [...others.map(w => `${esc(shortWindowLabel(w, separateCard))} ${formatPct(w)}`), ...spill].join(' · ');
+}
+function center(hero, count, providers) {
   if (!hero) return `<div class="dial-safe"><strong class="dial-number">—</strong><div class="dial-name">${count?'ALL PROVIDERS':'NO ACTIVE PROVIDERS'}</div><small class="dial-reset">${count?'Select a featured provider':'Choose providers in Settings'}</small></div>`;
-  const value = usage(hero.w), weekly = usage((hero.p.windows || []).find(w=>w.kind==='weekly'));
-  return `<div class="dial-safe"><strong class="dial-number">${value === null?'—':`${hero.w?.estimated?'~':''}${Math.round(value)}%`}</strong><div class="dial-name">${esc(label(hero.p))}</div><small class="dial-weekly">Weekly ${weekly === null?'—':`${(hero.p.windows || []).find(w=>w.kind==='weekly')?.estimated?'~':''}${Math.round(weekly)}%`}</small><small class="dial-reset">${esc(countdown(hero.w?.resets_at))}</small></div>`;
+  const value = usage(hero.w);
+  return `<div class="dial-safe"><strong class="dial-number">${value === null?'—':`${hero.w?.estimated?'~':''}${Math.round(value)}%`}</strong><div class="dial-name">${esc(label(hero.p))}</div><small class="dial-weekly">${secondaryRowsText(hero, providers)}</small><small class="dial-reset">${esc(countdown(hero.w?.resets_at))}</small></div>`;
 }
 function quotaTracks(providers, items) {
   if (providers.length !== 1) return items;
-  return ['session','weekly'].map(kind => ({p:providers[0],w:(providers[0].windows || []).find(w => w.kind === kind)}));
+  const wins = providers[0].windows || [];
+  if (!wins.length || (wins.length === 2 && wins.some(w => w.kind === 'session') && wins.some(w => w.kind === 'weekly'))) {
+    return ['session','weekly'].map(kind => ({p:providers[0],w:wins.find(w => w.kind === kind)}));
+  }
+  const rank = w => w.kind === 'session' ? 0 : w.kind === 'weekly' ? 1 : 2;
+  return [...wins].sort((a, b) => rank(a) - rank(b)).slice(0, 4).map(w => ({p:providers[0],w}));
 }
 function renderPill(root, snapshot, settings) {
   if (!renderers.has(settings.theme)) renderers.set(settings.theme, createRenderer(settings.theme));
-  renderers.get(settings.theme)(root, snapshot);
+  renderers.get(settings.theme)(root, snapshot, { showExtraWindows: settings.showExtraWindows });
 }
 export function renderRound(root, snapshot, settings) {
   const providers = snapshot?.providers || [];
@@ -59,7 +88,7 @@ export function renderRound(root, snapshot, settings) {
   const core = settings.theme === 'reactor' ? '<div class="reactor-core" aria-hidden="true"></div>' : '';
   const description = tracks.map(({p,w}) => `${label(p)} ${w?.kind || 'quota'} ${w?.estimated?'~':''}${usage(w) ?? 'unknown'}%`).join(', ');
   const width = style.width * (settings.colorMode === 'vivid' ? 1.12 : 1);
-  root.innerHTML = `<div class="dial">${core}<svg class="dial-rings" style="stroke-width:${width};stroke-linecap:${style.cap}" viewBox="0 0 340 340" role="img" aria-label="${esc(description)}">${tracks.map((item,i)=>dialTrack(item,i,context)).join('')}</svg>${arcLabels(tracks,color)}${center(hero,providers.length)}</div>`;
+  root.innerHTML = `<div class="dial">${core}<svg class="dial-rings" style="stroke-width:${width};stroke-linecap:${style.cap}" viewBox="0 0 340 340" role="img" aria-label="${esc(description)}">${tracks.map((item,i)=>dialTrack(item,i,context)).join('')}</svg>${arcLabels(tracks,color)}${center(hero,providers.length,providers)}</div>`;
 }
 const overlap = (a,b) => Math.abs(a.x-b.x)<46 && Math.abs(a.y-b.y)<22;
 function validLabel(candidate, placed) {

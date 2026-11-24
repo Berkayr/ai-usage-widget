@@ -1,4 +1,5 @@
 import {providerLogo} from './icons/provider-logos.js';
+import {applyLimits} from './limits.js';
 import {orderedProviders, featuredProvider} from './provider-layout.js';
 import {widgetProviders} from './sizing.js';
 import {hiddenStates, providerNames} from './themes/dot-matrix/render.js';
@@ -99,25 +100,30 @@ export function layoutControls(root, getDraft, getProviders, update, getSnapshot
   }
   return () => {
     const draft = getDraft(), ids = currentOrder();
+    const active = getSnapshot().filter(p => ids.includes(p.id) && !hiddenStates.has(String(p.state).toUpperCase()));
+    const visible = orderedProviders(applyLimits(active, draft), draft);
+    const derivedChoices = draft.separatePools
+        ? visible.filter(p => p.baseId).map(p => [p.id, `${providerNames[p.baseId] || p.baseId} · ${p.label || p.id}`])
+        : [];
+    const knownChoices = [...ids, ...derivedChoices.map(([id]) => id)];
     field.querySelector('#provider-order')
         .replaceChildren(...ids.map((id, i) => row(id, i, ids)));
     select.replaceChildren(
         ...[[ 'first', 'First in list' ], [ 'auto', 'Highest usage' ], [ 'none', 'None' ],
             ...(!draft.featuredProvider ? [['legacy', 'Legacy layout']] : []),
-            ...(draft.featuredProvider && !['first', 'auto', 'none', ...ids].includes(draft.featuredProvider)
+            ...(draft.featuredProvider && !['first', 'auto', 'none', ...knownChoices].includes(draft.featuredProvider)
                 ? [[draft.featuredProvider, 'Unavailable selection']] : []),
-            ...ids.map(id => [id, providerNames[id] || id])]
+            ...ids.map(id => [id, providerNames[id] || id]),
+            ...derivedChoices]
             .map(([ value, label ]) => new Option(label, value)));
     select.value = draft.featuredProvider || 'legacy';
     select.disabled = ['landscape', 'pill'].includes(draft.shape);
     select.setAttribute('aria-describedby', 'featured-hint');
     const round = ['circle', 'pill'].includes(draft.shape);
-    const visible = orderedProviders(getSnapshot().filter(p => ids.includes(p.id) &&
-        !hiddenStates.has(String(p.state).toUpperCase())), draft);
     const shown = round ? widgetProviders(visible, draft.widgetProviders) :
         draft.shape === 'square' ? visible.slice(0, 4) : visible;
     const hero = featuredProvider(shown, draft, draft.shape === 'portrait');
-    const name = hero ? providerNames[hero.id] || hero.id : 'No provider';
+    const name = hero ? providerNames[hero.id] || hero.label || hero.id : 'No provider';
     let hint = draft.featuredProvider === 'auto'
         ? `${name} selected by highest usage across quota windows. Up / Down changes order, not the featured provider.`
         : draft.featuredProvider === 'first'

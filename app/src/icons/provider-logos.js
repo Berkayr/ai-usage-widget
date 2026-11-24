@@ -8,6 +8,7 @@ export function validateProviderSvg(svg) {
 const sources = import.meta.env ? import.meta.glob('./providers/*.svg', { query: '?raw', import: 'default', eager: true }) : {};
 const logos = Object.fromEntries(Object.entries(sources).map(([path, svg]) => [path.split('/').at(-1).replace('.svg', ''), validateProviderSvg(svg)]));
 export function providerLogo(id) {
-  const svg = Object.hasOwn(logos, id) ? logos[id] : '';
+  const key = String(id?.baseId || id?.id || id || '').split('~')[0];
+  const svg = Object.hasOwn(logos, key) ? logos[key] : '';
   return svg ? `<span class="provider-logo" aria-hidden="true">${svg}</span>` : '';
 }

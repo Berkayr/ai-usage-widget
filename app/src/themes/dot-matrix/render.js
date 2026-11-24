@@ -24,14 +24,20 @@ function dots(pct, quotaWindow = {}, count = dotCount()) {
 function pctOf(window) {
   return typeof window?.used_percent === 'number' && Number.isFinite(window.used_percent) ? Math.max(0, Math.min(100, window.used_percent)) : null;
 }
-function shortWindowLabel(window) {
+function shortWindowLabel(window, separateCard = false) {
   const kind = String(window.kind || '').toLowerCase();
-  let label = kind === 'session' ? '5-hour' : kind === 'weekly' ? 'Weekly' : String(window.label || window.id || 'Quota');
+  const raw = String(window.label || window.id || 'Quota');
+  const pool = !separateCard && window?.pool?.id && window.pool.id !== 'main' ? window.pool : null;
+  let label = pool && raw.includes(' · ') ? raw : kind === 'session' ? '5-hour' : kind === 'weekly' ? 'Weekly' : raw;
   if (label.includes(' · ')) {
     const [group, name] = label.split(' · ', 2);
     const shortGroup = group.replace(/^Gemini 4 /i, '').replace(/ models$/i, '').trim();
     const shortName = /^(weekly|week)$/i.test(name) ? 'Weekly' : /^(5h|session|5-hour)$/i.test(name) ? '5-hour' : name;
     return `${shortGroup} · ${shortName}`;
+  }
+  if (pool && pool.label && !raw.toLowerCase().includes(String(pool.label).toLowerCase())) {
+    const shortGroup = String(pool.label).replace(/^Gemini 4 /i, '').replace(/ models$/i, '').trim();
+    return `${shortGroup} · ${label}`;
   }
   return label;
 }
