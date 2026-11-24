@@ -3,9 +3,10 @@ export async function auditColorModes(b) {
  const results=[];
  const themes=await b.evaluate('window.__AI_USAGE_DEMO__.themes.map(t=>t.id)');
  for(const theme of themes){
-  const saturation={};
+  const saturation={},stroke={};
   for(const colorMode of ['calm','vivid']){
    await b.evaluate(`(async()=>{const api=window.__AI_USAGE_DEMO__;await api.setSettings({theme:${JSON.stringify(theme)},colorMode:${JSON.stringify(colorMode)},shape:'circle',sizePreset:'Medium',fineTune:100,appearance:'dark',providerColors:{},widgetProviders:['claude','codex','gemini']});await api.setSnapshot({providers:['claude','codex','gemini'].map(id=>({id,state:'OK',windows:[{kind:'session',used_percent:65}]}))});})()`);
+   stroke[colorMode]=await b.evaluate("parseFloat(getComputedStyle(document.querySelector('.dial-value')).strokeWidth)");
    const {data}=await b.cdp('Page.captureScreenshot',{format:'png',clip:{x:0,y:0,width:340,height:340,scale:1}});
    saturation[colorMode]=await b.evaluate(`(async()=>{
     const img=new Image();img.src='data:image/png;base64,${data}';await img.decode();const canvas=document.createElement('canvas');canvas.width=340;canvas.height=340;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);let sum=0,count=0;
@@ -13,7 +14,8 @@ export async function auditColorModes(b) {
     return sum/count;
    })()`);
   }
-  results.push({theme,...saturation});
+  results.push({theme,...saturation,stroke});
  }
- return {results,failures:results.filter(r=>!(r.vivid>r.calm+.08))};
+ // Glyph uses neutral provider marks (d097972). Vivid still changes the arc weight.
+ return {results,failures:results.filter(r=>r.theme==='glyph' ? !(r.stroke.vivid>r.stroke.calm) : !(r.vivid>r.calm+.08))};
 }

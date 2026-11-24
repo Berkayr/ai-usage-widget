@@ -80,6 +80,10 @@
   background: color-mix(in srgb, var(--bgCard) 35%, transparent);
 }
 
+:root[data-theme=compact-strip][data-shape=portrait] #widget.widget .provider-card:nth-child(n) .quota-window {
+  flex-grow: 1;
+}
+
 :root[data-theme=compact-strip]:not([data-shape=pill]):not([data-shape=square]):not([data-shape=circle]) #widget.widget .provider-card:nth-child(n) .window-top {
   display: contents;
 }

@@ -51,6 +51,7 @@
 
 :root[data-theme=circular-rings] .widget .ring-display {
   position: relative;
+  container-type: inline-size;
   width: 100%;
   aspect-ratio: 1;
   align-self: center;
@@ -104,31 +105,41 @@
   padding: 14px;
 }
 
-:root[data-theme=circular-rings]:not([data-dense-shape=true]) #widget.widget .ring-center strong {
-  font-size: 16px;
+:root[data-theme=circular-rings] #widget.widget .ring-center strong {
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
   color: var(--textPrimary);
 }
 
-:root[data-theme=circular-rings]:not([data-dense-shape=true]) #widget.widget .ring-center small {
-  font-size: 11px;
-  line-height: 1.15;
-  color: var(--textSecondary);
-  margin-top: 2px;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+:root[data-theme=circular-rings][data-shape=landscape][data-dense-shape=true] #widget.widget .ring-center strong {
+  font-size: max(var(--shape-min-font), .875rem);
 }
 
-:root[data-theme=circular-rings][data-dense-shape=true] #widget.widget .ring-secondary {
+@container (max-width: 6rem) {
+  :root[data-theme=circular-rings] #widget.widget .ring-center strong {
+    font-size: max(var(--shape-min-font), .75rem);
+  }
+}
+
+@container (max-width: 4rem) {
+  :root[data-theme=circular-rings] #widget.widget .ring-center strong {
+    font-size: max(var(--shape-min-font), .5625rem);
+  }
+}
+
+:root[data-theme=circular-rings][data-shape=landscape][data-dense-shape=true] #widget.widget .ring-secondary {
   display: block;
+  flex: none;
   font-size: 11px;
   line-height: 1.1;
   color: var(--textSecondary);
   margin-top: 2px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 :root[data-theme=circular-rings]:is([data-shape=portrait],[data-shape=landscape],[data-shape=strip]):not([data-dense-shape=true]) #widget.widget .provider-card:nth-child(n) .windows {
@@ -232,7 +243,4 @@
 }
 :root[data-theme=circular-rings] #widget.widget #providers .provider-card[data-usage-compact=true] .ring-center {
   padding: 0;
-}
-:root[data-theme=circular-rings] #widget.widget #providers .provider-card[data-usage-compact=true] .ring-center :is(strong,small) {
-  line-height: 1.4;
 }

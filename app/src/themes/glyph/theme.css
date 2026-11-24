@@ -2,6 +2,7 @@
  .widget {font-family:system-ui,sans-serif;border-radius:18px;font-variant-numeric:tabular-nums}
 :root[data-theme=glyph] .widget .provider-card {background:transparent;border:0;border-top:1px solid var(--border);border-radius:0}
 :root[data-theme=glyph] .widget .window-top b,:root[data-theme=glyph] .dial-number {font-family:DotGothic16,monospace;font-weight:400}
+:root[data-theme=glyph] .widget .dial-safe .dial-number {margin-bottom:.15em}
 :root[data-theme=glyph][data-shape=portrait] .widget .window-top b {font-size:var(--size-font-display)}
 :root[data-theme=glyph] .widget .segments {display:flex;width:100%;height:auto;min-height:4px;flex-wrap:nowrap;justify-content:space-between;gap:var(--size-dot-gap)}
 :root[data-theme=glyph] .widget .segments i {flex:0 1 var(--size-dot);height:auto;aspect-ratio:1;border-radius:50%;background:var(--bgTrackOff)}

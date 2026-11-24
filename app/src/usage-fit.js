@@ -28,6 +28,7 @@ export function fitUsage(root) {
     delete el.dataset.usageFont;
   }
   // Recompute from authored styles after viewport, theme, quote or font changes.
+  delete root.dataset.usageScroll;
   root.style.removeProperty('grid-template-rows');
   root.style.setProperty('--portrait-growth', 0);
   root.style.removeProperty('flex-shrink');
@@ -44,7 +45,10 @@ export function fitUsage(root) {
       card.style.removeProperty('min-height');
       card.style.removeProperty('max-height');
     }
-    if (document.documentElement.dataset.shape === 'portrait') for (const ring of card.querySelectorAll('.ring-display')) ring.style.removeProperty('height');
+    if (shape === 'portrait') for (const ring of card.querySelectorAll('.ring-display')) {
+      ring.style.removeProperty('height');
+      ring.style.removeProperty('width');
+    }
   }
   // The scale changes geometry, but readable text has a physical 11px floor.
   for (const el of root.closest('.widget').querySelectorAll('*')) {
@@ -60,21 +64,22 @@ export function fitUsage(root) {
   cards.forEach(compactCard);
   cards.forEach(fitInlineResets);
   // Spend the existing compact tier before scrolling a long Portrait list.
-  if (document.documentElement.dataset.shape === 'portrait' && overflows(root.closest('.widget'))) {
+  if (shape === 'portrait' && overflows(root.closest('.widget'))) {
     cards.forEach(card => { card.dataset.usageCompact = 'true'; });
     cards.forEach(compactCard);
   }
   cards.forEach(fitPortraitGraphics);
-  // Once text reaches its floor, preserve the card and scroll the list.
-  if (document.documentElement.dataset.shape === 'portrait') {
-    cards.filter(overflows).forEach(card => { card.style.maxHeight = 'none'; });
-  }
-  if (document.documentElement.dataset.shape === 'portrait' && overflows(root.closest('.widget'))) root.style.flexShrink = '1';
+  if (shape === 'portrait' && overflows(root.closest('.widget'))) root.style.flexShrink = '1';
   growPortraitContent(root, cards);
-  // Graphic label reservations can exceed fractional tracks; share that minimum.
-  if (document.documentElement.dataset.shape === 'portrait' && cards.length && !root.closest('.has-inline-history')) {
-    const height = Math.max(...cards.map(card => card.getBoundingClientRect().height));
-    cards.forEach(card => { card.style.minHeight = `${height}px`; });
+  if (shape === 'portrait' && cards.length && !root.closest('.has-inline-history')) {
+    // Keep the equal tracks unless a card still clips after compaction.
+    if (cards.some(card => card.scrollHeight > card.clientHeight + 1)) {
+      root.dataset.usageScroll = '';
+      cards.forEach(card => card.style.removeProperty('min-height'));
+    } else {
+      const height = Math.max(...cards.map(card => card.getBoundingClientRect().height));
+      cards.forEach(card => { card.style.minHeight = `${height}px`; });
+    }
   }
   // Fractional rem budgets can round scrollHeight up while clientHeight rounds down.
   // Remove that rounding debt from trailing space, preserving every card's height.
@@ -110,16 +115,19 @@ function fitPortraitGraphics(card) {
   if (document.documentElement.dataset.shape !== 'portrait') return;
   const ring = card.querySelector('.ring-display');
   if (!ring) return;
+  ring.style.removeProperty('height');
+  ring.style.removeProperty('width');
   const style = getComputedStyle(card);
   const paired = style.gridTemplateColumns.split(' ').length > 1;
   const outerHeight = el => {const s=getComputedStyle(el);return el.getBoundingClientRect().height + parseFloat(s.marginTop) + parseFloat(s.marginBottom);};
   const reserved = [...card.children].filter(el => el !== ring && (!paired || !el.classList.contains('windows'))).reduce((sum, el) => sum + outerHeight(el), 0);
-  const labels = [...ring.querySelector('.ring-center').children].reduce((sum, el) => sum + el.getBoundingClientRect().height, 0);
+  const labelHeight = ring.querySelector('.ring-center strong').getBoundingClientRect().height;
   const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
   // Keep the shared track height; compactCard handles labels that exceed it.
   card.style.minHeight = '0';
-  const available = card.clientHeight - padding - reserved;
-  ring.style.height = `${Math.max(labels, Math.min(ring.getBoundingClientRect().height, available))}px`;
+  const available = card.clientHeight - padding - reserved - (parseFloat(style.rowGap) || 0);
+  const diameter = Math.min(ring.getBoundingClientRect().width, Math.max(labelHeight, available));
+  ring.style.height = ring.style.width = `${diameter}px`;
 }
 
 // Intrinsic text widths catch collisions and ellipsis that scrollWidth misses.

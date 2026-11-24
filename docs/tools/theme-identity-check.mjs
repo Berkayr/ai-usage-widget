@@ -77,6 +77,8 @@ try {
       const cards=[...document.querySelectorAll('.provider-card')];
       const widget=rect(document.querySelector('.widget'));
       const list=document.querySelector('.provider-list');
+      const scrolling=shape==='portrait'&&list.scrollHeight>list.clientHeight+1;
+      const listBounds=rect(list);
       check(cards.length===(shape==='square'?Math.min(4,${count}-${page}*4):${count}),'Provider count');
       // Measure painted content, not stretched layout wrappers: text ranges and
       // actual meters/rings. Padding and borders count towards trailing space.
@@ -96,10 +98,12 @@ try {
       };
       metrics.maxCardBottomSpaceRatio=0;
       for(const card of cards) {
-        const cr=rect(card),s=getComputedStyle(card);
+        if(scrolling)list.scrollTop+=rect(card).top-listBounds.top;
+        const cr=rect(card);
         check(card.scrollWidth<=card.clientWidth+2,'Card horizontal overflow');
         check(card.scrollHeight<=card.clientHeight+2,'Card vertical overflow');
         check(cr.left>=widget.left&&cr.right<=widget.right+1&&cr.bottom<=widget.bottom+1,'Card outside shell');
+        if(scrolling)check(/auto|scroll/.test(getComputedStyle(list).overflowY)&&cr.top>=listBounds.top-1&&cr.bottom<=listBounds.bottom+1,'Portrait card reachable');
         const windows=card.querySelector('.windows');
         const bottomSpace=Math.max(0,cr.bottom-contentBottom(card));
         const ratio=bottomSpace/cr.height;
@@ -113,24 +117,31 @@ try {
           }
         } else check(bottomSpace<=cr.height*.25+1,'Card content bottom space >25%');
         if(theme==='brutalist'&&shape!=='square') {
-          const ratio=parseFloat(getComputedStyle(card.querySelector('.window-top b')).fontSize)/parseFloat(s.fontSize);
-          metrics.displayRatio=ratio;check(ratio>=2.2,'Brutalist display size');
+          // The redesign uses heavy, tight inline numbers instead of oversized display type (f8ed74b).
+          const value=getComputedStyle(card.querySelector('.window-top b'));
+          check(value.fontWeight==='900'&&parseFloat(value.letterSpacing)<0,'Brutalist quota typography');
           check(getComputedStyle(card.querySelector('.window-top')).textTransform==='uppercase','Uppercase quota label');
         }
-        if(shape==='portrait'&&['brutalist','circular-rings'].includes(theme)) {
-          check(getComputedStyle(list).gridTemplateColumns.split(' ').length===2,'Two provider columns');
-          if(cards.length>1)check(Math.abs(rect(cards[0]).top-rect(cards[1]).top)<1&&rect(cards[1]).left>rect(cards[0]).right-1,'Providers must share a row');
+        if(shape==='portrait') {
+          // Portrait has one provider per row under the shape-owned contract (3ecf8f2).
+          check(getComputedStyle(list).gridTemplateColumns.split(' ').length===1,'Portrait full-width rows');
+          check(Math.abs(cr.width-list.clientWidth)<2,'Portrait card fills row');
         }
         if(theme==='circular-rings'&&shape!=='square') {
           const ring=card.querySelector('.ring-display'),r=rect(ring);
           metrics.ringRatio=r.width/cr.width;
           const svg=rect(ring.querySelector('svg'));
-          check(shape==='portrait'?r.width>=cr.width*.45:Math.min(svg.width,svg.height)>=Math.min(cr.width,cr.height)*.55,'Large ring');
+          // The ring shares a row with quota details where the tiles use the paired redesign (f8ed74b).
+          const diameter=Math.min(svg.width,svg.height);
+          check(diameter>0&&Math.abs(diameter-Math.min(r.width,r.height))<1,'Ring fills its assigned slot');
+          if(getComputedStyle(card).display==='grid'&&getComputedStyle(card).gridTemplateColumns.split(' ').length===2) {
+            check(r.right<=rect(windows).left+1,'Ring beside quota details');
+          }
           if(shape==='portrait')check(Math.abs(r.width-r.height)<1,'Round ring');
           check(rect(card.querySelector('.ring-center strong')).width>0,'Visible ring percentage');
           check(card.querySelectorAll('.ring-track').length===2,'Concentric window rings');
           const tracks=[...ring.querySelectorAll('.ring-track')];
-          const radius=(Math.min(...tracks.map(t=>t.r.baseVal.value))-parseFloat(getComputedStyle(tracks[0]).strokeWidth)/2)*Math.min(svg.width,svg.height)/160;
+          const radius=(Math.min(...tracks.map(t=>t.r.baseVal.value))-parseFloat(getComputedStyle(tracks[0]).strokeWidth)/2)*diameter/ring.querySelector('svg').viewBox.baseVal.width;
           const cx=svg.left+svg.width/2,cy=svg.top+svg.height/2;
           for(const text of card.querySelectorAll('.ring-center strong,.ring-center small')) {
             const tr=rect(text);if(!tr.width||!tr.height)continue;
@@ -141,8 +152,8 @@ try {
         }
         if(['frosted-glass','retro-lcd'].includes(theme)) {
           const q=[...windows.children].map(rect);
-          // Cramped cards are stacked on purpose (7ad84dc); roomy cards keep the two-column signature.
-          const stacked=card.dataset.usageStacked==='true';
+          // Dense strips follow the shared single-column grid, and cramped cards stack (3ecf8f2, 7ad84dc).
+          const stacked=card.dataset.usageStacked==='true'||(shape==='strip'&&document.documentElement.dataset.denseShape==='true');
           check(q.length===2&&(stacked?q[1].top>=q[0].bottom-1:Math.abs(q[0].top-q[1].top)<1&&q[1].left>=q[0].right),stacked?'Stacked quota rows':'Two quota columns');
           check(getComputedStyle(windows).gridTemplateColumns.split(' ').length===(stacked?1:2),'Quota grid');
         }
@@ -170,6 +181,7 @@ try {
       const listRect=rect(list);
       const lastCardBottom=Math.max(...cards.map(card=>rect(card).bottom));
       const listBottomSpace=Math.max(0,listRect.bottom-lastCardBottom);
+      list.scrollTop=0;
       metrics.listBottomSpaceRatio=listBottomSpace/rect(cards.at(-1)).height;
       check(listBottomSpace<=rect(cards.at(-1)).height*.25+1,'Space below last card >25%');
       if(theme==='terminal') {
@@ -226,6 +238,7 @@ try {
   await writeFile('docs/tools/theme-identity-results.json',JSON.stringify({rows,failures,similarityWarnings},null,2)+'\n');
   console.log(`${rows.length} theme/size/provider/appearance combinations; ${failures.length} identity failures`);
   if(failures.length){console.table(failures);process.exitCode=1;}
+  await b.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
   const layoutFailures=await auditLayoutVariants(b);console.log('Layout variants:',layoutFailures);if(layoutFailures.length)process.exitCode=1;
   await b.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
   await b.evaluate(`(async()=>{await window.__AI_USAGE_DEMO__.setSettings({theme:'reactor',shape:'circle',reactorMotion:true});if(getComputedStyle(document.querySelector('.reactor-core')).animationName!=='none')throw Error('Reduced motion');await window.__AI_USAGE_DEMO__.setSettings({reactorMotion:false});})()`);
