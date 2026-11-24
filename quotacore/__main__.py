@@ -276,6 +276,9 @@ def main(argv: list[str] | None = None) -> int:
         atomic_json(config_dir() / "config.json", config)
     elif args.command == "provider-config":
         detected, config = _config()
+        claude_config = config.get("providers", {}).get("claude")
+        if isinstance(claude_config, dict):
+            claude_config["local_history"] = claude_config.get("local_history") is True
         disclosures = {key: DISCLOSURES[key] for key in PROVIDERS}
         print(json.dumps({"detected": detected, "disclosures": disclosures, **config}))
     elif args.command in ("init", "configure"):
