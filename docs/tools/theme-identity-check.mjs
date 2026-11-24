@@ -46,7 +46,7 @@ try {
         if(shape==='circle') {check(document.querySelectorAll('.dial-track').length===(${count}===1?2:Math.min(3,${count})),'Dial tracks');check(document.querySelector('.dial-number').textContent==='100%','Highest usage');}
         if(shape==='circle') {
           const value=document.querySelector('.dial-value'),pattern=document.querySelector('.dial-pattern'),number=document.querySelector('.dial-number');
-          const expected={reactor:[9,'butt','9 1',600],system:[6,'round',null,800],brutalist:[12,'butt',null,900],'circular-rings':[13,'round',null,700],'dot-matrix':[7,'round','.1 3',800],'retro-lcd':[9,'butt','1.3 .7',500],terminal:[4,'butt','1 1',400],'frosted-glass':[8,'round',null,800],'minimal-pace':[2,'butt',null,300],'compact-strip':[5,'square',null,800]}[theme];
+          const expected={reactor:[9,'butt','9 1',700],system:[6,'round',null,800],brutalist:[12,'butt',null,900],'circular-rings':[13,'round',null,700],'dot-matrix':[7,'round','.1 3',800],'retro-lcd':[9,'butt','1.3 .7',500],terminal:[4,'butt','1 1',400],'frosted-glass':[8,'round',null,800],'minimal-pace':[2,'butt',null,300],'compact-strip':[5,'square',null,800],aurora:[6,'round',null,800],crisp:[6,'round',null,800],glyph:[6,'round',null,400],layer:[6,'round',null,800],'liquid-glass':[6,'round',null,800],pastel:[6,'round',null,800],pebble:[6,'round',null,800]}[theme];
           metrics.circleSignature={width:parseFloat(getComputedStyle(value).strokeWidth),cap:getComputedStyle(value).strokeLinecap,pattern:pattern.getAttribute('stroke-dasharray'),weight:Number(getComputedStyle(number).fontWeight)};
           check(JSON.stringify(Object.values(metrics.circleSignature))===JSON.stringify(expected),'Circle theme signature');
           check(!document.querySelector('.dial-legend'),'Center list removed');
@@ -141,8 +141,10 @@ try {
         }
         if(['frosted-glass','retro-lcd'].includes(theme)) {
           const q=[...windows.children].map(rect);
-          check(q.length===2&&Math.abs(q[0].top-q[1].top)<1&&q[1].left>=q[0].right,'Two quota columns');
-          check(getComputedStyle(windows).gridTemplateColumns.split(' ').length===2,'Quota grid');
+          // Cramped cards are stacked on purpose (7ad84dc); roomy cards keep the two-column signature.
+          const stacked=card.dataset.usageStacked==='true';
+          check(q.length===2&&(stacked?q[1].top>=q[0].bottom-1:Math.abs(q[0].top-q[1].top)<1&&q[1].left>=q[0].right),stacked?'Stacked quota rows':'Two quota columns');
+          check(getComputedStyle(windows).gridTemplateColumns.split(' ').length===(stacked?1:2),'Quota grid');
         }
         if(theme==='system')check(card.querySelectorAll('.meter').length===2,'Continuous meters');
         if(theme==='dot-matrix')check(card.querySelectorAll('.dot-bar').length===2,'Dot meters');

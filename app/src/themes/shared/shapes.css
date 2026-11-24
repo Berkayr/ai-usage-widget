@@ -10,7 +10,7 @@
 :root:is([data-shape=landscape],[data-shape=square]) .quota-window{min-height:0}
 :root:is([data-shape=landscape],[data-shape=square]) .no-data{min-height:0;grid-column:1/-1;grid-row:1/-1}
 /* Remove frame chrome before compressing core usage information. */
-:root[data-dense-shape=true] .widget{padding:.5rem;--size-gap:.375rem}
+:root[data-dense-shape=true] .widget{padding:.5rem;--size-pad:.5rem;--size-gap:.375rem}
 :root[data-dense-shape=true] :is(.sync-line,.footer,.plan){display:none}
 :root[data-dense-shape=true] .header{height:2.25rem;min-height:0;padding-bottom:.25rem}
 :root[data-dense-shape=true] .provider-heading h2{font-size:max(var(--shape-min-font),.75rem)}
@@ -374,7 +374,7 @@
 :root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-inline-reset=true] .reset{grid-column:3;grid-row:1;margin:0}
 :root[data-theme] #widget.widget #providers .provider-card:nth-child(n)[data-usage-inline-reset=true] :is(.meter,.segments,.dot-bar){grid-column:1/-1;grid-row:2}
 /* Sub-Small square cells retain every extra window before decorative padding. */
-:root[data-shape=square][data-small-size=true] #widget.widget:has(.quota-window:nth-child(3)){padding:4px}
+:root[data-shape=square][data-small-size=true] #widget.widget:has(.quota-window:nth-child(3)){padding:4px;--size-pad:4px}
 :root[data-shape=square][data-small-size=true] #widget.widget:has(.quota-window:nth-child(3)) .header{height:calc(var(--shape-min-font)*2.5);min-height:calc(var(--shape-min-font)*2.5)}
 :root[data-shape=square][data-small-size=true] #widget.widget:has(.quota-window:nth-child(3)) #providers{gap:1px}
 :root[data-shape=square][data-small-size=true] #widget.widget #providers .provider-card:nth-child(n):has(.quota-window:nth-child(3)){padding-block:0}

@@ -1,5 +1,8 @@
-import {writeFile, readFile, readdir} from 'node:fs/promises';
+import {writeFile, readFile, readdir, access} from 'node:fs/promises';
 import {browser} from './browser-harness.mjs';
+// One lazily loaded palette manifest chunk per theme directory that ships a theme.json.
+const themeDirs = [];
+for (const dir of await readdir('app/src/themes')) if (await access(`app/src/themes/${dir}/theme.json`).then(() => true, () => false)) themeDirs.push(dir);
 const b = await browser();
 try {
   await b.navigate('/?settings&sample','window.__SETTINGS_READY__');
@@ -60,12 +63,12 @@ try {
     await api.setSettings({theme:'system',palette:p.id,userPalettes:[p],appearance:'dark'});
     if(getComputedStyle(document.documentElement).getPropertyValue('--bgWidget').includes('url'))throw Error('Unvalidated CSS');
     if(api.getSettings().palette!=='default')throw Error('Invalid palette fallback');
-    return 'PASS: custom palettes render on all 10 themes in dark/light; hostile settings fall back before CSS';
+    return 'PASS: custom palettes render on every theme in dark/light; hostile settings fall back before CSS';
   })()`));
   const assets = 'app/dist/assets';
   const manifests = [];
   for (const name of await readdir(assets)) if (name.endsWith('.js') && (await readFile(`${assets}/${name}`,'utf8')).includes('palettes:{')) manifests.push(name);
-  if (manifests.length !== 10) throw Error('Expected 10 independent palette manifest chunks');
+  if (manifests.length !== themeDirs.length) throw Error(`Expected ${themeDirs.length} independent palette manifest chunks, found ${manifests.length}`);
   await b.cdp('Page.addScriptToEvaluateOnNewDocument',{source:`(()=>{
     let next=0;
     window.__TAURI_EVENT_PLUGIN_INTERNALS__={unregisterListener:()=>{}};
@@ -85,5 +88,5 @@ try {
   const requested=await b.evaluate('performance.getEntriesByType("resource").map(r=>r.name.split("/").at(-1))');
   const loaded=manifests.filter(name=>requested.includes(name));
   if(loaded.length!==1)throw Error('Native widget loaded '+loaded.length+' theme manifests');
-  console.log('PASS: native widget path requests only the selected theme manifest ('+loaded.length+'/10)');
+  console.log('PASS: native widget path requests only the selected theme manifest ('+loaded.length+'/'+themeDirs.length+')');
 } finally {await b.close();}

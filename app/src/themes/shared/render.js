@@ -48,7 +48,9 @@ export function createRenderer(type) {
     root.innerHTML = providers.map(p => {
       const state = safeState(p.state);
       const separateCard = Boolean(p.baseId);
-      const windows = (Array.isArray(p.windows) ? p.windows : []).filter(w => showExtraWindows || !w.hidden_by_default);
+      const windows = (Array.isArray(p.windows) ? p.windows : []).filter(w => showExtraWindows || !w.hidden_by_default)
+        // The fixed-height pill fits two rows at every size.
+        .slice(0, globalThis.document?.documentElement?.dataset?.shape === 'pill' ? 2 : undefined);
       const badge = state !== 'OK' || p.stale ? `<span class="status-badge ${p.stale || state === 'STALE' ? 'stale' : state.toLowerCase()}">${esc(p.stale && state === 'OK' ? 'STALE' : state.replaceAll('_',' '))}</span>` : '';
       const name = providerNames[String(p.id).toLowerCase()] || p.label || p.id || 'Provider';
       const meters = (Array.isArray(p.meters) ? p.meters : []).filter(hasMeterData).map(m => `<div class="balance-row"><span>${esc(m.label || 'Balance')}</span><b>${Number.isFinite(m.remaining) ? (m.unit === 'USD' ? '$'+m.remaining.toFixed(2) : `${esc(m.remaining)} ${esc(m.unit)}`) : Number.isFinite(m.used) ? (m.unit === 'USD' ? '$'+m.used.toFixed(2)+' used' : `${esc(m.used)} ${esc(m.unit)} used`) : Number.isFinite(m.limit) ? (m.unit === 'USD' ? '$'+m.limit.toFixed(2)+' limit' : `${esc(m.limit)} ${esc(m.unit)} limit`) : '—'}</b></div>`).join('');

@@ -70,10 +70,11 @@ try {
 
   await b.cdp('Page.addScriptToEvaluateOnNewDocument', {source:`delete window.__TAURI_INTERNALS__; delete window.__TAURI_EVENT_PLUGIN_INTERNALS__;`});
   await b.navigate('/?sample', "document.querySelectorAll('.provider-card').length > 0");
-  const sampleState = await b.evaluate(`({body:document.body.innerText, providerCount:document.querySelectorAll('.provider-card').length, percentages:[...document.querySelectorAll('.quota-window b')].map(el=>el.textContent),balances:[...document.querySelectorAll('.balance-row b')].map(el=>el.textContent)})`);
+  const sampleState = await b.evaluate(`({body:document.body.innerText, providerCount:document.querySelectorAll('.provider-card').length, plans:[...document.querySelectorAll('.plan')].map(el=>el.textContent),percentages:[...document.querySelectorAll('.quota-window b')].map(el=>el.textContent),balances:[...document.querySelectorAll('.balance-row b')].map(el=>el.textContent)})`);
   assert(sampleState.providerCount > 0, 'sample mode should render fictional providers');
   for (const provider of fixture.providers) {
-    if (provider.plan) assert(sampleState.body.includes(provider.plan), `sample mode should render ${provider.plan}`);
+    // The fitter may hide a plan badge on compact cards, so check the rendered badge text, not visible text.
+    if (provider.plan) assert(sampleState.plans.includes(provider.plan), `sample mode should render ${provider.plan}`);
     for (const window of provider.windows || []) if (!window.hidden_by_default && Number.isFinite(window.used_percent))
       assert(sampleState.percentages.includes(`${Math.round(window.used_percent)}%`), `sample mode should render ${window.used_percent}%`);
     for (const meter of provider.meters || []) if (Number.isFinite(meter.remaining))

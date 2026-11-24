@@ -202,6 +202,43 @@
     "selector": "select#featured-position"
   },
   {
+    "id": "limit-pool:*",
+    "where": "providers",
+    "setting": "limitVisibility",
+    "effect": "Sets a quota pool to Automatic, Show or Hide",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select[data-limit-pool]",
+    "pattern": true
+  },
+  {
+    "id": "limits-show-all",
+    "where": "providers",
+    "setting": "limitVisibility, showExtraWindows",
+    "effect": "Clears hidden pools and turns on Show extra windows so every limit appears",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button#limits-show-all"
+  },
+  {
+    "id": "limits-reset-auto",
+    "where": "providers",
+    "setting": "limitVisibility, showExtraWindows",
+    "effect": "Clears every pool choice and turns Show extra windows off",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button#limits-reset-auto"
+  },
+  {
+    "id": "separate-pools",
+    "where": "providers",
+    "setting": "separatePools",
+    "effect": "Places each non-main pool in its own card after its provider",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#separate-pools"
+  },
+  {
     "id": "theme:reactor",
     "where": "theme",
     "setting": "theme",
@@ -290,6 +327,69 @@
     "modes": "all",
     "disabledWhen": "never",
     "selector": "button[data-theme=\"minimal-pace\"]"
+  },
+  {
+    "id": "theme:pastel",
+    "where": "theme",
+    "setting": "theme",
+    "effect": "Switches theme to Pastel Pink",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"pastel\"]"
+  },
+  {
+    "id": "theme:layer",
+    "where": "theme",
+    "setting": "theme",
+    "effect": "Switches theme to Layer",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"layer\"]"
+  },
+  {
+    "id": "theme:liquid-glass",
+    "where": "theme",
+    "setting": "theme",
+    "effect": "Switches theme to Clear Glass",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"liquid-glass\"]"
+  },
+  {
+    "id": "theme:aurora",
+    "where": "theme",
+    "setting": "theme",
+    "effect": "Switches theme to Aurora",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"aurora\"]"
+  },
+  {
+    "id": "theme:pebble",
+    "where": "theme",
+    "setting": "theme",
+    "effect": "Switches theme to Pebble",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"pebble\"]"
+  },
+  {
+    "id": "theme:glyph",
+    "where": "theme",
+    "setting": "theme",
+    "effect": "Switches theme to Glyph",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"glyph\"]"
+  },
+  {
+    "id": "theme:crisp",
+    "where": "theme",
+    "setting": "theme",
+    "effect": "Switches theme to Crisp",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "button[data-theme=\"crisp\"]"
   },
   {
     "id": "palette-option:*",
@@ -505,10 +605,10 @@
     "id": "dot-count",
     "where": "theme",
     "setting": "dotCount",
-    "effect": "Selects number of meter marks per quota window (10, 20, or 30)",
+    "effect": "Selects number of meter marks per quota window (10, 20, or 30) on a range slider",
     "modes": "all except theme: system and shape: circle",
     "disabledWhen": "Hidden when theme is system or shape is circle",
-    "selector": "select#dot-count"
+    "selector": "input#dot-count"
   },
   {
     "id": "reactor-motion",
@@ -1082,6 +1182,15 @@
     "selector": "button#gear"
   },
   {
+    "id": "widget-provider-card",
+    "where": "widget",
+    "setting": "historyMode",
+    "effect": "Opens or closes usage history for the provider (Click a card mode) from the card",
+    "modes": "all",
+    "disabledWhen": "Inert when history is off or the card has no history",
+    "selector": "article.provider-card[role=\"button\"]"
+  },
+  {
     "id": "widget-menu-refresh",
     "where": "widget",
     "setting": null,
@@ -1198,6 +1307,169 @@
     "modes": "all",
     "disabledWhen": "Hidden unless placementEditing is active",
     "selector": ".placement-bar button:last-of-type"
+  },
+  {
+    "id": "widget-select",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Picks which widget the settings edit (Main or an additional widget) or starts adding one",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#widget-select"
+  },
+  {
+    "id": "widget-new-name",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Name for the widget being added",
+    "modes": "all",
+    "disabledWhen": "Hidden until Add widget is chosen",
+    "selector": "input#widget-new-name"
+  },
+  {
+    "id": "widget-new-monitor",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Monitor for the widget being added",
+    "modes": "all",
+    "disabledWhen": "Hidden until Add widget is chosen",
+    "selector": "select#widget-new-monitor"
+  },
+  {
+    "id": "widget-create",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Creates an additional widget that inherits Main",
+    "modes": "all",
+    "disabledWhen": "Hidden until Add widget is chosen; disabled when no monitor is available",
+    "selector": "button#widget-create"
+  },
+  {
+    "id": "widget-add-cancel",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Closes the add-widget form without creating",
+    "modes": "all",
+    "disabledWhen": "Hidden until Add widget is chosen",
+    "selector": "button#widget-add-cancel"
+  },
+  {
+    "id": "widget-name",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Renames the selected additional widget",
+    "modes": "all",
+    "disabledWhen": "Hidden when Main is selected",
+    "selector": "input#widget-name"
+  },
+  {
+    "id": "widget-remove",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Asks to remove the selected additional widget",
+    "modes": "all",
+    "disabledWhen": "Hidden when Main is selected",
+    "selector": "button#widget-remove"
+  },
+  {
+    "id": "widget-remove-yes",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Removes the selected additional widget",
+    "modes": "all",
+    "disabledWhen": "Hidden until Remove widget is clicked",
+    "selector": "button#widget-remove-yes"
+  },
+  {
+    "id": "widget-remove-cancel",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Keeps the widget and closes the removal confirmation",
+    "modes": "all",
+    "disabledWhen": "Hidden until Remove widget is clicked",
+    "selector": "button#widget-remove-cancel"
+  },
+  {
+    "id": "widget-reset:*",
+    "where": "shell",
+    "setting": "widgets",
+    "effect": "Drops the selected widget overrides for one settings category so it follows Main again",
+    "modes": "all",
+    "disabledWhen": "Hidden unless the selected widget overrides that category",
+    "selector": "button.widget-reset",
+    "pattern": true
+  },
+  {
+    "id": "history-enabled",
+    "where": "history",
+    "setting": "historyEnabled",
+    "effect": "Shows or hides usage history on the widget",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#history-enabled"
+  },
+  {
+    "id": "local-history",
+    "where": "history",
+    "setting": null,
+    "effect": "Grants or revokes permission to read Claude Code session logs for token history",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#local-history"
+  },
+  {
+    "id": "history-mode",
+    "where": "history",
+    "setting": "historyMode",
+    "effect": "Chooses where history appears: under each card, on card click, or in a side panel",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "select#history-mode"
+  },
+  {
+    "id": "history-panel-layout",
+    "where": "history",
+    "setting": "historyPanelLayout",
+    "effect": "Stacks all providers or shows one at a time in the side panel",
+    "modes": "all",
+    "disabledWhen": "Disabled unless history mode is Side panel",
+    "selector": "select#history-panel-layout"
+  },
+  {
+    "id": "history-cost",
+    "where": "history",
+    "setting": "historyCost",
+    "effect": "Shows API price equivalent in history",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#history-cost"
+  },
+  {
+    "id": "history-models",
+    "where": "history",
+    "setting": "historyModels",
+    "effect": "Shows model breakdown in history",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#history-models"
+  },
+  {
+    "id": "history-heatmap",
+    "where": "history",
+    "setting": "historyHeatmap",
+    "effect": "Shows the activity heatmap in history",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#history-heatmap"
+  },
+  {
+    "id": "history-machines",
+    "where": "history",
+    "setting": "historyMachines",
+    "effect": "Splits history by computer",
+    "modes": "all",
+    "disabledWhen": "Disabled unless history from 2+ computers is present",
+    "selector": "input#history-machines"
   },
   {
     "id": "shortcut:ctrl-plus",

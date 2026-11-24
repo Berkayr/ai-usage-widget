@@ -16,7 +16,20 @@ export const EXEMPTIONS = {
   'taskbar-enabled': 'Windows taskbar strip integration; separate OS shell window not rendered in desktop widget webview',
   'linux-layer': 'Wayland layer-shell protocol setting; managed by compositor outside webview DOM',
   'linux-margin': 'Wayland layer-shell anchor margin; managed by compositor outside webview DOM',
-  'linux-monitor': 'Wayland layer-shell monitor connector; managed by compositor outside webview DOM'
+  'linux-monitor': 'Wayland layer-shell monitor connector; managed by compositor outside webview DOM',
+  'local-history': 'Claude Code log permission is saved through a separate native command, not the settings preview',
+  'history-machines': 'Disabled without history from 2+ computers; covered by tests/history-browser.mjs fixtures',
+  'widget-provider-card': 'Needs per-card history data; covered by the history-toggle checks in tests/history-browser.mjs',
+  'widget-select': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs (create, rename, remove, reset, save)',
+  'widget-new-name': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs',
+  'widget-new-monitor': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs',
+  'widget-create': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs',
+  'widget-add-cancel': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs',
+  'widget-name': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs',
+  'widget-remove': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs',
+  'widget-remove-yes': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs',
+  'widget-remove-cancel': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs',
+  'widget-reset:*': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs'
 };
 
 const b = await browser();
@@ -439,7 +452,9 @@ try {
       await navCategory('shape-size'); $s('[data-shape="' + shape + '"]').click(); await settle();
       await navCategory('providers');
       const expectedProviderDisabled = ['landscape','pill'].includes(shape);
-      if (featuredSel.disabled !== expectedProviderDisabled || featPosSel.disabled !== (shape !== 'portrait'))
+      // Top/Bottom only applies to Portrait with an odd number of visible providers.
+      const expectedPositionDisabled = shape !== 'portrait' || sDoc.querySelectorAll('.provider-order-row input:checked').length % 2 === 0;
+      if (featuredSel.disabled !== expectedProviderDisabled || featPosSel.disabled !== expectedPositionDisabled)
         recordFailure('featured-position', shape, 'Inapplicable featured controls remain enabled', 'Disabled according to shape and odd count');
       if (!$s('#featured-hint').textContent.trim()) recordFailure('featured-provider', shape, 'No explanation', 'Hint retained');
     }
@@ -447,12 +462,74 @@ try {
     await navCategory('providers');
     const visibleCheck = sDoc.querySelector('.provider-order-row input:checked');
     visibleCheck.click(); await settle();
-    if (!featPosSel.disabled) recordFailure('featured-position', 'even portrait', 'Top/Bottom still enabled', 'Disabled with an even provider count');
+    // Toggling one provider flips the parity, so the control must follow it.
+    if (featPosSel.disabled !== (sDoc.querySelectorAll('.provider-order-row input:checked').length % 2 === 0)) recordFailure('featured-position', 'parity toggle', 'Top/Bottom did not follow the provider count parity', 'Enabled with an odd count, disabled with an even count');
     visibleCheck.click(); await settle();
+
+    // Limits and pools
+    await navCategory('providers');
+    const pool = () => $s('select[data-limit-pool]');
+    const lastPreview = () => bus.previews.at(-1) || {};
+    if (pool() && $s('input#separate-pools') && $s('button#limits-show-all') && $s('button#limits-reset-auto')) {
+      const key = pool().dataset.limitPool;
+      pool().value = 'hide';
+      pool().dispatchEvent(new Event('change', { bubbles: true }));
+      await settle();
+      expect(lastPreview().limitVisibility?.[key] === false, 'limit-pool:*', 'Hide choice reaches preview as false');
+      $s('button#limits-show-all').click();
+      await settle();
+      expect(lastPreview().showExtraWindows === true && !Object.values(lastPreview().limitVisibility || {}).includes(false) && pool().value === 'auto', 'limits-show-all', 'Hidden pools cleared and extra windows on');
+      pool().value = 'show';
+      pool().dispatchEvent(new Event('change', { bubbles: true }));
+      await settle();
+      expect(lastPreview().limitVisibility?.[key] === true, 'limit-pool:*', 'Show choice reaches preview as true');
+      $s('button#limits-reset-auto').click();
+      await settle();
+      expect(Object.keys(lastPreview().limitVisibility || {}).length === 0 && lastPreview().showExtraWindows === false && pool().value === 'auto', 'limits-reset-auto', 'Pool choices cleared and extra windows off');
+      $s('input#separate-pools').click();
+      await settle();
+      expect(lastPreview().separatePools === true, 'separate-pools', 'Separate pools reaches preview');
+      $s('input#separate-pools').click();
+      await settle();
+      expect(lastPreview().separatePools === false, 'separate-pools', 'Separate pools turns off again');
+      results.testedCount += 4;
+    } else recordFailure('limits-and-pools', 'providers', 'Limits controls missing from Providers', 'Pool select, Show everything, Reset and Separate pools present');
+
+    // History settings reach the widget preview
+    await navCategory('history');
+    for (const [id, key] of [['history-enabled', 'historyEnabled'], ['history-cost', 'historyCost'], ['history-models', 'historyModels'], ['history-heatmap', 'historyHeatmap']]) {
+      const box = $s('input#' + id);
+      if (!box) { recordFailure(id, 'history', 'Control missing', 'Present'); continue; }
+      const before = lastPreview()[key];
+      box.click();
+      await settle();
+      expect(lastPreview()[key] === box.checked && box.checked !== before, id, key + ' follows the checkbox in preview');
+      box.click();
+      await settle();
+      results.testedCount++;
+    }
+    const historyMode = $s('select#history-mode'), panelLayout = $s('select#history-panel-layout');
+    if (historyMode && panelLayout) {
+      historyMode.value = 'under';
+      historyMode.dispatchEvent(new Event('change', { bubbles: true }));
+      await settle();
+      expect(lastPreview().historyMode === 'under' && panelLayout.disabled, 'history-mode', 'Mode reaches preview and panel layout is disabled outside Side panel');
+      historyMode.value = 'panel';
+      historyMode.dispatchEvent(new Event('change', { bubbles: true }));
+      await settle();
+      expect(lastPreview().historyMode === 'panel' && !panelLayout.disabled, 'history-panel-layout', 'Panel layout enabled in Side panel');
+      panelLayout.value = 'single';
+      panelLayout.dispatchEvent(new Event('change', { bubbles: true }));
+      await settle();
+      expect(lastPreview().historyPanelLayout === 'single', 'history-panel-layout', 'Layout reaches preview');
+      $s('#revert')?.click();
+      await settle();
+      results.testedCount += 2;
+    }
 
     // 4. Themes
     await navCategory('theme');
-    const themeIds = ['reactor', 'system', 'dot-matrix', 'circular-rings', 'terminal', 'frosted-glass', 'brutalist', 'compact-strip', 'retro-lcd', 'minimal-pace'];
+    const themeIds = ['reactor', 'system', 'dot-matrix', 'circular-rings', 'terminal', 'frosted-glass', 'brutalist', 'compact-strip', 'retro-lcd', 'minimal-pace', 'pastel', 'layer', 'liquid-glass', 'aurora', 'pebble', 'glyph', 'crisp'];
     for (const t of themeIds) {
       const btn = $s(\`button[data-theme="\${t}"]\`);
       if (btn) {
@@ -600,7 +677,7 @@ try {
     }
 
     // dot-count & reactor-motion (with inapplicable mode checks)
-    const dotCountSel = $s('select#dot-count');
+    const dotCountSel = $s('input#dot-count');
     const reactorMotionInput = $s('input#reactor-motion');
     if (dotCountSel && reactorMotionInput) {
       // In theme: system, dot-count must be hidden
