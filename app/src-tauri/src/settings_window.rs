@@ -20,6 +20,8 @@ pub fn set_preview(app: &tauri::AppHandle, settings: Settings) -> Result<(), Str
     Ok(())
 }
 pub fn is_previewing() -> bool { PREVIEWING.load(std::sync::atomic::Ordering::Relaxed) }
+#[tauri::command]
+pub fn settings_open() -> bool { is_previewing() }
 fn apply_preview(app: &tauri::AppHandle, mut settings: Settings, label: &str) -> Result<(), String> {
     user_palettes::validate(&settings.user_palettes)?;
     settings.taskbar.color_mode=settings.color_mode.clone();

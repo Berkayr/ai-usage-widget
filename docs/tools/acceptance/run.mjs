@@ -36,6 +36,7 @@ const fast = [
   ['node', ['docs/tools/shape-final-check.mjs']],
   ['node', ['docs/tools/portrait-resize-check.mjs']],
   ['node', ['docs/tools/screen-fit-check.mjs']],
+  ['node', ['tests/preview-shortcut.mjs']],
   ['node', ['tests/settings-contract.mjs']],
   ['node', ['tests/size-contract.mjs']],
   ['node', ['tests/shapes-content.mjs']],
