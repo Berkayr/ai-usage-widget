@@ -5,6 +5,7 @@ from ..schema import iso_now, meter_record, provider_record
 from .common import get_json, number, make_window
 
 META = {"id": "copilot", "label": "GitHub Copilot", "category": "credits", "auth": "cli-login", "experimental": True, "docs_url": "https://github.com/settings/copilot"}
+MAIN_POOL = {"id": "main", "label": "Copilot"}
 URL = "https://api.github.com/copilot_internal/user"
 
 def _gh(): return shutil.which("gh")
@@ -43,7 +44,7 @@ def read(prev=None):
         if remaining is None and isinstance(item.get("percentRemaining"), (int, float)): remaining = number(item["percentRemaining"])
         reset = item.get("quota_reset_date", item.get("quotaResetDate"))
         if remaining is not None:
-            windows.append(make_window(key, label, 100 - remaining, reset, None, "other"))
+            windows.append(make_window(key, label, 100 - remaining, reset, None, "other", pool=MAIN_POOL))
         used = number(item.get("credits_used", item.get("creditsUsed")))
         limit = number(item.get("entitlement", item.get("limit")))
         if used is not None or limit is not None: meters.append(meter_record(key + "-credits", label + " credits", "credits", used=used, limit=limit, remaining=(limit-used if used is not None and limit is not None else None), resets_at=reset))

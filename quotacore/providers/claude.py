@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -12,9 +13,10 @@ from typing import Any
 
 from ..paths import data_path
 from ..schema import iso_now, provider_record
-from .common import NoRedirect, kind_for, make_window, safe_error, timestamp, read_response
+from .common import NoRedirect, kind_for, make_window, number, read_response, safe_error, slugify, timestamp
 
 LABEL = "Claude Code"
+MAIN_POOL = {"id": "main", "label": "Claude"}
 META = {"id": "claude", "label": LABEL, "category": "subscription", "auth": "local-file", "experimental": False, "docs_url": "https://docs.anthropic.com/"}
 USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 MAX_OBSERVATION_AGE = 45 * 60
@@ -67,22 +69,148 @@ def _live() -> tuple[dict[str, Any] | None, str | None, str | None]:
         return None, "SOURCE_UNAVAILABLE", "Usage endpoint unavailable or returned invalid data"
 
 
+def _scope_name(scope: Any) -> str | None:
+    if isinstance(scope, str) and scope.strip():
+        return scope.strip()
+    if not isinstance(scope, dict):
+        return None
+    for field in ("model", "surface"):
+        sub = scope.get(field)
+        if isinstance(sub, str) and sub.strip():
+            return sub.strip()
+        if isinstance(sub, dict):
+            for key in ("display_name", "name", "id"):
+                val = sub.get(key)
+                if isinstance(val, str) and val.strip():
+                    return val.strip()
+    for key in ("display_name", "name", "id"):
+        val = scope.get(key)
+        if isinstance(val, str) and val.strip():
+            return val.strip()
+    for val in scope.values():
+        if isinstance(val, str) and val.strip():
+            return val.strip()
+        if isinstance(val, dict):
+            for key in ("display_name", "name", "id"):
+                nested = val.get(key)
+                if isinstance(nested, str) and nested.strip():
+                    return nested.strip()
+    return None
+
+
+def _parse_limits(raw_limits: Any) -> tuple[dict[str, Any] | None, dict[str, Any] | None, list[dict[str, Any]], set[tuple[str, str]]]:
+    fallback_session = None
+    fallback_weekly = None
+    scoped_windows: list[dict[str, Any]] = []
+    covered_scoped: set[tuple[str, str]] = set()
+    if not isinstance(raw_limits, list):
+        return fallback_session, fallback_weekly, scoped_windows, covered_scoped
+    for entry in raw_limits:
+        if not isinstance(entry, dict):
+            continue
+        raw_kind = entry.get("kind")
+        entry_kind = raw_kind.strip() if isinstance(raw_kind, str) and raw_kind.strip() else ""
+        raw_group = entry.get("group")
+        group = raw_group.strip().lower() if isinstance(raw_group, str) else ""
+        pct = entry.get("percent", entry.get("utilization", entry.get("used_percentage")))
+        resets_at = entry.get("resets_at")
+        if entry_kind == "session":
+            if fallback_session is None:
+                fallback_session = make_window("five_hour", "5 hour", pct, resets_at, 300, "session", pool=MAIN_POOL)
+            continue
+        if entry_kind == "weekly_all":
+            if fallback_weekly is None:
+                fallback_weekly = make_window("seven_day", "7 day", pct, resets_at, 10080, "weekly", pool=MAIN_POOL)
+            continue
+        if not entry_kind and number(pct) is None:
+            continue
+        minutes = 300 if group == "session" else 10080 if group == "weekly" else None
+        human_kind = (entry_kind or "limit").replace("_", " ").strip()
+        kind_part = re.sub(r"[^a-z0-9_]+", "-", (entry_kind or "limit").lower()).strip("-_") or "limit"
+        extracted = _scope_name(entry.get("scope"))
+        if extracted is not None:
+            display_name = extracted
+            scope_slug = slugify(extracted, fallback=slugify(entry_kind, fallback="extra"))
+        else:
+            display_name = human_kind.title() or "Extra"
+            scope_slug = slugify(entry_kind, fallback="extra")
+        if group == "weekly":
+            label = f"{display_name} · weekly"
+        elif group == "session":
+            label = f"{display_name} · session"
+        else:
+            label = f"{display_name} · {human_kind.lower()}" if extracted is not None else display_name
+        window = make_window(
+            f"limit-{kind_part}-{scope_slug}",
+            label,
+            pct,
+            resets_at,
+            minutes,
+            kind_for(label, minutes),
+            pool={"id": scope_slug, "label": display_name},
+        )
+        window["hidden_by_default"] = True
+        scoped_windows.append(window)
+        if group in ("weekly", "session"):
+            covered_scoped.add((group, scope_slug))
+    return fallback_session, fallback_weekly, scoped_windows, covered_scoped
+
+
 def _usage_windows(data: dict[str, Any]) -> list[dict[str, Any]]:
+    if not isinstance(data, dict):
+        return []
+    fallback_session, fallback_weekly, scoped_windows, covered_scoped = _parse_limits(data.get("limits"))
     windows: list[dict[str, Any]] = []
+    known = {"five_hour": "5 hour", "fiveHour": "5 hour", "seven_day": "7 day", "sevenDay": "7 day"}
+    has_five = False
+    has_seven = False
     for key, entry in data.items():
         if not isinstance(entry, dict):
             continue
         pct = entry.get("utilization", entry.get("used_percentage"))
-        known = {"five_hour": "5 hour", "fiveHour": "5 hour", "seven_day": "7 day", "sevenDay": "7 day"}
+        if key in known:
+            minutes = 300 if key in ("five_hour", "fiveHour") else 10080
+            label = known[key]
+            windows.append(make_window(key, label, pct, entry.get("resets_at"), minutes,
+                                       kind_for(label, minutes), pool=MAIN_POOL))
+            if minutes == 300:
+                has_five = True
+            else:
+                has_seven = True
+            continue
+        if key.startswith("seven_day_") and len(key) > len("seven_day_") and number(pct) is not None:
+            suffix = key[len("seven_day_"):]
+            slug = slugify(suffix, fallback="extra")
+            if ("weekly", slug) in covered_scoped:
+                continue
+            name = suffix.replace("_", " ").strip().title()
+            window = make_window(key, f"{name} · weekly", pct, entry.get("resets_at"), 10080,
+                                 "weekly", pool={"id": slug, "label": name})
+            window["hidden_by_default"] = True
+            windows.append(window)
+            continue
+        if key.startswith("five_hour_") and len(key) > len("five_hour_") and number(pct) is not None:
+            suffix = key[len("five_hour_"):]
+            slug = slugify(suffix, fallback="extra")
+            if ("session", slug) in covered_scoped:
+                continue
+            name = suffix.replace("_", " ").strip().title()
+            window = make_window(key, f"{name} · session", pct, entry.get("resets_at"), 300,
+                                 "session", pool={"id": slug, "label": name})
+            window["hidden_by_default"] = True
+            windows.append(window)
+            continue
         raw_label = key.replace("_", " ").title()
-        is_extra = key not in known
-        label = "Extra window" if is_extra else known[key]
-        minutes = 300 if key in ("five_hour", "fiveHour") else 10080 if key in ("seven_day", "sevenDay") else None
-        window = make_window(key, label, pct, entry.get("resets_at"), minutes, kind_for(label, minutes))
-        if is_extra:
-            window.update(hidden_by_default=True, raw_label=raw_label)
+        window = make_window(key, "Extra window", pct, entry.get("resets_at"), None,
+                             kind_for("Extra window", None), pool=MAIN_POOL)
+        window.update(hidden_by_default=True, raw_label=raw_label)
         windows.append(window)
-    return windows
+    missing_main = []
+    if not has_five and fallback_session is not None:
+        missing_main.append(fallback_session)
+    if not has_seven and fallback_weekly is not None:
+        missing_main.append(fallback_weekly)
+    return missing_main + windows + scoped_windows
 
 
 def _observation_paths() -> list[Path]:
@@ -104,12 +232,44 @@ def _read_observation() -> tuple[dict[str, Any] | None, str | None]:
             for key, label, minutes in (("five", "5 hour", 300), ("seven", "7 day", 10080)):
                 pct = data.get(key)
                 if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 100:
-                    windows.append(make_window(key, label, pct, data.get(key + "_reset"), minutes, kind_for(label, minutes)))
+                    windows.append(make_window(key, label, pct, data.get(key + "_reset"), minutes,
+                                               kind_for(label, minutes), pool=MAIN_POOL))
             if windows:
                 return {"windows": windows, "captured_at": timestamp(epoch), "plan": None}, None
         except (OSError, ValueError, TypeError, AttributeError):
             continue
     return None, None
+
+
+def _carry_scoped_windows(observation: dict[str, Any], prev: dict[str, Any] | None) -> dict[str, Any]:
+    """Preserve unexpired scoped windows from prev when statusline only reports main windows."""
+    if not isinstance(prev, dict) or not isinstance(prev.get("windows"), list):
+        return observation
+    now = datetime.now(timezone.utc)
+    base = list(observation.get("windows") or [])
+    seen_ids = {w.get("id") for w in base if isinstance(w, dict)}
+    carried = []
+    prev_captured = prev.get("captured_at")
+    for window in prev["windows"]:
+        if not isinstance(window, dict):
+            continue
+        pool = window.get("pool")
+        is_scoped = (isinstance(pool, dict) and pool.get("id") and pool.get("id") != "main") or str(window.get("id") or "").startswith("limit-")
+        if not is_scoped or window.get("id") in seen_ids:
+            continue
+        reset = timestamp(window.get("resets_at"))
+        if not reset or datetime.fromisoformat(reset) <= now:
+            continue
+        item = dict(window)
+        item["stale"] = True
+        if prev_captured and "captured_at" not in item:
+            item["captured_at"] = prev_captured
+        carried.append(item)
+    if not carried:
+        return observation
+    merged = dict(observation)
+    merged["windows"] = base + carried
+    return merged
 
 
 def _read_cache() -> tuple[dict[str, Any] | None, str | None]:
@@ -192,7 +352,7 @@ def read(prev: dict[str, Any] | None = None) -> dict[str, Any]:
         state, error = "SCHEMA_CHANGED", "Usage response contained no recognized quota windows"
     observation, _ = _read_observation()
     if observation:
-        return with_history(_success("statusline", observation, plan))
+        return with_history(_success("statusline", _carry_scoped_windows(observation, prev), plan))
     cache, cache_source = _read_cache()
     if cache and cache_source:
         return with_history(_success(cache_source, cache, plan))

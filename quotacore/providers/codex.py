@@ -12,8 +12,9 @@ from pathlib import Path
 from typing import Any
 
 from ..schema import iso_now, provider_record
-from .common import kind_for, make_window, safe_error
+from .common import kind_for, make_window, number, safe_error, slugify
 
+MAIN_POOL = {"id": "main", "label": "Codex"}
 META = {"id": "codex", "label": "OpenAI Codex", "category": "subscription", "auth": "cli-login", "experimental": False, "docs_url": "https://developers.openai.com/codex/"}
 
 
@@ -157,24 +158,77 @@ def history_from_usage(payload: Any) -> dict[str, Any] | None:
             "summary": summary, "daily": daily}
 
 
+def _parse_duration(entry: dict[str, Any]) -> int | None:
+    duration = entry.get("windowDurationMins", entry.get("window_duration_mins"))
+    if isinstance(duration, bool):
+        return None
+    try:
+        return int(duration) if duration is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _window_label(key: str, entry: dict[str, Any], duration: int | None) -> str:
+    if duration == 300:
+        return "5 hour"
+    if duration == 10080:
+        return "7 day"
+    return str(entry.get("name") or key).replace("_", " ").title()
+
+
 def windows_from_response(payload: dict[str, Any]) -> tuple[list[dict[str, Any]], str | None]:
-    limits = payload.get("rateLimits") or payload.get("rate_limits") or {}
+    if not isinstance(payload, dict):
+        return [], None
+    raw_limits = payload.get("rateLimits") or payload.get("rate_limits")
+    limits = raw_limits if isinstance(raw_limits, dict) else {}
     windows = []
     for key, entry in limits.items():
         if not isinstance(entry, dict):
             continue
-        duration = entry.get("windowDurationMins", entry.get("window_duration_mins"))
-        try:
-            duration = int(duration) if duration is not None else None
-        except (TypeError, ValueError):
-            duration = None
-        label = "5 hour" if duration == 300 else "7 day" if duration == 10080 else str(entry.get("name") or key).replace("_", " ").title()
+        duration = _parse_duration(entry)
+        label = _window_label(str(key), entry, duration)
         window = make_window(str(key), label, entry.get("usedPercent", entry.get("used_percent")),
                              entry.get("resetsAt", entry.get("resets_at")), duration,
-                             kind_for(label, duration))
+                             kind_for(label, duration), pool=MAIN_POOL)
         if key not in ("primary", "secondary", "credits"):
             window.update(hidden_by_default=True, label="Extra window", raw_label=label)
         windows.append(window)
+
+    raw_main_id = limits.get("limitId") or limits.get("limit_id")
+    main_limit_id = raw_main_id.strip() if isinstance(raw_main_id, str) and raw_main_id.strip() else "codex"
+    by_id = payload.get("rateLimitsByLimitId")
+    if by_id is None:
+        by_id = payload.get("rate_limits_by_limit_id")
+    if isinstance(by_id, dict):
+        for limit_key, group in by_id.items():
+            if not isinstance(group, dict):
+                continue
+            raw_gid = group.get("limitId") or group.get("limit_id")
+            effective_id = raw_gid.strip() if isinstance(raw_gid, str) and raw_gid.strip() else str(limit_key)
+            if effective_id == main_limit_id or str(limit_key) == main_limit_id:
+                continue
+            raw_name = group.get("limitName") or group.get("limit_name")
+            limit_name = raw_name.strip() if isinstance(raw_name, str) and raw_name.strip() else effective_id
+            pool_id = slugify(effective_id, fallback=slugify(limit_name, fallback="extra"))
+            if pool_id == "main":
+                pool_id = slugify(limit_name, fallback="extra")
+                if pool_id == "main":
+                    pool_id = "extra"
+            pool = {"id": pool_id, "label": limit_name}
+            for key, entry in group.items():
+                if key == "credits" or not isinstance(entry, dict):
+                    continue
+                used_pct = entry.get("usedPercent", entry.get("used_percent"))
+                if number(used_pct) is None:
+                    continue
+                duration = _parse_duration(entry)
+                suffix = _window_label(str(key), entry, duration)
+                window = make_window(f"{effective_id}-{key}", f"{limit_name} · {suffix}", used_pct,
+                                     entry.get("resetsAt", entry.get("resets_at")), duration,
+                                     kind_for(suffix, duration), pool=pool)
+                window["hidden_by_default"] = True
+                windows.append(window)
+
     return windows, limits.get("planType", limits.get("plan_type")) if isinstance(limits, dict) else None
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 import math
 import json
 import os
+import re
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
@@ -87,17 +88,22 @@ def number(value: Any) -> float | None:
         return None
 
 
+def slugify(value: Any, fallback: str = "pool") -> str:
+    text = re.sub(r"[^a-z0-9]+", "-", str(value or "").strip().lower()).strip("-")
+    return text or fallback
+
+
 def make_window(key: str, label: str, pct: Any, reset: Any = None, minutes: Any = None,
-                kind: str = "other") -> dict[str, Any]:
+                kind: str = "other", *, pool: dict[str, str] | None = None) -> dict[str, Any]:
     n = number(pct)
     try:
-        mins = int(minutes) if minutes is not None else None
+        mins = int(minutes) if minutes is not None and not isinstance(minutes, bool) else None
         if mins is not None and mins < 0:
             mins = None
     except (TypeError, ValueError):
         mins = None
     return window_record(key, label, max(0.0, min(100.0, n)) if n is not None else None,
-                         timestamp(reset), mins, kind)
+                         timestamp(reset), mins, kind, pool=pool)
 
 
 def kind_for(label: str, minutes: int | None = None) -> str:
