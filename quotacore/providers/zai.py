@@ -1,7 +1,7 @@
 """Z.ai GLM Coding Plan quota reader."""
 
 from ..schema import iso_now, provider_record
-from .common import api_key, get_json, kind_for, number, timestamp
+from .common import api_key, get_json, kind_for, make_window, number
 
 META = {
     "id": "zai",
@@ -11,6 +11,7 @@ META = {
     "experimental": True,
     "docs_url": "https://api.z.ai/",
 }
+MAIN_POOL = {"id": "main", "label": "Z.ai"}
 URL = "https://api.z.ai/api/monitor/usage/quota/limit"
 
 
@@ -93,20 +94,24 @@ def read(prev=None):
             else str(kind)
         )
         minutes = 300 if kind == "TOKENS_LIMIT" else None
+        reset_raw = item.get("nextResetTime")
+        reset = (
+            reset_raw / 1000
+            if isinstance(reset_raw, (int, float))
+            and not isinstance(reset_raw, bool)
+            and reset_raw > 100000000000
+            else reset_raw
+        )
         windows.append(
-            {
-                "id": "session" if minutes else str(kind).lower(),
-                "label": label,
-                "used_percent": max(0, min(100, pct)),
-                "resets_at": timestamp(
-                    item.get("nextResetTime") / 1000
-                    if isinstance(item.get("nextResetTime"), (int, float))
-                    and item.get("nextResetTime") > 100000000000
-                    else item.get("nextResetTime")
-                ),
-                "window_minutes": minutes,
-                "kind": kind_for(label, minutes),
-            }
+            make_window(
+                "session" if minutes else str(kind).lower(),
+                label,
+                pct,
+                reset,
+                minutes,
+                kind_for(label, minutes),
+                pool=MAIN_POOL,
+            )
         )
     if not windows:
         return provider_record(

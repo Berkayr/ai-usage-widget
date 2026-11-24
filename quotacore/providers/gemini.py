@@ -11,7 +11,7 @@ from typing import Any
 
 from ..paths import data_path
 from ..schema import iso_now, provider_record
-from .common import kind_for, make_window, number, timestamp
+from .common import kind_for, make_window, number, slugify, timestamp
 
 META = {"id": "gemini", "label": "Google Gemini", "category": "subscription", "auth": "cli-login", "experimental": False, "docs_url": "https://github.com/google-gemini/gemini-cli"}
 
@@ -59,15 +59,62 @@ def _window_minutes(value: Any) -> int | None:
     return None
 
 
+def _group_pool(group: dict[str, Any], group_index: int, buckets: list[Any],
+                seen_pools: set[str]) -> tuple[str, dict[str, str]]:
+    raw_name = group.get("name")
+    has_name = isinstance(raw_name, str) and bool(raw_name.strip())
+    group_name = raw_name.strip() if has_name else "Gemini"
+    if group_index == 0:
+        seen_pools.add("main")
+        return group_name, {"id": "main", "label": group_name}
+    first_bucket_id = next(
+        (str(b.get("id")).strip() for b in buckets if isinstance(b, dict) and b.get("id")),
+        "",
+    )
+    base = slugify(group_name, fallback="") if has_name else slugify(first_bucket_id, fallback="")
+    if not base or base == "main":
+        base = slugify(first_bucket_id, fallback="")
+    if not base or base == "main":
+        base = f"group-{group_index}"
+    pool_id = base if base not in seen_pools else f"{base}-{group_index}"
+    seen_pools.add(pool_id)
+    return group_name, {"id": pool_id, "label": group_name}
+
+
+def _pool_from_label(label: str, item: dict[str, Any], primary_group: str) -> dict[str, str]:
+    raw_pool = item.get("pool")
+    if isinstance(raw_pool, dict) and raw_pool.get("id") and raw_pool.get("label"):
+        return {"id": str(raw_pool["id"]), "label": str(raw_pool["label"])}
+    group_part = label.split(" · ", 1)[0].strip() if " · " in label else "Gemini"
+    group_part = group_part or "Gemini"
+    if not item.get("hidden_by_default") and group_part == primary_group:
+        return {"id": "main", "label": group_part}
+    pool_id = slugify(group_part, fallback="")
+    if not pool_id or pool_id == "main":
+        pool_id = slugify(item.get("id"), fallback="extra")
+        if pool_id == "main":
+            pool_id = "extra"
+    return {"id": pool_id, "label": group_part}
+
+
 def windows_from_usage(payload: dict[str, Any]) -> tuple[list[dict[str, Any]], str | None]:
-    command = payload.get("command") or {}
-    data = command.get("data") or {}
-    groups = data.get("groups") or []
+    if not isinstance(payload, dict):
+        return [], None
+    command = payload.get("command")
+    data = command.get("data") if isinstance(command, dict) else None
+    if not isinstance(data, dict):
+        return [], None
+    groups = data.get("groups")
+    if not isinstance(groups, list):
+        groups = []
     windows = []
+    seen_pools: set[str] = set()
     for group_index, group in enumerate(groups):
         if not isinstance(group, dict):
             continue
-        for bucket in group.get("buckets") or []:
+        buckets = group.get("buckets") if isinstance(group.get("buckets"), list) else []
+        group_name, pool = _group_pool(group, group_index, buckets, seen_pools)
+        for bucket in buckets:
             if not isinstance(bucket, dict):
                 continue
             fraction = number(bucket.get("remaining_fraction"))
@@ -75,13 +122,12 @@ def windows_from_usage(payload: dict[str, Any]) -> tuple[list[dict[str, Any]], s
                 continue
             win = bucket.get("window")
             minutes = _window_minutes(win)
-            group_name = str(group.get("name") or "Gemini")
             window_name = str(win or bucket.get("name") or bucket.get("id") or "Quota")
             label = f"{group_name} · {window_name}"
             bucket_id = str(bucket.get("id") or label)
             kind = "session" if isinstance(win, str) and win.lower() == "5h" else kind_for(label, minutes)
             window = make_window(bucket_id, label, (1.0 - fraction) * 100,
-                                 bucket.get("reset_time"), minutes, kind)
+                                 bucket.get("reset_time"), minutes, kind, pool=pool)
             if group_index > 0:
                 window["hidden_by_default"] = True
             windows.append(window)
@@ -105,10 +151,16 @@ def read_snapshot() -> dict[str, Any] | None:
         raw_windows = data.get("windows")
         if not isinstance(raw_windows, list):
             return None
+        dict_items = [item for item in raw_windows if isinstance(item, dict)]
+        first_visible = next((item for item in dict_items if not item.get("hidden_by_default")), dict_items[0] if dict_items else None)
+        if first_visible is not None:
+            first_label = str(first_visible.get("window") or first_visible.get("label") or first_visible.get("name") or first_visible.get("id") or "Quota")
+            primary_group = first_label.split(" · ", 1)[0].strip() if " · " in first_label else "Gemini"
+            primary_group = primary_group or "Gemini"
+        else:
+            primary_group = "Gemini"
         windows = []
-        for item in raw_windows:
-            if not isinstance(item, dict):
-                continue
+        for item in dict_items:
             label = str(item.get("window") or item.get("label") or item.get("name") or item.get("id") or "Quota")
             pct = item.get("used_percent", item.get("usedPercent"))
             minutes = _window_minutes(item.get("window"))
@@ -117,9 +169,11 @@ def read_snapshot() -> dict[str, Any] | None:
             if pct is None and item.get("remaining_fraction") is not None:
                 remaining = number(item.get("remaining_fraction"))
                 pct = (1 - remaining) * 100 if remaining is not None else None
+            pool = _pool_from_label(label, item, primary_group)
             window = make_window(str(item.get("id") or item.get("name") or label), label,
                                  pct, item.get("resets_at", item.get("reset_time")), minutes,
-                                 item.get("kind") if item.get("kind") in ("session", "weekly", "model", "other") else kind_for(label, minutes))
+                                 item.get("kind") if item.get("kind") in ("session", "weekly", "model", "other") else kind_for(label, minutes),
+                                 pool=pool)
             # Keep visibility metadata when re-reading a normalized record.
             if item.get("hidden_by_default"):
                 window["hidden_by_default"] = True

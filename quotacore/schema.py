@@ -9,6 +9,11 @@ Quota windows may include ``hidden_by_default: true`` when the value is not
 useful by default (for example, empty credits, provider-specific extra windows,
 or non-primary Gemini model groups). ``raw_label`` preserves a provider's
 original label when its display label is normalized to "Extra window".
+
+Each quota window carries ``pool: {"id": str, "label": str}`` identifying the
+quota pool it belongs to (additive, schema v1). The primary pool uses id
+``"main"`` with the provider's short label (or primary group name for Gemini);
+secondary model or group pools use a stable slug id and display label.
 """
 from __future__ import annotations
 
@@ -52,11 +57,14 @@ def meter_record(meter_id: str, label: str, unit: str, *, used: float | None = N
 def window_record(window_id: str, label: str, used_percent: float | None,
                   resets_at: str | None = None, window_minutes: int | None = None,
                   kind: str = "other", *, hidden_by_default: bool = False,
-                  raw_label: str | None = None) -> dict[str, Any]:
+                  raw_label: str | None = None,
+                  pool: dict[str, str] | None = None) -> dict[str, Any]:
     if used_percent is not None:
         used_percent = max(0.0, min(100.0, float(used_percent)))
-    result = {"id": str(window_id), "label": label, "used_percent": used_percent,
-              "resets_at": resets_at, "window_minutes": window_minutes, "kind": kind}
+    result: dict[str, Any] = {"id": str(window_id), "label": label, "used_percent": used_percent,
+                              "resets_at": resets_at, "window_minutes": window_minutes, "kind": kind}
+    if isinstance(pool, dict) and pool.get("id") and pool.get("label"):
+        result["pool"] = {"id": str(pool["id"]), "label": str(pool["label"])}
     if hidden_by_default or used_percent is None and resets_at is None:
         result["hidden_by_default"] = True
     if raw_label is not None:
