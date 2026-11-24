@@ -61,6 +61,10 @@
   "fineTune": 82.0,
   "position": "Free",
   "showExtraWindows": true,
+  "limitVisibility": {
+    "gemini/claude-and-gpt-models": true
+  },
+  "separatePools": true,
   "taskbar": {
     "enabled": true,
     "providers": [

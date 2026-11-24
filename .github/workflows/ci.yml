@@ -40,6 +40,8 @@ jobs:
         run: node tests/linux-bundle.mjs
       - name: Renderer security tests
         run: node tests/render-security.mjs
+      - name: Limits and pools tests
+        run: node tests/limits.mjs
       - name: Check AUR draft checksums
         shell: bash
         run: |

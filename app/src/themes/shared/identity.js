@@ -1,7 +1,8 @@
 // Stable identities are shared by every shape and the settings preview.
 export const providerIds=['claude','codex','gemini','copilot','openrouter','deepseek','jetbrains','zai','moonshot','siliconflow','openai_admin','anthropic_admin'];
 export function providerIndex(provider, fallback=0) {
-  const index=providerIds.indexOf(String(provider?.id).toLowerCase());
+  const id = String(provider?.baseId || String(provider?.id || '').split('~')[0]).toLowerCase();
+  const index=providerIds.indexOf(id);
   return index<0 ? fallback%providerIds.length : index;
 }
 export const identityPatterns=['','6 2','1 2','8 2 1 2','3 3','1 1 4 1','8 4','1 4 1','2 3 2','3 1 3','4 2','5 2'];

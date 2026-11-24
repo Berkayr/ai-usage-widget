@@ -41,8 +41,9 @@ Overrides accept only `theme`, `shape`, `scale`, `sizePreset`, `fineTune`,
 `appearance`, `palette`, `accent`, `background`, `widgetOpacity`,
 `backgroundOpacity`, `colorMode`, `dotCount`, `accentEdge`, `historyEnabled`,
 `historyMode`, `historyCost`, `historyModels`, `historyHeatmap`, `historyMachines`,
-`historyPanelOpen`, `showExtraWindows`, `widgetProviders`, `featuredProvider`,
-`featuredPosition`, `quoteEnabled`, `quoteMode`, `quotePosition`, `quoteNavigation`,
+`historyPanelLayout`, `historyPanelOpen`, `showExtraWindows`, `limitVisibility`,
+`separatePools`, `widgetProviders`, `featuredProvider`, `featuredPosition`,
+`quoteEnabled`, `quoteMode`, `quotePosition`, `quoteNavigation`,
 `position`, `lockPosition`, `placementEditing`, `reservedTop`, `reservedBottom`,
 and nested `linux.layer` / `linux.margin`. Other override keys are discarded;
 invalid values reject the entry. `userPalettes`, `providerOrder`, `providerColors`,
@@ -86,7 +87,9 @@ Older application versions discard `widgets` when saving the settings file.
 | `reservedTop`, `reservedBottom` | `null` | Auto detected insets; explicit logical pixel overrides under Settings → Display → Advanced. |
 | `fitHeight` | `true` | Resize to content height. Width still controls the responsive layout. |
 | `position` | `Top right` | Top/Bottom + left/right corners, or `Free` where supported. |
-| `showExtraWindows` | `false` | Reveal secondary/model windows that the source marks hidden. |
+| `showExtraWindows` | `false` | Reveal secondary/model windows and pools that the source marks hidden; new limits appear automatically when on. |
+| `limitVisibility` | `{}` | Per-pool overrides keyed as `<provider>/<pool>` (`true` to show, `false` to hide, absent for automatic); non-boolean values are ignored. |
+| `separatePools` | `false` | Show each visible non-main pool as its own card next to its base provider. |
 | `linux` | See below | Linux layer-shell controls; hidden when unsupported. |
 | `taskbar` | See below | Windows strip, independent from desktop widget layout. |
 
@@ -166,6 +169,18 @@ across windows; the hint names the selection and explains that reordering cannot
 change it. A provider ID pins that provider; `"none"` disables the selection.
 Unknown or unavailable IDs safely select no provider. Missing settings preserve
 legacy behavior (last Portrait cell, highest-usage Circle center).
+
+Under Providers → Limits and pools, every enabled provider in the current snapshot
+lists its quota pools with a three-state choice (Automatic, Show, Hide) and current
+usage percentage. Automatic shows the `main` pool and any non-main pool that is not
+hidden by default, or all pools when **Show extra windows** is on (so newly added
+limits appear automatically). Explicit Show or Hide always wins, including hiding
+`main`; pools in `limitVisibility` that are absent from the current snapshot are
+preserved without cluttering the list. **Show everything** turns on Show extra
+windows and clears explicit Hide overrides; **Reset to automatic** clears all pool
+overrides and turns Show extra windows off. **Separate box for each pool** (`separatePools`) places each visible
+non-main pool in its own card (`<provider>~<pool>`) right after its base provider,
+sharing its logo and identity color while keeping token history on the base provider.
 
 Portrait features one card only with an odd visible count, whether quotes are on
 or off; `featuredPosition: "top" | "bottom"` places that card. Even counts use

@@ -3,6 +3,7 @@ import './history.css';
 import { paletteChoices } from './user-palettes.js';
 import { observeUsageFit } from './usage-fit.js';
 import { applyAppearance } from './appearance.js';
+import { applyLimits, normalizeLimitVisibility } from './limits.js';
 import { orderedProviders, arrangeCards } from './provider-layout.js';
 import { loadQuote, renderQuote, sampleQuote } from './quote.js';
 import './quote.css';
@@ -75,7 +76,7 @@ const isSample = new URLSearchParams(location.search).has('sample') || !('__TAUR
 const defaultTaskbar = { enabled: false, providers: ['claude', 'codex', 'gemini'], window: 'session', showBars: false, offsetX: 0, style: 'transparent', theme: 'auto' };
 const systemAppearance = matchMedia('(prefers-color-scheme: light)');
 const historyState = {};
-let settings = { ...historyDefaults, quoteEnabled:false, quoteMode:'qotd', quotePosition:'bottom', quoteNavigation:true, theme: 'system', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'default', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, fitHeight: true, scale: 100, position: 'Top right' };
+let settings = { ...historyDefaults, quoteEnabled:false, quoteMode:'qotd', quotePosition:'bottom', quoteNavigation:true, theme: 'system', appearance: 'auto', colorMode: 'calm', dotCount: 20, matchPhysicalSize: false, accentEdge: 'off', taskbar: { ...defaultTaskbar }, palette: 'default', accent: null, background: null, widgetOpacity: 100, backgroundOpacity: 100, showExtraWindows: false, limitVisibility: {}, separatePools: false, fitHeight: true, scale: 100, position: 'Top right' };
 try { settings.showExtraWindows = localStorage.getItem(storageKey('showExtraWindows')) === 'true'; } catch {}
 let shapePage = 0;
 let currentSnapshot = null;
@@ -150,6 +151,8 @@ function updateNarrowViewport() {
 function applySettings() {
   if (!theme) return;
   settings = normalizeSize(settings);
+  settings.limitVisibility = normalizeLimitVisibility(settings.limitVisibility);
+  settings.separatePools = settings.separatePools === true;
   document.documentElement.dataset.shape = $('#provider-onboarding').hidden ? settings.shape : 'portrait';
   document.documentElement.dataset.smallSize = String(settings.sizePreset === 'Small');
   document.documentElement.dataset.reactorMotion = String(settings.reactorMotion === true && !document.hidden);
@@ -209,11 +212,15 @@ function draw(snapshot, noData = false) {
     const filtered = settings.providerPreview && snapshot ? {...snapshot,providers:(snapshot.providers||[]).filter(p=>settings.providerPreview.includes(p.id))}:snapshot;
     const visible = snapshotOld(snapshot) ? { ...snapshot, providers: (snapshot.providers || []).map(p => ({ ...p, stale: true, state: ['OK', 'STALE'].includes(p.state) ? 'STALE' : p.state })) } : filtered;
     if (settings.providerPreview && visible?.providers) visible.providers=visible.providers.filter(p=>settings.providerPreview.includes(p.id));
-    const allProviders = orderedProviders((visible?.providers || []).filter(p => !hiddenStates.has(String(p.state).toUpperCase())), settings);
+    const activeProviders = (visible?.providers || []).filter(p => !hiddenStates.has(String(p.state).toUpperCase()));
+    const allProviders = orderedProviders(applyLimits(activeProviders, settings), settings);
+    const originalVisible = orderedProviders(activeProviders, settings);
     const pages = settings.shape === 'square' ? Math.ceil(allProviders.length / 4) : 1;
     shapePage = Math.min(shapePage, Math.max(0, pages - 1));
     const round = ['circle','pill'].includes(settings.shape);
     const selectedProviders = round ? widgetProviders(allProviders, settings.widgetProviders) : allProviders;
+    const selectedBaseIds = new Set(selectedProviders.map(p => p.baseId || p.id));
+    const historyProviders = round ? originalVisible.filter(p => selectedBaseIds.has(p.id)) : originalVisible;
     const paged = round ? {...visible,providers:selectedProviders} : pages > 1 ? {...visible, providers:allProviders.slice(shapePage*4, shapePage*4+4)} : {...visible,providers:allProviders};
     const pageNav = $('.shape-pages'); pageNav.hidden = pages <= 1; pageNav.replaceChildren();
     for (let page=0;page<pages && pages>1;page++) { const button=document.createElement('button'); button.textContent=`${page+1}`; button.setAttribute('aria-label', `Provider page ${page+1} of ${pages}`); button.setAttribute('aria-current', String(page===shapePage)); button.onclick=()=>{shapePage=page;draw(currentSnapshot,currentNoData);}; pageNav.append(button); }
@@ -223,7 +230,7 @@ function draw(snapshot, noData = false) {
       card.style.setProperty('--provider-identity',`var(--provider-${index})`);
       card.dataset.identity=index;
     });
-    const historyOpen = mountHistory($('#widget'), $('#providers'), paged.providers || [], settings, historyState, () => draw(currentSnapshot,currentNoData), open => { settings.historyPanelOpen=open; persist(); draw(currentSnapshot,currentNoData); }, undefined, selectedProviders);
+    const historyOpen = mountHistory($('#widget'), $('#providers'), paged.providers || [], settings, historyState, () => draw(currentSnapshot,currentNoData), open => { settings.historyPanelOpen=open; persist(); draw(currentSnapshot,currentNoData); }, undefined, historyProviders);
     document.documentElement.dataset.historyOpen = String(historyOpen);
     arrangeCards($('#providers'), paged.providers || [], settings);
     $('#updated').textContent = snapshot?.generated_at ? `SYNC ${new Date(snapshot.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'NO DATA YET';

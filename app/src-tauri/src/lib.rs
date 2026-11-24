@@ -45,7 +45,7 @@ pub(crate) struct Settings {
     #[serde(rename="hiddenProviders")] hidden_providers: Vec<String>,
     #[serde(rename="featuredProvider")] featured_provider: Option<String>,
     #[serde(rename="featuredPosition")] featured_position: Option<String>,
-    #[serde(rename="reactorMotion")] reactor_motion: bool, #[serde(rename="quoteEnabled")] quote_enabled: bool, #[serde(rename="quoteMode")] quote_mode: String, #[serde(default="default_quote_position", rename="quotePosition")] quote_position: String, #[serde(rename="quoteNavigation")] quote_navigation: bool, #[serde(default, rename="providerColors")] provider_colors: std::collections::BTreeMap<String,String>, #[serde(default, rename="widgetProviders")] widget_providers: Option<Vec<String>>, #[serde(default, rename="providerPreview")] provider_preview: Option<Vec<String>>, #[serde(default, rename="placementEditing")] placement_editing: bool, theme: String, #[serde(default, rename="stripLayoutVersion", skip_serializing_if="is_zero_layout_version")] strip_layout_version: u8, #[serde(default)] shape: Shape, #[serde(rename="colorMode")] color_mode: String, #[serde(rename="dotCount")] dot_count: u8, #[serde(default, rename="matchPhysicalSize")] match_physical_size: bool, #[serde(rename="accentEdge")] accent_edge: String, #[serde(default="default_fit_height", rename="lockPosition")] lock_position: bool, #[serde(default)] placement: placement::Placement, #[cfg(target_os = "linux")] #[serde(default)] linux: linux::Options, #[cfg(not(target_os = "linux"))] #[serde(default="default_linux_options")] linux: serde_json::Value, #[serde(default="default_auto")] appearance: String, palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale", deserialize_with="deserialize_scale")] scale: f64, #[serde(default, rename="sizePreset")] size_preset: Option<String>, #[serde(default, rename="fineTune")] fine_tune: Option<f64>, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default)] taskbar: TaskbarSettings }
+    #[serde(rename="reactorMotion")] reactor_motion: bool, #[serde(rename="quoteEnabled")] quote_enabled: bool, #[serde(rename="quoteMode")] quote_mode: String, #[serde(default="default_quote_position", rename="quotePosition")] quote_position: String, #[serde(rename="quoteNavigation")] quote_navigation: bool, #[serde(default, rename="providerColors")] provider_colors: std::collections::BTreeMap<String,String>, #[serde(default, rename="widgetProviders")] widget_providers: Option<Vec<String>>, #[serde(default, rename="providerPreview")] provider_preview: Option<Vec<String>>, #[serde(default, rename="placementEditing")] placement_editing: bool, theme: String, #[serde(default, rename="stripLayoutVersion", skip_serializing_if="is_zero_layout_version")] strip_layout_version: u8, #[serde(default)] shape: Shape, #[serde(rename="colorMode")] color_mode: String, #[serde(rename="dotCount")] dot_count: u8, #[serde(default, rename="matchPhysicalSize")] match_physical_size: bool, #[serde(rename="accentEdge")] accent_edge: String, #[serde(default="default_fit_height", rename="lockPosition")] lock_position: bool, #[serde(default)] placement: placement::Placement, #[cfg(target_os = "linux")] #[serde(default)] linux: linux::Options, #[cfg(not(target_os = "linux"))] #[serde(default="default_linux_options")] linux: serde_json::Value, #[serde(default="default_auto")] appearance: String, palette: String, accent: Option<String>, background: Option<String>, #[serde(rename="widgetOpacity")] widget_opacity: u8, #[serde(rename="backgroundOpacity")] background_opacity: u8, #[serde(default="default_fit_height")] #[serde(rename="fitHeight")] fit_height: bool, #[serde(default="default_scale", deserialize_with="deserialize_scale")] scale: f64, #[serde(default, rename="sizePreset")] size_preset: Option<String>, #[serde(default, rename="fineTune")] fine_tune: Option<f64>, #[serde(default="default_position")] position: String, #[serde(default, rename="showExtraWindows")] show_extra_windows: bool, #[serde(default, rename="limitVisibility", deserialize_with="deserialize_limit_visibility")] limit_visibility: std::collections::BTreeMap<String, bool>, #[serde(default, rename="separatePools")] separate_pools: bool, #[serde(default)] taskbar: TaskbarSettings }
 #[derive(Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all="lowercase")]
 pub(crate) enum Shape { #[default] Portrait, Landscape, Square, Circle, Pill, Strip }
@@ -62,12 +62,24 @@ fn deserialize_scale<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Resul
     // JSON encodes non-finite JavaScript numbers as null.
     Ok(normalize_scale(Option::<f64>::deserialize(deserializer)?.unwrap_or_else(default_scale)))
 }
+fn deserialize_limit_visibility<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<std::collections::BTreeMap<String, bool>, D::Error> {
+    let raw = Option::<serde_json::Map<String, Value>>::deserialize(deserializer)?.unwrap_or_default();
+    let mut out = std::collections::BTreeMap::new();
+    for (key, value) in raw {
+        if out.len() >= 256 { break; }
+        if key.is_empty() || key.len() > 128 || key.chars().any(char::is_control) { continue; }
+        if let Some(flag) = value.as_bool() {
+            out.insert(key, flag);
+        }
+    }
+    Ok(out)
+}
 
 #[derive(Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
 struct HistorySettings { history_enabled: bool, history_mode: String, history_cost: bool, history_models: bool, history_heatmap: bool, history_machines: bool, history_panel_open: bool, history_panel_layout: String }
 impl Default for HistorySettings { fn default() -> Self { Self { history_enabled:true, history_mode:"card".into(), history_cost:true, history_models:true, history_heatmap:true, history_machines:false, history_panel_open:false, history_panel_layout:"stacked".into() } } }
-impl Default for Settings { fn default() -> Self { Self { widgets: vec![], strip_layout_version: 0, history: HistorySettings::default(), user_palettes: vec![], palette_load_error: None, size_mode: "fixed".into(), fit_fraction: 1., fit_fine_tune: 100., reserved_top: None, reserved_bottom: None, provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), #[cfg(not(target_os = "linux"))] linux: default_linux_options(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, taskbar: TaskbarSettings::default() } } }
+impl Default for Settings { fn default() -> Self { Self { widgets: vec![], strip_layout_version: 0, history: HistorySettings::default(), user_palettes: vec![], palette_load_error: None, size_mode: "fixed".into(), fit_fraction: 1., fit_fine_tune: 100., reserved_top: None, reserved_bottom: None, provider_order: vec![], hidden_providers: vec![], featured_provider: None, featured_position: None, reactor_motion: false, quote_enabled: false, quote_mode: "qotd".into(), quote_position: default_quote_position(), quote_navigation: true, provider_colors: Default::default(), widget_providers: None, provider_preview: None, placement_editing: false, theme: "system".into(), shape: Shape::default(), color_mode: "calm".into(), dot_count: 20, match_physical_size: false, accent_edge: "off".into(), lock_position: true, placement: Default::default(), #[cfg(target_os = "linux")] linux: linux::Options::default(), #[cfg(not(target_os = "linux"))] linux: default_linux_options(), appearance: default_auto(), palette: "signal-orange".into(), accent: None, background: None, widget_opacity: 100, background_opacity: 100, fit_height: true, scale: 100.0, size_preset: None, fine_tune: None, position: "Top right".into(), show_extra_windows: false, limit_visibility: Default::default(), separate_pools: false, taskbar: TaskbarSettings::default() } } }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default, rename_all="camelCase")]
 struct TaskbarSettings { enabled: bool, providers: Vec<String>, window: String, show_bars: bool, offset_x: i32, style: String, theme: String, color_mode: String, dot_count: u8 }
@@ -214,6 +226,11 @@ fn parse_settings(data: &[u8]) -> Settings {
     }
     let mut settings: Settings = serde_json::from_value(value).unwrap_or_default();
     if let Ok(Value::Object(fields)) = serde_json::from_slice::<Value>(data) {
+        if let Some(vis) = fields.get("limitVisibility") {
+            if let Ok(valid) = serde_json::from_value::<Settings>(json!({"limitVisibility": vis})) {
+                settings.limit_visibility = valid.limit_visibility;
+            }
+        }
         if let Some(widgets) = fields.get("widgets") {
             match serde_json::from_value::<Settings>(json!({"widgets": widgets})) {
                 Ok(valid) => settings.widgets = valid.widgets,
@@ -528,6 +545,33 @@ mod settings_tests {
         assert_eq!(settings.provider_colors.get("claude").unwrap(), "#b85d40");
         let data = serde_json::to_vec(&settings).unwrap();
         assert_eq!(parse_settings(&data).provider_colors, settings.provider_colors);
+    }
+    #[test]
+    fn limit_visibility_and_separate_pools_round_trip() {
+        let legacy = parse_settings(b"{}");
+        assert!(legacy.limit_visibility.is_empty());
+        assert!(!legacy.separate_pools);
+        let oversized = "k".repeat(129);
+        let settings: Settings = serde_json::from_value(json!({
+            "separatePools": true,
+            "limitVisibility": {
+                "gemini/claude-and-gpt-models": true,
+                "gemini/main": false,
+                "non-bool-str": "show",
+                "non-bool-num": 1,
+                "non-bool-null": null,
+                "": true,
+                oversized: true
+            }
+        })).unwrap();
+        assert!(settings.separate_pools);
+        assert_eq!(settings.limit_visibility.len(), 2);
+        assert_eq!(settings.limit_visibility.get("gemini/claude-and-gpt-models"), Some(&true));
+        assert_eq!(settings.limit_visibility.get("gemini/main"), Some(&false));
+        let encoded = serde_json::to_vec(&settings).unwrap();
+        let restored = parse_settings(&encoded);
+        assert_eq!(restored.separate_pools, true);
+        assert_eq!(restored.limit_visibility, settings.limit_visibility);
     }
 
 

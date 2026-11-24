@@ -69,6 +69,8 @@ Choose Portrait, Landscape, Square, Circle Dial or Pill in **General → Layout 
 
 In **Providers → Provider layout**, reorder or hide widget rows without disabling collection. Choose a featured provider or None; Portrait supports Top / Bottom placement. Changes preview immediately; **Save** keeps them. See [configuration](docs/configuration.md) for shape-specific behavior.
 
+In **Providers → Limits and pools**, choose **Automatic**, **Show** or **Hide** for any quota pool, turn on **Separate box for each pool** to split model pools into their own cards, or choose **Show everything** so new limits appear by themselves.
+
 ### A size for every workspace
 
 Keep a compact row beside your editor or expand into detailed cards. Each theme uses the same local data.

@@ -19,8 +19,11 @@ fn legacy_fixture_adds_layout_default_and_preserves_other_bytes_and_omits_empty_
     let bytes = include_bytes!("fixtures/widget-settings.json");
     let settings = parse_settings(bytes);
     assert_eq!(settings.history.history_panel_layout, "stacked");
-    let expected = std::str::from_utf8(bytes).unwrap().replace(
-        "\"historyPanelOpen\": false,", "\"historyPanelOpen\": false,\n  \"historyPanelLayout\": \"stacked\",");
+    assert!(settings.limit_visibility.is_empty());
+    assert!(!settings.separate_pools);
+    let expected = std::str::from_utf8(bytes).unwrap()
+        .replace("\"historyPanelOpen\": false,", "\"historyPanelOpen\": false,\n  \"historyPanelLayout\": \"stacked\",")
+        .replace("\"showExtraWindows\": true,", "\"showExtraWindows\": true,\n  \"limitVisibility\": {},\n  \"separatePools\": false,");
     assert_eq!(serde_json::to_vec_pretty(&settings).unwrap(), expected.as_bytes());
     let mut with_empty: Value = serde_json::from_slice(bytes).unwrap();
     with_empty["widgets"] = json!([]);
@@ -43,6 +46,8 @@ fn effective_and_split_round_trip_without_mutating_root() {
     changed.theme = "system".into();
     changed.history.history_cost = false;
     changed.history.history_panel_layout = "single".into();
+    changed.separate_pools = true;
+    changed.limit_visibility.insert("gemini/claude-and-gpt-models".into(), true);
     let saved = split(&root,"side-2",&changed).unwrap();
     let mut actual = value(&effective(&saved,"side-2").unwrap());
     let mut expected = value(&changed);
@@ -50,6 +55,8 @@ fn effective_and_split_round_trip_without_mutating_root() {
     expected.as_object_mut().unwrap().remove("widgets");
     assert_eq!(actual, expected);
     assert_eq!(saved.theme, root.theme);
+    assert!(!saved.separate_pools);
+    assert!(saved.limit_visibility.is_empty());
     assert_eq!(value(&split(&root,"main",&changed).unwrap()),value(&changed));
     assert!(effective(&root,"missing").is_err());
     assert!(split(&root,"missing",&changed).is_err());

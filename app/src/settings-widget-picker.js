@@ -87,7 +87,7 @@ export function mountWidgetPicker({sections, bindings, root, selected, select, r
       for (const row of document.querySelectorAll('#settings label.setting-row, #settings .provider-choice, #settings .provider-order-row, #palette-tools label')) {
         const input = row.querySelector('input,select');
         const path = bindings[input?.id] || ({'featured-provider':'featuredProvider', 'featured-position':'featuredPosition', 'reactor-motion':'reactorMotion'})[input?.id];
-        const shared = path ? !canOverride(path) : !input?.dataset.widgetProvider;
+        const shared = path ? !canOverride(path) : !(input?.dataset.widgetProvider || input?.dataset.limitPool);
         let note = row.querySelector('.widget-shared-note');
         if (widget && shared && !note) {
           note = document.createElement('small');
