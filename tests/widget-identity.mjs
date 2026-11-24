@@ -6,7 +6,7 @@ import {runInNewContext} from 'node:vm';
 
 const source = readFileSync(new URL('../app/src/main.js', import.meta.url), 'utf8');
 const identity = source.match(/const widgetId = [^\n]+\nconst storageKey = [^\n]+/)[0];
-const persist = source.match(/async function persist\(\) \{[^\n]+/)[0];
+const persist = source.match(/async function settingsOpen\(\) \{[^\n]+/)[0] + '\n' + source.match(/async function persist\(\) \{[^\n]+/)[0];
 const startup = source.slice(source.indexOf('let initialSettingsError = null;'), source.indexOf('const initialOverrides ='));
 
 async function session(search, storage, settings, isSample = false) {
@@ -15,6 +15,7 @@ async function session(search, storage, settings, isSample = false) {
     normalizeSize, URLSearchParams, location: {search}, settings, isSample,
     localStorage: {setItem: (key, value) => storage.set(key, value)},
     invoke: async (command, args) => {
+      if (command === 'settings_open') return false;
       calls.push({command, args: structuredClone(args)});
       return command === 'load_settings' ? {theme: 'terminal'} : undefined;
     },
