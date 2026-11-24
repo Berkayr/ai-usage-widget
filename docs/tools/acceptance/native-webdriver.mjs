@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import {spawn, execFileSync} from 'node:child_process';
 import {existsSync} from 'node:fs';
-import {mkdtemp, mkdir, readFile, writeFile, rm, rename} from 'node:fs/promises';
+import {mkdtemp, mkdir, readFile, realpath, writeFile, rm, rename} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve, join} from 'node:path';
 
@@ -18,7 +18,8 @@ if (windows) {
 const binary = resolve(`app/src-tauri/target/debug/ai-usage${windows ? '.exe' : ''}`);
 const output = resolve('native-artifacts');
 await mkdir(output, {recursive:true});
-const root = await mkdtemp(join(tmpdir(), 'ai-usage-native-'));
+// Hosted Windows runners expose an 8.3 temp path (RUNNER~1) that Edge does not resolve.
+const root = await realpath(await mkdtemp(join(tmpdir(), 'ai-usage-native-')));
 const config = join(root, 'config');
 const state = join(root, 'state');
 const settingsPath = join(config, 'ai-usage', 'settings.json');
