@@ -1,0 +1,38 @@
+name: Diag
+on: {push: {branches: [diag/native-windows]}}
+permissions: {contents: read}
+jobs:
+  d:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: {node-version: '22', cache: npm, cache-dependency-path: app/package-lock.json}
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with: {toolchain: 1.99.1}
+      - run: npm ci
+        working-directory: app
+      - run: npx tauri build --debug --no-bundle
+        working-directory: app
+      - shell: pwsh
+        run: |
+          whoami /groups | Select-String 'Label'
+          $env:RUST_BACKTRACE=1
+          function Try($name) {
+            Write-Host "=== $name"
+            $p = Start-Process app/src-tauri/target/debug/ai-usage.exe -PassThru -RedirectStandardError "$name.err" -RedirectStandardOutput "$name.out"
+            Start-Sleep 15
+            Write-Host "exited: $($p.HasExited) code $($p.ExitCode)"
+            Get-Content "$name.err","$name.out" | Select-Object -First 25
+            Get-CimInstance Win32_Process -Filter "name='msedgewebview2.exe'" | Select-Object -First 3 | ForEach-Object { $_.CommandLine.Substring(0,[Math]::Min(700,$_.CommandLine.Length)) }
+            Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue; Start-Sleep 3
+          }
+          $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS='--remote-debugging-port=0'
+          Try 'plain'
+          $env:WEBVIEW2_USER_DATA_FOLDER="$env:RUNNER_TEMP\udf"; Try 'udf'
+          Get-ChildItem -Recurse -Filter DevToolsActivePort $env:RUNNER_TEMP,$env:LOCALAPPDATA -ErrorAction SilentlyContinue | ForEach-Object FullName
+          $r="$env:RUNNER_TEMP\iso"; mkdir "$r\data","$r\config" | Out-Null
+          $env:APPDATA="$r\config"; $env:LOCALAPPDATA="$r\data"; $env:WEBVIEW2_USER_DATA_FOLDER="$r\udf"
+          Try 'iso'
+          Get-ChildItem -Recurse -Filter DevToolsActivePort $r -ErrorAction SilentlyContinue | ForEach-Object FullName
