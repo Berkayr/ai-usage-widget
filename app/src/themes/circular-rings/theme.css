@@ -244,3 +244,21 @@
 :root[data-theme=circular-rings] #widget.widget #providers .provider-card[data-usage-compact=true] .ring-center {
   padding: 0;
 }
+
+/* Long pool names share narrow columns beside the dial. */
+:root[data-theme=circular-rings]:not([data-shape=pill]) #widget.widget #providers .provider-card:nth-child(n) .windows:has(.quota-window:nth-child(3)) .window-top {
+  flex-wrap: wrap;
+  row-gap: 0;
+}
+:root[data-theme=circular-rings]:not([data-shape=pill]) #widget.widget #providers .provider-card:nth-child(n) .windows:has(.quota-window:nth-child(3)) .window-top > span {
+  max-width: 100%;
+  flex-shrink: 1;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  line-height: 1.2;
+}
+:root[data-theme=circular-rings]:not([data-shape=pill]) #widget.widget #providers .provider-card:nth-child(n) .windows:has(.quota-window:nth-child(3)) .reset {
+  min-width: 0;
+  white-space: normal;
+}

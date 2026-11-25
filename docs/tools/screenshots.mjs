@@ -58,7 +58,8 @@ for (const appearance of ['dark','light']) {
  }
  for (const [i,id] of galleryThemeIds.entries()) {
   scenes.set(`themes/${id}-${appearance}`, {w:id==='compact-strip'?1056:436,h:1450,dpr:1,autoHeight:true,html:shell(frame(names[i],id==='compact-strip'?960:340,id==='compact-strip'?326:1250,{theme:id,shape:id==='compact-strip'?'strip':'portrait',appearance}),light)});
-  if(i<10) scenes.set(`checks/${id}-${appearance}`, {w:1260,h:1500,autoHeight:true,html:shell(heading('RESPONSIVE CHECK', `${names[i]} / ${appearance}`, 'Calm / 340 px and 200 px / 100% and 150%') + `<div class="row" style="gap:12px">${[340,200].map(width=>[100,150].map(scale=>frame(`${width}px / ${scale}%`,width,2400,{theme:id,appearance,scale})).join('')).join('')}</div>`,light)});
+  // Width and scale move together in the app, so rings never reach 200 px at 150%.
+  if(i<10) scenes.set(`checks/${id}-${appearance}`, {w:1260,h:1500,autoHeight:true,html:shell(heading('RESPONSIVE CHECK', `${names[i]} / ${appearance}`, 'Calm / 340 px and 200 px / 100% and 150%') + `<div class="row" style="gap:12px">${[340,200].map(width=>[100,150].filter(scale=>width===340||scale===100||id!=='circular-rings').map(scale=>frame(`${width}px / ${scale}%`,width,2400,{theme:id,appearance,scale})).join('')).join('')}</div>`,light)});
  }
 }
 
