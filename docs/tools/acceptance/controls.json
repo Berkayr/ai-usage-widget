@@ -1418,6 +1418,15 @@
     "selector": "input#local-history"
   },
   {
+    "id": "local-history-gemini",
+    "where": "history",
+    "setting": null,
+    "effect": "Grants or revokes permission to read Antigravity CLI logs for token history",
+    "modes": "all",
+    "disabledWhen": "never",
+    "selector": "input#local-history-gemini"
+  },
+  {
     "id": "history-mode",
     "where": "history",
     "setting": "historyMode",

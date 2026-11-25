@@ -143,8 +143,10 @@ fn configure_providers(app: tauri::AppHandle, providers: Vec<String>) -> Result<
     Ok(())
 }
 #[tauri::command]
-fn set_local_history(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
-    collector("local-history", &[if enabled {"on".into()} else {"off".into()}])?;
+fn set_local_history(app: tauri::AppHandle, enabled: bool, provider: Option<String>) -> Result<(), String> {
+    let provider = provider.unwrap_or_else(|| "claude".into());
+    if !["claude", "gemini"].contains(&provider.as_str()) { return Err("Unknown history provider".into()); }
+    collector("local-history", &[if enabled {"on".into()} else {"off".into()}, "--provider".into(), provider])?;
     let _=app.emit("provider-config-changed", ());
     Ok(())
 }

@@ -196,7 +196,7 @@ def read_snapshot() -> dict[str, Any] | None:
                            captured_at=captured, last_success_at=captured, windows=windows)
 
 
-def read(prev: dict[str, Any] | None = None) -> dict[str, Any]:
+def _read_quota(prev: dict[str, Any] | None = None) -> dict[str, Any]:
     if not detect():
         return provider_record("gemini", "Google Gemini", state="NOT_INSTALLED", error="agy not detected")
     value = read_snapshot()
@@ -208,6 +208,45 @@ def read(prev: dict[str, Any] | None = None) -> dict[str, Any]:
         return result
     return provider_record("gemini", "Google Gemini", state="SOURCE_UNAVAILABLE",
                            error="No recent agy snapshot available")
+
+
+def read(prev: dict[str, Any] | None = None) -> dict[str, Any]:
+    history_enabled = False
+    try:
+        from ..paths import load_config
+        history_enabled = load_config()["providers"].get("gemini", {}).get("local_history") is True
+    except Exception:  # noqa: BLE001, S110
+        # History configuration failures must not interrupt quota collection.
+        pass
+
+    def with_history(record: dict[str, Any]) -> dict[str, Any]:
+        if not history_enabled:
+            record.pop("history", None)
+            return record
+        previous = (prev or {}).get("history")
+        if isinstance(previous, dict):
+            try:
+                computed = datetime.fromisoformat(previous["computed_at"].replace("Z", "+00:00"))
+                fresh = (datetime.now(timezone.utc) - computed.astimezone(timezone.utc)).total_seconds() < 1800
+                # Hourly data belongs to one local day; recompute after midnight.
+                if fresh and computed.astimezone().date() == datetime.now().astimezone().date():
+                    record["history"] = previous
+                    return record
+            except (KeyError, ValueError, TypeError):
+                pass
+        # A stale summary copied from prev must not survive a failed recompute.
+        record.pop("history", None)
+        try:
+            from ..local_history import gemini_history
+            history = gemini_history()
+            if history is not None:
+                record["history"] = history
+        except Exception:  # noqa: BLE001, S110
+            # Local history failures must not interrupt quota collection.
+            pass
+        return record
+
+    return with_history(_read_quota(prev))
 
 
 def refresh_gemini(timeout: float = 45.0) -> int:

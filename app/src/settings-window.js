@@ -166,12 +166,12 @@ function preview(widgetId = selectedWidget, settings = draft) {
 function changed() {
   return !!saved && (!equalSettings(rootDraft, saved) ||
                      !equalSettings(providers, savedProviders) ||
-                     autostart !== savedAutostart || localHistory !== savedLocalHistory);
+                     autostart !== savedAutostart || historyChanges() > 0);
 }
 function mark() {
   const count = saved ? widgetChangeCount(rootDraft, saved) +
       Number(!equalSettings(providers, savedProviders)) +
-      Number(autostart !== savedAutostart) + Number(localHistory !== savedLocalHistory) : 0;
+      Number(autostart !== savedAutostart) + historyChanges() : 0;
   const dirty = count > 0;
   if (dirty)
     saveMessage = '';
@@ -571,9 +571,10 @@ for (const id of ['layout', 'position', 'quote-content', 'desktop']) {
 }
 const historyControls = sectionBlock(sections.history, 'Usage history', []);
 historyControls.insertAdjacentHTML('beforeend', `
-<p class="setting-note" id="history-explanation">Usage history shows daily token usage from Claude Code local logs and Codex account data. History data stays on this computer. Enable Read Claude Code logs to let AI Usage read this computer's Claude Code session logs and count tokens.</p>
+<p class="setting-note" id="history-explanation">Usage history shows daily token usage from Claude Code local logs and Codex account data. History data stays on this computer. Enable Read Claude Code logs to let AI Usage read this computer's Claude Code session logs and count tokens. Read Antigravity CLI logs does the same for Antigravity CLI conversation logs; that log format is unofficial and may break.</p>
 <label class="toggle-setting">Show usage history<input id="history-enabled" type="checkbox"></label>
 <label class="toggle-setting">Read Claude Code logs<input id="local-history" type="checkbox"></label>
+<label class="toggle-setting">Read Antigravity CLI logs<input id="local-history-gemini" type="checkbox"></label>
 <label>Show history<select id="history-mode"><option value="under">Under each card</option><option value="card">Click a card</option><option value="panel">Side panel</option></select></label>
 <label>Panel layout<select id="history-panel-layout"><option value="stacked">Stacked</option><option value="single">One at a time</option></select></label>
 <figure id="history-preview" aria-label="Usage history preview"></figure>`);
@@ -584,9 +585,13 @@ historyExtras.insertAdjacentHTML('beforeend', `
 <label class="toggle-setting">Activity heatmap<input id="history-heatmap" type="checkbox"></label>
 <label class="toggle-setting">Split by computer<input id="history-machines" type="checkbox" aria-describedby="history-machines-note"></label>
 <p id="history-machines-note" class="setting-note">Shown only when 2+ computers are found</p>`);
-let localHistory = false, savedLocalHistory = false;
-let localHistoryStatusUnknown = false;
-$('#local-history').onchange = () => {localHistory=$('#local-history').checked; mark();};
+// Log-reading permissions are saved through their own native command, one per provider.
+const historyProviders = {claude : 'local-history', gemini : 'local-history-gemini'};
+let localHistory = {claude : false, gemini : false}, savedLocalHistory = {...localHistory};
+const localHistoryUnknown = new Set();
+const historyChanges = () => Object.keys(historyProviders).filter(id => localHistory[id] !== savedLocalHistory[id]).length;
+for (const [id, element] of Object.entries(historyProviders))
+  $(`#${element}`).onchange = () => {localHistory[id]=$(`#${element}`).checked; mark();};
 const aboutInfo = sectionBlock(sections.about, 'AI Usage', []);
 sections.about.querySelector('h1').after(aboutInfo);
 aboutInfo.insertAdjacentHTML('beforeend', `<p class="setting-note">Version <span id="app-version"></span></p><p class="setting-note" id="data-folder"></p>`);
@@ -659,7 +664,8 @@ function renderLimitPools() {
 function renderControls() {
   renderHistoryPreview();
   $('#history-panel-layout').disabled = draft.historyMode !== 'panel';
-  $('#local-history').checked = localHistory;
+  for (const [id, element] of Object.entries(historyProviders))
+    $(`#${element}`).checked = localHistory[id];
   $('#history-machines').disabled = !snapshotProviders.some(p => splitMachines(p.history,true));
   $('#history-machines-note').hidden = !$('#history-machines').disabled;
   renderLayout();
@@ -1132,8 +1138,9 @@ async function save() {
   saveFailure = '';
   mark();
   const value = structuredClone(rootDraft), chosen = structuredClone(providers),
-        login = autostart, readLogs = localHistory;
-  let historyPermissionApplied = false;
+        login = autostart, readLogs = {...localHistory};
+  // Providers whose permission command already ran, so a later failure can re-read the real state.
+  const appliedHistory = [];
   try {
     await preview();
     if (!sample) {
@@ -1141,15 +1148,21 @@ async function save() {
         await settingsInvoke('configure_providers', {providers : chosen});
         settingsInvoke('refresh_now').catch(error);
       }
-      if (readLogs !== savedLocalHistory || localHistoryStatusUnknown) {
-        await settingsInvoke('set_local_history', {enabled:readLogs});
-        historyPermissionApplied = true;
+      const pendingHistory = Object.keys(historyProviders).filter(
+          id => readLogs[id] !== savedLocalHistory[id] || localHistoryUnknown.has(id));
+      if (pendingHistory.length) {
+        for (const id of pendingHistory) {
+          await settingsInvoke('set_local_history', {enabled:readLogs[id], provider:id});
+          appliedHistory.push(id);
+        }
         const config = await settingsInvoke('get_provider_config');
-        const actual = config.providers?.claude?.local_history;
-        if (typeof actual !== 'boolean') throw new Error('Local history permission status was not returned');
-        savedLocalHistory = actual;
-        localHistoryStatusUnknown = false;
-        if (savedLocalHistory !== readLogs) throw new Error('Local history permission was not saved');
+        for (const id of pendingHistory) {
+          const actual = config.providers?.[id]?.local_history;
+          if (typeof actual !== 'boolean') throw new Error('Local history permission status was not returned');
+          savedLocalHistory[id] = actual;
+          localHistoryUnknown.delete(id);
+          if (actual !== readLogs[id]) throw new Error('Local history permission was not saved');
+        }
         settingsInvoke('refresh_now').catch(error);
       }
       if (login !== savedAutostart) {
@@ -1165,7 +1178,7 @@ async function save() {
     saved = value;
     savedProviders = chosen;
     savedAutostart = login;
-    savedLocalHistory = readLogs;
+    savedLocalHistory = {...readLogs};
     $('#close-prompt').hidden = true;
     saveFailure = '';
     saveMessage =
@@ -1174,17 +1187,21 @@ async function save() {
     return true;
   } catch (e) {
     let message = `Unable to save: ${e}`;
-    if (historyPermissionApplied) {
+    if (appliedHistory.length) {
       try {
         const config = await settingsInvoke('get_provider_config');
-        const actual = config.providers?.claude?.local_history;
-        if (typeof actual !== 'boolean') throw new Error('Local history permission status was not returned');
-        savedLocalHistory = actual;
-        localHistoryStatusUnknown = false;
+        for (const id of appliedHistory) {
+          const actual = config.providers?.[id]?.local_history;
+          if (typeof actual !== 'boolean') throw new Error('Local history permission status was not returned');
+          savedLocalHistory[id] = actual;
+          localHistoryUnknown.delete(id);
+        }
         message = `History permission saved; other settings failed: ${e}`;
       } catch (readError) {
-        localHistoryStatusUnknown = true;
-        $('#local-history').indeterminate = true;
+        for (const id of appliedHistory) {
+          localHistoryUnknown.add(id);
+          $(`#${historyProviders[id]}`).indeterminate = true;
+        }
         message = `History permission status could not be verified; other settings failed: ${e}; ${readError}`;
       }
     }
@@ -1202,13 +1219,15 @@ async function save() {
 $('#save').onclick = save;
 $('#revert').onclick = async () => {
   saveFailure = '';
-  if (localHistoryStatusUnknown) {
+  if (localHistoryUnknown.size) {
     try {
       const config = await settingsInvoke('get_provider_config');
-      const actual = config.providers?.claude?.local_history;
-      if (typeof actual !== 'boolean') throw new Error('Local history permission status was not returned');
-      savedLocalHistory = actual;
-      localHistoryStatusUnknown = false;
+      for (const id of [...localHistoryUnknown]) {
+        const actual = config.providers?.[id]?.local_history;
+        if (typeof actual !== 'boolean') throw new Error('Local history permission status was not returned');
+        savedLocalHistory[id] = actual;
+        localHistoryUnknown.delete(id);
+      }
     } catch (e) {
       error(`History permission status could not be verified: ${e}`);
       return;
@@ -1219,8 +1238,9 @@ $('#revert').onclick = async () => {
   draft = effectiveWidget(rootDraft, selectedWidget);
   providers = structuredClone(savedProviders);
   autostart = savedAutostart;
-  localHistory = savedLocalHistory;
-  $('#local-history').indeterminate = false;
+  localHistory = {...savedLocalHistory};
+  for (const element of Object.values(historyProviders))
+    $(`#${element}`).indeterminate = false;
   $('#start-at-login').checked = autostart;
   positionBefore = null;
   renderProviders();
@@ -1362,8 +1382,9 @@ async function loadSession() {
   providers = Object.entries(providerConfig.providers)
                   .filter(([, p ]) => p.enabled && providerConfig.initialized)
                   .map(([ id ]) => id);
-  localHistory = providerConfig.providers?.claude?.local_history === true;
-  savedLocalHistory = localHistory;
+  for (const id of Object.keys(historyProviders))
+    localHistory[id] = providerConfig.providers?.[id]?.local_history === true;
+  savedLocalHistory = {...localHistory};
   if (sample) snapshotProviders = historySample.providers;
   savedProviders = structuredClone(providers);
   savedAutostart = autostart;

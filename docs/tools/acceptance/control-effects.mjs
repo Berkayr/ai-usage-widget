@@ -18,6 +18,7 @@ export const EXEMPTIONS = {
   'linux-margin': 'Wayland layer-shell anchor margin; managed by compositor outside webview DOM',
   'linux-monitor': 'Wayland layer-shell monitor connector; managed by compositor outside webview DOM',
   'local-history': 'Claude Code log permission is saved through a separate native command, not the settings preview',
+  'local-history-gemini': 'Antigravity CLI log permission is saved through a separate native command, not the settings preview',
   'history-machines': 'Disabled without history from 2+ computers; covered by tests/history-browser.mjs fixtures',
   'widget-provider-card': 'Needs per-card history data; covered by the history-toggle checks in tests/history-browser.mjs',
   'widget-select': 'Widget picker flow is driven end to end by docs/tools/settings-check.mjs (create, rename, remove, reset, save)',

@@ -10,7 +10,7 @@ import time
 from datetime import datetime, timezone
 
 from . import __version__
-from .paths import atomic_json, config_dir, data_path, load_config
+from .paths import HISTORY_PROVIDERS, atomic_json, config_dir, data_path, load_config
 from .providers import METADATA, PROVIDERS
 from .schema import provider_record, snapshot
 from .pace import calculate_pace, reset_events
@@ -202,15 +202,18 @@ def main(argv: list[str] | None = None) -> int:
     quote_parser.add_argument("--mode", choices=("qotd", "born", "died", "on-this-day", "mixed"), default="qotd")
     quote_parser.add_argument("--json", action="store_true")
     sub.add_parser("snapshot")
-    history_parser = sub.add_parser("history", help="summarize local Claude Code token usage")
+    history_parser = sub.add_parser("history", help="summarize local Claude Code or Antigravity CLI token usage")
     history_parser.add_argument("--json", action="store_true")
+    history_parser.add_argument("--provider", choices=HISTORY_PROVIDERS, default="claude")
     write_parser = sub.add_parser("write")
     write_parser.add_argument("--print", dest="print_snapshot", action="store_true",
                               help="also print the written snapshot as JSON")
     sub.add_parser("detect")
     sub.add_parser("doctor").add_argument("--live", action="store_true")
     sub.add_parser("init", help="choose providers before first collection")
-    sub.add_parser("local-history", help="allow or stop reading Claude Code logs").add_argument("mode", choices=("on", "off"))
+    local_history_parser = sub.add_parser("local-history", help="allow or stop reading Claude Code or Antigravity CLI logs")
+    local_history_parser.add_argument("mode", choices=("on", "off"))
+    local_history_parser.add_argument("--provider", choices=HISTORY_PROVIDERS, default="claude")
     sub.add_parser("provider-config", help="show consent status without reading credentials")
     consent_parser = sub.add_parser("configure", help="explicitly enable the selected providers")
     consent_parser.add_argument("providers", nargs="*", choices=list(PROVIDERS))
@@ -235,15 +238,18 @@ def main(argv: list[str] | None = None) -> int:
     pace_parser.add_argument("--purge", action="store_true", help="delete pace history and state without collecting")
     args = parser.parse_args(argv)
     if args.command == "history":
-        from .local_history import claude_history
-        result = claude_history()
+        from .local_history import claude_history, gemini_history
+        gemini = args.provider == "gemini"
+        result = gemini_history() if gemini else claude_history()
         if args.json:
             print(json.dumps(result, ensure_ascii=False, indent=2))
         elif result is None:
-            print("No Claude Code usage found in the last 30 days.")
+            print(f"No {'Antigravity CLI' if gemini else 'Claude Code'} usage found in the last 30 days.")
         else:
             totals = result["totals"]
-            print(f"30 days: {totals['tokens']:,} tokens; API price equivalent: ${totals['cost']:.2f}")
+            # Cost is None when the source has no price table; never print a dollar value then.
+            price = f"; API price equivalent: ${totals['cost']:.2f}" if totals["cost"] is not None else ""
+            print(f"30 days: {totals['tokens']:,} tokens{price}")
             for machine in result["machines"]:
                 label = " (this computer)" if machine["id"] == result["this_machine"] else ""
                 cost = f"${machine['cost']:.2f}" if machine["cost"] is not None else "unpriced"
@@ -272,13 +278,14 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(doctor(args.live), ensure_ascii=False, indent=2))
     elif args.command == "local-history":
         config = load_config()
-        config["providers"]["claude"]["local_history"] = args.mode == "on"
+        config["providers"][args.provider]["local_history"] = args.mode == "on"
         atomic_json(config_dir() / "config.json", config)
     elif args.command == "provider-config":
         detected, config = _config()
-        claude_config = config.get("providers", {}).get("claude")
-        if isinstance(claude_config, dict):
-            claude_config["local_history"] = claude_config.get("local_history") is True
+        for key in HISTORY_PROVIDERS:
+            item = config.get("providers", {}).get(key)
+            if isinstance(item, dict):
+                item["local_history"] = item.get("local_history") is True
         disclosures = {key: DISCLOSURES[key] for key in PROVIDERS}
         print(json.dumps({"detected": detected, "disclosures": disclosures, **config}))
     elif args.command in ("init", "configure"):
