@@ -35,7 +35,7 @@ export async function portraitManyProviders(b) {
       if (list.scrollWidth > list.clientWidth + 1) errors.push('list horizontal overflow');
       if (list.scrollHeight > list.clientHeight + 1 && !/auto|scroll/.test(getComputedStyle(list).overflowY)) errors.push('list overflow inaccessible');
       for (const card of list.querySelectorAll('.provider-card')) {
-        if (card.scrollHeight > card.clientHeight + 1 || card.scrollWidth > card.clientWidth + 1) errors.push('card content clipped');
+        if (card.scrollHeight > card.clientHeight + 1 || card.scrollWidth > card.clientWidth + 1) errors.push('card content clipped '+[card.id||card.dataset.provider||card.className,card.scrollHeight,card.clientHeight,card.scrollWidth,card.clientWidth,card.getAttribute('style'),JSON.stringify(card.dataset),getComputedStyle(card).height,getComputedStyle(card).minHeight,getComputedStyle(card).maxHeight,getComputedStyle(card).fontFamily,[...card.querySelectorAll('*')].map(e=>e.className+':'+e.getBoundingClientRect().top.toFixed(1)+'-'+e.getBoundingClientRect().bottom.toFixed(1)).join(',')].join('|'));
         list.scrollTop += card.getBoundingClientRect().top - bounds.top;
         const r = card.getBoundingClientRect();
         if (r.top < bounds.top - 1 || r.bottom > bounds.bottom + 1) errors.push('card inaccessible');

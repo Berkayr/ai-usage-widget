@@ -19,7 +19,7 @@ jobs:
         run: |
           whoami /groups | Select-String 'Label'
           $env:RUST_BACKTRACE=1
-          function Try($name) {
+          function Probe($name) {
             Write-Host "=== $name"
             $p = Start-Process app/src-tauri/target/debug/ai-usage.exe -PassThru -RedirectStandardError "$name.err" -RedirectStandardOutput "$name.out"
             Start-Sleep 15
@@ -29,10 +29,20 @@ jobs:
             Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue; Start-Sleep 3
           }
           $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS='--remote-debugging-port=0'
-          Try 'plain'
-          $env:WEBVIEW2_USER_DATA_FOLDER="$env:RUNNER_TEMP\udf"; Try 'udf'
+          Probe 'plain'
+          $env:WEBVIEW2_USER_DATA_FOLDER="$env:RUNNER_TEMP\udf"; Probe 'udf'
           Get-ChildItem -Recurse -Filter DevToolsActivePort $env:RUNNER_TEMP,$env:LOCALAPPDATA -ErrorAction SilentlyContinue | ForEach-Object FullName
           $r="$env:RUNNER_TEMP\iso"; mkdir "$r\data","$r\config" | Out-Null
           $env:APPDATA="$r\config"; $env:LOCALAPPDATA="$r\data"; $env:WEBVIEW2_USER_DATA_FOLDER="$r\udf"
-          Try 'iso'
+          Probe 'iso'
           Get-ChildItem -Recurse -Filter DevToolsActivePort $r -ErrorAction SilentlyContinue | ForEach-Object FullName
+  u:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: {node-version: '22', cache: npm, cache-dependency-path: app/package-lock.json}
+      - run: npm ci && npm run build
+        working-directory: app
+      - run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev librsvg2-dev
+      - run: fc-match sans-serif; fc-match system-ui; node docs/tools/acceptance/regressions.mjs
