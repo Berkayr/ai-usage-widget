@@ -291,6 +291,7 @@
 :root[data-shape=portrait] #widget.widget .provider-card:nth-child(n){min-height:0;height:100%;width:100%;grid-column:1/-1}
 :root[data-shape=portrait] #widget.widget #providers[data-usage-scroll]{grid-template-rows:none;grid-auto-rows:minmax(min-content,1fr)}
 :root[data-shape=portrait] #widget.widget #providers[data-usage-scroll] .provider-card:nth-child(n){height:auto}
+:root[data-shape=portrait] #widget.widget #providers[data-usage-scroll] .window-top{flex-wrap:wrap}
 :root[data-shape=portrait] #widget.widget .provider-card:nth-child(n) .windows{flex:1 0 auto;align-content:space-evenly}
 :root[data-shape=portrait] #widget.widget .provider-card:nth-child(n) .quota-window{justify-content:center}
 :root[data-shape=strip] #widget.widget{height:var(--widget-height,20.375rem);max-height:none}
