@@ -145,11 +145,11 @@ are written to ignored screenshots/checks/typography.json.
 
 ## Separate settings window
 
-The window is created lazily, then hidden on accepted close and reused. Reopening
-loads a fresh saved baseline without remounting the document or registering more
-listeners. Save / Discard / Cancel runs before hiding; hidden settings do not keep
-the widget in placement preview mode. This bounds WebKit webview creation to one
-per application session, with no second webview before settings are first opened.
+The window is created lazily. Once Save or Discard succeeds, or when there are no
+pending changes, the widget returns to its saved settings. Cancel keeps the
+window open. Linux destroys the Settings webview on close and creates a fresh
+one on the next open. Windows and macOS hide and reuse it, loading a fresh saved
+baseline on reopen with the existing listeners.
 
 The gear and context menu open one decorated `settings` window (900 × 680,
 minimum 640 × 480). It follows the system light/dark appearance independently

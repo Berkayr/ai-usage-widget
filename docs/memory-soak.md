@@ -13,6 +13,10 @@ files or starts authenticated provider CLIs. The application runs for 120 second
 inside a user systemd scope with MemoryMax=1500M, MemorySwapMax=0 and a 125-second
 timeout. No direct-launch fallback is allowed. The scope is stopped on exit.
 
+With a debug build, `--settings-cycles N` opens and closes Settings once for
+warm-up and once per cycle. On Linux the driver expects N + 1 Settings webview
+creations and zero reuses.
+
 The test samples the entire scope's memory.current every ten seconds (including
 WebKit children), watches snapshot OPEN events using ctypes/inotify, and makes
 three atomic os.replace updates at 40/60/80 seconds. It requires the maximum

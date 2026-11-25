@@ -148,8 +148,8 @@ with tempfile.TemporaryDirectory(prefix='ai-usage-soak-') as temporary:
                 (args.output / 'measurements.json').write_text(json.dumps(result, indent=2))
                 (args.output / 'app.log').write_text(trace)
             if args.settings_cycles:
-                assert result['settings_created'] == 1, 'Settings webview recreated or warm-up missing'
-                assert result['settings_reused'] == args.settings_cycles, 'Settings webview reuse missing'
+                assert result['settings_created'] == args.settings_cycles + 1, 'Expected one Settings webview per open, including warm-up'
+                assert result['settings_reused'] == 0, 'Settings webview reused instead of recreated'
                 assert result['settings_opened'] == args.settings_cycles, 'Settings open cycle missing (requires debug binary)'
                 assert result['settings_closed'] == args.settings_cycles, 'Settings close cycle missing'
                 assert result['monitor_applied'] == args.settings_cycles, 'Monitor event debounce did not coalesce each burst'

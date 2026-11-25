@@ -3,6 +3,30 @@ use std::sync::{Mutex, OnceLock};
 static CURRENT: OnceLock<Mutex<Settings>> = OnceLock::new();
 static PREVIEWS: std::sync::LazyLock<Mutex<std::collections::HashMap<String, Settings>>> = std::sync::LazyLock::new(Mutex::default);
 static PREVIEWING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+#[cfg(target_os = "linux")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CloseState {
+    Idle,
+    Destroying,
+    Reopen,
+}
+
+#[cfg(target_os = "linux")]
+thread_local! {
+    // Linux Settings lifecycle operations run on the UI thread.
+    static CLOSE_STATE: std::cell::Cell<CloseState> = const { std::cell::Cell::new(CloseState::Idle) };
+}
+
+#[cfg(target_os = "linux")]
+fn defer_open(state: &std::cell::Cell<CloseState>) -> bool {
+    if state.get() == CloseState::Idle {
+        return false;
+    }
+    state.set(CloseState::Reopen);
+    true
+}
+
 pub fn initialize() { let _ = CURRENT.set(Mutex::new(load_settings())); }
 pub fn current() -> Settings { CURRENT.get_or_init(|| Mutex::new(load_settings())).lock().unwrap_or_else(|e| e.into_inner()).clone() }
 pub fn current_for(label: &str) -> Settings {
@@ -52,11 +76,24 @@ pub fn preview_settings(app: tauri::AppHandle, settings: Settings, widget_id: Op
     };
     apply_preview(&app, settings, &label)
 }
-// Hide only after the frontend has resolved Save / Discard / Cancel.
+// Close only after the frontend has resolved Save / Discard / Cancel.
 #[tauri::command]
 pub fn finish_settings(app: tauri::AppHandle) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    if CLOSE_STATE.get() != CloseState::Idle {
+        return Ok(());
+    }
     set_preview(&app, load_settings())?;
     if let Some(window) = app.get_webview_window("settings") {
+        #[cfg(target_os = "linux")]
+        {
+            CLOSE_STATE.set(CloseState::Destroying);
+            if let Err(error) = window.destroy() {
+                CLOSE_STATE.set(CloseState::Idle);
+                return Err(error.to_string());
+            }
+        }
+        #[cfg(not(target_os = "linux"))]
         window.hide().map_err(|e| e.to_string())?;
     }
     PREVIEWING.store(false, std::sync::atomic::Ordering::Relaxed);
@@ -73,6 +110,22 @@ fn test_position() -> Option<(f64, f64)> {
 
 #[tauri::command(async)]
 pub fn open_settings(app: tauri::AppHandle) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    {
+        let handle = app.clone();
+        widgets::on_main(&app, move || show_settings(handle))
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        show_settings(app)
+    }
+}
+
+fn show_settings(app: tauri::AppHandle) -> Result<(), String> {
+    #[cfg(target_os = "linux")]
+    if CLOSE_STATE.with(defer_open) {
+        return Ok(());
+    }
     if let Some(window) = app.get_webview_window("settings") {
         if !window.is_visible().map_err(|e| e.to_string())? {
             PREVIEWING.store(true, std::sync::atomic::Ordering::Relaxed);
@@ -97,12 +150,42 @@ pub fn open_settings(app: tauri::AppHandle) -> Result<(), String> {
         // Also protect the lazy webview while its JS close listener initializes.
         tauri::WindowEvent::CloseRequested { api, .. } => api.prevent_close(),
         tauri::WindowEvent::Destroyed => {
+            #[cfg(target_os = "linux")]
+            match CLOSE_STATE.get() {
+                CloseState::Idle => {}
+                CloseState::Destroying => {
+                    CLOSE_STATE.set(CloseState::Idle);
+                    return;
+                }
+                CloseState::Reopen => {
+                    let app = handle.clone();
+                    // Let the event loop finish tearing down the old webview first.
+                    gtk::glib::idle_add_local_once(move || {
+                        CLOSE_STATE.set(CloseState::Idle);
+                        if let Err(error) = show_settings(app) {
+                            eprintln!("Could not reopen Settings: {error}");
+                        }
+                    });
+                    return;
+                }
+            }
             PREVIEWING.store(false, std::sync::atomic::Ordering::Relaxed);
             let _ = set_preview(&handle, load_settings());
         }
         _ => {}
     });
     Ok(())
+}
+
+#[cfg(all(test, target_os = "linux"))]
+#[test]
+fn open_during_destroy_records_one_reopen() {
+    let state = std::cell::Cell::new(CloseState::Idle);
+    assert!(!defer_open(&state));
+    state.set(CloseState::Destroying);
+    assert!(defer_open(&state));
+    assert!(defer_open(&state));
+    assert_eq!(state.get(), CloseState::Reopen);
 }
 
 // Opt-in debug instrumentation for the isolated native memory regression only.

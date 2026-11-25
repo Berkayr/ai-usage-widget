@@ -58,7 +58,10 @@ once startup has settled. The measurement driver runs outside the app cgroup.
   accelerated-canvas toggle is retained for older supported engines; newer engines
   ignore it. The context uses the document-viewer cache model. JavaScript, local
   storage, compositing and process sandboxing remain available.
-- There is one app webview. Modern WebKit's old process-count-limit API has no
+- The app creates a webview per widget and opens the separate Settings webview
+  on demand. Linux destroys the Settings webview on close to release its memory
+  and prevent blank widget rendering on Wayland/KWin with AMD graphics.
+  Modern WebKit's old process-count-limit API has no
   effect; forcing a single OS process would give up isolation. No such switch is
   used. See [WebKit's process-limit API](https://webkitgtk.org/reference/webkit2gtk/stable/method.WebContext.set_web_process_count_limit.html)
   and [cache models](https://webkitgtk.org/reference/webkit2gtk/stable/enum.CacheModel.html).
