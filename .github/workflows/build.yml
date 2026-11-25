@@ -109,7 +109,8 @@ jobs:
           python - <<'PY'
           import hashlib, pathlib
           out = pathlib.Path('release-artifacts')
-          files = sorted(p for p in out.iterdir() if p.is_file())
+          # GitHub turns spaces in asset names into dots; checksums must list the published names.
+          files = sorted(p.rename(p.with_name(p.name.replace(' ', '.'))) for p in list(out.iterdir()) if p.is_file())
           assert len(files) == 7, 'Expected Linux installers and both Windows editions'
           (out / 'SHA256SUMS.txt').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest() + '  ' + p.name + '\n' for p in files))
           PY
