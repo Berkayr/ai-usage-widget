@@ -1,8 +1,8 @@
 # Changelog
 
-Notable changes will be recorded here. No release has been published yet.
+Notable changes are recorded here.
 
-## [0.1.0](https://github.com/Berkayr/ai-usage-widget/compare/v0.1.0...v0.1.0) (2026-11-25)
+## [0.1.0](https://github.com/Berkayr/ai-usage-widget/releases/tag/v0.1.0) (2026-11-25)
 
 
 ### ⚠ BREAKING CHANGES
