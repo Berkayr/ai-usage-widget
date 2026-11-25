@@ -40,6 +40,7 @@ export function fitUsage(root) {
     delete card.dataset.usageBadge;
     delete card.dataset.usageInlineReset;
     card.style.removeProperty('padding-bottom');
+    card.style.removeProperty('padding-inline');
     for (const plan of card.querySelectorAll('.plan')) plan.style.removeProperty('visibility');
     if (document.documentElement.dataset.shape === 'portrait') {
       card.style.removeProperty('min-height');
@@ -69,6 +70,7 @@ export function fitUsage(root) {
     cards.forEach(compactCard);
   }
   cards.forEach(fitPortraitGraphics);
+  if (shape === 'portrait') cards.forEach(restoreSidePadding);
   if (shape === 'portrait' && overflows(root.closest('.widget'))) root.style.flexShrink = '1';
   growPortraitContent(root, cards);
   if (shape === 'portrait' && cards.length && !root.closest('.has-inline-history')) {
@@ -191,6 +193,20 @@ function compactCard(card) {
     settleCardRounding(card);
     if (!overflows(card)) break;
   }
+}
+
+// Height decides the compact tier, so give the side padding back where the text still fits.
+function restoreSidePadding(card) {
+  if (card.dataset.usageCompact !== 'true' || parseFloat(getComputedStyle(card).paddingLeft) >= 12) return;
+  // Compare with the compact layout: display type may already exceed its line box.
+  const debts = () => [card, card.parentElement, ...card.querySelectorAll('.windows,.quota-window,.plan')]
+    .flatMap(el => [el.scrollHeight - el.clientHeight, el.scrollWidth - el.clientWidth]);
+  const before = debts(), height = card.scrollHeight;
+  for (const padding of [12, 8]) {
+    card.style.paddingInline = `${padding}px`;
+    if (card.scrollHeight <= height && debts().every((debt, i) => debt <= Math.max(0, before[i]))) return;
+  }
+  card.style.removeProperty('padding-inline');
 }
 
 // The title is frame chrome, so it must fit even at fractional screen sizes.
