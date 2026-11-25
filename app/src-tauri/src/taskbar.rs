@@ -2,6 +2,7 @@
 use super::{load_settings, read_snapshot, save_settings, TaskbarSettings};
 use serde_json::Value;
 use std::cell::Cell;
+use std::collections::BTreeMap;
 use std::result::Result::Ok;
 use std::{
     ptr::{null, null_mut},
@@ -34,6 +35,7 @@ static WORKER: Mutex<Option<std::thread::JoinHandle<()>>> = Mutex::new(None);
 #[derive(Clone)]
 struct Model {
     settings: TaskbarSettings,
+    limit_visibility: BTreeMap<String, bool>,
     snapshot: Option<Value>,
 }
 fn wake() {
@@ -52,10 +54,10 @@ pub(super) fn update_snapshot(snapshot: Option<Value>) {
         wake();
     }
 }
-pub(super) fn update_settings(settings: TaskbarSettings) {
+pub(super) fn update_settings(settings: TaskbarSettings, limit_visibility: BTreeMap<String, bool>) {
     let enabled = settings.enabled;
     if let Some(model) = MODEL.get() {
-        if let Ok(mut m) = model.lock() { m.settings = settings; }
+        if let Ok(mut m) = model.lock() { m.settings = settings; m.limit_visibility = limit_visibility; }
     }
     // The GUI callback must never wait for a controller joining this thread.
     if IS_STRIP.with(|flag| flag.get()) { wake(); return; }
@@ -157,6 +159,11 @@ fn parse_timestamp(s: &str) -> Option<i64> {
     };
     Some(days * 86400 + h * 3600 + min * 60 + sec - offset)
 }
+// Same key as the desktop widget's limits: windows without a pool belong to "main".
+fn pool_hidden(visibility: &BTreeMap<String, bool>, provider: &str, window: &Value) -> bool {
+    let pool = window["pool"]["id"].as_str().map(str::trim).filter(|id| !id.is_empty()).unwrap_or("main");
+    visibility.get(&format!("{provider}/{pool}")) == Some(&false)
+}
 fn content(model: &Model, capacity: usize) -> (Vec<Row>, String) {
     let mut rows = Vec::new();
     let mut tips = Vec::new();
@@ -172,12 +179,22 @@ fn content(model: &Model, capacity: usize) -> (Vec<Row>, String) {
             continue;
         }
         let id = p["id"].as_str().unwrap_or("");
-        let windows: Vec<_> = p["windows"]
+        let available: Vec<_> = p["windows"]
             .as_array()
             .into_iter()
             .flatten()
             .filter(|w| w["hidden_by_default"] != true)
             .collect();
+        let windows: Vec<_> = available
+            .iter()
+            .copied()
+            .filter(|w| !pool_hidden(&model.limit_visibility, id, w))
+            .collect();
+        // Hidden by choice; error states still need their row.
+        if windows.is_empty() && !available.is_empty()
+            && matches!(p["state"].as_str(), Some("OK" | "STALE" | "RATE_LIMITED")) {
+            continue;
+        }
         let name = p["label"].as_str().unwrap_or(id);
         let details = windows
             .iter()
@@ -925,9 +942,9 @@ unsafe extern "system" fn procedure(hwnd: HWND, message: u32, wp: WPARAM, lp: LP
 }
 pub(super) fn start(app: tauri::AppHandle) {
     let _ = APP.set(app);
-    let settings = load_settings().taskbar;
-    let _ = MODEL.set(Mutex::new(Model { settings: settings.clone(), snapshot: read_snapshot() }));
-    update_settings(settings);
+    let settings = load_settings();
+    let _ = MODEL.set(Mutex::new(Model { settings: settings.taskbar.clone(), limit_visibility: settings.limit_visibility.clone(), snapshot: read_snapshot() }));
+    update_settings(settings.taskbar, settings.limit_visibility);
 }
 fn spawn_strip(app: tauri::AppHandle) -> std::thread::JoinHandle<()> {
     std::thread::Builder::new()
@@ -1050,6 +1067,7 @@ mod tests {
                 window: window.into(),
                 ..Default::default()
             },
+            limit_visibility: BTreeMap::new(),
             snapshot: Some(json!({"providers": [
                 {"id":"claude", "label":"Claude", "state":"OK", "windows":[
                     {"kind":"session", "label":"Session", "used_percent":34, "resets_in_minutes":161},
@@ -1096,6 +1114,22 @@ mod tests {
         assert!(rows[0].text.contains("S 34% · 2h41 | W 91%"));
         let (rows, _) = content(&model("both"), 2);
         assert!(rows[0].text.starts_with("CL"));
+    }
+    #[test]
+    fn hidden_pools_leave_rows_and_tooltip() {
+        let mut m = model("both");
+        let claude = &mut m.snapshot.as_mut().unwrap()["providers"][0]["windows"];
+        claude.as_array_mut().unwrap().push(json!({"kind":"weekly", "label":"Nova", "used_percent":97, "pool":{"id":" nova "}}));
+        assert_eq!(content(&m, 3).0[0].pct, Some(97.));
+        m.limit_visibility = BTreeMap::from([("claude/nova".into(), false), ("codex/main".into(), false), ("gemini/main".into(), true)]);
+        let (rows, tip) = content(&m, 3);
+        assert_eq!(rows.iter().map(|r| &r.text[..2]).collect::<Vec<_>>(), ["CL", "GM"]);
+        assert_eq!(rows[0].pct, Some(91.));
+        assert!(!tip.contains("Nova") && !tip.contains("codex"));
+        m.snapshot.as_mut().unwrap()["providers"][1]["state"] = json!("AUTH_REQUIRED");
+        let (rows, tip) = content(&m, 3);
+        assert_eq!(rows[1].text, "CX —");
+        assert!(tip.contains("AUTH_REQUIRED") && !tip.contains("80%"));
     }
     #[test]
     fn filter_and_unknown_weekly_usage_are_independent_of_desktop_settings() {
