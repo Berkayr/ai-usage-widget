@@ -204,7 +204,7 @@ try {
           }
           if (cmd === 'refresh_now') {
             bus.refreshed = (bus.refreshed || 0) + 1;
-            return;
+            return (await window.__TAURI_INTERNALS__.invoke('get_snapshot')).snapshot;
           }
           if (cmd === 'configure_providers') {
             return;
@@ -873,6 +873,7 @@ try {
       const refreshBefore=bus.refreshed;const openBefore=bus.openedSettings;
       menuRefresh.click();
       await settle();
+      $w('#widget').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 50, clientY: 50 }));
       menuSettings.click();
       await settle();
       expect(bus.refreshed>refreshBefore && bus.openedSettings>openBefore,'widget-context-menu','Refresh and Settings reach native commands');

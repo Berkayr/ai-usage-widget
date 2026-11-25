@@ -23,7 +23,7 @@ mod window_effects;
 #[cfg(target_os = "linux")]
 mod linux_blur;
 use std::io::Write;
-use std::{fs, path::PathBuf, thread, time::Duration};
+use std::{fs, path::PathBuf, sync::Mutex, thread, time::{Duration, Instant}};
 use tauri::{Emitter, Manager};
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -131,7 +131,29 @@ async fn get_quote(window: tauri::WebviewWindow) -> Result<Value, String> {
     let settings = settings_window::current_for(window.label());
     tauri::async_runtime::spawn_blocking(move || quote_if_enabled(settings, collector)).await.map_err(|_| "Quote worker unavailable".to_string())?
 }
-fn refresh() -> Result<(), String> { collector("write", &[]).map(|_| ()) }
+type RefreshResult = Result<Option<Value>, String>;
+type RefreshRun = (Instant, RefreshResult);
+static LAST_REFRESH: Mutex<Option<RefreshRun>> = Mutex::new(None);
+
+fn refresh_with(last: &Mutex<Option<RefreshRun>>, requested: Instant, collect: impl FnOnce() -> RefreshResult) -> RefreshResult {
+    let mut last = last.lock().unwrap_or_else(|error| error.into_inner());
+    // A run already underway at request time may have loaded an older provider configuration.
+    if let Some((started, result)) = &*last {
+        if *started > requested { return result.clone(); }
+    }
+    *last = None;
+    let started = Instant::now();
+    let result = collect();
+    *last = Some((started, result.clone()));
+    result
+}
+
+fn refresh(requested: Instant) -> RefreshResult {
+    refresh_with(&LAST_REFRESH, requested, || {
+        collector("write", &[])?;
+        Ok(read_snapshot())
+    })
+}
 #[tauri::command]
 fn get_provider_config() -> Result<Value, String> { collector("provider-config", &[]) }
 #[tauri::command]
@@ -190,7 +212,14 @@ fn snapshot_rendered(window: tauri::WebviewWindow, generated_at: String) {
 #[tauri::command]
 fn get_snapshot() -> Value { json!({"snapshot": read_snapshot()}) }
 #[tauri::command]
-fn refresh_now(app: tauri::AppHandle) -> Result<(), String> { refresh()?; emit_snapshot(&app); Ok(()) }
+async fn refresh_now(app: tauri::AppHandle) -> RefreshResult {
+    let requested = Instant::now();
+    tauri::async_runtime::spawn_blocking(move || {
+        let snapshot = refresh(requested)?;
+        emit_snapshot(&app);
+        Ok(snapshot)
+    }).await.map_err(|_| "Refresh worker unavailable".to_string())?
+}
 fn initial_settings() -> Settings {
     Settings { featured_provider: Some("first".into()), ..Settings::default() }
 }
@@ -426,7 +455,7 @@ fn start_background(app: tauri::AppHandle) {
         }
     });
     thread::spawn(move || loop {
-        if let Err(error) = refresh() { let _ = app.emit("refresh-error", error); }
+        if let Err(error) = refresh(Instant::now()) { let _ = app.emit("refresh-error", error); }
         emit_snapshot(&app);
         thread::sleep(Duration::from_secs(300));
     });
@@ -457,7 +486,14 @@ async fn get_desktop_info(window: tauri::WebviewWindow, widget_id: Option<String
     #[cfg(not(target_os="linux"))] { let _=window; Ok(json!({"platform": std::env::consts::OS, "layerShell": false, "monitors": []})) }
 }
 #[tauri::command]
-fn set_linux_focus(window: tauri::WebviewWindow, open: bool) { #[cfg(target_os="linux")] linux::set_linux_focus(window,open); }
+fn set_linux_focus(window: tauri::WebviewWindow, open: bool, focus: Option<bool>) {
+    #[cfg(target_os="linux")] {
+        linux::set_linux_focus(window.clone(), open);
+        if open && focus == Some(true) { let _ = window.set_focus(); }
+    }
+    #[cfg(not(target_os="linux"))]
+    let _ = (window, open, focus);
+}
 pub fn run() {
     tauri::Builder::default().invoke_handler(tauri::generate_handler![snapshot_rendered,get_quote,get_runtime_diagnostics,get_snapshot,refresh_now,get_provider_config,configure_providers,set_local_history,widgets::load_settings,widgets::save_settings,save_window_state,get_monitor_scale,fit_window_height,resize_widget,snap_window,set_autostart,get_autostart,get_desktop_info,set_linux_focus,get_linux_hint,settings_window::open_settings,settings_window::finish_settings,settings_window::settings_open,settings_window::preview_settings,placement::get_placement_monitors,placement::capture_position]).on_page_load(|webview,payload| { #[cfg(target_os="linux")] if widgets::id_from_label(webview.label()).is_ok() && payload.event()==tauri::webview::PageLoadEvent::Finished { let _=webview.eval(linux::SCRIPT); } }).setup(|app| { migration::run()?; configure_python(app); settings_window::initialize(); let window=widgets::build(app.handle(), widgets::MAIN_ID)?; initialize_widget(&window)?; widgets::sync(app.handle().clone()); placement::watch(app.handle().clone()); #[cfg(debug_assertions)] settings_window::start_soak(app.handle().clone()); #[cfg(windows)] taskbar::start(app.handle().clone()); start_background(app.handle().clone()); Ok(()) }).run(tauri::generate_context!()).expect("error while running AI Usage");
 }
@@ -465,6 +501,26 @@ pub fn run() {
 #[cfg(test)]
 mod settings_tests {
     use super::*;
+    #[test]
+    fn refresh_only_reuses_a_run_started_after_the_request() {
+        let started = Instant::now();
+        let last = Mutex::new(Some((started, Ok(Some(json!({"run":1}))))));
+        let earlier = started - Duration::from_secs(1);
+        assert_eq!(refresh_with(&last, earlier, || panic!("Started a redundant collector")), Ok(Some(json!({"run":1}))));
+        for requested in [started, started + Duration::from_secs(1)] {
+            *last.lock().unwrap() = Some((started, Ok(Some(json!({"run":1})))));
+            assert_eq!(refresh_with(&last, requested, || Ok(Some(json!({"run":2})))), Ok(Some(json!({"run":2}))));
+        }
+    }
+
+    #[test]
+    fn refresh_recovers_after_collector_panics() {
+        let last = Mutex::new(None);
+        let requested = Instant::now();
+        assert!(std::panic::catch_unwind(|| refresh_with(&last, requested, || panic!("Synthetic collector panic"))).is_err());
+        assert_eq!(refresh_with(&last, requested, || Ok(None)), Ok(None));
+    }
+
     #[test]
     fn history_settings_round_trip() {
         assert_eq!(Settings::default().history.history_mode, "card");

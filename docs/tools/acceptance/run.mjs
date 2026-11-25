@@ -29,6 +29,7 @@ if (ids.size !== controls.length) {
 const fast = [
   ['node', ['docs/tools/acceptance/inventory-check.mjs']],
   ['node', ['docs/tools/acceptance/control-effects.mjs']],
+  ['node', ['docs/tools/menu-refresh-check.mjs']],
   ['node', ['docs/tools/acceptance/regressions.mjs']],
   ['node', ['docs/tools/settings-check.mjs']],
   ['node', ['docs/tools/provider-layout-check.mjs']],
@@ -43,6 +44,7 @@ const fast = [
   ['node', ['tests/quote-privacy.mjs']],
   ['node', ['tests/live-startup.mjs']],
   ['node', ['tests/limits.mjs']],
+  ['node', ['tests/menu-refresh.mjs']],
   ['node', ['docs/tools/acceptance/live-startup.mjs']],
   ['node', ['tests/documentation.mjs']],
   ['node', ['--test', 'tests/screen-fit.mjs', 'tests/user-palettes.mjs', 'tests/pairwise.mjs', 'tests/provider-layout.mjs', 'tests/limits.mjs']],

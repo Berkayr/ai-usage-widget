@@ -229,6 +229,7 @@ try {
   await execute("document.querySelector('#widget').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:40,clientY:40}))");
   assert.equal(await execute("return document.querySelector('#context-menu').hidden"),false,'Context menu did not open');
   await click('#refresh');
+  assert.equal(await execute("return document.querySelector('#context-menu').hidden"),true,'Context menu remained open after Refresh now');
   await execute("document.querySelector('#widget').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:40,clientY:40}))");
   await click('#menu-settings');
   await selectWindow('window.__SETTINGS_READY__');

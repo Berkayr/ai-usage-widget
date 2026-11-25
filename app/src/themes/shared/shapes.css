@@ -43,8 +43,8 @@
 :root[data-dense-shape=true][data-theme=circular-rings] .provider-card{padding:.375rem}
 /* Round silhouettes use the same box in every theme. Text occupies the inner square. */
 :root:is([data-shape=circle],[data-shape=pill]) .widget{padding:0;overflow:hidden;max-height:none;position:relative;box-sizing:border-box;--size-font-small:max(var(--shape-min-font),.6875rem);--size-font-base:max(var(--shape-min-font),.9375rem)}
-:root[data-shape=circle] .widget{width:21.25rem;height:21.25rem;border-radius:50%;clip-path:circle(50%)}
-:root[data-shape=pill] .widget{width:30rem;height:7.5rem;border-radius:3.75rem;clip-path:inset(0 round 3.75rem)}
+:root[data-shape=circle] .widget{--circle-diameter:min(21.25rem,100cqw,100cqh);width:var(--circle-diameter);height:var(--circle-diameter);border-radius:50%;clip-path:circle(50%)}
+:root[data-shape=pill] .widget{width:min(30rem,100cqw);height:min(7.5rem,100cqh);border-radius:3.75rem;clip-path:inset(0 round 3.75rem)}
 :root:is([data-shape=circle],[data-shape=pill]) :is(.footer,.title-block,.shape-pages){display:none}
 :root:is([data-shape=circle],[data-shape=pill]) .header{position:absolute;z-index:3;border:0;padding:0;margin:0;height:auto;width:auto;background:none;top:1.75rem;left:calc(50% - .75rem)}
 :root:is([data-shape=circle],[data-shape=pill]) .gear{width:1.5rem;height:1.5rem;padding:0;font-size:max(var(--shape-min-font),1rem);line-height:1;border:0;background:var(--bgWidget);color:var(--chromeText)}
