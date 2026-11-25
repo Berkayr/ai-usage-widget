@@ -26,6 +26,11 @@ class RuntimePackagingTests(unittest.TestCase):
                     imports.add(node.module.split('.')[0])
         self.assertFalse(imports - sys.stdlib_module_names - {'quotacore'})
 
+    @unittest.skipIf(os.name == 'nt', 'POSIX file modes')
+    def test_panel_launcher_is_executable(self):
+        # deb and rpm copy the source mode; panels look the launcher up on PATH.
+        self.assertTrue(os.access(ROOT / 'packaging/bin/quotacore', os.X_OK))
+
     def test_doctor_identifies_native_selection_without_reading_providers(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {
             'QUOTACORE_HOME': home, 'QUOTACORE_RUNTIME_SOURCE': 'embedded',
