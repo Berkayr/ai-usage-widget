@@ -14,6 +14,7 @@ import { effectiveSizeMode, normalizeSize, widgetWidth, widgetHeight, widgetProv
 import { hiddenStates } from './themes/dot-matrix/render.js';
 import { repairTextContrast } from './text-contrast.js';
 import { startupFailure } from './live-startup.js';
+import { createRefreshFeedback, refreshProgress } from './refresh-feedback.js';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { mountProviders } from './themes/shared/providers.js';
 import './themes/shared/chrome.css';
@@ -44,7 +45,7 @@ document.head.append(themeStyle);
 // Wayland does not expose layer-bottom occlusion. Avoid continuous animation
 // even if the compositor keeps the document's visibility state as visible.
 const motionStyle = document.createElement('style');
-motionStyle.textContent = ':root:not([data-reactor-motion=true]) *::before,:root:not([data-reactor-motion=true]) *::after,:root:not([data-reactor-motion=true]) *{animation:none!important} @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}';
+motionStyle.textContent = ':root:not([data-reactor-motion=true]) *::before,:root:not([data-reactor-motion=true]) *::after,:root:not([data-reactor-motion=true]) *:not(.toast-spinner){animation:none!important} @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}';
 document.head.append(motionStyle);
 import { invoke } from '@tauri-apps/api/core';
 import { listen, emitTo } from '@tauri-apps/api/event';
@@ -52,6 +53,7 @@ const unlisteners = [];
 let meterObserver;
 let disposed = false;
 const domEvents = new AbortController();
+let menuCloseTimer;
 async function subscribe(name, handler) {
   const options = ['settings-preview', 'monitor-scale'].includes(name)
     ? { target: { kind: 'Window', label: getCurrentWindow().label } } : undefined;
@@ -62,6 +64,8 @@ let pollTimer;
 function dispose() {
   usageFit.disconnect();
   disposed = true;
+  clearTimeout(menuCloseTimer);
+  refreshFeedback.dispose();
   domEvents.abort();
   unlisteners.splice(0).forEach(stop => stop());
   clearInterval(pollTimer); clearTimeout(toastTimer);
@@ -139,7 +143,9 @@ document.querySelector('#app').innerHTML = `
     <section class="quote-section" id="quote" hidden aria-label="Daily quote"></section>
     <footer class="footer"><span>AI USAGE</span><span>SYSTEM</span></footer>
     <nav class="context-menu" id="context-menu" hidden><button id="refresh">Refresh now</button><button id="menu-settings">Settings</button></nav>
-    <div class="toast" id="toast" hidden></div>
+    <div class="toast-region" role="status" aria-live="polite" aria-atomic="true">
+      <div class="toast" id="toast" hidden><span class="toast-spinner" aria-hidden="true" hidden></span><span id="toast-message"></span></div>
+    </div>
   </main>`;
 
 const $ = selector => document.querySelector(selector);
@@ -298,7 +304,30 @@ function currentSample() {
 async function settingsOpen() { return !isSample && await invoke('settings_open').catch(() => false) === true; }
 async function persist() { if (await settingsOpen()) return; if (!isSample) try { localStorage.setItem(storageKey('widgetTheme'), settings.theme); localStorage.setItem(storageKey('widgetLook'), JSON.stringify({ colorMode: settings.colorMode, accentEdge: settings.accentEdge, dotCount: settings.dotCount, matchPhysicalSize: settings.matchPhysicalSize })); } catch {} if (!isSample) try { await invoke('save_settings', { settings, widgetId }); } catch (error) { showToast(String(error)); } }
 let toastTimer;
-function showToast(message) { clearTimeout(toastTimer); const el = $('#toast'); el.textContent = message; el.hidden = false; toastTimer = setTimeout(() => { el.hidden = true; }, 3200); }
+function showToast(message, duration = 3200) {
+  if (disposed) return;
+  clearTimeout(toastTimer);
+  const toast = $('#toast');
+  toast.title = message;
+  $('.toast-spinner').hidden = duration !== 0;
+  $('#toast-message').textContent = message;
+  toast.hidden = false;
+  if (duration) toastTimer = setTimeout(() => {
+    if (refreshFeedback.isRunning()) showToast(refreshProgress.message, refreshProgress.duration);
+    else {
+      toast.hidden = true;
+      $('#toast-message').textContent = '';
+    }
+  }, duration);
+}
+
+const refreshFeedback = createRefreshFeedback(async () => {
+  if (!isSample) return invoke('refresh_now');
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const snapshot = currentSample();
+  draw(snapshot);
+  return snapshot;
+}, ({ message, duration }) => showToast(message, duration));
 
 async function activateTheme(id) {
   const request = ++themeRequest;
@@ -319,10 +348,60 @@ function appearanceChanged() { if (settings.appearance === 'auto') applySettings
 systemAppearance.addEventListener('change', appearanceChanged);
 const openSettings = () => isSample ? window.open('/?settings&sample', 'settings', 'width=900,height=680') : invoke('open_settings').catch(error => showToast(String(error)));
 $('#gear').onclick = openSettings;
-$('#widget').addEventListener('contextmenu', event => { event.preventDefault(); $('#context-menu').hidden = false; const menu=$('#context-menu'),r=$('#widget').getBoundingClientRect();const round=['circle','pill'].includes(settings.shape);menu.style.left=`${round?r.left+r.width/2-menu.offsetWidth/2:Math.min(event.clientX,r.right-menu.offsetWidth)}px`;menu.style.top=`${round?r.top+r.height/2-menu.offsetHeight/2:Math.min(event.clientY,r.bottom-menu.offsetHeight)}px`; }, { signal: domEvents.signal });
-document.addEventListener('click', event => { if (!event.target.closest('#context-menu')) $('#context-menu').hidden = true; }, { signal: domEvents.signal });
-$('#refresh').onclick = async () => { if (isSample) return draw(currentSample()); try { await invoke('refresh_now'); } catch (error) { showToast(String(error)); } };
-$('#menu-settings').onclick = openSettings;
+const menu = $('#context-menu');
+function setMenuFocus(open) {
+  // Passive Linux widgets accept keyboard focus only while a control needs it.
+  if (!isSample && desktopInfo?.platform === 'linux' && $('#provider-onboarding').hidden) {
+    invoke('set_linux_focus', { open, focus: open }).catch(() => {});
+  }
+}
+function closeMenu() {
+  clearTimeout(menuCloseTimer);
+  if (menu.hidden) return;
+  menu.hidden = true;
+  setMenuFocus(false);
+}
+$('#widget').addEventListener('contextmenu', event => {
+  event.preventDefault();
+  clearTimeout(menuCloseTimer);
+  const opening = menu.hidden;
+  menu.hidden = false;
+  const box = $('#widget').getBoundingClientRect();
+  const right = Math.min(box.right, document.documentElement.clientWidth);
+  const bottom = Math.min(box.bottom, document.documentElement.clientHeight);
+  const round = ['circle', 'pill'].includes(document.documentElement.dataset.shape);
+  const insetX = round ? (right - box.left) * .15 : 0;
+  const insetY = round ? (bottom - box.top) * .15 : 0;
+  const position = (point, start, end, inset, size) => end - start - 2 * inset < size
+    ? (start + end - size) / 2 : Math.max(start + inset, Math.min(point, end - inset - size));
+  menu.style.left = `${position(event.clientX, box.left, right, insetX, menu.offsetWidth)}px`;
+  menu.style.top = `${position(event.clientY, box.top, bottom, insetY, menu.offsetHeight)}px`;
+  if (opening) {
+    menu.querySelector('button').focus({ preventScroll: true });
+    setMenuFocus(true);
+  }
+}, { signal: domEvents.signal });
+document.documentElement.addEventListener('mouseleave', () => {
+  if (!menu.hidden) menuCloseTimer = setTimeout(closeMenu, 600);
+}, { signal: domEvents.signal });
+document.documentElement.addEventListener('mouseenter', () => clearTimeout(menuCloseTimer), { signal: domEvents.signal });
+menu.addEventListener('click', event => {
+  const item = event.target.closest('button');
+  if (menu.hidden || !item) return;
+  closeMenu();
+  if (item.id === 'refresh') void refreshFeedback.run();
+  if (item.id === 'menu-settings') openSettings();
+}, { signal: domEvents.signal });
+document.addEventListener('pointerdown', event => {
+  if (!menu.contains(event.target)) closeMenu();
+}, { capture: true, signal: domEvents.signal });
+window.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeMenu();
+}, { signal: domEvents.signal });
+window.addEventListener('blur', closeMenu, { signal: domEvents.signal });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) closeMenu();
+}, { signal: domEvents.signal });
 
 let initialSettingsError = null;
 if (!isSample) {
@@ -372,7 +451,6 @@ else {
       clearInterval(pollTimer);
       if (document.hidden) {
         cancelAnimationFrame(drawFrame); drawFrame = 0;
-        clearTimeout(toastTimer); $('#toast').hidden = true;
       } else {
         draw(currentSnapshot, currentNoData);
         recoverSnapshot(); updateQuote();
