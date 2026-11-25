@@ -31,6 +31,18 @@ class RuntimePackagingTests(unittest.TestCase):
         # deb and rpm copy the source mode; panels look the launcher up on PATH.
         self.assertTrue(os.access(ROOT / 'packaging/bin/quotacore', os.X_OK))
 
+    def test_panel_launcher_finds_packaged_sources(self):
+        with tempfile.TemporaryDirectory() as root:
+            launcher = Path(root, 'bin', 'quotacore')
+            launcher.parent.mkdir()
+            shutil.copy(ROOT / 'packaging/bin/quotacore', launcher)
+            package = Path(root, 'lib', 'ai-usage', 'quotacore')
+            package.mkdir(parents=True)
+            (package / '__init__.py').touch()
+            (package / '__main__.py').write_text('def main(): return print("packaged")', encoding='utf-8')
+            result = subprocess.run([sys.executable, '-I', str(launcher)], capture_output=True, text=True)
+        self.assertEqual(result.stdout.strip(), 'packaged', result.stderr)
+
     def test_doctor_identifies_native_selection_without_reading_providers(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {
             'QUOTACORE_HOME': home, 'QUOTACORE_RUNTIME_SOURCE': 'embedded',

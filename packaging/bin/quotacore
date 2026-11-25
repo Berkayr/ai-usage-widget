@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 
 # Tauri's Linux bundle resources are installed beside the application's library.
-resources = Path(__file__).resolve().parents[1] / 'lib' / 'AI Usage'
+resources = Path(__file__).resolve().parents[1] / 'lib' / 'ai-usage'
 if (resources / 'quotacore' / '__main__.py').is_file():
     sys.path.insert(0, str(resources))
 from quotacore.__main__ import main
