@@ -122,7 +122,7 @@ Prefer the familiar? System uses your desktop font, light/dark appearance and sy
 </picture>
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/themes-new-light.png">
-  <img src="docs/screenshots/themes-new.png" alt="Seven new themes and Compact Strip complete the seventeen-theme gallery; fictional data" width="1100">
+  <img src="docs/screenshots/themes-new.png" alt="Eight more themes and Compact Strip complete the seventeen-theme gallery; fictional data" width="1100">
 </picture>
 <sub>All 17 designs across two sheets · alternating Light / Dark · Vivid · fictional data. Open the image for full-size detail.</sub>
 
