@@ -49,15 +49,15 @@ const oneProvider = { ...snapshot, providers: snapshot.providers.slice(0,1) };
 for (const appearance of ['dark','light']) {
  const light = appearance === 'light';
 
- for (const [part, ids] of [galleryThemeIds.filter(id=>id!=='compact-strip').slice(0,9), [...galleryThemeIds.filter(id=>id!=='compact-strip').slice(9),'compact-strip']].entries()) {
+ for (const [part, ids] of [galleryThemeIds.filter(id=>id!=='compact-strip').slice(0,8), [...galleryThemeIds.filter(id=>id!=='compact-strip').slice(8),'compact-strip']].entries()) {
  const name = `themes${part?'-new':''}${light?'-light':''}`;
  galleries.add(name);
- const specimen=(id,j)=>{const i=galleryThemeIds.indexOf(id);return frame(names[i]+' · '+((j+(light?1:0))%2?'Light':'Dark'),id==='compact-strip'?960:340,1250,{theme:id,shape:id==='compact-strip'?'strip':'portrait',sizePreset:'Medium',fineTune:100,appearance:(j+(light?1:0))%2?'light':'dark',colorMode:'vivid',...(id==='dot-matrix'?{palette:'sakura-pink'}:{})});};
+ const specimen=(id,j)=>{const i=galleryThemeIds.indexOf(id);return frame(names[i]+' · '+((j+(light?1:0))%2?'Light':'Dark'),id==='compact-strip'?960:340,id==='compact-strip'?326:1250,{theme:id,shape:id==='compact-strip'?'strip':'portrait',sizePreset:'Medium',fineTune:100,appearance:(j+(light?1:0))%2?'light':'dark',colorMode:'vivid',...(id==='dot-matrix'?{palette:'sakura-pink'}:{})});};
  scenes.set(name, {w:1180,h:3000,dpr:.9,autoHeight:true,html:shell(heading('17 THEMES',part?'A fresh perspective':'Find your own rhythm',`Part ${part+1} of 2 · Medium · three fictional providers · open for full-size detail.`)+`<div style="display:grid;grid-template-columns:repeat(3,340px);gap:32px;align-items:start">${[0,1,2].map(column=>`<div style="display:grid;gap:32px">${ids.filter(id=>id!=='compact-strip').map((id,j)=>j%3===column?specimen(id,j):'').join('')}</div>`).join('')}${ids.includes('compact-strip')?`<div style="grid-column:1/-1">${specimen('compact-strip',0)}</div>`:''}</div>`,light)});
 
  }
  for (const [i,id] of galleryThemeIds.entries()) {
-  scenes.set(`themes/${id}-${appearance}`, {w:id==='compact-strip'?1056:436,h:1450,dpr:1,autoHeight:true,html:shell(frame(names[i],id==='compact-strip'?960:340,1250,{theme:id,shape:id==='compact-strip'?'strip':'portrait',appearance}),light)});
+  scenes.set(`themes/${id}-${appearance}`, {w:id==='compact-strip'?1056:436,h:1450,dpr:1,autoHeight:true,html:shell(frame(names[i],id==='compact-strip'?960:340,id==='compact-strip'?326:1250,{theme:id,shape:id==='compact-strip'?'strip':'portrait',appearance}),light)});
   if(i<10) scenes.set(`checks/${id}-${appearance}`, {w:1260,h:1500,autoHeight:true,html:shell(heading('RESPONSIVE CHECK', `${names[i]} / ${appearance}`, 'Calm / 340 px and 200 px / 100% and 150%') + `<div class="row" style="gap:12px">${[340,200].map(width=>[100,150].map(scale=>frame(`${width}px / ${scale}%`,width,2400,{theme:id,appearance,scale})).join('')).join('')}</div>`,light)});
  }
 }
@@ -226,7 +226,7 @@ try {
   if(process.env.SCENE && !process.env.SCENE.split(',').some(prefix=>name.startsWith(prefix)))continue;
   if(process.env.GALLERY_ONLY && name.startsWith('checks/'))continue;
   errors.length=0;
-  await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:scene.h,deviceScaleFactor:scene.dpr||2,mobile:false});
+  await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:scene.h,deviceScaleFactor:scene.dpr||2,mobile:false,screenWidth:1920,screenHeight:1080});
   await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:scene.appearance || 'dark'}]});
   await cdp('Page.navigate',{url:`${base}/scene/${name}`});
   if(name==='history'||name==='history-light') {
@@ -279,7 +279,7 @@ try {
   if(galleries.has(name))await cdp('Runtime.evaluate',{expression:`document.querySelector('header').style.textAlign='center'`});
   if(scene.autoHeight){
    const bounds=await cdp('Runtime.evaluate',{expression:`Math.ceil(Math.max(...[...document.body.children].map(el=>el.getBoundingClientRect().bottom)))+48`,returnByValue:true});
-   await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:bounds.result.value,deviceScaleFactor:scene.dpr||2,mobile:false});
+   await cdp('Emulation.setDeviceMetricsOverride',{width:scene.w,height:bounds.result.value,deviceScaleFactor:scene.dpr||2,mobile:false,screenWidth:1920,screenHeight:1080});
    await cdp('Runtime.evaluate',{expression:'new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))',awaitPromise:true});
   }
   if(galleries.has(name)) {
