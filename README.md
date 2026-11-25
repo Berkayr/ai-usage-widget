@@ -22,15 +22,15 @@
 
 Keep Claude Code, Codex and Gemini quota windows visible while you work. A compact desktop widget shows how much is used, when limits reset, and when a source needs attention. Resize it for a small glanceable display or keep detailed cards beside your editor. Panel integrations share the same local snapshot.
 
-Pre-release: installers are coming with v0.1. Gallery values are fictional; provider and desktop validation are listed below.
+Installers for Windows and Linux are on [GitHub Releases](https://github.com/Berkayr/ai-usage-widget/releases/latest). Gallery values are fictional; provider and desktop validation are listed below.
 
 ## Install
 
-Installers are coming with v0.1; no release is available yet.
+Download the latest version from [GitHub Releases](https://github.com/Berkayr/ai-usage-widget/releases/latest).
 
-- **Linux (after v0.1):** `curl -fsSL https://raw.githubusercontent.com/Berkayr/ai-usage-widget/main/scripts/install.sh | sh` or download the `.deb` / `.rpm` / AppImage from GitHub Releases.
-- **Windows 10/11 (after v0.1):** Download `windows-x86_64-with-python-AI Usage_*_x64-setup.exe` from GitHub Releases, then choose **Next, Next, Finish**; no Python installation is needed. Windows may show SmartScreen because the installer is not signed yet: choose **More info**, then **Run anyway**. If Smart App Control is on, Windows blocks unsigned installers and offers no such option, so the setup `.exe` may not run until a signed build exists; the `.msi` worked in our Smart App Control tests, but that can change between releases. Install one package type: mixing the NSIS `.exe` and the `.msi` creates two entries in Installed apps.
-- **Arch Linux:** AUR package availability is also coming with v0.1; recipe drafts only.
+- **Linux:** `curl -fsSL https://raw.githubusercontent.com/Berkayr/ai-usage-widget/main/scripts/install.sh | sh` or download the `.deb` / `.rpm` / AppImage from GitHub Releases.
+- **Windows 10/11:** Download `windows-x86_64-with-python-AI Usage_*_x64-setup.exe` from GitHub Releases, then choose **Next, Next, Finish**; no Python installation is needed. Windows may show SmartScreen because the installer is not signed yet: choose **More info**, then **Run anyway**. If Smart App Control is on, Windows blocks unsigned installers and offers no such option, so the setup `.exe` may not run until a signed build exists; the `.msi` worked in our Smart App Control tests, but that can change between releases. Install one package type: mixing the NSIS `.exe` and the `.msi` creates two entries in Installed apps.
+- **Arch Linux:** not on the AUR yet; `packaging/aur` holds recipe drafts. Use the AppImage for now.
 
 Linux needs host Python 3.10+, provider CLIs and the appropriate GTK/WebKit runtime; AppImage also has host dependencies. Windows slim installers are for users who already have Python 3.10+. Provider tools are installed separately. See [packaging](packaging/README.md) before building or testing a package.
 
@@ -249,7 +249,7 @@ Off by default. When on, AI Usage contacts en.wikiquote.org (and wikidata.org) o
 
 **Can I use it without an account?** Open the source preview with `?sample` for fictional data. Real quotas require the corresponding provider credentials; collection stays off until you opt in.
 
-**Are installers available?** Installers are coming with v0.1. Until a release is published, use a source build and treat packaging recipes as previews.
+**Are installers available?** Yes, from GitHub Releases. Treat the AUR and Flatpak recipes in `packaging` as previews.
 
 **Can I share my palette?** Export its JSON from Settings. Share only palette colors; snapshots and settings can contain sensitive usage or local metadata.
 
