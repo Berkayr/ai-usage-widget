@@ -269,10 +269,28 @@ pub fn watch(app: tauri::AppHandle) {
 #[cfg(windows)]
 mod windows_events {
     use super::*;
-    use windows_sys::Win32::{Foundation::{HWND,LPARAM,LRESULT,WPARAM},UI::{Shell::{DefSubclassProc,RemoveWindowSubclass,SetWindowSubclass},WindowsAndMessaging::{WM_DISPLAYCHANGE,WM_DPICHANGED,WM_NCDESTROY,WM_SETTINGCHANGE}}};
+    use windows_sys::Win32::{Foundation::{HWND,LPARAM,LRESULT,WPARAM},UI::{Shell::{DefSubclassProc,RemoveWindowSubclass,SetWindowSubclass},WindowsAndMessaging::{ShowWindow,SW_SHOWNOACTIVATE,WM_DISPLAYCHANGE,WM_DPICHANGED,WM_NCDESTROY,WM_SETTINGCHANGE}}};
     const ID: usize=0x415550;
+    // Windows 11 minimizes windows on a disconnected monitor, sometimes after the display event.
+    fn restore_minimized(app: tauri::AppHandle) {
+        thread::spawn(move || for delay in [800,2200] {
+            thread::sleep(Duration::from_millis(delay));
+            let target=app.clone();
+            let _=app.run_on_main_thread(move || {
+                let mut restored=false;
+                for (label,window) in target.webview_windows() {
+                    if widgets::id_from_label(&label).is_err() || !window.is_minimized().unwrap_or(false) || !window.is_visible().unwrap_or(false) {continue;}
+                    let settings=settings_window::current_for(&label);
+                    if selected(&configured_monitors(&window,&settings),&settings).is_none() {continue;}
+                    if let Ok(hwnd)=window.hwnd() {unsafe {ShowWindow(hwnd.0 as HWND,SW_SHOWNOACTIVATE);} restored=true;}
+                }
+                if restored {monitor_changed(target.clone());}
+            });
+        });
+    }
     unsafe extern "system" fn procedure(hwnd: HWND,message:u32,wparam:WPARAM,lparam:LPARAM,id:usize,data:usize)->LRESULT {
         if message==WM_DISPLAYCHANGE || message==WM_DPICHANGED || (message==WM_SETTINGCHANGE && wparam==0x002f) { monitor_changed((*(data as *const tauri::AppHandle)).clone()); }
+        if message==WM_DISPLAYCHANGE { restore_minimized((*(data as *const tauri::AppHandle)).clone()); }
         if message==WM_NCDESTROY { RemoveWindowSubclass(hwnd,Some(procedure),id); drop(Box::from_raw(data as *mut tauri::AppHandle)); }
         DefSubclassProc(hwnd,message,wparam,lparam)
     }
