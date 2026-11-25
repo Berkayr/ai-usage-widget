@@ -73,7 +73,7 @@ export function fitUsage(root) {
   growPortraitContent(root, cards);
   if (shape === 'portrait' && cards.length && !root.closest('.has-inline-history')) {
     // Keep the equal tracks unless a card still clips after compaction.
-    if (cards.some(card => card.scrollHeight > card.clientHeight + 1)) {
+    if (cards.some(card => card.scrollHeight > card.clientHeight + 1 || card.scrollWidth > card.clientWidth + 1)) {
       root.dataset.usageScroll = '';
       cards.forEach(card => card.style.removeProperty('min-height'));
     } else {
