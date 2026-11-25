@@ -118,7 +118,7 @@ Prefer the familiar? System uses your desktop font, light/dark appearance and sy
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/themes-light.png">
-  <img src="docs/screenshots/themes.png" alt="Original nine portrait theme layouts in the first gallery sheet; fictional data" width="1100">
+  <img src="docs/screenshots/themes.png" alt="Eight portrait themes in the first gallery sheet; fictional data" width="1100">
 </picture>
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/themes-new-light.png">
