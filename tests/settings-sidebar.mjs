@@ -9,7 +9,7 @@ try {
   await b.cdp('Page.addScriptToEvaluateOnNewDocument', {source:`(() => {
     const callbacks = new Map(), events = new Map();
     let next = 0, disk = {theme:'system', palette:'default'};
-    const state = window.__FAKE_NATIVE__ = {calls:[], previews:[], saves:[], hidden:0, fail:null, mismatch:false, historyPermission:false};
+    const state = window.__FAKE_NATIVE__ = {calls:[], previews:[], saves:[], hidden:0, fail:null, mismatch:false, historyPermission:false,geminiHistory:false};
     state.emit = async event => {for (const [id, name] of events) if (name === event) await callbacks.get(id)({event, id, payload:{}});};
     window.__TAURI_EVENT_PLUGIN_INTERNALS__ = {unregisterListener:(_, id) => events.delete(id)};
     window.__TAURI_INTERNALS__ = {
@@ -20,8 +20,8 @@ try {
         if (cmd === state.fail) throw Error('Synthetic failure: ' + cmd);
         if (cmd === 'load_settings') {const value = structuredClone(disk); if (state.mismatch) delete value.fineTune; return value;}
         if (cmd === 'get_snapshot') return {snapshot:{providers:['claude','codex'].map(id => ({id,state:'OK'}))}};
-        if (cmd === 'get_provider_config') return {initialized:true,providers:{claude:{enabled:true,local_history:state.historyPermission},codex:{enabled:true}},disclosures:{claude:'Synthetic quota metadata',codex:'Synthetic quota metadata'},detected:{}};
-        if (cmd === 'set_local_history') {state.historyPermission=args.enabled;return;}
+        if (cmd === 'get_provider_config') return {initialized:true,providers:{claude:{enabled:true,local_history:state.historyPermission},codex:{enabled:true},gemini:{enabled:false,local_history:state.geminiHistory}},disclosures:{claude:'Synthetic quota metadata',codex:'Synthetic quota metadata'},detected:{}};
+        if (cmd === 'set_local_history') {if (args.provider === 'gemini') state.geminiHistory=args.enabled; else state.historyPermission=args.enabled;return;}
         if (cmd === 'get_autostart') return false;
         if (cmd === 'get_desktop_info') return {platform:'linux',layerShell:true};
         if (cmd === 'get_placement_monitors') return {layerShell:true,monitors:[{name:'Synthetic display',width:1920,height:1080,primary:true}],widgetWidth:340,widgetHeight:600};
@@ -79,6 +79,10 @@ try {
     check($('#save').disabled && $('#local-history').checked,'Verified log permission Save');
     $('#local-history').click();$('#save').click();await wait();
     check($('#save').disabled && !$('#local-history').checked,'Disable log permission');
+    $('#local-history-gemini').click();$('#save').click();await wait();
+    check($('#save').disabled && native.geminiHistory && !native.historyPermission,'Antigravity permission is separate');
+    $('#local-history-gemini').click();$('#save').click();await wait();
+    check(!native.geminiHistory && !$('#local-history-gemini').checked,'Disable Antigravity permission');
     $('#local-history').click();$('#quote-enabled').click();native.fail='save_settings';$('#save').click();await wait();
     check(native.historyPermission && $('#status').textContent.includes('History permission saved'),'Permission remains enabled after later Save failure');
     $('#revert').click();await wait();
@@ -146,7 +150,7 @@ try {
   assert.equal(await b.evaluate(`document.querySelector('[aria-selected=true]').dataset.category`), 'theme', 'Legacy appearance category maps to Theme');
   const bindings = Object.keys(Function('return (' + (await readFile(new URL('../app/src/settings-window.js',import.meta.url),'utf8')).match(/export const bindings = ([\s\S]*?);/)[1] + ')')());
   assert.equal(await b.evaluate(`(${JSON.stringify(bindings)}).every(id => document.getElementById(id))`), true, 'All original binding IDs exist');
-  assert.equal(await b.evaluate(`document.querySelector('#category-history').querySelectorAll('input,select').length`), 8);
+  assert.equal(await b.evaluate(`document.querySelector('#category-history').querySelectorAll('input,select').length`), 9);
   assert.equal(await b.evaluate(`/coming soon/i.test(document.querySelector('#category-history').textContent)`), false);
   assert.equal(await b.evaluate(`document.querySelectorAll('#settings>section').length`), 10);
   const destinations = {

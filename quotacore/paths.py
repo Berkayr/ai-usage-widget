@@ -10,6 +10,8 @@ from typing import Any
 
 IDS = ("claude", "codex", "gemini", "copilot", "openrouter", "deepseek", "jetbrains", "zai", "moonshot", "siliconflow", "openai_admin", "anthropic_admin")
 DEFAULT_ORDER = list(IDS)
+# Providers with an opt-in local log history permission.
+HISTORY_PROVIDERS = ("claude", "gemini")
 
 
 def home_dir() -> Path:
@@ -59,7 +61,7 @@ def normalize_config(data: dict[str, Any], detect: dict[str, bool] | None = None
         # New providers always require explicit opt-in.
         default = False
         providers[key] = {"enabled": bool(item.get("enabled", default)), "order": int(item.get("order", index))}
-        if key == "claude" and item.get("local_history") is True:
+        if key in HISTORY_PROVIDERS and item.get("local_history") is True:
             providers[key]["local_history"] = True
     try:
         interval = max(30, int(data.get("interval", 300)))

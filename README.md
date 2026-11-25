@@ -184,7 +184,7 @@ Claude history comes only from Claude Code logs available on **this computer**, 
 
 Optional extras include **API price equivalents** (estimates, not your subscription bill), model shares, an activity heatmap in the side panel, and computer splitting when logs contain two distinct machine types. Synced logs may include other computers; two computers of the same type cannot be distinguished. Model/activity breakdowns cover available parsed records; charts and price totals follow the selected range.
 
-Codex supplies **account-wide** daily totals across devices, without model, computer or activity breakdowns. Gemini has no usage history. History display is separate from permission to read Claude logs. See [history configuration](docs/configuration.md#widget-usage-history).
+Codex supplies **account-wide** daily totals across devices, without model, computer or activity breakdowns. Antigravity CLI (Gemini) history is opt-in and comes from local conversation logs, without prices; that log format is unofficial and may break. History display is separate from permission to read local logs. See [history configuration](docs/configuration.md#widget-usage-history).
 
 ## Supported tools
 

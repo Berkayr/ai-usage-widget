@@ -131,12 +131,20 @@ not all account activity. Synced logs can include other computers; machine types
 are inferred from paths, so two machines of the same type cannot be separated.
 Disabling permission stops future reads; refreshing replaces the previous
 snapshot. Hiding history in the widget alone does not revoke log access.
+**Read Antigravity CLI logs** is a separate permission, also off by default
+(`quotacore local-history on --provider gemini`; one-time read: `quotacore
+history --provider gemini`). It opens the SQLite conversation databases under
+`~/.gemini/antigravity-cli/conversations` read-only and keeps only token counts,
+model names and times. The format is unofficial and may break; unreadable
+records are skipped, and no history is shown if nothing can be read. No prices
+are estimated.
+
 Codex daily totals come from its account usage source and cover all devices;
-model, computer and heatmap breakdowns are unavailable. Gemini has no token
-history. API price equivalents are estimates, not subscription charges.
+model, computer and heatmap breakdowns are unavailable. API price equivalents are estimates, not subscription charges.
 
 Implementation: [local parser](../quotacore/local_history.py),
 [Claude adapter](../quotacore/providers/claude.py),
+[Gemini adapter](../quotacore/providers/gemini.py),
 [Codex adapter](../quotacore/providers/codex.py).
 
 ## Processes and hooks

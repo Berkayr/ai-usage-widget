@@ -63,6 +63,7 @@ export function mountNavigation(sections) {
 const descriptions = {
   'history-enabled':'Show token history when a provider supplies it.',
   'local-history':"Counts tokens from this computer's logs. Nothing is stored.",
+  'local-history-gemini':'Counts tokens from Antigravity CLI logs on this computer. Unofficial format that may break. Nothing is stored.',
   'history-mode':'Choose where usage history appears in the widget.',
   'history-panel-layout':'Show all tools together or choose one at a time in the side panel.',
   'history-cost':'Estimated API prices, not your actual bill.',

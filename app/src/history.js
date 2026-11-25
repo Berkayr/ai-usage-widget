@@ -77,11 +77,13 @@ export function bars(history, days, machines = false, now) {
 function price(value, history) {
   return `<p class="history-price" title="Estimated API price equivalent, not your actual bill. Prices as of ${esc(history.prices_as_of || 'unknown')}; unpriced tokens may be excluded.">≈ ${formatMoney(value)} at API prices</p>`;
 }
+// Gemini history has no price table (cost is null), so only the source label differs from Claude's.
+const localLabel = history => history.source === 'antigravity-cli-logs' ? 'Antigravity CLI logs' : 'Claude Code logs';
 function details(history, settings, days, panel, now) {
   const rows = dailySeries(history,30,now);
   const today=rows.slice(-1);
   const chart=days === 1 && history.scope === 'local' ? hourlyBars(history,now) : days === 1 && history.scope === 'account' ? `<p class="history-today">${partial(today) ? 'No data yet today' : formatTokens(sum(today))+' tokens today'}</p>` : days === 1 && history.scope === 'all' && Array.isArray(history.today_hourly) ? allHourlyBars(history,now) : bars(history,days,settings.historyMachines,now);
-  let html = `<div class="history-scope">${history.scope === 'all' ? 'All tools · local + account' : history.scope === 'local' ? 'Claude Code logs · LOCAL' : 'All devices · ACCOUNT'}</div><div class="history-kpis">${[['Today',today],['7d',rows.slice(-7)],['30d',rows]].map(([label,data])=>`<span>${label}<b>${history.scope === 'account' && label === 'Today' && partial(data) ? 'No data yet today' : totalLabel(data)}</b></span>`).join('')}</div>${chart}`;
+  let html = `<div class="history-scope">${history.scope === 'all' ? 'All tools · local + account' : history.scope === 'local' ? localLabel(history) + ' · LOCAL' : 'All devices · ACCOUNT'}</div><div class="history-kpis">${[['Today',today],['7d',rows.slice(-7)],['30d',rows]].map(([label,data])=>`<span>${label}<b>${history.scope === 'account' && label === 'Today' && partial(data) ? 'No data yet today' : totalLabel(data)}</b></span>`).join('')}</div>${chart}`;
   if (history.tools) html += `<div class="history-legend">${history.tools.map((p,i)=>{
     const label=esc(p.label || p.id), providerRows=dailySeries(p.history,days,now);
     const value=days===1 && history.scope==='all' && Array.isArray(history.today_hourly) && !todayHourly(p.history,now)
