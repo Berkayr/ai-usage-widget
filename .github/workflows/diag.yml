@@ -2,47 +2,50 @@ name: Diag
 on: {push: {branches: [diag/native-windows]}}
 permissions: {contents: read}
 jobs:
-  d:
+  native-windows:
     runs-on: windows-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
-        with: {node-version: '22', cache: npm, cache-dependency-path: app/package-lock.json}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
-        with: {toolchain: 1.99.1}
+        with:
+          toolchain: 1.99.1
+      - name: Install pinned Tauri driver and matching Edge driver
+        shell: pwsh
+        run: |
+          cargo install tauri-driver --version 2.1.0 --locked
+          # The app runs on the WebView2 runtime, which can be a different version than Edge.
+          $edge = (Get-ItemProperty 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}').pv
+          Write-Host "WebView2 runtime $edge"
+          $driverDir = Join-Path $env:RUNNER_TEMP 'edge-driver'
+          $zip = Join-Path $env:RUNNER_TEMP 'edge-driver.zip'
+          Invoke-WebRequest "https://msedgedriver.microsoft.com/$edge/edgedriver_win64.zip" -OutFile $zip
+          Expand-Archive $zip -DestinationPath $driverDir
+          $driverDir | Out-File $env:GITHUB_PATH -Append
       - run: npm ci
         working-directory: app
-      - run: npx tauri build --debug --no-bundle
+      - name: Build debug binary with embedded frontend
+        run: npx tauri build --debug --no-bundle
         working-directory: app
-      - shell: pwsh
+      - name: Allow the driver to reach WebView2
+        shell: pwsh
         run: |
-          whoami /groups | Select-String 'Label'
-          $env:RUST_BACKTRACE=1
-          function Probe($name) {
-            Write-Host "=== $name"
-            $p = Start-Process app/src-tauri/target/debug/ai-usage.exe -PassThru -RedirectStandardError "$name.err" -RedirectStandardOutput "$name.out"
-            Start-Sleep 15
-            Write-Host "exited: $($p.HasExited) code $($p.ExitCode)"
-            Get-Content "$name.err","$name.out" | Select-Object -First 25
-            Get-CimInstance Win32_Process -Filter "name='msedgewebview2.exe'" | Select-Object -First 3 | ForEach-Object { $_.CommandLine.Substring(0,[Math]::Min(700,$_.CommandLine.Length)) }
-            Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue; Start-Sleep 3
-          }
-          $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS='--remote-debugging-port=0'
-          Probe 'plain'
-          $env:WEBVIEW2_USER_DATA_FOLDER="$env:RUNNER_TEMP\udf"; Probe 'udf'
-          Get-ChildItem -Recurse -Filter DevToolsActivePort $env:RUNNER_TEMP,$env:LOCALAPPDATA -ErrorAction SilentlyContinue | ForEach-Object FullName
-          $r="$env:RUNNER_TEMP\iso"; mkdir "$r\data","$r\config" | Out-Null
-          $env:APPDATA="$r\config"; $env:LOCALAPPDATA="$r\data"; $env:WEBVIEW2_USER_DATA_FOLDER="$r\udf"
-          Probe 'iso'
-          Get-ChildItem -Recurse -Filter DevToolsActivePort $r -ErrorAction SilentlyContinue | ForEach-Object FullName
-  u:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
-        with: {node-version: '22', cache: npm, cache-dependency-path: app/package-lock.json}
-      - run: npm ci && npm run build
-        working-directory: app
-      - run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev librsvg2-dev
-      - run: fc-match sans-serif; fc-match system-ui; node docs/tools/acceptance/regressions.mjs
+          # An elevated hosted runner drops WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS; the policy key still applies.
+          $key = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge\WebView2\AdditionalBrowserArguments'
+          New-Item $key -Force | Out-Null
+          New-ItemProperty $key -Name 'ai-usage.exe' -Value '--remote-debugging-port=0' -Force | Out-Null
+      - name: Drive actual WebView2 windows
+        run: node docs/tools/acceptance/native-webdriver.mjs
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: native-windows
+          path: native-artifacts/
