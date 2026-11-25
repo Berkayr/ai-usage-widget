@@ -426,7 +426,7 @@
   {
     "id": "p-design-10",
     "source": "docs/design-spec.md:148",
-    "claim": "Settings window created lazily, hidden on close, reused without listener leak; Save/Discard/Cancel before hide.",
+    "claim": "Save or Discard closes Settings after resolving pending changes. Cancel keeps Settings open. A reused window reloads its saved baseline with the existing listeners.",
     "verify": "headless",
     "test": "docs/tools/settings-check.mjs:192-208",
     "reason": null

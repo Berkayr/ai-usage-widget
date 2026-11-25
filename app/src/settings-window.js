@@ -1255,9 +1255,10 @@ async function close() {
   closing = true;
   try {
     await previewWork;
-    if (!sample)
+    if (!sample) {
+      // Linux may destroy this webview before the IPC reply.
       await settingsInvoke('finish_settings');
-    else
+    } else
       window.close();
   } catch (e) {
     error(e);
