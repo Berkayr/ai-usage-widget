@@ -4,7 +4,9 @@ from __future__ import annotations
 import html
 import json
 import math
+import os
 from datetime import datetime, timezone
+from pathlib import Path
 from .paths import data_path
 
 SHORT = {"claude": "CL", "codex": "CX", "gemini": "GM", "copilot": "CP"}
@@ -22,7 +24,30 @@ def remaining(value, now):
         return "?"
 
 
-def report(snapshot, providers=None, window="session", now=None):
+def limit_visibility():
+    """The main widget's pool choices; the app keeps them in its own config directory."""
+    if os.name == "nt":
+        root = Path(os.environ.get("APPDATA") or (Path.home() / "AppData" / "Roaming"))
+    else:
+        # The app ignores a relative XDG path, as the specification requires.
+        root = Path(os.environ.get("XDG_CONFIG_HOME") or "")
+        if not root.is_absolute():
+            root = Path.home() / ".config"
+    try:
+        value = json.loads((root / "ai-usage" / "settings.json").read_text(encoding="utf-8"))["limitVisibility"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def pool_key(provider, window):
+    pool = window.get("pool")
+    name = pool.get("id") if isinstance(pool, dict) else None
+    name = name.strip() if isinstance(name, str) else ""
+    return f"{provider}/{name or 'main'}"
+
+
+def report(snapshot, providers=None, window="session", now=None, visibility=None):
     now = now or datetime.now(timezone.utc)
     generated_at = snapshot.get("generated_at")
     try:
@@ -42,6 +67,7 @@ def report(snapshot, providers=None, window="session", now=None):
             state = "STALE"
         stale = bool(p.get("stale")) or state == "STALE"
         all_windows = []
+        hidden_pool = False
         raw_windows = p.get("windows")
         for w in raw_windows if isinstance(raw_windows, list) else []:
             if not isinstance(w, dict):
@@ -53,12 +79,18 @@ def report(snapshot, providers=None, window="session", now=None):
                 used = None
             if w.get("hidden_by_default") or used is None:
                 continue
+            if (visibility or {}).get(pool_key(key, w)) is False:
+                hidden_pool = True
+                continue
             used = max(0, min(100, used))
             text = ("~" if w.get("estimated") else "") + f"{used:.0f}%" if used is not None else "?"
             reset = remaining(w.get("resets_at"), now)
             label = str(w.get("label") or w.get("id") or "Quota").replace("\n", " ")
             line = f"{label}: {text} · {reset}"
             all_windows.append({"label": label, "used_percent": used, "remaining": reset, "text": line, "kind": w.get("kind"), "hidden": bool(w.get("hidden_by_default")), "estimated": bool(w.get("estimated"))})
+        # Every usable window was hidden by choice, so "?" would read as a failure.
+        if hidden_pool and not all_windows:
+            continue
         selected = [w for w in all_windows if not w["hidden"] and (window == "both" and w["kind"] in ("session", "weekly") or w["kind"] == window)]
         bits = []
         for w in selected:
@@ -83,7 +115,7 @@ def render(format="plain", providers=None, window="session"):
             value = {}
     except (OSError, ValueError):
         value = {}
-    result = report(value, providers, window)
+    result = report(value, providers, window, visibility=limit_visibility())
     if format == "json":
         return json.dumps(result, ensure_ascii=False, separators=(",", ":"))
     if format == "waybar":

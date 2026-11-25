@@ -184,6 +184,10 @@ sharing its logo and identity color while keeping token history on the base prov
 Pill cards show the first two rows and the circle center one secondary limit; turn on
 separate boxes to see every pool in those shapes.
 
+The Windows taskbar strip and the Linux panels (KDE, GNOME, Waybar, Polybar, i3blocks)
+leave out pools the main widget hides, and a provider whose pools are all hidden.
+They do not add pools set to Show.
+
 Portrait features one card only with an odd visible count, whether quotes are on
 or off; `featuredPosition: "top" | "bottom"` places that card. Even counts use
 equal cards. Square uses equal rows and moves the selected provider within each

@@ -16,7 +16,8 @@ class BarTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.env = patch.dict(os.environ, QUOTACORE_HOME=self.temp.name)
+        self.env = patch.dict(os.environ, QUOTACORE_HOME=self.temp.name,
+                              XDG_CONFIG_HOME=self.temp.name, APPDATA=self.temp.name)
         self.env.start()
         self.addCleanup(self.env.stop)
         self.now = datetime(2030, 1, 1, tzinfo=timezone.utc)
@@ -106,6 +107,40 @@ class BarTests(unittest.TestCase):
         self.assertEqual(len(render('i3blocks').splitlines()), 2)
         self.assertIsInstance(json.loads(render('json'))['providers'], list)
         self.assertEqual(render('plain'), render('polybar'))
+
+    def write_settings(self, text):
+        path = Path(self.temp.name) / 'ai-usage' / 'settings.json'
+        path.parent.mkdir(exist_ok=True)
+        path.write_text(text, encoding='utf-8')
+
+    def test_hidden_pool_is_absent_from_every_format(self):
+        self.value['providers'][0]['windows'].append(
+            {'kind': 'session', 'label': 'Nova', 'used_percent': 97, 'pool': {'id': ' nova ', 'label': 'Nova'}})
+        (Path(self.temp.name) / 'snapshot.json').write_text(json.dumps(self.value))
+        for name in ('plain', 'waybar', 'polybar', 'i3blocks', 'json'):
+            self.assertIn('97%', render(name), name)
+        self.write_settings(json.dumps({'limitVisibility': {'claude/nova': False}}))
+        for name in ('plain', 'waybar', 'polybar', 'i3blocks', 'json'):
+            output = render(name)
+            self.assertIn('34%', output, name)
+            self.assertNotIn('97%', output, name)
+            self.assertNotIn('Nova', output, name)
+        self.assertEqual(json.loads(render('waybar'))['class'], 'ok')
+        self.assertEqual(json.loads(render('json'))['percentage'], 34)
+
+    def test_fully_hidden_provider_is_dropped_but_errors_stay(self):
+        hidden = {'claude/main': False}
+        result = report(self.value, ['claude'], now=self.now, visibility=hidden)
+        self.assertEqual((result['providers'], result['percentage'], result['tooltip']), ([], None, ''))
+        self.value['providers'][0]['state'] = 'AUTH_REQUIRED'
+        result = report(self.value, ['claude'], now=self.now, visibility=hidden)
+        self.assertIn('AUTH_REQUIRED', result['tooltip'])
+
+    def test_unusable_visibility_hides_nothing(self):
+        (Path(self.temp.name) / 'snapshot.json').write_text(json.dumps(self.value))
+        for text in ('{', '[]', 'null', '{}', '{"limitVisibility": [1]}', '{"limitVisibility": {"claude/main": 0, "claude/x": false}}'):
+            self.write_settings(text)
+            self.assertIn('CL 34%', render('plain'), text)
 
     def test_cli_uses_snapshot_without_collecting(self):
         with patch('quotacore.__main__.collect', side_effect=AssertionError('must not collect')), redirect_stdout(io.StringIO()) as output:

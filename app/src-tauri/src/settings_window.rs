@@ -62,7 +62,7 @@ fn apply_preview(app: &tauri::AppHandle, mut settings: Settings, label: &str) ->
         window.run_on_main_thread(move || { let _ = placement::apply(&target, &value); }).map_err(|e|e.to_string())?;
         window.emit_to(label, "settings-preview", &settings).map_err(|e| e.to_string())?;
     }
-    #[cfg(windows)] if label == widgets::MAIN_ID { taskbar::update_settings(settings.taskbar); }
+    #[cfg(windows)] if label == widgets::MAIN_ID { taskbar::update_settings(settings.taskbar, settings.limit_visibility); }
     Ok(())
 }
 #[tauri::command]
