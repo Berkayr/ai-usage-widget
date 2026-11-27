@@ -192,7 +192,7 @@ fn content(model: &Model, capacity: usize) -> (Vec<Row>, String) {
             .collect();
         // Hidden by choice; error states still need their row.
         if windows.is_empty() && !available.is_empty()
-            && matches!(p["state"].as_str(), Some("OK" | "STALE" | "RATE_LIMITED")) {
+            && matches!(p["state"].as_str(), Some("OK" | "STALE")) {
             continue;
         }
         let name = p["label"].as_str().unwrap_or(id);
@@ -1126,10 +1126,12 @@ mod tests {
         assert_eq!(rows.iter().map(|r| &r.text[..2]).collect::<Vec<_>>(), ["CL", "GM"]);
         assert_eq!(rows[0].pct, Some(91.));
         assert!(!tip.contains("Nova") && !tip.contains("codex"));
-        m.snapshot.as_mut().unwrap()["providers"][1]["state"] = json!("AUTH_REQUIRED");
-        let (rows, tip) = content(&m, 3);
-        assert_eq!(rows[1].text, "CX —");
-        assert!(tip.contains("AUTH_REQUIRED") && !tip.contains("80%"));
+        for state in ["AUTH_REQUIRED", "RATE_LIMITED"] {
+            m.snapshot.as_mut().unwrap()["providers"][1]["state"] = json!(state);
+            let (rows, tip) = content(&m, 3);
+            assert_eq!(rows[1], Row { text: "CX —".into(), pct: None });
+            assert!(tip.contains(state) && !tip.contains("80%"));
+        }
     }
     #[test]
     fn filter_and_unknown_weekly_usage_are_independent_of_desktop_settings() {
