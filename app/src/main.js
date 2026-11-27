@@ -298,7 +298,7 @@ async function requestFit() {
 }
 function currentSample() {
   const now = Date.now();
-  return { ...sample, generated_at: new Date(now).toISOString(), providers: sample.providers.map(provider => ({ ...provider, windows: (provider.windows || []).map(window => ({ ...window, resets_at: Number.isFinite(window.resets_in_minutes) ? new Date(now + window.resets_in_minutes * 60000).toISOString() : null })) })) };
+  return { ...sample, generated_at: new Date(now).toISOString(), providers: sample.providers.map(provider => ({ ...provider, captured_at: new Date(now).toISOString(), windows: (provider.windows || []).map(window => ({ ...window, resets_at: Number.isFinite(window.resets_in_minutes) ? new Date(now + window.resets_in_minutes * 60000).toISOString() : null })) })) };
 }
 // While settings are open, `settings` may hold an unsaved preview.
 async function settingsOpen() { return !isSample && await invoke('settings_open').catch(() => false) === true; }

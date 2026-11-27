@@ -45,7 +45,7 @@ test('coalesces menu activation and releases the guard on resolve and reject', a
   assert.equal(calls, 1);
   assert.equal(feedback.isRunning(), true);
   assert.deepEqual(shown, [refreshProgress]);
-  pending.resolve({ providers: [fresh] });
+  pending.resolve({ providers: [{ ...fresh, captured_at: new Date().toISOString() }] });
   await first;
   assert.equal(feedback.isRunning(), false);
   assert.match(shown.at(-1).message, /^Updated \d{2}:\d{2}$/);
@@ -60,7 +60,7 @@ test('coalesces menu activation and releases the guard on resolve and reject', a
   assert.equal(shown.at(-1).duration, 8000);
 
   const third = feedback.run();
-  pending.resolve({ providers: [fresh] });
+  pending.resolve({ providers: [{ ...fresh, captured_at: new Date().toISOString() }] });
   await third;
   assert.equal(calls, 3);
 });
@@ -76,4 +76,61 @@ test('dispose releases the guard and suppresses late completion', async () => {
   await running;
   await feedback.run();
   assert.deepEqual(shown, [refreshProgress]);
+});
+
+test('distinguishes newly measured readings from unchanged OK providers when start time is given', () => {
+  const started = new Date(2026, 0, 1, 7, 4);
+  const geminiOld = { id: 'gemini', state: 'OK', captured_at: new Date(2025, 11, 30, 7, 4).toISOString() };
+  const codexNew = { id: 'codex', state: 'OK', captured_at: new Date(2026, 0, 1, 7, 4, 30).toISOString() };
+  const claudeAuth = { id: 'claude', state: 'AUTH_REQUIRED' };
+
+  assert.deepEqual(
+    formatRefreshResult({ providers: [geminiOld] }, completed, started),
+    { message: 'Checked 07:05 · no new readings', duration: 3200 }
+  );
+  assert.deepEqual(
+    formatRefreshResult({ providers: [codexNew, geminiOld] }, completed, started),
+    { message: 'Updated 07:05 · Gemini: no new reading', duration: 3200 }
+  );
+  assert.deepEqual(
+    formatRefreshResult({ providers: [geminiOld, claudeAuth] }, completed, started),
+    { message: 'Checked 07:05 · Claude: sign-in needed · Gemini: no new reading', duration: 8000 }
+  );
+  assert.deepEqual(
+    formatRefreshResult(
+      { providers: [{ id: 'codex', state: 'OK', captured_at: new Date(2026, 0, 1, 7, 4, 12, 0).toISOString() }] },
+      completed,
+      new Date(2026, 0, 1, 7, 4, 12, 850)
+    ),
+    { message: 'Updated 07:05', duration: 3200 }
+  );
+  assert.deepEqual(
+    formatRefreshResult(
+      { providers: [{ id: 'codex', state: 'OK' }, { id: 'gemini', state: 'OK', captured_at: 'not-a-date' }] },
+      completed,
+      started
+    ),
+    { message: 'Checked 07:05 · no new readings', duration: 3200 }
+  );
+  assert.deepEqual(
+    formatRefreshResult(
+      { providers: [codexNew, geminiOld, claudeAuth, { id: 'deepseek', state: 'OK', captured_at: geminiOld.captured_at }] },
+      completed,
+      started
+    ),
+    { message: 'Updated 07:05 · Claude: sign-in needed · Gemini: no new reading · +1 more', duration: 8000 }
+  );
+});
+
+test('createRefreshFeedback passes a start time so old captured_at yields Checked', async () => {
+  const shown = [];
+  const feedback = createRefreshFeedback(
+    async () => ({ providers: [{ id: 'gemini', state: 'OK', captured_at: '2020-01-01T00:00:00Z' }] }),
+    message => shown.push(message)
+  );
+  await feedback.run();
+  assert.equal(shown.length, 2);
+  assert.deepEqual(shown[0], refreshProgress);
+  assert.match(shown[1].message, /^Checked \d{2}:\d{2} · no new readings$/);
+  assert.equal(shown[1].duration, 3200);
 });
