@@ -66,7 +66,10 @@ function installMock({ monitor, snapshot }) {
       if (['refresh_now', 'open_settings'].includes(cmd)) {
         ipc.actions.push([cmd, document.querySelector('#context-menu').hidden]);
         if (cmd === 'open_settings') throw new Error('Synthetic settings error');
-        return new Promise((resolve, reject) => { ipc.pending = { resolve, reject }; });
+        // A real write stamps freshly measured providers with captured_at.
+        const measured = value => value && Array.isArray(value.providers)
+          ? { ...value, providers: value.providers.map(p => ({ captured_at: new Date().toISOString(), ...p })) } : value;
+        return new Promise((resolve, reject) => { ipc.pending = { resolve: value => resolve(measured(value)), reject }; });
       }
       if (cmd === 'set_linux_focus') { ipc.menuFocus = args; return; }
       if (['snapshot_rendered', 'fit_window_height', 'resize_widget', 'plugin:event|unlisten'].includes(cmd)) return;
