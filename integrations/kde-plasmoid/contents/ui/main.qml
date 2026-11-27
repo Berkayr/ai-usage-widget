@@ -11,6 +11,8 @@ PlasmoidItem {
     id: root
     property var quota: ({providers: []})
     property string error: ""
+    property string refreshError: ""
+    readonly property string notice: refreshError && error ? refreshError + "\n" + error : refreshError || error
     property bool refreshing: false
     property double clock: Date.now()
     readonly property bool vertical: Plasmoid.formFactor === PlasmaCore.Types.Vertical
@@ -70,7 +72,8 @@ PlasmoidItem {
         onNewData: function(name, data) {
             disconnectSource(name);
             root.refreshing = false;
-            if (data["exit code"] !== 0) { root.error = "Refresh failed. Check quotacore installation and provider access."; return; }
+            if (data["exit code"] !== 0) { root.refreshError = "Refresh failed. Check quotacore installation and provider access."; return; }
+            root.refreshError = "";
             source.disconnectSource(root.command);
             source.connectSource(root.command);
         }
@@ -100,7 +103,7 @@ PlasmoidItem {
         implicitWidth: root.vertical ? 64 : compactGrid.implicitWidth + 12
         implicitHeight: compactGrid.implicitHeight + 4
         onClicked: root.expanded = !root.expanded
-        Controls.ToolTip.text: root.error || root.quota.tooltip || "No snapshot available — run quotacore write"
+        Controls.ToolTip.text: root.notice || root.quota.tooltip || "No snapshot available — run quotacore write"
         Controls.ToolTip.visible: containsMouse
         hoverEnabled: true
         GridLayout {
@@ -133,7 +136,7 @@ PlasmoidItem {
                     DotStrip { visible: root.config.miniBarType === 1 || (root.mono && root.config.miniBarType === 0); count: root.dotCount; percent: mini.modelData.percentage; dotSize: Kirigami.Theme.defaultFont.pixelSize * 0.18 }
                 }
             }
-            Controls.Label { visible: !root.providers.length; text: root.error ? "Quota !" : "Quota —"; textFormat: Text.PlainText }
+            Controls.Label { visible: !root.providers.length; text: root.notice ? "Quota !" : "Quota —"; textFormat: Text.PlainText }
         }
     }
     fullRepresentation: ColumnLayout {
@@ -146,8 +149,8 @@ PlasmoidItem {
         spacing: 10
         Controls.Label { text: "AI USAGE  /  USAGE"; font.family: "monospace"; font.bold: true; Layout.margins: 12 }
         Controls.Label {
-            visible: !!root.error || !root.providers.length || !root.quota.generated_at
-            text: root.error || (!root.quota.generated_at && root.providerIds ? "No snapshot yet. Choose Refresh or run quotacore write." : root.providerIds ? "No active quota windows. Run quotacore write to create a snapshot." : "Choose providers in the widget settings.")
+            visible: !!root.notice || !root.providers.length || !root.quota.generated_at
+            text: root.notice || (!root.quota.generated_at && root.providerIds ? "No snapshot yet. Choose Refresh or run quotacore write." : root.providerIds ? "No active quota windows. Run quotacore write to create a snapshot." : "Choose providers in the widget settings.")
             wrapMode: Text.Wrap; textFormat: Text.PlainText
             Layout.fillWidth: true; Layout.margins: 12
         }
