@@ -2,6 +2,29 @@
 
 Notable changes are recorded here.
 
+## [0.2.0](https://github.com/Berkayr/ai-usage-widget/compare/v0.1.0...v0.2.0) (2026-11-27)
+
+
+### Features
+
+* **history:** add opt-in Antigravity CLI usage history ([90357e0](https://github.com/Berkayr/ai-usage-widget/commit/90357e09aa36cf152e1acc15e98b3cca8c69877f))
+
+
+### Bug Fixes
+
+* **circular-rings:** wrap long pool names ([67b288e](https://github.com/Berkayr/ai-usage-widget/commit/67b288e3803e99e7e4384ff10fb0c146ebef4f27))
+* **icons:** show the Kimi logo on light themes ([38b7877](https://github.com/Berkayr/ai-usage-widget/commit/38b7877bb2feb0cb28bd0a59f05fab8362dd352e))
+* **linux:** destroy Settings webview on close ([c09e4ef](https://github.com/Berkayr/ai-usage-widget/commit/c09e4eff7d7b840a4bff7dbf827b4212eccb6f9b))
+* **packaging:** make the panel launcher executable ([c2535be](https://github.com/Berkayr/ai-usage-widget/commit/c2535bec80123b18917cbcf55af265477ca9ae2c))
+* **packaging:** point the panel launcher at installed sources ([9724012](https://github.com/Berkayr/ai-usage-widget/commit/9724012411c2d579eaeef487a469a0eda8ea0ef0))
+* **panel:** keep rate-limited providers visible when all their pools are hidden ([8b3f7f0](https://github.com/Berkayr/ai-usage-widget/commit/8b3f7f057f90f570c70ab7f8f6e6fd0a9b67871f))
+* **panels:** respect hidden pools in taskbar and panels ([7925f7a](https://github.com/Berkayr/ai-usage-widget/commit/7925f7a67d8fd08ee50bf68e3108af468dd6b93c))
+* **plasmoid:** keep refresh failures until a refresh succeeds ([a182187](https://github.com/Berkayr/ai-usage-widget/commit/a182187bfb769d7b4c45f2e7454d49f5176137f0))
+* **portrait:** restore side padding on compact cards ([f0bf053](https://github.com/Berkayr/ai-usage-widget/commit/f0bf053cdb4a14158548d973eabc66a04000dd5f))
+* **widget:** close the context menu on selection and show refresh status ([7e561af](https://github.com/Berkayr/ai-usage-widget/commit/7e561af203202661fe9e1885962a4ce0a28ea4fb))
+* **widget:** say checked instead of updated when no provider was remeasured ([1b00516](https://github.com/Berkayr/ai-usage-widget/commit/1b00516c3e0a7e2806f4844041186365edf7955b))
+* **windows:** restore widgets minimized when a monitor is unplugged ([10ab9f4](https://github.com/Berkayr/ai-usage-widget/commit/10ab9f464acaa3b07b88d16ddd9293b0cdd7f481))
+
 ## [0.1.0](https://github.com/Berkayr/ai-usage-widget/releases/tag/v0.1.0) (2026-11-25)
 
 
