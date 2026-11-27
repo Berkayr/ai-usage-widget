@@ -136,6 +136,26 @@ class BarTests(unittest.TestCase):
         result = report(self.value, ['claude'], now=self.now, visibility=hidden)
         self.assertIn('AUTH_REQUIRED', result['tooltip'])
 
+    def test_rate_limited_fully_hidden_provider_keeps_error_without_hidden_window(self):
+        snapshot = {'providers': [{'id': 'claude', 'state': 'RATE_LIMITED', 'stale': True, 'windows': [
+            {'kind': 'session', 'label': 'Session', 'used_percent': 97, 'pool': {'id': 'main', 'label': 'MainPool'}}]}]}
+        (Path(self.temp.name) / 'snapshot.json').write_text(json.dumps(snapshot))
+        self.write_settings(json.dumps({'limitVisibility': {'claude/main': False}}))
+        raw_json = render('json', ['claude'])
+        data = json.loads(raw_json)
+        waybar = json.loads(render('waybar', ['claude']))
+        self.assertIn('RATE_LIMITED', data['tooltip'])
+        self.assertIn('RATE_LIMITED', waybar['tooltip'])
+        self.assertEqual([p['state'] for p in data['providers']], ['RATE_LIMITED'])
+        self.assertEqual(data['providers'][0]['windows'], [])
+        self.assertIsNone(data['percentage'])
+        self.assertIsNone(waybar['percentage'])
+        self.assertEqual(waybar['class'], 'ok')
+        for output in (raw_json, json.dumps(waybar), render('plain', ['claude'])):
+            self.assertNotIn('97', output)
+            self.assertNotIn('Session', output)
+            self.assertNotIn('MainPool', output)
+
     def test_unusable_visibility_hides_nothing(self):
         (Path(self.temp.name) / 'snapshot.json').write_text(json.dumps(self.value))
         for text in ('{', '[]', 'null', '{}', '{"limitVisibility": [1]}', '{"limitVisibility": {"claude/main": 0, "claude/x": false}}'):

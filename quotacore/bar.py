@@ -88,8 +88,8 @@ def report(snapshot, providers=None, window="session", now=None, visibility=None
             label = str(w.get("label") or w.get("id") or "Quota").replace("\n", " ")
             line = f"{label}: {text} · {reset}"
             all_windows.append({"label": label, "used_percent": used, "remaining": reset, "text": line, "kind": w.get("kind"), "hidden": bool(w.get("hidden_by_default")), "estimated": bool(w.get("estimated"))})
-        # Every usable window was hidden by choice, so "?" would read as a failure.
-        if hidden_pool and not all_windows:
+        # Every usable window was hidden by choice; drop non-error states so "?" is not read as a failure.
+        if hidden_pool and not all_windows and state in ("OK", "STALE"):
             continue
         selected = [w for w in all_windows if not w["hidden"] and (window == "both" and w["kind"] in ("session", "weekly") or w["kind"] == window)]
         bits = []
