@@ -2,6 +2,13 @@
 
 Notable changes are recorded here.
 
+## [0.2.1](https://github.com/Berkayr/ai-usage-widget/compare/v0.2.0...v0.2.1) (2026-11-28)
+
+
+### Bug Fixes
+
+* **footprint:** report unreadable PIDs and keep partial samples out of PSS ([ae9b118](https://github.com/Berkayr/ai-usage-widget/commit/ae9b118273c04cf8384613b7ed508f839711b8cf))
+
 ## [0.2.0](https://github.com/Berkayr/ai-usage-widget/compare/v0.1.0...v0.2.0) (2026-11-27)
 
 
