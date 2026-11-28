@@ -81,6 +81,24 @@ class LightnessBudgetTests(unittest.TestCase):
         self.assertEqual(len(budget_failures(result)), 3)
         self.assertEqual(len(budget_failures(result, appimage=True)), 2)
 
+    def test_partial_samples_stay_out_of_rss_and_pss_medians(self):
+        from scripts.footprint import idle_median
+        full = {'memory_bytes': 100, 'rss_bytes': 80, 'pss_bytes': 60, 'pids_skipped': 0}
+        partial = {'memory_bytes': 120, 'rss_bytes': 10, 'pss_bytes': 5, 'pids_skipped': 1}
+        self.assertEqual(idle_median([full, partial, dict(full)]), {'memory_bytes': 100, 'rss_bytes': 80, 'pss_bytes': 60})
+        self.assertEqual(idle_median([partial]), {'memory_bytes': 120, 'rss_bytes': None, 'pss_bytes': None})
+
+    def test_read_sample_counts_unreadable_pids(self):
+        from scripts.footprint import read_sample
+        with tempfile.TemporaryDirectory() as tmp:
+            group = Path(tmp)
+            (group / 'cgroup.procs').write_text(f'{os.getpid()}\n999999999\n')
+            (group / 'cpu.stat').write_text('usage_usec 5\n')
+            (group / 'memory.current').write_text('4096\n')
+            sample = read_sample(group)
+        self.assertEqual((sample['pids_total'], sample['pids_skipped']), (2, 1))
+        self.assertEqual(len(sample['processes']), 1)
+
     def test_bare_binary_resources_and_monitor_are_staged_before_launch(self):
         from scripts import footprint
         class Staged(Exception):
