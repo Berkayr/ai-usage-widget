@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def read_sample(group):
     pids = sorted({int(pid) for file in group.rglob('cgroup.procs') for pid in file.read_text().split()})
     processes = []
+    skipped = 0
     for pid in pids:
         try:
             proc = Path('/proc') / str(pid)
@@ -39,11 +40,12 @@ def read_sample(group):
                               'rss_bytes': int(mem['Rss'].split()[0]) * 1024,
                               'pss_bytes': int(mem['Pss'].split()[0]) * 1024, 'voluntary_switches': switches})
         except (OSError, KeyError, ValueError):
+            skipped += 1
             continue
     cpu = dict(line.split() for line in (group / 'cpu.stat').read_text().splitlines())
     return {'memory_bytes': int((group / 'memory.current').read_text()), 'cpu_usec': int(cpu['usage_usec']),
             'rss_bytes': sum(p['rss_bytes'] for p in processes), 'pss_bytes': sum(p['pss_bytes'] for p in processes),
-            'processes': processes}
+            'pids_total': len(pids), 'pids_skipped': skipped, 'processes': processes}
 
 
 def measure(binary, enabled, duration, monitor=None):
@@ -133,7 +135,9 @@ def measure(binary, enabled, duration, monitor=None):
                           'idle_cpu_seconds': (last['cpu_usec']-first['cpu_usec'])/1e6,
                           'idle_cpu_percent': (last['cpu_usec']-first['cpu_usec'])/1e4/(last['seconds']-first['seconds']),
                           'idle_voluntary_switches_delta_surviving_processes': switches,
-                          'idle_median': {k: statistics.median(s[k] for s in stable) for k in ('memory_bytes', 'rss_bytes', 'pss_bytes')},
+                          'idle_median': idle_median(stable),
+                          'sample_coverage': {'stable': len(stable), 'complete': sum(1 for s in stable if not s['pids_skipped']),
+                                              'skipped_pids': sum(s['pids_skipped'] for s in stable)},
                           'samples': samples}
                 result['budget_failures'] = budget_failures(result, binary.suffix.lower() == '.appimage')
                 return result
@@ -144,6 +148,15 @@ def measure(binary, enabled, duration, monitor=None):
                 except subprocess.TimeoutExpired:
                     child.kill()
                     child.wait()
+
+
+def idle_median(stable):
+    # A sample with an unreadable PID undercounts RSS/PSS, so only complete samples feed those medians.
+    complete = [s for s in stable if not s['pids_skipped']]
+    median = {'memory_bytes': statistics.median(s['memory_bytes'] for s in stable)}
+    for key in ('rss_bytes', 'pss_bytes'):
+        median[key] = statistics.median(s[key] for s in complete) if complete else None
+    return median
 
 
 def budget_failures(result, appimage=False):
